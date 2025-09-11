@@ -26,7 +26,7 @@ from ase.io.formats import IOFormat
 if TYPE_CHECKING:
     from ase.atoms import Atoms
 
-_I = TypeVar("_I")
+_I = TypeVar('_I')
 
 
 class MissingFunction(ValueError):
@@ -34,7 +34,8 @@ class MissingFunction(ValueError):
 
 
 class Plugin(metaclass=ABCMeta):
-    def __init__(self, *, name: str, metadata: dict[str, str] | None = None
+    def __init__(
+        self, *, name: str, metadata: dict[str, str] | None = None
     ) -> None:
         self.name = name
         self.metadata: dict[str, str] = metadata if metadata else {}
@@ -63,9 +64,9 @@ class Plugin(metaclass=ABCMeta):
         for _ in range(levels):
             frame = cls._f_back(frame)
 
-        module_name = frame.f_globals["__name__"]
+        module_name = frame.f_globals['__name__']
 
-        if module_name != "__main__":
+        if module_name != '__main__':
             return importlib.import_module(module_name)
 
         return None
@@ -75,7 +76,7 @@ class Plugin(metaclass=ABCMeta):
         """Wrap frame.f_back with a guarantee it won't return None"""
         f_back = frame.f_back
         if f_back is None:
-            raise ValueError("Could not determine module context")
+            raise ValueError('Could not determine module context')
         return f_back
 
     def display(self) -> str:
@@ -85,13 +86,13 @@ class Plugin(metaclass=ABCMeta):
             else self.module
         )
 
-        return f"{self.name:<20} ({module_name})"
+        return f'{self.name:<20} ({module_name})'
 
     @cached_property
     def package(self) -> str:
         if self.module:
-            return self.module.__name__.split(".")[0]
-        return ""
+            return self.module.__name__.split('.')[0]
+        return ''
 
     def package_data(self) -> PackageMetadata | None:
         if not self.package:
@@ -101,7 +102,7 @@ class Plugin(metaclass=ABCMeta):
     @singledispatchmethod
     @staticmethod
     def _resolve(implementation: str) -> Any:
-        modulename, classname = implementation.rsplit(".", maxsplit=1)
+        modulename, classname = implementation.rsplit('.', maxsplit=1)
         module = importlib.import_module(modulename)
         return getattr(module, classname)
 
@@ -157,14 +158,14 @@ class IOFormatPlugin(Plugin):
         super().__init__(name=name, metadata=metadata)
 
         if not any((reader, writer)):
-            raise ValueError("IOFormatPlugin must provide a reader or a writer")
+            raise ValueError('IOFormatPlugin must provide a reader or a writer')
 
         self.name = name
         self.description = description
 
         assert len(code) == 2
-        assert code[0] in list("+1")
-        assert code[1] in list("BFS")
+        assert code[0] in list('+1')
+        assert code[1] in list('BFS')
         self.code = code
 
         self._reader = reader
@@ -195,7 +196,7 @@ class IOFormatPlugin(Plugin):
         self, *args: list[Any], **kwargs: dict[str, Any]
     ) -> Atoms | Iterator[Atoms]:
         if not self.can_read:
-            raise ValueError("This plugin does not implement a reader")
+            raise ValueError('This plugin does not implement a reader')
         assert self._resolved_reader is not None
         return self._resolved_reader(*args, **kwargs)
 
@@ -207,7 +208,7 @@ class IOFormatPlugin(Plugin):
         **kwargs: dict[str, Any],
     ) -> None:
         if not self.can_write:
-            raise ValueError("This plugin does not implement a writer")
+            raise ValueError('This plugin does not implement a writer')
         assert self._resolved_writer is not None
         self._resolved_writer(filename, images, *args, **kwargs)
 
@@ -238,14 +239,14 @@ class IOFormatPlugin(Plugin):
 
     def match_magic(self, data: bytes) -> bool:
         if self.magic_regex:
-            assert not self.magic, "Define only one of magic and magic_regex"
+            assert not self.magic, 'Define only one of magic and magic_regex'
             match = re.match(self.magic_regex, data, re.M | re.S)
             return match is not None
 
         from fnmatch import fnmatchcase
 
         return any(
-            fnmatchcase(data, magic + b"*")  # type: ignore[operator, type-var]
+            fnmatchcase(data, magic + b'*')  # type: ignore[operator, type-var]
             for magic in self.magic
         )
 
@@ -289,7 +290,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
     def _legacy_function_loader(
         name: str,
         module_name: str,
-        prefix: Literal["read_", "write_"],
+        prefix: Literal['read_', 'write_'],
         error_message: str,
     ) -> Callable[[], Callable[..., Any]]:
         """Get specially-named function from a module, wrapped in Callable
@@ -299,7 +300,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
         """
 
         def func() -> Callable[..., Any]:
-            formatname = name.replace("-", "_")
+            formatname = name.replace('-', '_')
             module = importlib.import_module(module_name)
             legacy_function = getattr(module, prefix + formatname, None)
             if legacy_function is None:
@@ -319,13 +320,13 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
         reader = cls._legacy_function_loader(
             io_format.name,
             io_format.module_name,
-            "read_",
+            'read_',
             f"Can't read from {io_format.name}-format",
         )
         writer = cls._legacy_function_loader(
             io_format.name,
             io_format.module_name,
-            "write_",
+            'write_',
             f"Can't write to {io_format.name}-format",
         )
 
@@ -335,7 +336,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             code=io_format.code,
             reader=reader,
             writer=writer,
-            metadata={"note": "Imported from legacy IOFormat"} | metadata,
+            metadata={'note': 'Imported from legacy IOFormat'} | metadata,
             extensions=io_format.extensions,
             globs=io_format.globs,
             magic=io_format.magic,
@@ -355,14 +356,14 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
         reader = cls._legacy_function_loader(
             entry_point.name,
             entry_point.module,
-            "read_",
+            'read_',
             f"Can't read from {entry_point.name}-format",
         )
 
         writer = cls._legacy_function_loader(
             entry_point.name,
             entry_point.module,
-            "write_",
+            'write_',
             f"Can't write to {entry_point.name}-format",
         )
 
@@ -372,7 +373,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             code=fmt.code,
             reader=reader,
             writer=writer,
-            metadata={"note": "Imported from legacy ExternalIOFormat"},
+            metadata={'note': 'Imported from legacy ExternalIOFormat'},
             extensions=fmt.ext,
             globs=fmt.glob,
             magic=fmt.magic,

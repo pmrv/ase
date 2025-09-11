@@ -10,7 +10,7 @@ from typing_extensions import Self
 
 from .plugin import CalculatorPlugin, IOFormatPlugin, Plugin
 
-P = TypeVar("P", bound=Plugin, covariant=True)
+P = TypeVar('P', bound=Plugin, covariant=True)
 
 
 class PluginCollection(Collection[P]):
@@ -26,7 +26,7 @@ class PluginCollection(Collection[P]):
     be replaced if you have a really good reason to do so.
     """
 
-    _cached_properties = "by_package", "by_type"
+    _cached_properties = 'by_package', 'by_type'
 
     def __init__(self, plugins: Collection[P]) -> None:
         self.plugins = frozenset(plugins)
@@ -35,7 +35,7 @@ class PluginCollection(Collection[P]):
         super().__setattr__(name, value)
 
         """Invalidate cached properties"""
-        if name == "plugins":
+        if name == 'plugins':
             for attr in self._cached_properties:
                 self.__dict__.pop(attr, None)
 
@@ -55,10 +55,10 @@ class PluginCollection(Collection[P]):
         return (type(other) is type(self)) and other.plugins == self.plugins
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({repr(self.plugins)})"
+        return f'{self.__class__.__name__}({repr(self.plugins)})'
 
     @classmethod
-    def from_entry_points(cls, group: str = "ase.plugins") -> Self:
+    def from_entry_points(cls, group: str = 'ase.plugins') -> Self:
         """Instantiate collection from Plugins registered as entry points
 
         Note that if __ase_plugins__ is missing from a registered entry point,
@@ -69,7 +69,7 @@ class PluginCollection(Collection[P]):
         modules = (e_p.load() for e_p in group_entry_points)
         plugin_set: set[P] = set()
         for module in modules:
-            plugins: Collection[P] = getattr(module, "__ase_plugins__", set())
+            plugins: Collection[P] = getattr(module, '__ase_plugins__', set())
             plugin_set = plugin_set | set(plugins)
 
         return cls(plugin_set)
@@ -99,8 +99,9 @@ class PluginCollection(Collection[P]):
         and will include plugins that are subclasses. Any remaining plugin
         types will be listed separately.
         """
-        plugins_by_type: defaultdict[type[Plugin], set[Plugin]] \
-            = defaultdict(set)
+        plugins_by_type: defaultdict[type[Plugin], set[Plugin]] = defaultdict(
+            set
+        )
 
         for plugin in self.plugins:
             if isinstance(plugin, CalculatorPlugin):
@@ -110,44 +111,45 @@ class PluginCollection(Collection[P]):
             else:
                 plugins_by_type[type(plugin)].add(plugin)
 
-        plugincollections_by_type: dict[type[Plugin], PluginCollection[Plugin]]\
-            = (
-            {
-                # From Python 3.13 should be able to use type(self)[Plugin]
-                # (So far mypy doesn't like it...)
-                key: PluginCollection(plugin_set)
-                for key, plugin_set in plugins_by_type.items()
-            }
-        )
+        plugincollections_by_type: dict[
+            type[Plugin], PluginCollection[Plugin]
+        ] = {
+            # From Python 3.13 should be able to use type(self)[Plugin]
+            # (So far mypy doesn't like it...)
+            key: PluginCollection(plugin_set)
+            for key, plugin_set in plugins_by_type.items()
+        }
 
         # CalculatorPlugin and IOFormatPlugin groups should always be present
         # but may be empty collections.
         plugincollections_by_type.setdefault(
-            CalculatorPlugin, type(self)(set()))
-        plugincollections_by_type.setdefault(
-            IOFormatPlugin, type(self)(set()))
+            CalculatorPlugin, type(self)(set())
+        )
+        plugincollections_by_type.setdefault(IOFormatPlugin, type(self)(set()))
 
         return plugincollections_by_type
 
     @property
     def calculators(self) -> PluginCollection[CalculatorPlugin]:
         """Get a PluginCollection containing only CalculatorPlugins"""
-        return cast(PluginCollection[CalculatorPlugin],
-                    self.by_type[CalculatorPlugin])
+        return cast(
+            PluginCollection[CalculatorPlugin], self.by_type[CalculatorPlugin]
+        )
 
     @property
     def io_formats(self) -> PluginCollection[IOFormatPlugin]:
         """Get a PluginCollection containing only IOFormatPlugins"""
-        return cast(PluginCollection[IOFormatPlugin],
-                    self.by_type[IOFormatPlugin])
+        return cast(
+            PluginCollection[IOFormatPlugin], self.by_type[IOFormatPlugin]
+        )
 
     @staticmethod
     def _get_package(plugin: Plugin) -> str:
-        return plugin.__module__.split(".", maxsplit=1)[0]
+        return plugin.__module__.split('.', maxsplit=1)[0]
 
     @staticmethod
     def _is_plugin(item: Any) -> TypeGuard[Plugin]:
         return isinstance(item, Plugin)
 
     def display(self) -> str:
-        return "\n".join(sorted(plugin.display() for plugin in self))
+        return '\n'.join(sorted(plugin.display() for plugin in self))

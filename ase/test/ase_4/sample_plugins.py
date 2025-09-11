@@ -3,13 +3,12 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-from ase.io.formats import IOFormat
-
 from ase._4.plugins.plugin import (
     CalculatorPlugin,
     IOFormatPlugin,
     LegacyIOFormatPlugin,
 )
+from ase.io.formats import IOFormat
 
 if TYPE_CHECKING:
     from ase.calculators.lj import LennardJones
@@ -17,30 +16,33 @@ if TYPE_CHECKING:
 
 
 Metadata = dict[str, str]
-metadata: Metadata = {"project": "ase-plugin-demo", "authors": "ajjackson"}
+metadata: Metadata = {'project': 'ase-plugin-demo', 'authors': 'ajjackson'}
 
 # Calculator plugin using string to defer import
-emt_plugin = CalculatorPlugin(name="emt",
-                              metadata=metadata,
-                              implementation="ase.calculators.emt.EMT",
-                              )
+emt_plugin = CalculatorPlugin(
+    name='emt',
+    metadata=metadata,
+    implementation='ase.calculators.emt.EMT',
+)
 
 
 # Calculator plugin using function to defer import
 def get_lj_calc() -> type[LennardJones]:
     from ase.calculators.lj import LennardJones
+
     return LennardJones
 
 
 lj_plugin = CalculatorPlugin(
-             name="lj",
-             metadata=metadata | {"warning": "This is pretty basic"},
-             implementation=get_lj_calc,
+    name='lj',
+    metadata=metadata | {'warning': 'This is pretty basic'},
+    implementation=get_lj_calc,
 )
 
 
 def get_ase_io_format(name: str) -> IOFormat:
     from ase.io.formats import ioformats
+
     return ioformats[name]
 
 
@@ -50,7 +52,7 @@ class VaspCalculatorPlugin(CalculatorPlugin):
         super().__init__(
             name='vasp',
             implementation='',  # To be overriden
-            metadata=metadata
+            metadata=metadata,
         )
 
     @cached_property
@@ -67,31 +69,33 @@ class VaspCalculatorPlugin(CalculatorPlugin):
 vasp_plugin = VaspCalculatorPlugin(metadata)
 
 # IOFormat plugin created using __init__
-poscar_plugin = IOFormatPlugin(name="vasp",
-                               description="VASP POSCAR/CONTCAR",
-                               code="1F",
-                               extensions=["poscar"],
-                               globs=["*POSCAR*", "*CONTCAR*", "*CENTCAR*"],
-                               reader="ase.io.vasp.read_vasp",
-                               writer="ase.io.vasp.write_vasp")
+poscar_plugin = IOFormatPlugin(
+    name='vasp',
+    description='VASP POSCAR/CONTCAR',
+    code='1F',
+    extensions=['poscar'],
+    globs=['*POSCAR*', '*CONTCAR*', '*CENTCAR*'],
+    reader='ase.io.vasp.read_vasp',
+    writer='ase.io.vasp.write_vasp',
+)
 
 # IOFormat plugin converted from existing ASE setup
 extxyz_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
-    get_ase_io_format("extxyz"),
-    metadata=metadata)
+    get_ase_io_format('extxyz'), metadata=metadata
+)
 
 # A read-only format from existing ASE setup
 castep_castep_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
-    get_ase_io_format("castep-castep"),
-    metadata=metadata)
+    get_ase_io_format('castep-castep'), metadata=metadata
+)
 
 
 # Plugin creation wrapped by a function:
 # this shouldn't impact the module/file detection
 def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
     return LegacyIOFormatPlugin.from_legacy_io_format(
-        io_format=get_ase_io_format("dftb"),
-        metadata=metadata)
+        io_format=get_ase_io_format('dftb'), metadata=metadata
+    )
 
 
 __ase_plugins__ = {

@@ -5,4 +5,4 @@ from .plugin_collection import PluginCollection
 
 plugins: PluginCollection[Plugin] = PluginCollection.from_entry_points()
 
-__all__ = ["Plugin", "PluginCollection", "plugins"]
+__all__ = ['Plugin', 'PluginCollection', 'plugins']

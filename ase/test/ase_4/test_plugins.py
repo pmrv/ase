@@ -7,11 +7,11 @@ from pathlib import Path
 
 import pytest
 
-from ase import Atoms
-from ase._4.plugins.plugin import CalculatorPlugin
-from ase._4.plugins import PluginCollection
 import ase.test.ase_4.sample_plugins as sample_plugins
+from ase import Atoms
+from ase._4.plugins import PluginCollection
 from ase._4.plugins import plugins as auto_plugins
+from ase._4.plugins.plugin import CalculatorPlugin
 
 
 @pytest.fixture
@@ -24,47 +24,52 @@ def sample_calc_plugins():
 @pytest.fixture
 def sample_mixed_plugins():
     """Collection of two calculator plugins and one ioformat"""
-    return [sample_plugins.emt_plugin,
-            sample_plugins.lj_plugin,
-            sample_plugins.extxyz_plugin]
+    return [
+        sample_plugins.emt_plugin,
+        sample_plugins.lj_plugin,
+        sample_plugins.extxyz_plugin,
+    ]
 
 
 @pytest.fixture
 def two_instances_plugins():
     another_emt_plugin = CalculatorPlugin(
-        name="emt",
+        name='emt',
         metadata={},
-        implementation="ase.calculators.emt.EMT",
+        implementation='ase.calculators.emt.EMT',
     )
 
-    return [sample_plugins.emt_plugin,
-            sample_plugins.lj_plugin,
-            another_emt_plugin]
+    return [
+        sample_plugins.emt_plugin,
+        sample_plugins.lj_plugin,
+        another_emt_plugin,
+    ]
 
 
 @pytest.fixture
 def sample_atoms() -> Atoms:
     import ase.build
 
-    return ase.build.bulk("Au", cubic=True)
+    return ase.build.bulk('Au', cubic=True)
 
 
-@pytest.fixture(scope="module", params=[("POSCAR", "vasp"),
-                                        ("dftb_in.hsd", "dftb"),
-                                        ("tmp.xyz", "extxyz")])
+@pytest.fixture(
+    scope='module',
+    params=[('POSCAR', 'vasp'), ('dftb_in.hsd', 'dftb'), ('tmp.xyz', 'extxyz')],
+)
 def sample_file_and_format(request) -> tuple[Path, str]:
     filename, format_name = request.param
-    path = Path(__file__).parent / f"data/{filename}"
+    path = Path(__file__).parent / f'data/{filename}'
     return path, format_name
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def cat_plugin():
     from ase_entry_demo.plugin import Plugin
 
     class CatPlugin(Plugin): ...
 
-    return CatPlugin(name="Felix", metadata={"fur": "black"})
+    return CatPlugin(name='Felix', metadata={'fur': 'black'})
 
 
 def test_build_from_entry_points():
@@ -79,7 +84,8 @@ def test_display(sample_calc_plugins):
     assert PluginCollection(sample_calc_plugins).display() == textwrap.dedent(
         """\
         emt                  (ase.test.ase_4.sample_plugins)
-        lj                   (ase.test.ase_4.sample_plugins)""")
+        lj                   (ase.test.ase_4.sample_plugins)"""
+    )
 
 
 # def test_calculator_factory(sample_plugins, sample_atoms):
@@ -115,9 +121,7 @@ def test_cache_invalidation(sample_calc_plugins):
     new_calculators = plugins.calculators
     new_by_package = plugins.by_package
 
-    assert len(initial_by_package["ase"]) != len(
-        new_by_package["ase"]
-    )
+    assert len(initial_by_package['ase']) != len(new_by_package['ase'])
 
     assert len(initial_calculators) == 2
     assert len(new_calculators) == 1

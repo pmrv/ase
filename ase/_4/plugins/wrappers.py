@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import TYPE_CHECKING
-
 from ase._4.plugins.plugin import LegacyIOFormatPlugin
 from ase.io.formats import ioformats
 
