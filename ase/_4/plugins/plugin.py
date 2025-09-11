@@ -149,6 +149,7 @@ class IOFormatPlugin(Plugin):
             [], Callable[Concatenate[str | BinaryIO | TextIO, Atoms, ...], None]
         ]
         | None,
+        encoding: str | None = None,
         metadata: dict[str, str] | None = None,
         extensions: list[str] | None = None,
         globs: list[str] | None = None,
@@ -167,6 +168,7 @@ class IOFormatPlugin(Plugin):
         assert code[0] in list('+1')
         assert code[1] in list('BFS')
         self.code = code
+        self.encoding = encoding
 
         self._reader = reader
         self._writer = writer
@@ -334,6 +336,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             name=io_format.name,
             description=io_format.description,
             code=io_format.code,
+            encoding=io_format.encoding,
             reader=reader,
             writer=writer,
             metadata={'note': 'Imported from legacy IOFormat'} | metadata,

@@ -3,6 +3,12 @@
 # Note:
 # Try to avoid module level import statements here to reduce
 # import time during CLI execution
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from ase._4.plugins.plugin import IOFormatPlugin
 
 
 class CLICommand:
@@ -91,26 +97,57 @@ def print_info():
         print(f'{name:24} {path}')
 
 
+class IOFormatInfo:
+    """Provide methods for read-only info display of IOFormatPlugin"""
+    def __init__(self, io_plugin: IOFormatPlugin):
+        self._fmt = io_plugin
+
+    @property
+    def rw_modes(self) -> Literal['r', 'w', 'rw']:
+        return (f'{"r" if self._fmt.can_read else ""}'
+                f'{"w" if self._fmt.can_write else ""}')
+
+    @property
+    def single_or_multi(self) -> Literal['single', 'multi']:
+        if self._fmt.code[0] == '1':
+            return 'single'
+        return 'multi'
+
+    @property
+    def is_binary(self) -> bool:
+        if self._fmt.code[1] == 'B':
+            return True
+        return False
+
+    @property
+    def encoding(self) -> str | None:
+        return self._fmt.encoding
+
+    def info_string(self) -> str:
+        infos = [self.rw_modes, self.single_or_multi]
+
+        if self.is_binary:
+            infos.append('binary')
+        if self.encoding is not None:
+            infos.append(self.encoding)
+
+        return '/'.join(infos)
+
+
 def print_formats():
-    from ase.io.formats import ioformats
+    from operator import attrgetter
+
+    from ase._4.plugins import plugins
 
     print('Supported formats:')
-    for fmtname in sorted(ioformats):
-        fmt = ioformats[fmtname]
+    for fmt in sorted(plugins.io_formats, key=attrgetter("name")):
+        info = [IOFormatInfo(fmt).info_string()]
 
-        infos = [fmt.modes, 'single' if fmt.single else 'multi']
-        if fmt.isbinary:
-            infos.append('binary')
-        if fmt.encoding is not None:
-            infos.append(fmt.encoding)
-        infostring = '/'.join(infos)
-
-        moreinfo = [infostring]
         if fmt.extensions:
-            moreinfo.append('ext={}'.format('|'.join(fmt.extensions)))
+            info.append('ext={}'.format('|'.join(fmt.extensions)))
         if fmt.globs:
-            moreinfo.append('glob={}'.format('|'.join(fmt.globs)))
+            info.append('glob={}'.format('|'.join(fmt.globs)))
 
         print('  {} [{}]: {}'.format(fmt.name,
-                                     ', '.join(moreinfo),
+                                     ', '.join(info),
                                      fmt.description))
