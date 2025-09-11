@@ -102,36 +102,43 @@ class IOFormatInfo:
     def __init__(self, io_plugin: IOFormatPlugin):
         self._fmt = io_plugin
 
-    @property
+    def get_name(self) -> str:
+        return self._fmt.name
+
+    def get_description(self) -> str:
+        return self._fmt.description
+
     def rw_modes(self) -> Literal['r', 'w', 'rw']:
         return (f'{"r" if self._fmt.can_read else ""}'
                 f'{"w" if self._fmt.can_write else ""}')
 
-    @property
     def single_or_multi(self) -> Literal['single', 'multi']:
-        if self._fmt.code[0] == '1':
-            return 'single'
-        return 'multi'
+        return 'single' if self._fmt.code[0] == '1' else 'multi'
 
-    @property
     def is_binary(self) -> bool:
-        if self._fmt.code[1] == 'B':
-            return True
-        return False
+        return self._fmt.code[1] == 'B'
 
-    @property
     def encoding(self) -> str | None:
         return self._fmt.encoding
 
-    def info_string(self) -> str:
-        infos = [self.rw_modes, self.single_or_multi]
+    def __str__(self) -> str:
+        rw_info = [self.rw_modes(), self.single_or_multi()]
 
-        if self.is_binary:
-            infos.append('binary')
-        if self.encoding is not None:
-            infos.append(self.encoding)
+        if self.is_binary():
+            rw_info.append('binary')
+        if (encoding := self.encoding()) is not None:
+            rw_info.append(encoding)
 
-        return '/'.join(infos)
+        info = ['/'.join(rw_info)]
+
+        if self._fmt.extensions:
+            info.append('ext={}'.format('|'.join(self._fmt.extensions)))
+        if self._fmt.globs:
+            info.append('glob={}'.format('|'.join(self._fmt.globs)))
+
+        return ('  {} [{}]: {}'.format(self.get_name(),
+                                       ', '.join(info),
+                                       self.get_description()))
 
 
 def print_formats():
@@ -141,13 +148,4 @@ def print_formats():
 
     print('Supported formats:')
     for fmt in sorted(plugins.io_formats, key=attrgetter("name")):
-        info = [IOFormatInfo(fmt).info_string()]
-
-        if fmt.extensions:
-            info.append('ext={}'.format('|'.join(fmt.extensions)))
-        if fmt.globs:
-            info.append('glob={}'.format('|'.join(fmt.globs)))
-
-        print('  {} [{}]: {}'.format(fmt.name,
-                                     ', '.join(info),
-                                     fmt.description))
+        print(IOFormatInfo(fmt))
