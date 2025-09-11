@@ -88,28 +88,6 @@ def test_display(sample_calc_plugins):
     )
 
 
-# def test_calculator_factory(sample_plugins, sample_atoms):
-#     from ase_entry_demo.factories import calculator_factory
-
-#     good_collection = PluginCollection(sample_plugins)
-#     emt_calculator = calculator_factory("emt", plugins=good_collection)
-#     sample_atoms.calc = emt_calculator()
-#     sample_atoms.get_potential_energy()
-
-
-# def test_calculator_factory_warning(two_instances_plugins, sample_atoms):
-#     from ase_entry_demo.factories import calculator_factory
-
-#     redundant_collection = PluginCollection(two_instances_plugins)
-#     with pytest.warns(UserWarning):
-#         first_emt_calculator = calculator_factory(
-#             "emt", plugins=redundant_collection
-#         )
-
-#     sample_atoms.calc = first_emt_calculator()
-#     sample_atoms.get_potential_energy()
-
-
 def test_cache_invalidation(sample_calc_plugins):
     plugins = PluginCollection(sample_calc_plugins)
 
@@ -127,79 +105,8 @@ def test_cache_invalidation(sample_calc_plugins):
     assert len(new_calculators) == 1
 
 
-# def test_read_function(sample_file_and_format):
-#     from ase_entry_demo.factories import read
-
-#     sample_file, file_format = sample_file_and_format
-
-#     atoms = read(sample_file)
-#     assert len(atoms) == 4
-
-#     atoms = read(sample_file, format_name=file_format)
-#     assert len(atoms) == 4
-
-
 def test_missing_writer():
     from .sample_plugins import castep_castep_plugin
 
     assert castep_castep_plugin.can_read
     assert not castep_castep_plugin.can_write
-
-
-# def _compare_plugins_by_category_with_expected(plugins: PluginCollection,
-#                                                expected: str):
-#     from io import StringIO
-
-#     from ase_entry_demo.info import print_plugins_by_category
-
-#     buffer = StringIO()
-#     print_plugins_by_category(plugins, file=buffer)
-
-#     buffer.seek(0)
-#     assert buffer.read() == expected
-
-
-# def test_print_calculators_by_category(sample_plugins):
-#     _compare_plugins_by_category_with_expected(
-#         PluginCollection(sample_plugins),
-#         """\
-# Calculator plugins:
-# -------------------
-# emt                  (ase_entry_demo.wrappers)
-# lj                   (ase_entry_demo.wrappers)
-
-# """)
-
-
-# def test_print_all_categories(sample_mixed_plugins, cat_plugin):
-#     _compare_plugins_by_category_with_expected(
-#         PluginCollection(sample_mixed_plugins),
-#         """\
-# Calculator plugins:
-# -------------------
-# emt                  (ase_entry_demo.wrappers)
-# lj                   (ase_entry_demo.wrappers)
-
-# IO plugins:
-# -----------
-# extxyz               (ase_entry_demo.wrappers)
-
-# """)
-
-#     _compare_plugins_by_category_with_expected(
-#         PluginCollection(sample_mixed_plugins + [cat_plugin]),
-#         """\
-# Calculator plugins:
-# -------------------
-# emt                  (ase_entry_demo.wrappers)
-# lj                   (ase_entry_demo.wrappers)
-
-# IO plugins:
-# -----------
-# extxyz               (ase_entry_demo.wrappers)
-
-# CatPlugin:
-# ----------
-# Felix                (_pytest.fixtures)
-
-# """)
