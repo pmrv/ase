@@ -5,7 +5,7 @@
 # import time during CLI execution
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ase._4.plugins.plugin import IOFormatPlugin
@@ -108,11 +108,12 @@ class IOFormatInfo:
     def get_description(self) -> str:
         return self._fmt.description
 
-    def rw_modes(self) -> Literal['r', 'w', 'rw']:
+    def rw_modes(self) -> str:
+        "Get rw mode '', 'r', 'w' or 'rw'"
         return (f'{"r" if self._fmt.can_read else ""}'
-                f'{"w" if self._fmt.can_write else ""}')
+                 f'{"w" if self._fmt.can_write else ""}')
 
-    def single_or_multi(self) -> Literal['single', 'multi']:
+    def single_or_multi(self) -> str:
         return 'single' if self._fmt.code[0] == '1' else 'multi'
 
     def is_binary(self) -> bool:
