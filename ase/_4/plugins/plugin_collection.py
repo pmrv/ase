@@ -8,8 +8,8 @@ from typing import Any, TypeGuard, TypeVar, cast
 
 from typing_extensions import Self
 
-from .plugin import CalculatorPlugin, Plugin
 from .io import IOFormatPlugin
+from .plugin import CalculatorPlugin, Plugin
 
 P = TypeVar('P', bound=Plugin, covariant=True)
 

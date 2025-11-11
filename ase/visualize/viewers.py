@@ -44,7 +44,7 @@ from ase.utils.plugins import ExternalViewer
 
 
 class UnknownViewerError(Exception):
-    """The view type is unknown"""
+    """The view tyep is unknown"""
 
 
 class AbstractViewer:
@@ -53,7 +53,7 @@ class AbstractViewer:
 
 
 class PyViewer(AbstractViewer):
-    def __init__(self, name: str, desc: str, module_name: str):
+    def __init__(self, name: str, desc: str, module_name: str | None):
         """
         Instantiate an viewer
         """
