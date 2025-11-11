@@ -44,7 +44,7 @@ from ase.utils.plugins import ExternalViewer
 
 
 class UnknownViewerError(Exception):
-    """The view tyep is unknown"""
+    """The view type is unknown"""
 
 
 class AbstractViewer:
