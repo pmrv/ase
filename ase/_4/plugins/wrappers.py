@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ase._4.plugins.plugin import LegacyIOFormatPlugin
+from ase._4.plugins.io import LegacyIOFormatPlugin
 from ase.io.formats import ioformats
 
 wrapped_ioformats = {

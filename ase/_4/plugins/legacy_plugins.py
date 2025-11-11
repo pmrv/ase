@@ -5,7 +5,7 @@ From there they are exposed to the new plugin system
 
 from importlib.metadata import entry_points
 
-from .plugin import LegacyIOFormatPlugin
+from .io import LegacyIOFormatPlugin
 
 legacy_entry_points = entry_points(group='ase.ioformats')
 

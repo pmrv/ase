@@ -3,8 +3,8 @@ from __future__ import annotations
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-from ase._4.plugins.plugin import (
-    CalculatorPlugin,
+from ase._4.plugins.plugin import CalculatorPlugin
+from ase._4.plugins.io import (
     IOFormatPlugin,
     LegacyIOFormatPlugin,
 )
