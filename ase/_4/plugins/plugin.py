@@ -5,7 +5,7 @@ import inspect
 from abc import ABCMeta
 from collections.abc import Callable
 from functools import cached_property, singledispatchmethod
-from importlib.metadata import PackageMetadata, metadata
+from importlib.metadata import metadata
 from types import FrameType, ModuleType
 from typing import (
     TYPE_CHECKING,
@@ -19,6 +19,8 @@ from ase.calculators.calculator import BaseCalculator
 from ase.visualize.viewers import AbstractViewer
 
 if TYPE_CHECKING:
+    from importlib.metadata import EntryPoint, PackageMetadata
+
     from ase.utils.plugins import ExternalViewer
 
 _I = TypeVar('_I')
@@ -193,3 +195,17 @@ class LegacyViewerPlugin(ViewerPlugin):
             implementation=(lambda: implementation),
             metadata=metadata,
         )
+
+    @classmethod
+    def from_legacy_entry_point(
+        cls,
+        entry_point: EntryPoint,
+    ) -> Self:
+        external_viewer = entry_point.load()
+        if not isinstance(external_viewer, ExternalViewer):
+            raise TypeError(
+                "Wrong type for registering external IO formats "
+                f"in format {entry_point.name}, expected "
+                "ExternalViewer"
+            )
+        return cls.from_externalviewer(entry_point.name, external_viewer)
