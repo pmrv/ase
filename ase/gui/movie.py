@@ -51,7 +51,6 @@ class Movie:
 
         self.gui = gui
         self.direction = 1
-        self.timer = None
         gui.obs.new_atoms.register(self.close)
 
     def close(self):
@@ -78,11 +77,11 @@ class Movie:
     def play(self):
         self.stop()
         t = 1 / self.time.value
-        self.timer = self.gui.window.after(t, self.step)
+        self.gui.movie_timer = self.gui.window.after(t, self.step)
 
     def stop(self):
-        if self.timer is not None:
-            self.timer.cancel()
+        if self.gui.movie_timer is not None:
+            self.gui.movie_timer.cancel()
 
     def step(self):
         i = self.gui.frame
@@ -108,7 +107,6 @@ class MovieToolbar:
 
         self.gui = gui
         self.direction = 1
-        self.timer = None
 
         tkframe = ttk.Frame(parent, relief='raised', borderwidth=1)
         self.tkframe = tkframe
@@ -231,11 +229,11 @@ class MovieToolbar:
     def play(self):
         self.stop()
         t = 1 / 24
-        self.timer = self.gui.window.after(t, self.step)
+        self.gui.movie_timer = self.gui.window.after(t, self.step)
 
     def stop(self):
-        if self.timer is not None:
-            self.timer.cancel()
+        if self.gui.movie_timer is not None:
+            self.gui.movie_timer.cancel()
 
     def step(self):
         framenum = self.gui.frame
