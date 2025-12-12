@@ -325,6 +325,7 @@ def test_surface(gui):
 
 
 def test_movie(animation):
+    animation.movie()
     movie = animation.movie_window
     assert movie is not None
 
