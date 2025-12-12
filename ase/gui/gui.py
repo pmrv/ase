@@ -28,6 +28,7 @@ from ase.gui.view import View
 
 class GUIObservers:
     def __init__(self):
+        self.new_images = Observers()
         self.new_atoms = Observers()
         self.set_atoms = Observers()
         self.change_atoms = Observers()
@@ -52,6 +53,16 @@ class GUI(View):
         # Ordinary observers seem unused now, delete?
         self.observers = []
         self.obs = GUIObservers()
+
+        if not isinstance(images, Images):
+            images = Images(
+                images, notify_new_images=self.obs.new_images.notify
+            )
+
+        # Not always logical to go to last frame but it's more consistent
+        # than if we don't do anything.
+        self.obs.new_images.register(self.goto_last_frame)
+        self.images = images
 
         self.config = read_defaults()
         if show_bonds:
@@ -81,7 +92,7 @@ class GUI(View):
         self.arrowkey_mode = self.ARROWKEY_SCAN
         self.move_atoms_mask = None
 
-        self.set_frame(len(self.images) - 1, focus=True)
+        self.goto_last_frame()
 
         # Used to move the structure with the mouse
         self.prev_pos = None
@@ -89,6 +100,9 @@ class GUI(View):
         self.orig_scale = self.scale
 
         self._caller_expr = expr
+
+    def goto_last_frame(self):
+        self.set_frame(len(self.images) - 1, focus=True)
 
     def plot_graph_standard(self):
         expr = self._caller_expr
