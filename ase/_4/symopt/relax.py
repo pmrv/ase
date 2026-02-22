@@ -777,9 +777,6 @@ class Relax:
 
         return True
 
-    def __ase_optimizable__(self):
-        return self
-
     def visualize_modes(self):
         from ase.io.trajectory import Trajectory
 
