@@ -11,6 +11,7 @@ from ase._4.symopt.relax_print import (
     pretty_header,
     pretty_subheader,
 )
+from ase.utils.abc import Optimizable
 
 
 def green(text: str) -> str:
@@ -445,7 +446,7 @@ class SymmetryAdaptedScaledCoordinates:
         return sasc
 
 
-class SymmetryAdaptedAtoms:
+class SymmetryAdaptedAtoms(Optimizable):
     """Implementation of symmetry adapted atoms
 
     Symmetry adapted atoms WILL symmetrize the actual_atoms given to init.
@@ -527,9 +528,6 @@ class SymmetryAdaptedAtoms:
             log=log,
         )
         return cls(atoms, symmetries, log=log)
-
-    def __ase_optimizable__(self):
-        return self
 
     @property
     def stress_conv(self):
