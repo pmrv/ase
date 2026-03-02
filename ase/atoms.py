@@ -1108,6 +1108,9 @@ class _LimitedAtoms:
 
         # Optionally, translate to center about a point in space.
         if about is not None:
+            # Convert scalar to a 3-element array to prevent subscriptable error
+            if np.isscalar(about):
+                about = [about] * 3
             for n, vector in enumerate(self.cell):
                 if n in axes:
                     translation -= vector / 2.0
