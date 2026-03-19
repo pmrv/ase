@@ -64,6 +64,8 @@ Supported :mod:`Calculators <ase.calculators>`
 News
 ====
 
+* :ref:`ASE version 3.28.0 <releasenotes>` released (17 March 2026).
+
 * :ref:`ASE version 3.27.0 <releasenotes>` released (28 December 2025).
 
 * :ref:`ASE version 3.26.0 <releasenotes>` released (12 August 2025).
@@ -201,7 +203,6 @@ Contents
     install
     examples_generated/index
     gettingstarted/gettingstarted
-    tutorials/tutorials
     ase/ase
     cmdline
     tips
@@ -209,6 +210,7 @@ Contents
     releasenotes
     contact
     ecosystem
+    committee
     development/development
     faq
     events/events
