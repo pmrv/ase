@@ -13,7 +13,8 @@ def numerical_chol_derivative(A, dA, eps=1e-10):
 def test_chol_derivative():
     for i in range(10):
         # Create a random positive definite matrix
-        A = np.random.rand(3, 3)
+        rng = np.random.RandomState(42 + i)
+        A = rng.random((3, 3))
         A = A @ A.T
 
         # Create a random perturbation
