@@ -562,7 +562,24 @@ class SymmetryAdaptedAtoms(Optimizable):
             self.atom_coordinates.get_scaled_coordinates(self.atoms_z)
         )
 
-    def get_gradient(self):
+    def get_Fback_av(self, F_av, C_cv, atoms_grad_z):
+        natomz = len(self.atom_coordinates.dof_zac)
+        # For sanity check, we want to project the atomic gradient back
+        # minimizing the Cartesian metrix.
+        if natomz > 0:
+            dof_zX = np.einsum(
+                'cv,zac->zav', C_cv, self.atom_coordinates.dof_zac
+            ).reshape((natomz, -1))
+            back_Fav = -(
+                dof_zX.T @ np.linalg.inv(dof_zX @ dof_zX.T) @ atoms_grad_z
+            ).reshape(F_av.shape)
+        else:
+            # Even if there is degrees of freedom, it is possible to
+            # get symmetry violation
+            back_Fav = np.zeros_like(F_av)
+        return back_Fav
+
+    def _get_gradient(self):
         grad_z = np.zeros(self._ndofs_cell)
         S_vv = self.actual_atoms.get_stress(voigt=False)
         C_cv = self.cell_coordinates.get_cell(self.cell_z)
@@ -586,38 +603,25 @@ class SymmetryAdaptedAtoms(Optimizable):
         # dE/ds_z = dE/dR_av dR_av/ds_ac ds_ac/ds_z
         # R_av = ds_ac C_cv
         # ds_ac = self.dof_zac S_z
+
         atoms_grad_z = -np.einsum(
             'av,cv,zac->z', F_av, C_cv, self.atom_coordinates.dof_zac
         )
 
-        natomz = len(self.atom_coordinates.dof_zac)
-        # For sanity check, we want to project the atomic gradient back
-        # minimizing the Cartesian metrix.
-        if natomz > 0:
-            dof_zX = np.einsum(
-                'cv,zac->zav', C_cv, self.atom_coordinates.dof_zac
-            ).reshape((natomz, -1))
-            back_Fav = -(
-                dof_zX.T @ np.linalg.inv(dof_zX @ dof_zX.T) @ atoms_grad_z
-            ).reshape(F_av.shape)
-        else:
-            # Even if there is degrees of freedom, it is possible to
-            # get symmetry violation
-            back_Fav = np.zeros_like(F_av)
+        back_Fav = self.get_Fback_av(F_av, C_cv, atoms_grad_z)
 
         dF_av = F_av - back_Fav
-        dF = np.max(np.linalg.norm(dF_av, axis=1))
-        self.symmetry_force_violation = dF
-        self.back_Fav = back_Fav
+        symmetry_force_violation = np.max(np.linalg.norm(dF_av, axis=1))
 
-        if dF > self.fmax / 20:
+        if symmetry_force_violation > self.fmax / 20:
             # Should probably be logged somehow instead of being a warning
             # as such.  This may happen if the code's forces are noisy.
             import warnings
 
             warning_chunks = [
                 'Warning!!! Back projection of symmetry adapted'
-                f' forces to Cartesian space failed by {dF:7.13f}\n'
+                ' forces to Cartesian space failed by '
+                f'{symmetry_force_violation:7.13f}\n'
                 'atom Obtained force           Back projected force'
             ]
 
@@ -629,7 +633,17 @@ class SymmetryAdaptedAtoms(Optimizable):
 
             warnings.warn('\n'.join(warning_chunks))
 
-        return np.hstack([grad_z, atoms_grad_z])
+        return dict(
+            gradient=np.hstack([grad_z, atoms_grad_z]),
+            symmetry_force_violation=symmetry_force_violation,
+            back_Fav=back_Fav,
+        )
+
+    def get_gradient(self):
+        grad_obj = self._get_gradient()
+        self.back_Fav = grad_obj['back_Fav']
+        self.symmetry_force_violation = grad_obj['symmetry_force_violation']
+        return grad_obj['gradient']
 
     def gradient_norm(self, grad_z):
         # Go actually to cell metric
