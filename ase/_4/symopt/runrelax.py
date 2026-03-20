@@ -15,7 +15,7 @@ def main():
 
         url = f'https://c2db.fysik.dtu.dk/material/{argv[1]}/download/xyz'
         print(url)
-        request = requests.get(url)
+        request = requests.get(url)  # type: ignore
         with open('atoms.xyz', 'wb') as f:
             f.write(request.content)
         print('Written to atoms.xyz')
