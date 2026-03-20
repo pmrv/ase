@@ -579,6 +579,17 @@ class SymmetryAdaptedAtoms(Optimizable):
             back_Fav = np.zeros_like(F_av)
         return back_Fav
 
+    def get_Sback_vv(self, S_vv, A_zV, grad_z):
+        ncellz = len(A_zV)
+        if ncellz > 0:
+            return (
+                A_zV.T @ np.linalg.inv(A_zV @ A_zV.T) @ grad_z
+            ).reshape((3, 3))
+
+        # Even if there are no cell degrees of freedom, the stress can
+        # still violate the imposed symmetry in Cartesian space.
+        return np.zeros((3, 3))
+
     def _get_gradient(self):
         grad_z = np.zeros(self._ndofs_cell)
         S_vv = self.actual_atoms.get_stress(voigt=False)
@@ -592,12 +603,31 @@ class SymmetryAdaptedAtoms(Optimizable):
         # dE/deps_vv deps_vv/dC_cv dC_cv/dz
 
         ncellz = len(self.cell_coordinates.dM_zcc)
+        A_zV = np.zeros((ncellz, 9))
         for z in range(ncellz):
             dC_cv = (
                 chol_derivative(M_cc, self.cell_coordinates.dM_zcc[z])
                 @ self.cell_coordinates.rot_vv.T
             )
-            grad_z[z] = V * np.sum(S_vv * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2)
+            A_zV[z] = (
+                V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2
+            ).reshape((9,))
+
+        grad_z[:] = np.dot(A_zV, S_vv.reshape((9,)))
+        back_Svv = self.get_Sback_vv(S_vv, A_zV, grad_z)
+        dS_vv = S_vv - back_Svv
+        symmetry_stress_violation = np.linalg.norm(dS_vv)
+
+        if symmetry_stress_violation > self.smax:
+            import warnings
+
+            warnings.warn(
+                'Warning!!! Back projection of symmetry adapted '
+                'stresses to Cartesian space failed by '
+                f'{symmetry_stress_violation:7.13f}\n'
+                f'Cartesian stress:\n{S_vv}\n'
+                f'Back projected stress:\n{back_Svv}'
+            )
 
         F_av = self.actual_atoms.get_forces()
         # dE/ds_z = dE/dR_av dR_av/ds_ac ds_ac/ds_z
@@ -635,14 +665,18 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         return dict(
             gradient=np.hstack([grad_z, atoms_grad_z]),
+            back_Svv=back_Svv,
             symmetry_force_violation=symmetry_force_violation,
+            symmetry_stress_violation=symmetry_stress_violation,
             back_Fav=back_Fav,
         )
 
     def get_gradient(self):
         grad_obj = self._get_gradient()
         self.back_Fav = grad_obj['back_Fav']
+        self.back_Svv = grad_obj['back_Svv']
         self.symmetry_force_violation = grad_obj['symmetry_force_violation']
+        self.symmetry_stress_violation = grad_obj['symmetry_stress_violation']
         return grad_obj['gradient']
 
     def gradient_norm(self, grad_z):
@@ -741,7 +775,8 @@ class Relax:
         )
         self.log(
             f'iter  time     E           maxF   maxS     maxG   a1    a2'
-            f'    a3    L1      L2       L3     {dtitles}   log_10 viol.'
+            f'    a3    L1      L2       L3     {dtitles}'
+            '   log_10 viol. (F / S)'
         )
         for _ in self.optimizer.irun(fmax=fmax):
             import time
@@ -778,9 +813,15 @@ class Relax:
             symviol = f'{syviol:4.1f}'
             if syviol < self.fmax:
                 symviol = green(symviol)
+            syviol2 = np.log10(
+                self.symmetry_adapted_atoms.symmetry_stress_violation
+            )
+            symviol2 = f'{syviol2:4.1f}'
+            if syviol2 < self.smax:
+                symviol2 = green(symviol2)
             self.log(
                 f'{i:5d} {tstr} {E:9.5f} {sFmax} {sSmax} {gmax:7.3f}'
-                f' {cell}{dofs} {symviol}'
+                f' {cell}{dofs} {symviol} {symviol2}'
             )
             i += 1
             if i > self.maxiter or i > 40:
