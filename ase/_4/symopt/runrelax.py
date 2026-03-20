@@ -11,11 +11,11 @@ def main():
     # Wurtzite, distorted structure, nice logging, quick convergence
 
     if world.rank == 0:
-        import requests
+        import requests  # type: ignore[import-untyped]
 
         url = f'https://c2db.fysik.dtu.dk/material/{argv[1]}/download/xyz'
         print(url)
-        request = requests.get(url)  # type: ignore
+        request = requests.get(url)
         with open('atoms.xyz', 'wb') as f:
             f.write(request.content)
         print('Written to atoms.xyz')
