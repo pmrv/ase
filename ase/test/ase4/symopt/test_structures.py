@@ -34,6 +34,7 @@ def system(request):
 
 
 def test_symmetry_constrained_relaxation_emt(system):
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     symbol, atoms_ref = system
     atoms_ref = atoms_ref.copy()
     atoms = atoms_ref.copy()

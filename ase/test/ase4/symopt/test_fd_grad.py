@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from ase._4.symopt.relax import Relax
 from ase.build import bulk
@@ -19,6 +20,7 @@ def test_generalized_coordinate_units():
     |deps| = |dz(cell)|  (Cell strain)
 
     """
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     atoms = bulk('AuAg', crystalstructure='wurtzite', a=3.24, c=5.20)
     print(atoms.cell.volume, 'SCALE')
     relax = Relax(
@@ -65,6 +67,7 @@ def test_generalized_coordinate_units():
 
 
 def test_fd_gradients():
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     atoms = bulk('AuAg', crystalstructure='wurtzite', a=3.24, c=5.20)
     relax = Relax(
         atoms=atoms,
