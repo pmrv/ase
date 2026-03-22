@@ -9,8 +9,10 @@ class SymGradient:
     gradient: np.ndarray
     loginfo: Callable
     converged: bool
-    Fback_av: np.ndarray
-    Sback_vv: np.ndarray
+    backF_av: np.ndarray
+    backS_vv: np.ndarray
+    symmetry_force_violation: float
+    symmetry_stress_violation: float
 
 
 class SymOpt:
@@ -41,13 +43,12 @@ class SymOpt:
         return self.symmatoms.get_value()
 
     def get_gradient(self):
-        gradient = self.symmatoms.get_gradient()
-        converged = self.symmatoms.converged(gradient, self.fmax)
+        gradient = self.symmatoms._get_gradient()
 
         def loginfo():
             return {'hello': 42}
 
-        return SymGradient(gradient, loginfo=loginfo, converged=converged)
+        return SymGradient(loginfo=loginfo, **gradient)
 
     def get_x(self):
         return self.symmatoms.get_x()

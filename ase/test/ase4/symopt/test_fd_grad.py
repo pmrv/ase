@@ -30,6 +30,10 @@ def test_generalized_coordinate_units():
         symprec=0.01,
         comm=world,
     )
+    # XXX remove me:
+    relax.symmetry_adapted_atoms.fmax = 1e-6
+    relax.symmetry_adapted_atoms.smax = 1e-6
+
     optimizable = relax.symmetry_adapted_atoms.__ase_optimizable__()
     for z in range(3):
         vec = np.zeros((3,))
@@ -76,6 +80,8 @@ def test_fd_gradients():
         symprec=0.01,
         comm=world,
     )
+    relax.symmetry_adapted_atoms.fmax = 1e-6  # XXX remove me
+    relax.symmetry_adapted_atoms.smax = 1e-6
     optimizable = relax.symmetry_adapted_atoms.__ase_optimizable__()
     for z in range(3):
         vec = np.zeros((3,))

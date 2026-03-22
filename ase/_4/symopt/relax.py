@@ -582,9 +582,9 @@ class SymmetryAdaptedAtoms(Optimizable):
     def get_Sback_vv(self, S_vv, A_zV, grad_z):
         ncellz = len(A_zV)
         if ncellz > 0:
-            return (
-                A_zV.T @ np.linalg.inv(A_zV @ A_zV.T) @ grad_z
-            ).reshape((3, 3))
+            return (A_zV.T @ np.linalg.inv(A_zV @ A_zV.T) @ grad_z).reshape(
+                (3, 3)
+            )
 
         # Even if there are no cell degrees of freedom, the stress can
         # still violate the imposed symmetry in Cartesian space.
@@ -609,9 +609,7 @@ class SymmetryAdaptedAtoms(Optimizable):
                 chol_derivative(M_cc, self.cell_coordinates.dM_zcc[z])
                 @ self.cell_coordinates.rot_vv.T
             )
-            A_zV[z] = (
-                V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2
-            ).reshape((9,))
+            A_zV[z] = (V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2).reshape((9,))
 
         grad_z[:] = np.dot(A_zV, S_vv.reshape((9,)))
         back_Svv = self.get_Sback_vv(S_vv, A_zV, grad_z)
@@ -663,18 +661,21 @@ class SymmetryAdaptedAtoms(Optimizable):
 
             warnings.warn('\n'.join(warning_chunks))
 
+        converged = self._converged(back_Fav, self.fmax, back_Svv, self.smax)
+
         return dict(
             gradient=np.hstack([grad_z, atoms_grad_z]),
-            back_Svv=back_Svv,
+            backF_av=back_Fav,
+            backS_vv=back_Svv,
             symmetry_force_violation=symmetry_force_violation,
             symmetry_stress_violation=symmetry_stress_violation,
-            back_Fav=back_Fav,
+            converged=converged,
         )
 
     def get_gradient(self):
         grad_obj = self._get_gradient()
-        self.back_Fav = grad_obj['back_Fav']
-        self.back_Svv = grad_obj['back_Svv']
+        self.back_Fav = grad_obj['backF_av']
+        self.back_Svv = grad_obj['backS_vv']
         self.symmetry_force_violation = grad_obj['symmetry_force_violation']
         self.symmetry_stress_violation = grad_obj['symmetry_stress_violation']
         return grad_obj['gradient']
@@ -692,8 +693,16 @@ class SymmetryAdaptedAtoms(Optimizable):
     def converged(self, gradient, fmax):
         # Convergence needs to be from the back projected forces.
         # The symmetry violating forces will never converge.
-        Fconv = np.max(np.linalg.norm(self.back_Fav, axis=1))
-        return Fconv < self.fmax and self.stress_conv < self.smax
+        return self._converged(
+            backF_av=self.back_Fav,
+            fmax=self.fmax,
+            smax=self.smax,
+            backS_av=self.stress_conv,
+        )  # XXX use backS_av
+
+    def _converged(self, backF_av, fmax, backS_av, smax):
+        Fconv = np.max(np.linalg.norm(backF_av, axis=1))
+        return Fconv < fmax and abs(backS_av).max() < smax
 
     @property
     def atoms_z(self):
