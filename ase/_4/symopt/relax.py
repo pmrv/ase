@@ -613,7 +613,16 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         grad_z[:] = np.dot(A_zV, S_vv.reshape((9,)))
         back_Svv = self.get_Sback_vv(S_vv, A_zV, grad_z)
-        dS_vv = S_vv - back_Svv
+
+        def get_mask_3x3(pbc):
+            from ase._4.optimize.frechet import default_mask
+            from ase.stress import voigt_6_to_full_3x3_stress
+            mask_6 = default_mask(pbc)
+            return voigt_6_to_full_3x3_stress(mask_6)
+
+        mask_3x3 = get_mask_3x3(self.actual_atoms.pbc)
+
+        dS_vv = S_vv * mask_3x3 - back_Svv
         symmetry_stress_violation = np.linalg.norm(dS_vv)
 
         if symmetry_stress_violation > self.smax:
