@@ -319,11 +319,11 @@ class SymmeryAdaptedCellCoordinates:
             rows = []
             for k in range(6):
                 row = U_vv @ eps_ijk[:, :, k] @ U_vv.T - eps_ijk[:, :, k]
-                rows.append(row.reshape((9,)))
+                rows.append(row.reshape(9))
             A_blocks.append(np.vstack(rows))
         for c in range(3):
             if not pbc_c[c]:
-                A_blocks.append(e(c, c).reshape((9,)))
+                A_blocks.append(e(c, c).reshape(9))
         A = np.vstack(A_blocks)
         A = A @ eps_ijk.reshape((9, 6))
         # Compute null space via SVD
@@ -399,10 +399,6 @@ class SymmetryAdaptedScaledCoordinates:
         for a in range(na):
             B_A[(a * 3) : (a * 3 + 3), :] = np.eye(3)
         B_EA = np.vstack([B_EA, B_A.T])
-        # import sympy as sp
-
-        # nullspace = np.array(sp.Matrix(np.array(B_EA,
-        # dtype=int)).nullspace(), dtype=float)
 
         # Make sure the old svd code reproduces the same result
         U, S, Vh = np.linalg.svd(B_EA, False)
@@ -441,9 +437,7 @@ class SymmetryAdaptedScaledCoordinates:
             ]
             # minimize_l1(dof_zac)
 
-        sasc = SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
-
-        return sasc
+        return SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
 
 
 class SymmetryAdaptedAtoms(Optimizable):
@@ -609,14 +603,15 @@ class SymmetryAdaptedAtoms(Optimizable):
                 chol_derivative(M_cc, self.cell_coordinates.dM_zcc[z])
                 @ self.cell_coordinates.rot_vv.T
             )
-            A_zV[z] = (V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2).reshape((9,))
+            A_zV[z] = (V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2).reshape(9)
 
-        grad_z[:] = np.dot(A_zV, S_vv.reshape((9,)))
+        grad_z[:] = np.dot(A_zV, S_vv.reshape(9))
         back_Svv = self.get_Sback_vv(S_vv, A_zV, grad_z)
 
         def get_mask_3x3(pbc):
             from ase._4.optimize.frechet import default_mask
             from ase.stress import voigt_6_to_full_3x3_stress
+
             mask_6 = default_mask(pbc)
             return voigt_6_to_full_3x3_stress(mask_6)
 
