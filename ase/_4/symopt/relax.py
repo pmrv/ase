@@ -534,7 +534,7 @@ class SymmetryAdaptedAtoms(Optimizable):
             S_cc[c, :] = 0.0
             S_cc[:, c] = 0.0
         S_vv = np.linalg.inv(C_cv) @ S_cc @ C_cv
-        return np.max(np.max(np.linalg.norm(S_vv)))
+        return np.linalg.norm(S_vv)
 
     # Properties for internal degrees of freedom
     @property
