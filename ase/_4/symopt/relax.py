@@ -627,7 +627,7 @@ class SymmetryAdaptedAtoms(Optimizable):
                 'Warning!!! Back projection of symmetry adapted '
                 'stresses to Cartesian space failed by '
                 f'{symmetry_stress_violation:7.13f}\n'
-                f'Cartesian stress:\n{S_vv}\n'
+                f'Cartesian stress:\n{S_vv * mask_3x3}\n'
                 f'Back projected stress:\n{back_Svv}'
             )
 
@@ -846,10 +846,10 @@ class Relax:
     def visualize_modes(self):
         from ase.io.trajectory import Trajectory
 
-        traj = Trajectory('modes.traj', 'w')
-        for z in range(self.ndofs()):
-            x = np.zeros((self.ndofs(),))
-            for i in np.arange(0, 6 * np.pi, 0.1):
-                x[z] = np.sin(i) * 0.004
-                self.set_x(x)
-                traj.write(self.atoms.copy())
+        with Trajectory('modes.traj', 'w') as traj:
+            for z in range(self.ndofs()):
+                x = np.zeros((self.ndofs(),))
+                for i in np.arange(0, 6 * np.pi, 0.1):
+                    x[z] = np.sin(i) * 0.004
+                    self.set_x(x)
+                    traj.write(self.atoms.copy())
