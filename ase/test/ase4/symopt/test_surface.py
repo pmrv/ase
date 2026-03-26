@@ -2,9 +2,17 @@ from io import StringIO
 
 import numpy as np
 import pytest
+
+from ase._4.optimize.bfgs import BFGSMethod, fd_hessian
+from ase._4.optimize.run import Optimizer
+from ase._4.optimize.symopt import SymOpt
+from ase._4.symopt.relax import Relax, SymmetryAdaptedAtoms
 from ase.build import fcc111
 from ase.calculators.emt import EMT
+from ase.filters import FrechetCellFilter
 from ase.optimize.bfgs import BFGS
+from ase.optimize.cellawarebfgs import CellAwareBFGS
+from ase.parallel import world
 from ase.utils import spglib_new_errorhandling
 
 symprec = 0.001
@@ -33,9 +41,6 @@ def dataset(atoms0):
 
 
 def test_relaxation_old(atoms0):
-    from ase.filters import FrechetCellFilter
-    from ase.optimize.cellawarebfgs import CellAwareBFGS
-
     atoms = atoms0.copy()
     target = FrechetCellFilter(
         atoms, mask=[1, 1, 0, 0, 0, 1], exp_cell_factor=1.0
@@ -58,41 +63,6 @@ def test_relaxation_old(atoms0):
     energy = atoms.get_potential_energy()
     assert energy == pytest.approx(ref_energy)
 
-    # a) Test that EMT works the same with 1) old ASE, 2) ase._4, 3) symopt
-    # a1) we need some non-trivial (variably symmetric) systems
-    # b) The same, but with GPAW, and a small system
-
-    # calc = GPAW(mode='pw', kpts={'density': 2.0}, symmetry=symmdict)
-    # atoms.calc = calc
-
-
-def fd_hessian(target, eps=1e-5, tol=1e-8):
-    xval_orig = target.get_x()
-
-    ndofs = len(xval_orig)
-    hessian = np.empty((ndofs, ndofs))
-
-    xval = xval_orig.copy()
-
-    for i in range(ndofs):
-        xval[i] = xval_orig[i] + eps
-        target.set_x(xval)
-        gradplus = target.get_gradient().gradient
-        xval[i] = xval_orig[i] - eps
-        target.set_x(xval)
-        gradminus = target.get_gradient().gradient
-        xval[i] = xval_orig[i]
-
-        dgrad_dx = (gradplus - gradminus) / (2 * eps)
-        hessian[i, :] = dgrad_dx
-
-    target.set_x(xval_orig)
-
-    symm_error = abs(hessian.T - hessian).max()
-    assert symm_error < tol, symm_error
-    symm_hessian = 0.5 * (hessian.T + hessian)
-    return symm_hessian
-
 
 def seventy(target):
     ndofs = len(target.get_x())
@@ -103,11 +73,6 @@ def seventy(target):
     'initialize_hessian, nsteps', [(seventy, 7), (fd_hessian, 6)]
 )
 def test_relaxation_ase4(atoms0, dataset, initialize_hessian, nsteps):
-    from ase._4.optimize.bfgs import BFGSMethod
-    from ase._4.optimize.run import Optimizer
-    from ase._4.optimize.symopt import SymOpt
-    from ase._4.symopt.relax import SymmetryAdaptedAtoms
-
     atoms = atoms0.copy()
     atoms.calc = EMT()
 
@@ -126,9 +91,6 @@ def test_relaxation_ase4(atoms0, dataset, initialize_hessian, nsteps):
 
 
 def test_relaxation_symopt(atoms0, dataset, tmp_path):
-    from ase._4.symopt.relax import Relax
-    from ase.parallel import world
-
     atoms = atoms0.copy()
 
     logfile = tmp_path / 'opt.log'
