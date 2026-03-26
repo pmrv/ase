@@ -139,8 +139,6 @@ class AtomsSymmetries:
     rotation_scc: np.ndarray
     atommap_sa: np.ndarray
     translation_sc: np.ndarray
-    symmorphic: bool
-    symprec: float
 
     @classmethod
     def from_spglib_auto(cls, atoms, *, symprec=1e-4):
@@ -160,8 +158,6 @@ class AtomsSymmetries:
             rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
             translation_sc=snap_translations_to_zero(dataset.translations),
             atommap_sa=build_atommaps(atoms, dataset)[0],
-            symmorphic=False,  # XXX necessary?
-            symprec=1.234e-5,  # XXX necessary?
         )
 
     @classmethod
@@ -172,14 +168,11 @@ class AtomsSymmetries:
             atoms, tolerance=tolerance, symmorphic=symmorphic
         )
         log(gpaw_symmetries)
-        sym = AtomsSymmetries(
+        return cls(
             gpaw_symmetries.rotation_scc,
             gpaw_symmetries.atommap_sa,
             gpaw_symmetries.translation_sc,
-            symmorphic,
-            tolerance,
         )
-        return sym
 
 
 @dataclass
@@ -404,7 +397,6 @@ class SymmetryAdaptedScaledCoordinates:
         rotation_scc,
         translation_sc,
         atommap_sa,
-        symprec,
         C_cv,
         *,
         log,
@@ -496,7 +488,6 @@ class SymmetryAdaptedAtoms(Optimizable):
             self.symmetries.rotation_scc,
             self.symmetries.translation_sc,
             self.symmetries.atommap_sa,
-            self.symmetries.symprec,
             self.cell_coordinates.C_cv,
             log=log,
         )
@@ -783,9 +774,9 @@ class Relax:
         self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms(
             self.atoms, log=self.log, symmorphic=False, symprec=symprec
         )
-        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
-            self.atoms, symprec=symprec
-        )
+        # self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
+        #    self.atoms, symprec=symprec
+        # )
 
         # Now, with cell and atoms symmetrized,
         # it is safe to assign the calculator
