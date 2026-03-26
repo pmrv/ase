@@ -12,6 +12,7 @@ from ase._4.symopt.relax_print import (
     pretty_subheader,
 )
 from ase.utils.abc import Optimizable
+from ase.utils import spglib_new_errorhandling
 
 
 def green(text: str) -> str:
@@ -140,6 +141,28 @@ class AtomsSymmetries:
     translation_sc: np.ndarray
     symmorphic: bool
     symprec: float
+
+    @classmethod
+    def from_spglib_auto(cls, atoms, *, symprec=1e-4):
+        from spglib import get_symmetry_dataset
+
+        dataset = spglib_new_errorhandling(get_symmetry_dataset)(
+            (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
+            symprec=symprec,
+        )
+        return cls.from_spglib(atoms, dataset)
+
+    @classmethod
+    def from_spglib(cls, atoms, dataset):
+        from c2db.symmetrize import build_atommaps, snap_translations_to_zero
+
+        return cls(
+            rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
+            translation_sc=snap_translations_to_zero(dataset.translations),
+            atommap_sa=build_atommaps(atoms, dataset)[0],
+            symmorphic=False,  # XXX necessary?
+            symprec=1.234e-5,  # XXX necessary?
+        )
 
     @classmethod
     def from_GPAW(cls, atoms, log=None, *, tolerance, symmorphic):
@@ -514,6 +537,16 @@ class SymmetryAdaptedAtoms(Optimizable):
         self.actual_atoms.wrap()
 
     @classmethod
+    def from_atoms_spglib(cls, atoms, log=print, *, symprec):
+        symmetries = AtomsSymmetries.from_spglib_auto(atoms, symprec=symprec)
+        return cls(atoms, symmetries, log=log)
+
+    @classmethod
+    def from_spglib_dataset(cls, atoms, dataset, log=print):
+        symmetries = AtomsSymmetries.from_spglib(atoms, dataset)
+        return cls(atoms, symmetries, log=log)
+
+    @classmethod
     def from_atoms(cls, atoms, log=print, *, symprec, symmorphic):
         symmetries = AtomsSymmetries.from_GPAW(
             atoms,
@@ -749,6 +782,9 @@ class Relax:
         self.atoms = atoms
         self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms(
             self.atoms, log=self.log, symmorphic=False, symprec=symprec
+        )
+        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
+            self.atoms, symprec=symprec
         )
 
         # Now, with cell and atoms symmetrized,
