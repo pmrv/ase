@@ -11,8 +11,8 @@ from ase._4.symopt.relax_print import (
     pretty_header,
     pretty_subheader,
 )
-from ase.utils.abc import Optimizable
 from ase.utils import spglib_new_errorhandling
+from ase.utils.abc import Optimizable
 
 
 def green(text: str) -> str:
