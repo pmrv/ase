@@ -25,7 +25,12 @@ def generate_all_bulk_structures():
     return cases
 
 
-@pytest.fixture(scope='session', params=generate_all_bulk_structures())
+@pytest.fixture(
+    scope='session',
+    params=[
+        pytest.param(obj, id=obj[0]) for obj in generate_all_bulk_structures()
+    ],
+)
 def system(request):
     symbol, atoms = request.param
     atoms = atoms.copy()
