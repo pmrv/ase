@@ -154,10 +154,12 @@ class AtomsSymmetries:
     def from_spglib(cls, atoms, dataset):
         from c2db.symmetrize import build_atommaps, snap_translations_to_zero
 
+        translations = snap_translations_to_zero(dataset.translations)
+
         return cls(
             rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
-            translation_sc=snap_translations_to_zero(dataset.translations),
-            atommap_sa=build_atommaps(atoms, dataset),
+            translation_sc=translations,
+            atommap_sa=build_atommaps(atoms, dataset.rotations, translations),
         )
 
     @classmethod

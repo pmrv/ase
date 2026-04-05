@@ -41,17 +41,18 @@ def transform(scaled_positions, rotation, translation):
 
 def build_atommaps(
     atoms,
-    dataset,
+    rotations: np.ndarray,
+    translations: np.ndarray,
     maxerr: float = 1e-12,
     min_atomdist: float = 0.5,
 ) -> tuple[np.ndarray, float]:
-    assert len(dataset.rotations) == len(dataset.translations)
+    assert len(rotations) == len(translations)
     atommap_sa = []
 
     orig_spos = atoms.get_scaled_positions(wrap=False)
     mapped_atoms = atoms.copy()
 
-    for rot, trans in zip(dataset.rotations, dataset.translations):
+    for rot, trans in zip(rotations, translations):
         newspos = transform(orig_spos, rot, trans)
         mapped_atoms.positions[:] = atoms.cell.cartesian_positions(newspos)
 
