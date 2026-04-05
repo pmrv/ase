@@ -157,7 +157,7 @@ class AtomsSymmetries:
         return cls(
             rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
             translation_sc=snap_translations_to_zero(dataset.translations),
-            atommap_sa=build_atommaps(atoms, dataset)[0],
+            atommap_sa=build_atommaps(atoms, dataset),
         )
 
     @classmethod
