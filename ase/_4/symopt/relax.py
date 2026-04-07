@@ -51,6 +51,18 @@ def minimize_l1(dof_zac):
     dof_zac[:] = np.einsum('zw,wac->zac', U_zz(np.array(xopt)), dof_zac)
 
 
+def snap_translations_to_zero(translations, tol=1e-13):
+    # spglib may produce translations that are +/- 1e-15, we want those to be 0
+    # It may also produce 1 (+/- 1e-15), and we want those to be zero as well.
+
+    # If a translation is 1, it means a whole lattice vector and that we
+    # can also use 0 instead (no matter the corresponding rotation).
+    cleaned_translations = translations - np.rint(translations)
+    cleaned_translations[abs(cleaned_translations) < tol] = 0.0
+    assert (abs(cleaned_translations) <= 0.5).all()
+    return cleaned_translations
+
+
 def chol_derivative(A, dA, L=None):
     """
     Compute the derivative of the Cholesky factorization.
