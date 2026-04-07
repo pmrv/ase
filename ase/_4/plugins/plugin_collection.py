@@ -10,6 +10,7 @@ from typing_extensions import Self
 
 from .io import IOFormatPlugin
 from .plugin import CalculatorPlugin, Plugin
+from .viewer import ViewerPlugin
 
 P = TypeVar('P', bound=Plugin, covariant=True)
 
@@ -142,6 +143,13 @@ class PluginCollection(Collection[P]):
         """Get a PluginCollection containing only IOFormatPlugins"""
         return cast(
             PluginCollection[IOFormatPlugin], self.by_type[IOFormatPlugin]
+        )
+
+    @property
+    def viewers(self) -> PluginCollection[IOFormatPlugin]:
+        """Get a PluginCollection containing only ViewerPlugins"""
+        return cast(
+            PluginCollection[ViewerPlugin], self.by_type[ViewerPlugin]
         )
 
     @staticmethod
