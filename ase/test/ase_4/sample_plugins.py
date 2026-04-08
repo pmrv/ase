@@ -99,15 +99,16 @@ def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
         io_format=get_ase_io_format('dftb'), metadata=metadata
     )
 
+
 # Viewer plugins; wrap viewers from ase.visualize.viewers
 avogadro_plugin = ViewerPlugin(
-    name="Cloned avogadro viewer",
-    implementation=(lambda: VIEWERS["avogadro"]),
-    metadata={"Note", "Mock Viewer plugin"},
+    name='Cloned avogadro viewer',
+    implementation=(lambda: VIEWERS['avogadro']),
+    metadata={'Note', 'Mock Viewer plugin'},
 )
 ase_gui_plugin = ViewerPlugin(
-    name="ASE GUI",
-    implementation=(lambda: VIEWERS["ase"]),
+    name='ASE GUI',
+    implementation=(lambda: VIEWERS['ase']),
     metadata={},
 )
 

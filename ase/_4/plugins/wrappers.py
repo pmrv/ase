@@ -15,14 +15,18 @@ wrapped_cli_viewers = {
     ViewerPlugin(
         name=key,
         implementation=(lambda: value),
-        metadata={"Note": "imported from ase.visualize.viewers.CLI_VIEWERS"}) for key, value in CLI_VIEWERS.items()
+        metadata={'Note': 'imported from ase.visualize.viewers.CLI_VIEWERS'},
+    )
+    for key, value in CLI_VIEWERS.items()
 }
 
 wrapped_py_viewers = {
     ViewerPlugin(
         name=key,
         implementation=(lambda: value),
-        metadata={"Note": "imported from ase.visualize.viewers.PY_VIEWERS"}) for key, value in PY_VIEWERS.items()
+        metadata={'Note': 'imported from ase.visualize.viewers.PY_VIEWERS'},
+    )
+    for key, value in PY_VIEWERS.items()
 }
 
 __ase_plugins__ = wrapped_ioformats | wrapped_cli_viewers | wrapped_py_viewers

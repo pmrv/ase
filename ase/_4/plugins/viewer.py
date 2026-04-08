@@ -53,10 +53,10 @@ class LegacyViewerPlugin(ViewerPlugin):
 
     @classmethod
     def from_externalviewer(
-            cls,
-            name: str,
-            ext_viewer: ExternalViewer,
-            metadata: dict[str, str] | None = None
+        cls,
+        name: str,
+        ext_viewer: ExternalViewer,
+        metadata: dict[str, str] | None = None,
     ) -> Self:
         from ase.visualize.viewers import CLIViewer, PyViewer
 
@@ -65,9 +65,7 @@ class LegacyViewerPlugin(ViewerPlugin):
 
         implementation: AbstractViewer
         if ext_viewer.cli:
-            implementation = CLIViewer(
-                name, ext_viewer.fmt, ext_viewer.argv
-            )
+            implementation = CLIViewer(name, ext_viewer.fmt, ext_viewer.argv)
         else:
             implementation = PyViewer(
                 name, ext_viewer.desc, module_name=ext_viewer.module
@@ -87,8 +85,8 @@ class LegacyViewerPlugin(ViewerPlugin):
         external_viewer = entry_point.load()
         if not isinstance(external_viewer, ExternalViewer):
             raise TypeError(
-                "Wrong type for registering external IO formats "
-                f"in format {entry_point.name}, expected "
-                "ExternalViewer"
+                'Wrong type for registering external IO formats '
+                f'in format {entry_point.name}, expected '
+                'ExternalViewer'
             )
         return cls.from_externalviewer(entry_point.name, external_viewer)

@@ -11,10 +11,14 @@ def test_info(cli):
 def test_info_formats(cli):
     output = cli.ase('info', '--formats')
 
-    assert ('espresso-out [r/multi, ext=pwo|out]: Quantum espresso out file'
-            in output)
-    assert ('dlp4 [rw/single, ext=config, glob=*CONFIG*]: DL_POLY_4 CONFIG file'
-            in output)
+    assert (
+        'espresso-out [r/multi, ext=pwo|out]: Quantum espresso out file'
+        in output
+    )
+    assert (
+        'dlp4 [rw/single, ext=config, glob=*CONFIG*]: DL_POLY_4 CONFIG file'
+        in output
+    )
     assert 'gen [rw/single]: DFTBPlus GEN format' in output
 
 

@@ -53,6 +53,7 @@ def two_instances_plugins():
 @pytest.fixture
 def atoms() -> Atoms:
     import ase.build
+
     return ase.build.bulk('Au', cubic=True)
 
 

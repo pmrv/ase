@@ -148,9 +148,7 @@ class PluginCollection(Collection[P]):
     @property
     def viewers(self) -> PluginCollection[IOFormatPlugin]:
         """Get a PluginCollection containing only ViewerPlugins"""
-        return cast(
-            PluginCollection[ViewerPlugin], self.by_type[ViewerPlugin]
-        )
+        return cast(PluginCollection[ViewerPlugin], self.by_type[ViewerPlugin])
 
     @staticmethod
     def _get_package(plugin: Plugin) -> str:
