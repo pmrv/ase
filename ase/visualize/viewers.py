@@ -213,7 +213,7 @@ define_viewer("mlab", "View atoms using matplotlib.")
 define_viewer("sage", "View atoms using sage.")
 define_viewer("x3d", "View atoms using x3d.")
 
-# CLI viweers that are internally supported
+# CLI viewers that are internally supported
 define_viewer(
     "avogadro", "View atoms using avogradro.", cli=True, fmt="cube",
     argv=["avogadro"]

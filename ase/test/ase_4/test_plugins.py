@@ -2,13 +2,15 @@
 
 """Tests for experimental ASE v4 plugin system."""
 
+import os
 import textwrap
 from pathlib import Path
 
 import pytest
 
-import ase.test.ase_4.sample_plugins as sample_plugins
 from ase import Atoms
+import ase.test.ase_4.sample_plugins as sample_plugins
+from ase.visualize.viewers import AbstractViewer
 from ase._4.plugins import PluginCollection
 from ase._4.plugins import plugins as auto_plugins
 from ase._4.plugins.plugin import CalculatorPlugin
@@ -23,11 +25,13 @@ def sample_calc_plugins():
 
 @pytest.fixture
 def sample_mixed_plugins():
-    """Collection of two calculator plugins and one ioformat"""
+    """Collection of two calculators, one ioformat and two visualizers"""
     return [
         sample_plugins.emt_plugin,
         sample_plugins.lj_plugin,
         sample_plugins.extxyz_plugin,
+        sample_plugins.avogadro_plugin,
+        sample_plugins.ase_gui_plugin,
     ]
 
 
@@ -47,9 +51,8 @@ def two_instances_plugins():
 
 
 @pytest.fixture
-def sample_atoms() -> Atoms:
+def atoms() -> Atoms:
     import ase.build
-
     return ase.build.bulk('Au', cubic=True)
 
 
@@ -110,3 +113,19 @@ def test_missing_writer():
 
     assert castep_castep_plugin.can_read
     assert not castep_castep_plugin.can_write
+
+
+def test_viewer_plugin(sample_mixed_plugins, atoms):
+    plugins = PluginCollection(sample_mixed_plugins)
+
+    assert len(plugins) > 2
+    assert len(plugins.viewers) == 2
+    for viewer in plugins.viewers:
+        assert isinstance(viewer.implementation, AbstractViewer)
+
+        # If factoring this out to another test, consider formally skipping
+        # with pytest.skip when DISPLAY unavailable.
+        if viewer.name == 'ASE GUI' and os.environ.get('DISPLAY'):
+            ### Shortcut to the .view() method of implementation
+            ase_gui_view = viewer(atoms, repeat=(1, 1, 1))
+            ase_gui_view.terminate()
