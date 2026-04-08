@@ -30,7 +30,7 @@ dependencies = [
     'numpy>=1.21.6',  # April 2022
     'scipy>=1.8.1',  # May 2022
     'matplotlib>=3.5.2',  # May 2022
-    'typing_extensions>=4.0.0'  # Sep 2025
+    'typing_extensions>=4.13.1'  # Apr 2026
 ]
 
 [project.urls]
