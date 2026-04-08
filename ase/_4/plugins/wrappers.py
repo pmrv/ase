@@ -3,7 +3,6 @@ from __future__ import annotations
 from ase._4.plugins.io import LegacyIOFormatPlugin
 from ase._4.plugins.viewer import ViewerPlugin
 from ase.io.formats import ioformats
-
 from ase.visualize.viewers import CLI_VIEWERS, PY_VIEWERS
 
 wrapped_ioformats = {

@@ -8,12 +8,12 @@ from pathlib import Path
 
 import pytest
 
-from ase import Atoms
 import ase.test.ase_4.sample_plugins as sample_plugins
-from ase.visualize.viewers import AbstractViewer
+from ase import Atoms
 from ase._4.plugins import PluginCollection
 from ase._4.plugins import plugins as auto_plugins
 from ase._4.plugins.plugin import CalculatorPlugin
+from ase.visualize.viewers import AbstractViewer
 
 
 @pytest.fixture
@@ -127,6 +127,6 @@ def test_viewer_plugin(sample_mixed_plugins, atoms):
         # If factoring this out to another test, consider formally skipping
         # with pytest.skip when DISPLAY unavailable.
         if viewer.name == 'ASE GUI' and os.environ.get('DISPLAY'):
-            ### Shortcut to the .view() method of implementation
+            # Shortcut to the .view() method of implementation
             ase_gui_view = viewer(atoms, repeat=(1, 1, 1))
             ase_gui_view.terminate()
