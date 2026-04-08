@@ -146,7 +146,7 @@ class PluginCollection(Collection[P]):
         )
 
     @property
-    def viewers(self) -> PluginCollection[IOFormatPlugin]:
+    def viewers(self) -> PluginCollection[ViewerPlugin]:
         """Get a PluginCollection containing only ViewerPlugins"""
         return cast(PluginCollection[ViewerPlugin], self.by_type[ViewerPlugin])
 

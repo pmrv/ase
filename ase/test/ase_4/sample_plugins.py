@@ -104,7 +104,7 @@ def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
 avogadro_plugin = ViewerPlugin(
     name='Cloned avogadro viewer',
     implementation=(lambda: VIEWERS['avogadro']),
-    metadata={'Note', 'Mock Viewer plugin'},
+    metadata={'Note': 'Mock Viewer plugin'},
 )
 ase_gui_plugin = ViewerPlugin(
     name='ASE GUI',
