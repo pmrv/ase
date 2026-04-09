@@ -64,6 +64,39 @@ def test_relaxation_old(atoms0):
     assert energy == pytest.approx(ref_energy)
 
 
+def apply_pbc_to_symops(rotations, translations, pbc):
+    """spglib thinks we are a 3d system, but actually we may be 2D/1D.
+
+    spglib will produce symops that involve e.g. a z-flip, but that
+    flips the positions to negative z-values, and we need to apply the
+    full z axis as translation vector in order to map the position back
+    into the cell.
+
+    This function equips such operations with the necessary translations.
+
+    We also do some sanity checking.
+    """
+    translations = translations.copy()
+    assert len(rotations) == len(translations)
+
+    for i in range(3):
+        if pbc[i]:
+            continue
+
+        for s in range(len(rotations)):
+            nonpbc_rot = rotations[s, i, i]
+            assert nonpbc_rot in (-1, 1)
+            nonpbc_op_row = np.zeros(3, int)
+            nonpbc_op_row[i] = nonpbc_rot
+            assert (rotations[s, :, i] == nonpbc_op_row).all()
+            assert (rotations[s, i, :] == nonpbc_op_row).all()
+            if nonpbc_rot == -1:
+                assert translations[s, i] == 0
+                translations[s, i] = 1.0
+
+    return translations
+
+
 def seventy(target):
     ndofs = len(target.get_x())
     return 70.0 * np.identity(ndofs)
@@ -90,18 +123,47 @@ def test_relaxation_ase4(atoms0, dataset, initialize_hessian, nsteps):
     assert step.value == pytest.approx(ref_energy)
 
 
+def get_atoms_symmetries_nonperiodic(atoms, symprec):
+    from spglib import get_symmetry_dataset
+
+    from ase._4.symopt.atommap import build_atommaps
+    from ase._4.symopt.relax import AtomsSymmetries
+
+    scaled_pos = atoms.get_scaled_positions()
+    assert (scaled_pos < 1.0).all(), 'please wrap atoms'
+    assert (scaled_pos >= 0.0).all(), 'please wrap atoms'
+
+    dataset = spglib_new_errorhandling(get_symmetry_dataset)(
+        (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
+        symprec=symprec,
+    )
+
+    translations = apply_pbc_to_symops(
+        dataset.rotations, dataset.translations, pbc=atoms.pbc
+    )
+
+    return AtomsSymmetries(
+        dataset.rotations.transpose(0, 2, 1),
+        atommap_sa=build_atommaps(atoms, dataset.rotations, translations),
+        translation_sc=translations,
+    )
+
+
 def test_relaxation_symopt(atoms0, dataset, tmp_path):
     atoms = atoms0.copy()
 
     logfile = tmp_path / 'opt.log'
 
+    atoms_symmetries = get_atoms_symmetries_nonperiodic(atoms, symprec)
+
     relax = Relax(
         atoms=atoms,
         calc=EMT,
         optimizer_factory=lambda atoms: BFGS(atoms),
-        symprec=symprec,
+        symprec=symprec,  # XXXX redundant with atoms_symmetries
         comm=world,
         logfile=logfile,
+        atoms_symmetries=atoms_symmetries,
     )
 
     relax.run(fmax=fmax, smax=smax)

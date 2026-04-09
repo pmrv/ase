@@ -152,6 +152,12 @@ class AtomsSymmetries:
     atommap_sa: np.ndarray
     translation_sc: np.ndarray
 
+    def __post_init__(self):
+        ns = len(self.rotation_scc)
+        assert self.rotation_scc.shape == (ns, 3, 3)
+        assert len(self.atommap_sa) == ns
+        assert self.translation_sc.shape == (ns, 3)
+
     @classmethod
     def from_spglib_auto(cls, atoms, *, symprec=1e-4):
         from spglib import get_symmetry_dataset
@@ -164,14 +170,14 @@ class AtomsSymmetries:
 
     @classmethod
     def from_spglib(cls, atoms, dataset):
-        from c2db.symmetrize import build_atommaps, snap_translations_to_zero
-
-        translations = snap_translations_to_zero(dataset.translations)
+        from ase._4.symopt.atommap import build_atommaps
 
         return cls(
             rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
-            translation_sc=translations,
-            atommap_sa=build_atommaps(atoms, dataset.rotations, translations),
+            translation_sc=dataset.translations,
+            atommap_sa=build_atommaps(
+                atoms, dataset.rotations, dataset.translations
+            ),
         )
 
     @classmethod
@@ -765,6 +771,7 @@ class Relax:
         optimizer_factory,
         symprec,
         comm,
+        atoms_symmetries=None,
     ):
         self.comm = comm
         self.logfile = logfile
@@ -785,12 +792,15 @@ class Relax:
         pprint_atoms(self.original_atoms, self.log)
 
         self.atoms = atoms
-        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms(
-            self.atoms, log=self.log, symmorphic=False, symprec=symprec
-        )
-        # self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
-        #    self.atoms, symprec=symprec
-        # )
+        if atoms_symmetries is None:
+            symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
+                self.atoms, symprec=symprec
+            )
+        else:
+            symmetry_adapted_atoms = SymmetryAdaptedAtoms(
+                self.atoms, atoms_symmetries
+            )
+        self.symmetry_adapted_atoms = symmetry_adapted_atoms
 
         # Now, with cell and atoms symmetrized,
         # it is safe to assign the calculator

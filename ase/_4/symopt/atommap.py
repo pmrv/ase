@@ -55,7 +55,6 @@ def build_atommaps(
     for rot, trans in zip(rotations, translations):
         newspos = transform(orig_spos, rot, trans)
         mapped_atoms.positions[:] = atoms.cell.cartesian_positions(newspos)
-
         atommap = build_one_atommap(atoms, mapped_atoms, maxerr, min_atomdist)
         atommap_sa.append(atommap)
     return np.array(atommap_sa, int)
