@@ -51,6 +51,13 @@ def minimize_l1(dof_zac):
     dof_zac[:] = np.einsum('zw,wac->zac', U_zz(np.array(xopt)), dof_zac)
 
 
+def argsort_rotations(rotations):
+    return sorted(
+        range(len(rotations)),
+        key=lambda i: tuple(rotations[i].reshape(9).tolist()),
+    )
+
+
 def snap_translations_to_zero(translations, tol=1e-13):
     # spglib may produce translations that are +/- 1e-15, we want those to be 0
     # It may also produce 1 (+/- 1e-15), and we want those to be zero as well.
@@ -172,11 +179,15 @@ class AtomsSymmetries:
     def from_spglib(cls, atoms, dataset):
         from ase._4.symopt.atommap import build_atommaps
 
+        args = argsort_rotations(dataset.rotations.transpose(0, 2, 1))
+
         return cls(
-            rotation_scc=dataset.rotations.transpose(0, 2, 1).copy(),
-            translation_sc=dataset.translations,
+            rotation_scc=dataset.rotations[args].transpose(0, 2, 1).copy(),
+            translation_sc=-dataset.translations[args],
             atommap_sa=build_atommaps(
-                atoms, dataset.rotations, dataset.translations
+                atoms.copy(),
+                dataset.rotations[args].copy(),
+                dataset.translations[args].copy(),
             ),
         )
 
@@ -187,11 +198,12 @@ class AtomsSymmetries:
         gpaw_symmetries = create_symmetries_object(
             atoms, tolerance=tolerance, symmorphic=symmorphic
         )
+        args = argsort_rotations(gpaw_symmetries.rotation_scc)
         log(gpaw_symmetries)
         return cls(
-            gpaw_symmetries.rotation_scc,
-            gpaw_symmetries.atommap_sa,
-            gpaw_symmetries.translation_sc,
+            gpaw_symmetries.rotation_scc[args],
+            gpaw_symmetries.atommap_sa[args],
+            gpaw_symmetries.translation_sc[args],
         )
 
 
@@ -793,14 +805,37 @@ class Relax:
 
         self.atoms = atoms
         if atoms_symmetries is None:
-            symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms_spglib(
+            atoms_symmetries1 = AtomsSymmetries.from_spglib_auto(
                 self.atoms, symprec=symprec
             )
-        else:
-            symmetry_adapted_atoms = SymmetryAdaptedAtoms(
-                self.atoms, atoms_symmetries
+            atoms_symmetries2 = AtomsSymmetries.from_GPAW(
+                self.atoms,
+                tolerance=symprec,
+                symmorphic=symmorphic,
+                log=self.log,
             )
-        self.symmetry_adapted_atoms = symmetry_adapted_atoms
+
+            assert len(atoms_symmetries1.rotation_scc) == len(
+                atoms_symmetries2.rotation_scc
+            )
+
+            for rot1, rot2 in zip(
+                atoms_symmetries1.rotation_scc, atoms_symmetries2.rotation_scc
+            ):
+                assert (rot1.ravel() == rot2.ravel()).all()
+
+            for T1, T2 in zip(
+                atoms_symmetries1.translation_sc,
+                atoms_symmetries2.translation_sc,
+            ):
+                err = abs(T2 - T1).max()
+                assert err < 1e-13, err
+
+            atoms_symmetries = atoms_symmetries1
+
+        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms(
+            self.atoms, atoms_symmetries
+        )
 
         # Now, with cell and atoms symmetrized,
         # it is safe to assign the calculator
