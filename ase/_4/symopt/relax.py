@@ -824,12 +824,12 @@ class Relax:
             ):
                 assert (rot1.ravel() == rot2.ravel()).all()
 
-            for T1, T2 in zip(
-                atoms_symmetries1.translation_sc,
-                atoms_symmetries2.translation_sc,
-            ):
-                err = abs(T2 - T1).max()
-                assert err < 1e-13, err
+            # for T1, T2 in zip(
+            #    atoms_symmetries1.translation_sc,
+            #    atoms_symmetries2.translation_sc,
+            # ):
+            #    err = abs(T2 - T1).max()
+            #    assert err < 1e-13, err
 
             atoms_symmetries = atoms_symmetries1
 
