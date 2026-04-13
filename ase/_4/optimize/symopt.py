@@ -14,6 +14,10 @@ class SymGradient:
     symmetry_force_violation: float
     symmetry_stress_violation: float
 
+    def datafy(self):
+        # XXX save something useful
+        return {}
+
 
 class SymOpt:
     iotype = 'symopt'
@@ -29,7 +33,10 @@ class SymOpt:
         return self.symmatoms
 
     def datafy(self):
-        raise NotImplementedError
+        # What do we need to save?
+        # symmatoms defines the initial reduced positions as 0, so the
+        # mapping absolutely needs saving aside from the Hessian.
+        return {}  # XXX
 
     @classmethod
     def undatafy(cls, dct):
@@ -60,4 +67,4 @@ class SymOpt:
         raise NotImplementedError
 
     def iterimages(self):
-        raise NotImplementedError
+        yield self.symmatoms.actual_atoms
