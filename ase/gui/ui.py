@@ -656,8 +656,8 @@ class ASEGUIWindow(MainWindow):
 
         self.size = np.array([450, 450])
 
-        self.fg = config['gui_foreground_color']
-        self.bg = config['gui_background_color']
+        self.fg = config.get('gui_foreground_color')
+        self.bg = config.get('gui_background_color')
 
         gui.icons.set_scaling(self.win.tk.call('tk', 'scaling'))
 
@@ -690,7 +690,7 @@ class ASEGUIWindow(MainWindow):
         self.canvas.bind('<Control-ButtonRelease>', bind(release, 'ctrl'))
         self.canvas.bind('<Shift-ButtonRelease>', bind(release, 'shift'))
         self.canvas.bind('<Configure>', resize)
-        if not config['swap_mouse']:
+        if not config.getboolean('swap_mouse'):
             for button in (2, 3):
                 self.canvas.bind(f'<Shift-B{button}-Motion>',
                                  bind(scroll))

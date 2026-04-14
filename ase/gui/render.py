@@ -148,7 +148,7 @@ class Render:
             povray_settings['colors'] = self.gui.get_colors(rgb=True)
             atoms = self.gui.images.get_atoms(frame)
             radii_scale = 1  # atom size multiplier
-            # self.gui.config['show_bonds'] is always False
+            # self.gui.config.getboolean('show_bonds') is always False
             if self.gui.window['toggle-show-bonds']:
                 print(' | Building bonds')
                 povray_settings['bondatoms'] = get_bondpairs(atoms)

@@ -18,8 +18,8 @@ class Images:
     def __init__(self, images=None, *, notify_new_images=lambda: None):
         self.covalent_radii = covalent_radii.copy()
         self.config = read_defaults()
-        self.configure_radii(self.config['covalent_radii'])
-        self.atom_scale = self.config['radii_scale']
+        self.configure_radii(self.config.getliteral('covalent_radii'))
+        self.atom_scale = self.config.getfloat('radii_scale')
         if images is None:
             images = [Atoms()]
         self.notify_new_images = notify_new_images
