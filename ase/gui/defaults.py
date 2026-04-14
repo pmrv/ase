@@ -5,6 +5,7 @@ configuration file, for backwards compatibility. The configuration is
 imported when opening ASE-GUI and can then be modified at runtime, if
 necessary.
 """
+
 import ast
 import os
 import runpy
@@ -37,6 +38,7 @@ class GUIConfig(Config):
     hopefully forwards compatible way. Designed to be operated like
     a ConfigParser object.
     """
+
     def _env(self):
         if self.parser.has_section('gui'):
             return self.parser['gui']
@@ -75,11 +77,15 @@ def read_defaults():
     #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
     old_configfile = os.path.expanduser('~/.ase/gui.py')
     if os.path.exists(old_configfile):
-        warnings.warn('Found GUI configuration file gui.py which is deprecated'
-                      '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',
-                      FutureWarning)
-        runpy.run_path(old_configfile, init_globals={'gui_default_settings':
-                                           gui_default_settings})
+        warnings.warn(
+            'Found GUI configuration file gui.py which is deprecated'
+            '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',
+            FutureWarning,
+        )
+        runpy.run_path(
+            old_configfile,
+            init_globals={'gui_default_settings': gui_default_settings},
+        )
 
     config = GUIConfig.read(
         defaults={
