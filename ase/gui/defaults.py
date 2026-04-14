@@ -8,8 +8,9 @@ necessary.
 import ast
 import os
 import runpy
+import warnings
 
-from ase.config import Config
+from ase.config import ASE_CONFIG_FILE, Config
 
 gui_default_settings = {
     'gui_graphs_string': 'i, e - E[-1]',
@@ -25,8 +26,8 @@ gui_default_settings = {
     'show_bonds': False,
     'shift_cell': False,
     'swap_mouse': False,
-    'movie_rate': 'auto',  # can set to float
-    'movie_skip': 'auto',  # can set to int
+    'movie_rate': 'auto',  # float or 'auto'
+    'movie_skip': 'auto',  # int or 'auto'
     'movie_rock': False,
 }
 
@@ -70,6 +71,9 @@ def read_defaults():
     #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
     old_configfile = os.path.expanduser('~/.ase/gui.py')
     if os.path.exists(old_configfile):
+        warnings.warn('Found GUI configuration file gui.py which is deprecated'
+                      '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',
+                      FutureWarning)
         runpy.run_path(old_configfile, init_globals={'gui_default_settings':
                                            gui_default_settings})
 
