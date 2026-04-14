@@ -139,7 +139,8 @@ class Config(Mapping):
 
         cfg = cls()
         if defaults:
-            # See ConfigParser.read_dict documentation
+            # The 'defaults' dictionary needs to have a very specific
+            # structure, see the ConfigParser.read_dict() documentation.
             cfg.parser.read_dict(defaults)
         cfg._read_paths(paths)
 

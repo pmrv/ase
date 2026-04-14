@@ -33,6 +33,10 @@ gui_default_settings = {
 
 
 class GUIConfig(Config):
+    """For interfacing with the GUI configuration in a backwards and
+    hopefully forwards compatible way. Designed to be operated like
+    a ConfigParser object.
+    """
     def _env(self):
         if self.parser.has_section('gui'):
             return self.parser['gui']
