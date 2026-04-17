@@ -7,12 +7,17 @@ import numpy as np
 @dataclass
 class SymGradient:
     gradient: np.ndarray
-    loginfo: Callable
+    # loginfo: Callable
+    fnorm: float
+    snorm: float
     converged: bool
     backF_av: np.ndarray
     backS_vv: np.ndarray
     symmetry_force_violation: float
     symmetry_stress_violation: float
+
+    def loginfo(self):
+        return {'F': self.fnorm, 'S': self.snorm, 'Ferr': self.symmetry_force_violation, 'Serr': self.symmetry_stress_violation}
 
     def datafy(self):
         # XXX save something useful
@@ -52,10 +57,10 @@ class SymOpt:
     def get_gradient(self):
         gradient = self.symmatoms._get_gradient()
 
-        def loginfo():
-            return {'hello': 42}
+        # def loginfo():
+        #     return {'hello': 42}
 
-        return SymGradient(loginfo=loginfo, **gradient)
+        return SymGradient(**gradient)
 
     def get_x(self):
         return self.symmatoms.get_x()

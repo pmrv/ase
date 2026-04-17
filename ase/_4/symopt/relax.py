@@ -730,6 +730,8 @@ class SymmetryAdaptedAtoms(Optimizable):
             symmetry_force_violation=symmetry_force_violation,
             symmetry_stress_violation=symmetry_stress_violation,
             converged=converged,
+            fnorm=self._fnorm(back_Fav),
+            snorm=self._snorm(back_Svv),
         )
 
     def get_gradient(self):
@@ -760,9 +762,15 @@ class SymmetryAdaptedAtoms(Optimizable):
             backS_av=self.stress_conv,
         )  # XXX use backS_av
 
+    def _fnorm(self, backF_av):
+        return np.max(np.linalg.norm(backF_av, axis=1))
+
+    def _snorm(self, backS_av):
+        return abs(backS_av).max()
+
     def _converged(self, backF_av, fmax, backS_av, smax):
-        Fconv = np.max(np.linalg.norm(backF_av, axis=1))
-        return Fconv < fmax and abs(backS_av).max() < smax
+        Fconv = self._fnorm(backF_av)
+        return Fconv < fmax and self._snorm(backS_av) < smax
 
     @property
     def atoms_z(self):
