@@ -34,6 +34,15 @@ class AimsParseError(Exception):
 
 
 # Read aims geometry files
+
+@deprecated(
+    message=(
+        "FHI-aims io is moving to the ase-io-aims plugin."
+        " To test install ase-io-aims and use read(..., format=aims-pyfa)."
+        " This functionality will be removed at a later date."
+    ),
+    category=FutureWarning,
+)
 @reader
 def read_aims(fd, apply_constraints=True):
     """Import FHI-aims geometry type files.
@@ -243,6 +252,14 @@ def _write_velocities_alias(args: list, kwargs: dict[str, Any]) -> bool:
     "Use of `velocities` is deprecated, please use `write_velocities`",
     category=FutureWarning,
     callback=_write_velocities_alias,
+)
+@deprecated(
+    message=(
+        "FHI-aims io is moving to the ase-io-aims plugin."
+        " To test install ase-io-aims and use write(..., format=aims-pyfa)."
+        " This functionality will be removed at a later date."
+    ),
+    category=FutureWarning,
 )
 @writer
 def write_aims(
@@ -496,6 +513,14 @@ def format_aims_control_parameter(key, value, format="%s"):
 
 
 # Write aims control.in files
+@deprecated(
+    message=(
+        "FHI-aims io is moving to the ase-io-aims plugin."
+        " To test install ase-io-aims and use write(..., format=aims-control)."
+        " This functionality will be removed at a later date."
+    ),
+    category=FutureWarning,
+)
 @writer
 def write_control(fd, atoms, parameters, verbose_header=False):
     """Write the control.in file for FHI-aims
@@ -1681,6 +1706,14 @@ def check_convergence(chunks, non_convergence_ok=False):
     return True
 
 
+@deprecated(
+    message=(
+        "FHI-aims io is moving to the ase-io-aims plugin. To test install "
+        "ase-io-aims and use read(..., format=aims-output-pyfa). "
+        "This functionality will be removed at a later date."
+    ),
+    category=FutureWarning,
+)
 @reader
 def read_aims_output(fd, index=-1, non_convergence_ok=False):
     """Import FHI-aims output files with all data available, i.e.
@@ -1697,6 +1730,14 @@ def read_aims_output(fd, index=-1, non_convergence_ok=False):
     return images[index]
 
 
+@deprecated(
+    message=(
+        "FHI-aims io is moving to the ase-io-aims plugin."
+        " To test install ase-io-aims and use the function supported there."
+        " This functionality will be removed at a later date."
+    ),
+    category=FutureWarning,
+)
 @reader
 def read_aims_results(fd, index=-1, non_convergence_ok=False):
     """Import FHI-aims output files and summarize all relevant information
