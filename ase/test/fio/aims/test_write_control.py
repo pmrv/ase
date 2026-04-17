@@ -209,7 +209,7 @@ def aims_species_dir_light(tmp_path):
     ],
 )
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_manipulate_tiers(tier, expected_basis_functions):
     """Test manipulating the basis functions using manipulate_tiers."""
@@ -221,7 +221,7 @@ def test_manipulate_tiers(tier, expected_basis_functions):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_species_path(aims_species_dir_light):
     """Test parsing the species file for all species."""
@@ -241,7 +241,7 @@ def test_parse_species_path(aims_species_dir_light):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_write_species(aims_species_dir_light):
     """Test writing species file."""
@@ -268,7 +268,7 @@ def test_write_species(aims_species_dir_light):
     ],
 )
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_control_tier(
     aims_species_dir_light,
@@ -308,7 +308,7 @@ def test_control_tier(
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_control(bulk_au, parameters_dict, aims_species_dir_light):
     """Tests that control.in for a Gold bulk system works.
@@ -357,7 +357,7 @@ def test_control(bulk_au, parameters_dict, aims_species_dir_light):
     ],
 )
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_control_functional(
     aims_species_dir_light,

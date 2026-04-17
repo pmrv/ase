@@ -10,8 +10,9 @@ from ase.stress import full_3x3_to_voigt_6_stress
 
 parent = Path(__file__).parents[2]
 
+
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_socketio(testdir):
     traj = read(parent / 'testdata/aims/socket.out', ':', format='aims-output')
@@ -52,7 +53,7 @@ def test_parse_socketio(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_md(testdir):
     traj = read(parent / 'testdata/aims/md.out', ':', format='aims-output')
@@ -93,7 +94,7 @@ def test_parse_md(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_relax(testdir):
     traj = read(parent / 'testdata/aims/relax.out', ':', format='aims-output')
@@ -134,7 +135,7 @@ def test_parse_relax(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_singlepoint(testdir):
     atoms = read(parent / 'testdata/aims/singlepoint.out', format='aims-output')
@@ -156,7 +157,7 @@ def test_parse_singlepoint(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_dfpt_dielectric(testdir):
     outfile = parent / 'testdata/aims/DFPT_dielectric.out'
@@ -174,7 +175,7 @@ def test_parse_dfpt_dielectric(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_polarization(testdir):
     outfile = parent / 'testdata/aims/polarization.out'
@@ -188,7 +189,7 @@ def test_parse_polarization(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_preamble_failed(testdir):
     outfile = parent / 'testdata/aims/preamble_fail.out'
@@ -197,7 +198,7 @@ def test_preamble_failed(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_numerical_stress(testdir):
     outfile = parent / 'testdata/aims/numerical_stress.out'
@@ -217,7 +218,7 @@ def test_numerical_stress(testdir):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_spin_collinear_w_md_light(testdir):
     """Issue 3345"""

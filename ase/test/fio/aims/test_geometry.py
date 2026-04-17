@@ -33,7 +33,7 @@ def H2O():
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_cartesian_Si(Si):
     """write cartesian coords and check if structure was preserved"""
@@ -43,7 +43,7 @@ def test_cartesian_Si(Si):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_scaled_Si(Si):
     """write fractional coords and check if structure was preserved"""
@@ -53,7 +53,7 @@ def test_scaled_Si(Si):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_param_const_Si(Si):
     """Check to ensure parametric constraints are passed to crystal systems"""
@@ -111,7 +111,7 @@ def test_param_const_Si(Si):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_wrap_Si(Si):
     """write fractional coords and check if structure was preserved"""
@@ -125,7 +125,7 @@ def test_wrap_Si(Si):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_constraints_Si(Si):
     """Test that non-parmetric constraints are written and read in properly"""
@@ -139,7 +139,7 @@ def test_constraints_Si(Si):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_cartesian_H2O(H2O):
     """write cartesian coords and check if structure was preserved for
@@ -150,7 +150,7 @@ def test_cartesian_H2O(H2O):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_scaled_H2O(H2O):
     """Attempt to write fractional coordinates and see if scaled is set to
@@ -164,7 +164,7 @@ def test_scaled_H2O(H2O):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_param_const_H2O(H2O):
     """Check to ensure if geo_constrain is True it does not affect the
@@ -186,7 +186,7 @@ def test_param_const_H2O(H2O):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_velocities_H2O(H2O):
     """Confirm that the velocities are passed to the geometry.in file and
@@ -200,7 +200,7 @@ def test_velocities_H2O(H2O):
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_info_str(H2O):
     """Confirm that the passed info_str is passed to the geometry.in file"""
@@ -264,7 +264,7 @@ expected_lattice_vectors = np.array(
 
 
 @pytest.mark.filterwarnings(
-    "ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning"
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_parse_geometry_lines():
     lines = sample_geometry_1.splitlines()
