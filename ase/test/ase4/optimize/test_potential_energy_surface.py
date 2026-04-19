@@ -1,0 +1,58 @@
+from ase._4.optimize.potential_energy_surface import PotentialEnergySurface
+from ase.optimize import BFGS
+
+
+def _wrap_with_counter(calculator):
+    """Wrap `calculator.evaluate` so calls are counted. Returns a `[n]` list."""
+    counter = [0]
+    original = calculator.evaluate
+
+    def counting_evaluate(atoms, properties=None):
+        counter[0] += 1
+        return original(atoms, properties)
+
+    calculator.evaluate = counting_evaluate
+    return counter
+
+
+def test_caches_within_same_state(v4atoms, calculator):
+    """get_gradient and get_value share a single evaluate() call when
+    positions have not changed."""
+    counter = _wrap_with_counter(calculator)
+    pes = PotentialEnergySurface(v4atoms, calculator)
+
+    pes.get_gradient()
+    assert counter[0] == 1
+
+    pes.get_value()
+    assert counter[0] == 1
+
+
+def test_set_x_invalidates(v4atoms, calculator):
+    """set_x flips the stale flag so the next evaluate() recomputes."""
+    counter = _wrap_with_counter(calculator)
+    pes = PotentialEnergySurface(v4atoms, calculator)
+
+    pes.get_gradient()
+    assert counter[0] == 1
+
+    pes.set_x(pes.get_x())
+    pes.get_gradient()
+    assert counter[0] == 2
+
+
+def test_bfgs_one_evaluate_per_step(v4atoms, calculator):
+    """A BFGS run should trigger exactly one evaluate() per optimizer step,
+    not two (gradient + value were previously evaluated independently)."""
+    v4atoms = v4atoms * (2, 2, 2)
+    v4atoms.rattle(stdev=0.01, seed=42)
+
+    counter = _wrap_with_counter(calculator)
+    pes = PotentialEnergySurface(v4atoms, calculator)
+
+    steps = 5
+    with BFGS(pes, logfile=None) as opt:
+        opt.run(fmax=1e-6, steps=steps)
+
+    # BFGS's Dynamics.irun() evaluates once at start, then once per step.
+    assert counter[0] == steps + 1
