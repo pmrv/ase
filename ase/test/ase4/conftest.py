@@ -52,7 +52,9 @@ def properties(
 
 @pytest.fixture
 def atoms() -> V3Atoms:
-    return bulk('Cu', 'fcc', a=3.6)
+    atoms = bulk('Cu', 'fcc', a=3.6) * (2, 2, 2)
+    atoms.rattle(stdev=0.01, seed=42)
+    return atoms
 
 
 # a bit hacky for now
