@@ -777,6 +777,67 @@ class SymmetryAdaptedAtoms(Optimizable):
     def atoms_z(self):
         return self.get_x()[self._ndofs_cell :]
 
+    def logheaders(self):
+        dtitles = '    '.join([f'q{i:02d}' for i in range(len(self.atoms_z))])
+        return (
+            f'iter  time     E           maxF   maxS     maxG   a1    a2'
+            f'    a3    L1      L2       L3     {dtitles}'
+            '   log_10 viol. (F / S)'
+        )
+
+    def step_to_string(self, i, fmax, smax):
+        import time
+
+        T = time.localtime()
+        tstr = '%02d:%02d:%02d' % (T[3], T[4], T[5])
+        E = self.actual_atoms.get_potential_energy()
+        F = self.back_Fav  # get_forces()
+        g = self.get_gradient()
+        Fmax = np.max(np.linalg.norm(F, axis=1))
+        sFmax = f'{Fmax:7.3f}'
+        if Fmax < fmax:
+            sFmax = green(sFmax)
+
+        Smax = self.stress_conv
+        sSmax = f'{Smax:7.4f}'
+        if Smax < smax:
+            sSmax = green(sSmax)
+
+        gmax = np.max(np.abs(g))
+
+        cell = self.actual_atoms.cell
+        a = cell.angles()
+        l = cell.lengths()
+        cell = f'{a[0]:5.1f} {a[1]:5.1f} {a[2]:5.1f} '
+        cell += f'{l[0]:7.3f} {l[1]:7.3f} {l[2]:7.3f}'
+
+        dofs = ''
+        for Z in self.atoms_z:
+            dofs += f' {Z:6.3f}'
+        syviol = np.log10(self.symmetry_force_violation)
+        symviol = f'{syviol:4.1f}'
+        if syviol < fmax:
+            symviol = green(symviol)
+        syviol2 = np.log10(self.symmetry_stress_violation)
+        symviol2 = f'{syviol2:4.1f}'
+        if syviol2 < smax:
+            symviol2 = green(symviol2)
+        return (
+            f'{i:5d} {tstr} {E:9.5f} {sFmax} {sSmax} {gmax:7.3f}'
+            f' {cell}{dofs} {symviol} {symviol2}'
+        )
+
+
+def print_headers(atoms, log):
+    pretty_header('Symmetry adapted Cell and Atomic Relaxation', log)
+    pretty_subheader('Original atoms', log)
+    pprint_atoms(atoms, log)
+
+
+def print_symmetrized_atoms(atoms, log):
+    pretty_subheader('Symmetrized atoms', log)
+    pprint_atoms(atoms, log)
+
 
 class Relax:
     """General utility class to log and perform symmetry adapted relax"""
@@ -807,10 +868,8 @@ class Relax:
 
         self.symprec = symprec
 
-        pretty_header('Symmetry adapted Cell and Atomic Relaxation', self.log)
-        pretty_subheader('Original atoms', self.log)
         self.original_atoms = atoms.copy()
-        pprint_atoms(self.original_atoms, self.log)
+        print_headers(atoms, self.log)
 
         self.atoms = atoms
         if atoms_symmetries is None:
@@ -852,8 +911,9 @@ class Relax:
         self.calc = calc
         self.symmetry_adapted_atoms.actual_atoms.calc = calc()
 
-        pretty_subheader('Symmetrized atoms', self.log)
-        pprint_atoms(self.symmetry_adapted_atoms.actual_atoms, self.log)
+        print_symmetrized_atoms(
+            self.symmetry_adapted_atoms.actual_atoms, self.log
+        )
 
         self.optimizer_factory = optimizer_factory
         self.optimizer = self.optimizer_factory(self.symmetry_adapted_atoms)
@@ -874,64 +934,15 @@ class Relax:
         self.smax = smax
         self.fmax = fmax
         self.maxiter = steps
-        i = 0
-        dtitles = '    '.join(
-            [
-                f'q{i:02d}'
-                for i in range(len(self.symmetry_adapted_atoms.atoms_z))
-            ]
-        )
-        self.log(
-            f'iter  time     E           maxF   maxS     maxG   a1    a2'
-            f'    a3    L1      L2       L3     {dtitles}'
-            '   log_10 viol. (F / S)'
-        )
-        for _ in self.optimizer.irun(fmax=fmax):
-            import time
 
-            T = time.localtime()
-            tstr = '%02d:%02d:%02d' % (T[3], T[4], T[5])
-            E = self.symmetry_adapted_atoms.actual_atoms.get_potential_energy()
-            F = self.symmetry_adapted_atoms.back_Fav  # get_forces()
-            g = self.symmetry_adapted_atoms.get_gradient()
-            Fmax = np.max(np.linalg.norm(F, axis=1))
-            sFmax = f'{Fmax:7.3f}'
-            if Fmax < self.fmax:
-                sFmax = green(sFmax)
+        self.log(self.symmetry_adapted_atoms.logheaders())
 
-            Smax = self.symmetry_adapted_atoms.stress_conv
-            sSmax = f'{Smax:7.4f}'
-            if Smax < self.smax:
-                sSmax = green(sSmax)
-
-            gmax = np.max(np.abs(g))
-
-            cell = self.symmetry_adapted_atoms.actual_atoms.cell
-            a = cell.angles()
-            l = cell.lengths()
-            cell = f'{a[0]:5.1f} {a[1]:5.1f} {a[2]:5.1f} '
-            cell += f'{l[0]:7.3f} {l[1]:7.3f} {l[2]:7.3f}'
-
-            dofs = ''
-            for Z in self.symmetry_adapted_atoms.atoms_z:
-                dofs += f' {Z:6.3f}'
-            syviol = np.log10(
-                self.symmetry_adapted_atoms.symmetry_force_violation
+        for i, _ in enumerate(self.optimizer.irun(fmax=fmax)):
+            line = self.symmetry_adapted_atoms.step_to_string(
+                i, fmax=self.fmax, smax=self.smax
             )
-            symviol = f'{syviol:4.1f}'
-            if syviol < self.fmax:
-                symviol = green(symviol)
-            syviol2 = np.log10(
-                self.symmetry_adapted_atoms.symmetry_stress_violation
-            )
-            symviol2 = f'{syviol2:4.1f}'
-            if syviol2 < self.smax:
-                symviol2 = green(symviol2)
-            self.log(
-                f'{i:5d} {tstr} {E:9.5f} {sFmax} {sSmax} {gmax:7.3f}'
-                f' {cell}{dofs} {symviol} {symviol2}'
-            )
-            i += 1
+            self.log(line)
+
             if i > self.maxiter or i > 40:
                 self.log(f'Not converged in {self.maxiter} or 40 steps.')
                 return False
