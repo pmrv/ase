@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Callable
 
 import numpy as np
 
@@ -7,7 +6,6 @@ import numpy as np
 @dataclass
 class SymGradient:
     gradient: np.ndarray
-    # loginfo: Callable
     fnorm: float
     snorm: float
     converged: bool
@@ -18,7 +16,13 @@ class SymGradient:
     volume: float
 
     def loginfo(self):
-        return {'F': self.fnorm, 'S': self.snorm, 'Ferr': self.symmetry_force_violation, 'Serr': self.symmetry_stress_violation, 'V': self.volume}
+        return {
+            'F': self.fnorm,
+            'S': self.snorm,
+            'Ferr': self.symmetry_force_violation,
+            'Serr': self.symmetry_stress_violation,
+            'V': self.volume,
+        }
 
     def datafy(self):
         # XXX save something useful
