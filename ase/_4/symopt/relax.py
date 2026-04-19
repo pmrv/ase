@@ -732,6 +732,7 @@ class SymmetryAdaptedAtoms(Optimizable):
             converged=converged,
             fnorm=self._fnorm(back_Fav),
             snorm=self._snorm(back_Svv),
+            volume=self.actual_atoms.cell.volume,
         )
 
     def get_gradient(self):

@@ -15,9 +15,10 @@ class SymGradient:
     backS_vv: np.ndarray
     symmetry_force_violation: float
     symmetry_stress_violation: float
+    volume: float
 
     def loginfo(self):
-        return {'F': self.fnorm, 'S': self.snorm, 'Ferr': self.symmetry_force_violation, 'Serr': self.symmetry_stress_violation}
+        return {'F': self.fnorm, 'S': self.snorm, 'Ferr': self.symmetry_force_violation, 'Serr': self.symmetry_stress_violation, 'V': self.volume}
 
     def datafy(self):
         # XXX save something useful
