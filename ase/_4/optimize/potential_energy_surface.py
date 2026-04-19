@@ -24,7 +24,8 @@ class PotentialEnergySurface(Optimizable):
     def evaluate(self):
         if self._stale:
             self._results = self.calc.evaluate(
-                self.atoms, properties=list(self.properties))
+                self.atoms, properties=list(self.properties)
+            )
             self._stale = False
         return self._results
 

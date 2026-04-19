@@ -95,10 +95,10 @@ class Atoms(_LimitedAtoms):
     def get_total_energy(self, **kwargs):
         raise NotImplementedError(
             "Use calculator.evaluate(atoms, properties=['energy']) in ASE v4 "
-            "and add atoms.get_kinetic_energy()."
+            'and add atoms.get_kinetic_energy().'
         )
 
     def get_properties(self, *args, **kwargs):
         raise NotImplementedError(
-            "Use calculator.evaluate(atoms, properties=[...]) in ASE v4."
+            'Use calculator.evaluate(atoms, properties=[...]) in ASE v4.'
         )
