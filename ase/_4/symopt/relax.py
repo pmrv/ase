@@ -325,9 +325,7 @@ class SymmetryAdaptedCellCoordinates:
         return osymC_cv, symC_cv, M_cc, rot_vv
 
     @classmethod
-    def unit_cell_symmetry(
-        cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log
-    ):
+    def unit_cell_symmetry(cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log):
         pretty(
             C_cv @ C_cv.T, "Cell metric (M_cc' = C_cv C_c'v)", units, log=log
         )
