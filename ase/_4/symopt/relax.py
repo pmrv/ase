@@ -208,14 +208,14 @@ class AtomsSymmetries:
 
 
 @dataclass
-class SymmeryAdaptedCellCoordinates:
+class SymmetryAdaptedCellCoordinates:
     """Class for defining symmetry adapted cell coordinates
 
     Note: This is not symmetry adapted cell, it just provides the set of
     generalized coordinates for the symmetry adapted cell.
     To get the cell, call C_cv = get_cell(cell_z).
 
-    sacc = SymmeryAdaptedCellCoordinates(...)
+    sacc = SymmetryAdaptedCellCoordinates(...)
     sacc.get_cell(cell_z), where cell_z is 1D array of the cell coordinates.
 
     Thus, the M_cc and C_cv here is just the origin of the coordinate system.
@@ -505,8 +505,8 @@ class SymmetryAdaptedAtoms(Optimizable):
         self.fmax = 0.01
 
         pretty_subheader('Symmetry adapted cell coordinates', log)
-        self.cell_coordinates: SymmeryAdaptedCellCoordinates = (
-            SymmeryAdaptedCellCoordinates.build(
+        self.cell_coordinates: SymmetryAdaptedCellCoordinates = (
+            SymmetryAdaptedCellCoordinates.build(
                 self.actual_atoms.cell,
                 self.actual_atoms.pbc,
                 self.symmetries.rotation_scc,
