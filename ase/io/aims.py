@@ -37,9 +37,11 @@ class AimsParseError(Exception):
 
 @deprecated(
     message=(
-        "FHI-aims io is moving to the ase-io-aims plugin."
-        " To test install ase-io-aims and use read(..., format=aims-pyfa)."
-        " This functionality will be removed at a later date."
+        "FHI-aims IO is moving to the ase-io-aims plugin."
+        " To test, install the plugin (`pip install ase-io-aims`)"
+        " and use `read(..., format=aims-plugin)`."
+        " This functionality will be removed at a later date and"
+        " `format=aims` will be used for new functionality."
     ),
     category=FutureWarning,
 )
@@ -255,9 +257,11 @@ def _write_velocities_alias(args: list, kwargs: dict[str, Any]) -> bool:
 )
 @deprecated(
     message=(
-        "FHI-aims io is moving to the ase-io-aims plugin."
-        " To test install ase-io-aims and use write(..., format=aims-pyfa)."
-        " This functionality will be removed at a later date."
+        "FHI-aims IO is moving to the ase-io-aims plugin."
+        " To test, install the plugin (`pip install ase-io-aims`)"
+        " and use `write(..., format=aims-plugin)`."
+        " This functionality will be removed at a later date and"
+        " `format=aims` will be used for new functionality."
     ),
     category=FutureWarning,
 )
@@ -515,9 +519,11 @@ def format_aims_control_parameter(key, value, format="%s"):
 # Write aims control.in files
 @deprecated(
     message=(
-        "FHI-aims io is moving to the ase-io-aims plugin."
-        " To test install ase-io-aims and use write(..., format=aims-control)."
-        " This functionality will be removed at a later date."
+        "FHI-aims IO is moving to the ase-io-aims plugin."
+        " To test, install the plugin (`pip install ase-io-aims`)"
+        " and use `write(..., format=aims-control)`."
+        " This functionality will be removed at a later date and"
+        " `format=aims` will be used for new functionality."
     ),
     category=FutureWarning,
 )
@@ -1707,10 +1713,13 @@ def check_convergence(chunks, non_convergence_ok=False):
 
 
 @deprecated(
+
     message=(
-        "FHI-aims io is moving to the ase-io-aims plugin. To test install "
-        "ase-io-aims and use read(..., format=aims-output-pyfa). "
-        "This functionality will be removed at a later date."
+        "FHI-aims IO is moving to the ase-io-aims plugin."
+        " To test, install the plugin (`pip install ase-io-aims`)"
+        " and use `read(..., format=aims-output-plugin)`."
+        " This functionality will be removed at a later date and"
+        " `format=aims` will be used for new functionality."
     ),
     category=FutureWarning,
 )
@@ -1735,6 +1744,14 @@ def read_aims_output(fd, index=-1, non_convergence_ok=False):
         "FHI-aims io is moving to the ase-io-aims plugin."
         " To test install ase-io-aims and use the function supported there."
         " This functionality will be removed at a later date."
+    ),
+
+    message=(
+        "FHI-aims IO is moving to the ase-io-aims plugin."
+        " To test, install the plugin (`pip install ase-io-aims`)"
+        " and use the function supported there."
+        " This functionality will be removed at a later date and"
+        " `format=aims` will be used for new functionality."
     ),
     category=FutureWarning,
 )
