@@ -1741,12 +1741,6 @@ def read_aims_output(fd, index=-1, non_convergence_ok=False):
 
 @deprecated(
     message=(
-        "FHI-aims io is moving to the ase-io-aims plugin."
-        " To test install ase-io-aims and use the function supported there."
-        " This functionality will be removed at a later date."
-    ),
-
-    message=(
         "FHI-aims IO is moving to the ase-io-aims plugin."
         " To test, install the plugin (`pip install ase-io-aims`)"
         " and use the function supported there."
