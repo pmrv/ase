@@ -92,6 +92,10 @@ class Optimizer:
 
     def irun(self, *, steps: int | None = None) -> Iterator[Step]:
         if self.step is None:
+            # XXX does not allow the method to write anything.
+            if hasattr(self.target, 'log_headers'):
+                self.log.write(self.target.log_headers())
+                self.log.write('\n')
             self.step = Step.start(self.target)
             self._writefiles(self.step)
             yield self.step
@@ -114,7 +118,13 @@ class Optimizer:
             yield self.step
 
     def _writefiles(self, step):
-        write_to_log(self.method, self.log, self.step)
+        # XXX Also need to pass method, at least.
+        # Or maybe method should log to a separate line.
+        if hasattr(self.target, 'step_to_string'):
+            self.log.write(self.target.step_to_string(step))
+            self.log.write('\n')
+        else:
+            write_to_log(self.method, self.log, self.step)
         if self.trajectory is not None:
             write_to_traj(self.target, self.trajectory, self.comm)
         if self.restartfile is not None and self.comm.rank == 0:

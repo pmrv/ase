@@ -37,6 +37,14 @@ class SymOpt:
         self.fmax = symmatoms.fmax = fmax
         self.smax = symmatoms.smax = smax
 
+    def step_to_string(self, step):
+        return self.symmatoms.step_to_string(
+            step.i, self.fmax, self.smax, step.gradient_obj
+        )
+
+    def log_headers(self):
+        return self.symmatoms.logheaders()
+
     @property
     def optimizable(self):
         # Needed for gradient_norm()
@@ -60,12 +68,12 @@ class SymOpt:
         return self.symmatoms.get_value()
 
     def get_gradient(self):
-        gradient = self.symmatoms._get_gradient()
+        return self.symmatoms._get_gradient()
 
         # def loginfo():
         #     return {'hello': 42}
 
-        return SymGradient(**gradient)
+        # return SymGradient(**gradient)
 
     def get_x(self):
         return self.symmatoms.get_x()

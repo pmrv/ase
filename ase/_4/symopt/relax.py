@@ -721,7 +721,9 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         converged = self._converged(back_Fav, self.fmax, back_Svv, self.smax)
 
-        return dict(
+        from ase._4.optimize.symopt import SymGradient
+
+        return SymGradient(
             gradient=np.hstack([grad_z, atoms_grad_z]),
             backF_av=back_Fav,
             backS_vv=back_Svv,
@@ -735,11 +737,11 @@ class SymmetryAdaptedAtoms(Optimizable):
 
     def get_gradient(self):
         grad_obj = self._get_gradient()
-        self.back_Fav = grad_obj['backF_av']
-        self.back_Svv = grad_obj['backS_vv']
-        self.symmetry_force_violation = grad_obj['symmetry_force_violation']
-        self.symmetry_stress_violation = grad_obj['symmetry_stress_violation']
-        return grad_obj['gradient']
+        self.back_Fav = grad_obj.backF_av
+        self.back_Svv = grad_obj.backS_vv
+        self.symmetry_force_violation = grad_obj.symmetry_force_violation
+        self.symmetry_stress_violation = grad_obj.symmetry_stress_violation
+        return grad_obj.gradient
 
     def gradient_norm(self, grad_z):
         # Go actually to cell metric
@@ -783,14 +785,15 @@ class SymmetryAdaptedAtoms(Optimizable):
             '   log_10 viol. (F / S)'
         )
 
-    def step_to_string(self, i, fmax, smax):
+    def step_to_string(self, i, fmax, smax, gradient_obj):
         import time
 
         T = time.localtime()
         tstr = '%02d:%02d:%02d' % (T[3], T[4], T[5])
         E = self.actual_atoms.get_potential_energy()
-        F = self.back_Fav  # get_forces()
-        g = self.get_gradient()
+        F = gradient_obj.backF_av
+        g = gradient_obj.gradient  # XXX clean up
+        # g = self.get_gradient()
         Fmax = np.max(np.linalg.norm(F, axis=1))
         sFmax = f'{Fmax:7.3f}'
         if Fmax < fmax:
@@ -812,11 +815,17 @@ class SymmetryAdaptedAtoms(Optimizable):
         dofs = ''
         for Z in self.atoms_z:
             dofs += f' {Z:6.3f}'
-        syviol = np.log10(self.symmetry_force_violation)
+        if gradient_obj.symmetry_force_violation:
+            syviol = np.log10(gradient_obj.symmetry_force_violation)
+        else:
+            syviol = -np.inf
         symviol = f'{syviol:4.1f}'
         if syviol < fmax:
             symviol = green(symviol)
-        syviol2 = np.log10(self.symmetry_stress_violation)
+        if gradient_obj.symmetry_stress_violation:
+            syviol2 = np.log10(gradient_obj.symmetry_stress_violation)
+        else:
+            syviol2 = -np.inf
         symviol2 = f'{syviol2:4.1f}'
         if syviol2 < smax:
             symviol2 = green(symviol2)
@@ -936,8 +945,9 @@ class Relax:
         self.log(self.symmetry_adapted_atoms.logheaders())
 
         for i, _ in enumerate(self.optimizer.irun(fmax=fmax)):
+            gradient_obj = self.symmetry_adapted_atoms._get_gradient()
             line = self.symmetry_adapted_atoms.step_to_string(
-                i, fmax=self.fmax, smax=self.smax
+                i, self.fmax, self.smax, gradient_obj
             )
             self.log(line)
 
