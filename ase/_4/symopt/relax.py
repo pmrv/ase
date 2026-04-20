@@ -192,7 +192,7 @@ class AtomsSymmetries:
         )
 
     @classmethod
-    def from_GPAW(cls, atoms, log=None, *, tolerance, symmorphic):
+    def from_GPAW(cls, atoms, *, log, tolerance, symmorphic):
         from gpaw.new.symmetry import create_symmetries_object
 
         gpaw_symmetries = create_symmetries_object(
@@ -326,7 +326,7 @@ class SymmetryAdaptedCellCoordinates:
 
     @classmethod
     def unit_cell_symmetry(
-        cls, C_cv, rotation_scc, pbc_c, units='Å^2', log=None
+        cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log
     ):
         pretty(
             C_cv @ C_cv.T, "Cell metric (M_cc' = C_cv C_c'v)", units, log=log
