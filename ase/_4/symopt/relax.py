@@ -369,7 +369,8 @@ class SymmetryAdaptedCellCoordinates:
             A_blocks.append(np.vstack(rows))
         for c in range(3):
             if not pbc_c[c]:
-                A_blocks.append(e(c, c).reshape(9))
+                for cprime in range(3):
+                    A_blocks.append(e(c, cprime).reshape(9))
         A = np.vstack(A_blocks)
         A = A @ eps_ijk.reshape((9, 6))
         # Compute null space via SVD
