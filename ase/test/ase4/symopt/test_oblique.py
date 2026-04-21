@@ -1,9 +1,13 @@
 import numpy as np
+import pytest
+
 from ase import Atoms
-from ase._4.symopt.relax import SymmetryAdaptedAtoms
+from ase._4.symopt.relax import SymmetryAdaptedAtoms, chol_derivative
 
 
 def test_oblique():
+    """Test against bug where oblique cell vector acquired a z component."""
+
     cell = np.array(
         [
             6.871958264638166,
@@ -65,8 +69,17 @@ def test_oblique():
 
     # symm = SymmetryAdaptedAtoms.from_atoms_spglib(atoms, symprec=0.1)
     symm = SymmetryAdaptedAtoms.from_atoms(atoms, symprec=0.1, symmorphic=False)
+
+    coords = symm.cell_coordinates
+    for dM_cc in coords.dM_zcc:
+        dC_cv = chol_derivative(coords.M_cc, dM_cc) @ coords.rot_vv.T
+        # Bug meant that dC_cv[0, 2] would be nonzero in one case
+        assert dC_cv[2, :2] == pytest.approx(0, abs=1e-15)
+        assert dC_cv[:2, 2] == pytest.approx(0, abs=1e-15)
+
+    # Let's also verify that actual coordinates do not misbehave:
     x = symm.get_x()
-    assert all(x == 0)
+    assert all(x == 0)  # Coordinates start as zero.
     symm.set_x(x + 0.1)
 
     assert not atoms.cell[2, :2].any()
