@@ -2,7 +2,11 @@ import numpy as np
 import pytest
 
 from ase import Atoms
-from ase._4.symopt.relax import SymmetryAdaptedAtoms, chol_derivative
+from ase._4.symopt.relax import (
+    AtomsSymmetries,
+    SymmetryAdaptedAtoms,
+    chol_derivative,
+)
 
 
 def test_oblique():
@@ -67,10 +71,10 @@ def test_oblique():
     assert not atoms.cell[2, :2].any()
     assert not atoms.cell[:2, 2].any()
 
-    # symm = SymmetryAdaptedAtoms.from_atoms_spglib(atoms, symprec=0.1)
-    symm = SymmetryAdaptedAtoms.from_atoms(atoms, symprec=0.1, symmorphic=False)
+    symmetries = AtomsSymmetries.from_spglib_auto(atoms)
+    symmatoms = SymmetryAdaptedAtoms(atoms, symmetries)
 
-    coords = symm.cell_coordinates
+    coords = symmatoms.cell_coordinates
     for dM_cc in coords.dM_zcc:
         dC_cv = chol_derivative(coords.M_cc, dM_cc) @ coords.rot_vv.T
         # Bug meant that dC_cv[0, 2] would be nonzero in one case
@@ -78,9 +82,9 @@ def test_oblique():
         assert dC_cv[:2, 2] == pytest.approx(0, abs=1e-15)
 
     # Let's also verify that actual coordinates do not misbehave:
-    x = symm.get_x()
+    x = symmatoms.get_x()
     assert all(x == 0)  # Coordinates start as zero.
-    symm.set_x(x + 0.1)
+    symmatoms.set_x(x + 0.1)
 
     assert not atoms.cell[2, :2].any()
     assert not atoms.cell[:2, 2].any()

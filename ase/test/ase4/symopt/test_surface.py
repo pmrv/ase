@@ -6,7 +6,7 @@ import pytest
 from ase._4.optimize.bfgs import BFGSMethod, fd_hessian
 from ase._4.optimize.run import Optimizer
 from ase._4.optimize.symopt import SymOpt
-from ase._4.symopt.relax import Relax, SymmetryAdaptedAtoms
+from ase._4.symopt.relax import Relax, SymmetryAdaptedAtoms, apply_pbc_to_symops
 from ase.build import fcc111
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
@@ -62,39 +62,6 @@ def test_relaxation_old(atoms0):
 
     energy = atoms.get_potential_energy()
     assert energy == pytest.approx(ref_energy)
-
-
-def apply_pbc_to_symops(rotations, translations, pbc):
-    """spglib thinks we are a 3d system, but actually we may be 2D/1D.
-
-    spglib will produce symops that involve e.g. a z-flip, but that
-    flips the positions to negative z-values, and we need to apply the
-    full z axis as translation vector in order to map the position back
-    into the cell.
-
-    This function equips such operations with the necessary translations.
-
-    We also do some sanity checking.
-    """
-    translations = translations.copy()
-    assert len(rotations) == len(translations)
-
-    for i in range(3):
-        if pbc[i]:
-            continue
-
-        for s in range(len(rotations)):
-            nonpbc_rot = rotations[s, i, i]
-            assert nonpbc_rot in (-1, 1)
-            nonpbc_op_row = np.zeros(3, int)
-            nonpbc_op_row[i] = nonpbc_rot
-            assert (rotations[s, :, i] == nonpbc_op_row).all()
-            assert (rotations[s, i, :] == nonpbc_op_row).all()
-            if nonpbc_rot == -1:
-                assert translations[s, i] == 0
-                translations[s, i] = 1.0
-
-    return translations
 
 
 def seventy(target):

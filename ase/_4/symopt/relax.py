@@ -146,6 +146,39 @@ def symmetrize_atoms(
     return Ssym_ac
 
 
+def apply_pbc_to_symops(rotations, translations, pbc):
+    """spglib thinks we are a 3d system, but actually we may be 2D/1D.
+
+    spglib will produce symops that involve e.g. a z-flip, but that
+    flips the positions to negative z-values, and we need to apply the
+    full z axis as translation vector in order to map the position back
+    into the cell.
+
+    This function equips such operations with the necessary translations.
+
+    We also do some sanity checking.
+    """
+    translations = translations.copy()
+    assert len(rotations) == len(translations)
+
+    for i in range(3):
+        if pbc[i]:
+            continue
+
+        for s in range(len(rotations)):
+            nonpbc_rot = rotations[s, i, i]
+            assert nonpbc_rot in (-1, 1)
+            nonpbc_op_row = np.zeros(3, int)
+            nonpbc_op_row[i] = nonpbc_rot
+            assert (rotations[s, :, i] == nonpbc_op_row).all()
+            assert (rotations[s, i, :] == nonpbc_op_row).all()
+            if nonpbc_rot == -1:
+                assert abs(translations[s, i]) < 1e-15, translations[s, i]
+                translations[s, i] = 1.0
+
+    return translations
+
+
 @dataclass
 class AtomsSymmetries:
     """
@@ -181,13 +214,18 @@ class AtomsSymmetries:
 
         args = argsort_rotations(dataset.rotations.transpose(0, 2, 1))
 
+        rotations = dataset.rotations[args]
+        translations = apply_pbc_to_symops(
+            dataset.rotations, dataset.translations, pbc=atoms.pbc
+        )[args]
+
         return cls(
-            rotation_scc=dataset.rotations[args].transpose(0, 2, 1).copy(),
-            translation_sc=-dataset.translations[args],
+            rotation_scc=rotations.transpose(0, 2, 1).copy(),
+            translation_sc=-translations,
             atommap_sa=build_atommaps(
                 atoms.copy(),
-                dataset.rotations[args].copy(),
-                dataset.translations[args].copy(),
+                rotations,
+                translations.copy(),
             ),
         )
 
