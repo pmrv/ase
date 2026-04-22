@@ -218,6 +218,7 @@ class AtomsSymmetries:
         translations = apply_pbc_to_symops(
             dataset.rotations, dataset.translations, pbc=atoms.pbc
         )[args]
+        translations = snap_translations_to_zero(translations)
 
         return cls(
             rotation_scc=rotations.transpose(0, 2, 1).copy(),

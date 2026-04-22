@@ -13,6 +13,7 @@ def build_one_atommap(
 
     atommap_a = []
     assert len(atoms1) == len(atoms2)
+
     for a in range(len(atoms1)):
         _, distances = find_mic(
             atoms2.positions[a] - atoms1.positions,
@@ -49,11 +50,11 @@ def build_atommaps(
     assert len(rotations) == len(translations)
     atommap_sa = []
 
-    orig_spos = atoms.get_scaled_positions(wrap=False)
+    orig_spos = atoms.get_scaled_positions() % 1.0 % 1.0
     mapped_atoms = atoms.copy()
 
     for rot, trans in zip(rotations, translations):
-        newspos = transform(orig_spos, rot, trans)
+        newspos = transform(orig_spos, rot, trans) % 1.0 % 1.0
         mapped_atoms.positions[:] = atoms.cell.cartesian_positions(newspos)
         atommap = build_one_atommap(atoms, mapped_atoms, maxerr, min_atomdist)
         atommap_sa.append(atommap)
