@@ -49,7 +49,7 @@ def test_compare_symops_gpaw_vs_spglib(diamond):
     symmetry = create_symmetries_object(diamond, symmorphic=False)
     dataset = spglib_dataset(diamond)
 
-    gpaw_symops = symop_dict(symmetry.rotation_scc, -symmetry.translation_sc)
+    gpaw_symops = symop_dict(symmetry.rotation_scc, symmetry.translation_sc)
     spglib_symops = symop_dict(
         dataset.rotations.transpose(0, 2, 1), dataset.translations
     )
