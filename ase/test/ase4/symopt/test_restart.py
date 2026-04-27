@@ -20,10 +20,9 @@ def getatoms():
 
 fmax = 1e-5
 smax = 1e-7
-restartfile = 'restart.json'
 
 
-def getopt(atoms):
+def getopt(atoms, restartfile):
     symmatoms = SymmetryAdaptedAtoms.from_atoms_spglib(
         atoms, log=print, symprec=0.1
     )
@@ -34,10 +33,12 @@ def getopt(atoms):
     return Optimizer(target, method, restartfile=restartfile)
 
 
-def test_restart_consistent():
+def test_restart_consistent(tmp_path):
+    restartfile = tmp_path / 'restart.json'
+
     atoms = getatoms()
 
-    opt = getopt(atoms)
+    opt = getopt(atoms, restartfile)
 
     print('run 4')
     step4 = opt.run(steps=4)
