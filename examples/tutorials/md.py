@@ -219,6 +219,7 @@ dyn = Langevin(
 
 # We also want to save the positions of all atoms after every 100th time step.
 traj = Trajectory('fccCu_NPT.traj', 'w', atoms)
+dyn.attach(traj.write, interval=100)
 
 # Now run the dynamics
 print('running a NVT simulation of fcc Cu')
