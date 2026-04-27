@@ -1,6 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from typing import ClassVar
 
 import numpy as np
+
+from ase._4.symopt.relax import SymmetryAdaptedAtoms
 
 
 @dataclass
@@ -25,17 +28,16 @@ class SymGradient:
         }
 
     def datafy(self):
-        # XXX save something useful
-        return {}
+        return asdict(self)
 
 
+@dataclass
 class SymOpt:
-    iotype = 'symopt'
+    iotype: ClassVar[str] = 'symopt'
 
-    def __init__(self, symmatoms, fmax, smax):
-        self.symmatoms = symmatoms
-        self.fmax = symmatoms.fmax = fmax
-        self.smax = symmatoms.smax = smax
+    symmatoms: SymmetryAdaptedAtoms
+    fmax: float
+    smax: float
 
     def step_to_string(self, step):
         return self.symmatoms.step_to_string(
@@ -54,26 +56,26 @@ class SymOpt:
         # What do we need to save?
         # symmatoms defines the initial reduced positions as 0, so the
         # mapping absolutely needs saving aside from the Hessian.
-        return {}  # XXX
+
+        dct = asdict(self).copy()
+        dct['symmatoms'] = self.symmatoms.datafy()
+        return dct
 
     @classmethod
-    def undatafy(cls, dct):
-        raise NotImplementedError
+    def undatafy(cls, dct, calc):
+        dct = dct.copy()
+        dct['symmatoms'] = SymmetryAdaptedAtoms.undatafy(dct['symmatoms'], calc)
+        return cls(**dct)
 
     @classmethod
     def undatafy_gradient(cls, dct):
-        raise NotImplementedError
+        return SymGradient(**dct)
 
     def get_value(self):
         return self.symmatoms.get_value()
 
     def get_gradient(self):
-        return self.symmatoms._get_gradient()
-
-        # def loginfo():
-        #     return {'hello': 42}
-
-        # return SymGradient(**gradient)
+        return self.symmatoms._get_gradient(self.smax)
 
     def get_x(self):
         return self.symmatoms.get_x()

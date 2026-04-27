@@ -132,6 +132,17 @@ class Optimizer:
 
     @classmethod
     def restart(cls, restartfile, calc, **kwargs):
+        # We need these read behaviours:
+        #  * Start from scratch
+        #  * Read this file
+        #  * Read this file if it exists, else start from scratch
+        #
+        # ... and these write behaviours:
+        #
+        #  * Do not write
+        #  * Write to this file
+        #  * Write to file we restarted from
+
         # Since this method has "calc", it doesn't really belong on this
         # class (we know about Targets etc. but not calcs).
         # Maybe therefore this should be a standalone function.
@@ -254,6 +265,7 @@ def write_restartfile(restartfile, method, target, step):
 
 
 def read_restartfile(restartfile, calc):
+    restartfile = Path(restartfile)
     json_text = restartfile.read_text()
     dct = json.loads(json_text, object_hook=object_hook)
 
@@ -266,14 +278,18 @@ def read_restartfile(restartfile, calc):
 
         method = BFGSMethod.undatafy(method_data)
     else:
-        raise ValueError(f'No such method: {method_iotype}')
+        raise ValueError(f'No such method: {method_iotype!r}')
 
     if target_iotype == 'frechet':
         from ase._4.optimize.frechet import FrechetTarget
 
         target = FrechetTarget.undatafy(target_dct, calc)
+    elif target_iotype == 'symopt':
+        from ase._4.optimize.symopt import SymOpt
+
+        target = SymOpt.undatafy(target_dct, calc)
     else:
-        raise ValueError(f'No such target: {target_iotype}')
+        raise ValueError(f'No such target: {target_iotype!r}')
 
     gradient_obj = target.undatafy_gradient(dct['step']['gradient_obj'])
     step = Step.undatafy(dct['step'], gradient_obj)

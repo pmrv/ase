@@ -25,6 +25,8 @@ def build_one_atommap(
         sorted_distances = distances[dist_indices]
         mindist = sorted_distances[0]
         assert mindist < maxerr, f'Symmetry-mapped position off by {mindist}'
+        assert atoms1.symbols[dist_indices[0]] == atoms1.symbols[a]
+        # assert atoms1.symbols[
         if len(sorted_distances) > 1:
             # (This assertion may trigger if input structure is bad)
             assert sorted_distances[1] > min_atomdist, (

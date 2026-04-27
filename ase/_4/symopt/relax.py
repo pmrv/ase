@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 import numpy as np
 
@@ -487,6 +487,7 @@ class SymmetryAdaptedScaledCoordinates:
 
         # Make sure the old svd code reproduces the same result
         U, S, Vh = np.linalg.svd(B_EA, False)
+        print(S)
         tol = 1e-6
         null_mask = S < tol
         nullspace = Vh[null_mask]
@@ -501,6 +502,9 @@ class SymmetryAdaptedScaledCoordinates:
 
         # Just make the printing prettyer for now
         nullspace = np.where(np.abs(nullspace) < 1e-10, 0, nullspace)
+
+        print('ATOMMAP')
+        print(atommap_sa)
 
         s0_ac = symmetrize_atoms(
             s_ac,
@@ -535,37 +539,49 @@ class SymmetryAdaptedAtoms(Optimizable):
     """
 
     def __init__(
-        self, actual_atoms: Atoms, symmetries: AtomsSymmetries, log=print
+        self,
+        actual_atoms: Atoms,
+        symmetries: AtomsSymmetries,
+        log=print,
+        cell_coordinates=None,
+        atom_coordinates=None,
+        value_z=None,
     ):
         self.actual_atoms = actual_atoms
         self.symmetries = symmetries
+
+        # XXX remove these attributes:
         self.symmetry_force_violation = np.inf
         self.fmax = 0.01
 
-        pretty_subheader('Symmetry adapted cell coordinates', log)
-        self.cell_coordinates: SymmetryAdaptedCellCoordinates = (
-            SymmetryAdaptedCellCoordinates.build(
-                self.actual_atoms.cell,
-                self.actual_atoms.pbc,
+        if cell_coordinates is None:
+            pretty_subheader('Symmetry adapted cell coordinates', log)
+            cell_coordinates: SymmetryAdaptedCellCoordinates = (
+                SymmetryAdaptedCellCoordinates.build(
+                    self.actual_atoms.cell,
+                    self.actual_atoms.pbc,
+                    self.symmetries.rotation_scc,
+                    log=log,
+                )
+            )
+
+        self.cell_coordinates = cell_coordinates
+
+        if atom_coordinates is None:
+            pretty_subheader('Symmetry adapted atomic coordinates', log)
+            atom_coordinates = SymmetryAdaptedScaledCoordinates.build(
+                self.actual_atoms.get_scaled_positions(),
                 self.symmetries.rotation_scc,
+                self.symmetries.translation_sc,
+                self.symmetries.atommap_sa,
+                self.cell_coordinates.C_cv,
                 log=log,
             )
-        )
+            pretty_atomic_dofs(actual_atoms, atom_coordinates.dof_zac, log=log)
 
-        pretty_subheader('Symmetry adapted atomic coordinates', log)
-        self.atom_coordinates = SymmetryAdaptedScaledCoordinates.build(
-            self.actual_atoms.get_scaled_positions(),
-            self.symmetries.rotation_scc,
-            self.symmetries.translation_sc,
-            self.symmetries.atommap_sa,
-            self.cell_coordinates.C_cv,
-            log=log,
-        )
-        pretty_atomic_dofs(actual_atoms, self.atom_coordinates.dof_zac, log=log)
+        assert isinstance(atom_coordinates, SymmetryAdaptedScaledCoordinates)
+        self.atom_coordinates = atom_coordinates
 
-        assert isinstance(
-            self.atom_coordinates, SymmetryAdaptedScaledCoordinates
-        )
         # s_ac = dof_zac s_z -> ds_ac/d_sz = dof_zac
         # dR_av / dsz = dR_av / d_sac ds_ac / ds_z
         # R_av = s_ac C_cv
@@ -575,27 +591,52 @@ class SymmetryAdaptedAtoms(Optimizable):
         #
         # self.actual_atoms.wrap()
         # self.actual_atoms.set_scaled_positions(self.S_ac)
-        if 1:
-            log('Skipping sanity checks for now')
-        else:
-            pass
-            # new_positions = atoms.get_positions()
-            # dR_av = new_positions - old_positions
-            # s_ac = np.linalg.solve(self.C_cv, dR_av.T)
-            # assert (
-            #     np.max(np.abs(new_positions.flatten() -
-            #                   old_positions.flatten()))
-            #     < symprec
-            # )
+        # if 1:
+        #     log('Skipping sanity checks for now')
+        # else:
+        #     pass
+        #    # new_positions = atoms.get_positions()
+        #    # dR_av = new_positions - old_positions
+        #    # s_ac = np.linalg.solve(self.C_cv, dR_av.T)
+        #    # assert (
+        #    #     np.max(np.abs(new_positions.flatten() -
+        #    #                   old_positions.flatten()))
+        #    #     < symprec
+        #    # )
 
         self._ndofs_cell = len(self.cell_coordinates.dM_zcc)
         self._ndofs_atoms = len(self.atom_coordinates.dof_zac)
         self._ndofs = self._ndofs_cell + self._ndofs_atoms
 
-        self.value_z = np.zeros((self._ndofs))
+        if value_z is None:
+            value_z = np.zeros((self._ndofs))
+
+        self.value_z = value_z
         # !!! This actually symmetrizes actual atoms
         self.set_x(self.value_z)
         self.actual_atoms.wrap()
+
+    def datafy(self):
+        return {
+            'actual_atoms': self.actual_atoms,
+            'symmetries': asdict(self.symmetries),
+            'value_z': self.value_z,
+            'cell_coordinates': asdict(self.cell_coordinates),
+            'atom_coordinates': asdict(self.atom_coordinates),
+        }
+
+    @classmethod
+    def undatafy(cls, dct, calc):
+        dct = dct.copy()
+        dct['symmetries'] = AtomsSymmetries(**dct['symmetries'])
+        dct['cell_coordinates'] = SymmetryAdaptedCellCoordinates(
+            **dct['cell_coordinates']
+        )
+        dct['atom_coordinates'] = SymmetryAdaptedScaledCoordinates(
+            **dct['atom_coordinates']
+        )
+        dct['actual_atoms'].calc = calc
+        return cls(**dct, log=lambda *args, **kwargs: None)
 
     @classmethod
     def from_atoms_spglib(cls, atoms, log=print, *, symprec):
@@ -604,6 +645,12 @@ class SymmetryAdaptedAtoms(Optimizable):
 
     @classmethod
     def from_spglib_dataset(cls, atoms, dataset, log=print):
+        # XXX This will fail in atommaps if atoms are not exactly symmetrized.
+        # Better to not fail now, but rather wait until after the
+        # symmetrization and then check the atommaps against the
+        # symmetrized atoms with a fine tolerance.
+        #
+        # Here we can only promise ~symprec tolerance.
         symmetries = AtomsSymmetries.from_spglib(atoms, dataset)
         return cls(atoms, symmetries, log=log)
 
@@ -678,7 +725,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         # still violate the imposed symmetry in Cartesian space.
         return np.zeros((3, 3))
 
-    def _get_gradient(self):
+    def _get_gradient(self, smax):
         grad_z = np.zeros(self._ndofs_cell)
         S_vv = self.actual_atoms.get_stress(voigt=False)
         C_cv = self.cell_coordinates.get_cell(self.cell_z)
@@ -714,7 +761,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         dS_vv = S_vv * mask_3x3 - back_Svv
         symmetry_stress_violation = np.linalg.norm(dS_vv)
 
-        if symmetry_stress_violation > self.smax:
+        if symmetry_stress_violation > smax:
             import warnings
 
             warnings.warn(
@@ -759,7 +806,7 @@ class SymmetryAdaptedAtoms(Optimizable):
 
             warnings.warn('\n'.join(warning_chunks))
 
-        converged = self._converged(back_Fav, self.fmax, back_Svv, self.smax)
+        converged = self._converged(back_Fav, self.fmax, back_Svv, smax)
 
         from ase._4.optimize.symopt import SymGradient
 
@@ -776,7 +823,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         )
 
     def get_gradient(self):
-        grad_obj = self._get_gradient()
+        grad_obj = self._get_gradient(smax=self.smax)
         self.back_Fav = grad_obj.backF_av
         self.back_Svv = grad_obj.backS_vv
         self.symmetry_force_violation = grad_obj.symmetry_force_violation
