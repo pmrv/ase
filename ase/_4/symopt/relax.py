@@ -1032,7 +1032,7 @@ class Relax:
         self.log(self.symmetry_adapted_atoms.logheaders())
 
         for i, _ in enumerate(self.optimizer.irun(fmax=fmax)):
-            gradient_obj = self.symmetry_adapted_atoms._get_gradient()
+            gradient_obj = self.symmetry_adapted_atoms._get_gradient(smax=smax)
             line = self.symmetry_adapted_atoms.step_to_string(
                 i, self.fmax, self.smax, gradient_obj
             )
