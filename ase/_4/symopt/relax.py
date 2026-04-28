@@ -487,7 +487,6 @@ class SymmetryAdaptedScaledCoordinates:
 
         # Make sure the old svd code reproduces the same result
         U, S, Vh = np.linalg.svd(B_EA, False)
-        print(S)
         tol = 1e-6
         null_mask = S < tol
         nullspace = Vh[null_mask]
@@ -502,9 +501,6 @@ class SymmetryAdaptedScaledCoordinates:
 
         # Just make the printing prettyer for now
         nullspace = np.where(np.abs(nullspace) < 1e-10, 0, nullspace)
-
-        print('ATOMMAP')
-        print(atommap_sa)
 
         s0_ac = symmetrize_atoms(
             s_ac,
