@@ -57,9 +57,11 @@ class SymOpt:
         # symmatoms defines the initial reduced positions as 0, so the
         # mapping absolutely needs saving aside from the Hessian.
 
-        dct = asdict(self).copy()
-        dct['symmatoms'] = self.symmatoms.datafy()
-        return dct
+        return {
+            'fmax': self.fmax,
+            'smax': self.smax,
+            'symmatoms': self.symmatoms.datafy(),
+        }
 
     @classmethod
     def undatafy(cls, dct, calc):
