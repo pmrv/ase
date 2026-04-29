@@ -2,15 +2,46 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterator
 
 import numpy as np
 
+import ase
 from ase import Atoms
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
 from ase.parallel import world
+from ase.utils import search_current_git_hash
+
+
+@lru_cache
+def ase_version() -> str:
+    githash = search_current_git_hash(ase)
+
+    version = f'ase-{ase.__version__}'
+    if githash is not None:
+        version = f'{version} @ {githash}'
+    return version
+
+
+def toplevel_header(target, method):
+    import datetime
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    # Log initialization
+    # Log fmax/smax if known?
+    # Allow each object to write description of itself
+
+    return (
+        f'{ase_version()}\n'
+        f"Optimizing '{target.__class__.__name__}' "
+        f'using method {method.methodname!r} '
+        f'starting {timestamp}\n\n'
+    )
 
 
 class Target:
@@ -91,6 +122,7 @@ class Optimizer:
         return self.step
 
     def irun(self, *, steps: int | None = None) -> Iterator[Step]:
+        self.log.write(toplevel_header(self.target, self.method))
         if self.step is None:
             # XXX does not allow the method to write anything.
             if hasattr(self.target, 'log_headers'):
