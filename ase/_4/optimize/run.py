@@ -149,6 +149,8 @@ class Optimizer:
             self._writefiles(self.step)
             yield self.step
 
+        self.log.write(f'\nOptimization ended with step {self.step.i}.')
+
     def _writefiles(self, step):
         # XXX Also need to pass method, at least.
         # Or maybe method should log to a separate line.
