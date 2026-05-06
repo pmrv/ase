@@ -77,7 +77,7 @@ class SymOpt:
         return self.symmatoms.get_value()
 
     def get_gradient(self):
-        return self.symmatoms._get_gradient(self.smax)
+        return self.symmatoms._get_gradient(fmax=self.fmax, smax=self.smax)
 
     def get_x(self):
         return self.symmatoms.get_x()

@@ -721,7 +721,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         # still violate the imposed symmetry in Cartesian space.
         return np.zeros((3, 3))
 
-    def _get_gradient(self, smax):
+    def _get_gradient(self, fmax, smax):
         grad_z = np.zeros(self._ndofs_cell)
         S_vv = self.actual_atoms.get_stress(voigt=False)
         C_cv = self.cell_coordinates.get_cell(self.cell_z)
@@ -782,7 +782,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         dF_av = F_av - back_Fav
         symmetry_force_violation = np.max(np.linalg.norm(dF_av, axis=1))
 
-        if symmetry_force_violation > self.fmax / 20:
+        if symmetry_force_violation > fmax / 20:
             # Should probably be logged somehow instead of being a warning
             # as such.  This may happen if the code's forces are noisy.
             import warnings
@@ -802,7 +802,7 @@ class SymmetryAdaptedAtoms(Optimizable):
 
             warnings.warn('\n'.join(warning_chunks))
 
-        converged = self._converged(back_Fav, self.fmax, back_Svv, smax)
+        converged = self._converged(back_Fav, fmax, back_Svv, smax)
 
         from ase._4.optimize.symopt import SymGradient
 
@@ -871,18 +871,17 @@ class SymmetryAdaptedAtoms(Optimizable):
     def step_to_string(self, i, fmax, smax, gradient_obj):
         import time
 
-        T = time.localtime()
-        tstr = '%02d:%02d:%02d' % (T[3], T[4], T[5])
+        tstr = time.strftime('%H:%M:%S')
         E = self.actual_atoms.get_potential_energy()
         F = gradient_obj.backF_av
         g = gradient_obj.gradient  # XXX clean up
-        # g = self.get_gradient()
-        Fmax = np.max(np.linalg.norm(F, axis=1))
+        Fmax = gradient_obj.fnorm
         sFmax = f'{Fmax:7.3f}'
+
         if Fmax < fmax:
             sFmax = green(sFmax)
 
-        Smax = self.stress_conv
+        Smax = gradient_obj.snorm
         sSmax = f'{Smax:7.4f}'
         if Smax < smax:
             sSmax = green(sSmax)
