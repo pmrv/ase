@@ -819,7 +819,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         )
 
     def get_gradient(self):
-        grad_obj = self._get_gradient(smax=self.smax)
+        grad_obj = self._get_gradient(fmax=self.fmax, smax=self.smax)
         self.back_Fav = grad_obj.backF_av
         self.back_Svv = grad_obj.backS_vv
         self.symmetry_force_violation = grad_obj.symmetry_force_violation
@@ -1027,7 +1027,9 @@ class Relax:
         self.log(self.symmetry_adapted_atoms.logheaders())
 
         for i, _ in enumerate(self.optimizer.irun(fmax=fmax)):
-            gradient_obj = self.symmetry_adapted_atoms._get_gradient(smax=smax)
+            gradient_obj = self.symmetry_adapted_atoms._get_gradient(
+                fmax=fmax, smax=smax
+            )
             line = self.symmetry_adapted_atoms.step_to_string(
                 i, self.fmax, self.smax, gradient_obj
             )
