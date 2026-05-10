@@ -1,4 +1,5 @@
-from ase._4.optimize.potential_energy_surface import PotentialEnergySurface
+from ase._4.optimize.optimize import OptimizablePES
+from ase._4.pes import PotentialEnergySurface
 from ase.optimize import BFGS
 
 
@@ -16,28 +17,27 @@ def _wrap_with_counter(calculator):
 
 
 def test_caches_within_same_state(v4atoms, calculator):
-    """get_gradient and get_value share a single evaluate() call when
-    positions have not changed."""
+    """Repeated property lookups on a fresh PES share a single evaluate()."""
     counter = _wrap_with_counter(calculator)
     pes = PotentialEnergySurface(v4atoms, calculator)
 
-    pes.get_gradient()
+    pes.get_property('forces')
     assert counter[0] == 1
 
-    pes.get_value()
+    pes.get_property('energy')
     assert counter[0] == 1
 
 
-def test_set_x_invalidates(v4atoms, calculator):
-    """set_x flips the stale flag so the next evaluate() recomputes."""
+def test_set_positions_invalidates(v4atoms, calculator):
+    """set_positions flips the stale flag so the next evaluate() recomputes."""
     counter = _wrap_with_counter(calculator)
     pes = PotentialEnergySurface(v4atoms, calculator)
 
-    pes.get_gradient()
+    pes.get_property('forces')
     assert counter[0] == 1
 
-    pes.set_x(pes.get_x())
-    pes.get_gradient()
+    pes.set_positions(pes.get_positions())
+    pes.get_property('forces')
     assert counter[0] == 2
 
 
@@ -49,9 +49,10 @@ def test_bfgs_one_evaluate_per_step(v4atoms, calculator):
 
     counter = _wrap_with_counter(calculator)
     pes = PotentialEnergySurface(v4atoms, calculator)
+    optimizable = OptimizablePES(pes)
 
     steps = 5
-    with BFGS(pes, logfile=None) as opt:
+    with BFGS(optimizable, logfile=None) as opt:
         opt.run(fmax=1e-6, steps=steps)
 
     # BFGS's Dynamics.irun() evaluates once at start, then once per step.
