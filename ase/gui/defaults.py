@@ -11,7 +11,7 @@ import os
 import runpy
 import warnings
 
-from ase.config import ASE_CONFIG_FILE, Config
+from ase.config import Config
 
 gui_default_settings = {
     'gui_graphs_string': 'i, e - E[-1]',
@@ -71,12 +71,12 @@ def read_defaults():
     """Read ASE configuration files and return an object from which settings
     can be retrieved.
     """
-
     # should look for .config/ase/gui.py
     # if 'XDG_CONFIG_HOME' in os.environ:
     #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
     old_configfile = os.path.expanduser('~/.ase/gui.py')
     if os.path.exists(old_configfile):
+        from ase.config import ASE_CONFIG_FILE
         warnings.warn(
             'Found GUI configuration file gui.py which is deprecated'
             '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',

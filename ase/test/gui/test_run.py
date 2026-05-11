@@ -9,6 +9,7 @@ from ase import Atoms
 from ase.build import bulk, molecule
 from ase.calculators.calculator import compare_atoms
 from ase.calculators.singlepoint import SinglePointCalculator
+import ase.config
 from ase.gui.gui import GUI
 from ase.gui.i18n import _
 from ase.gui.quickinfo import info
@@ -53,7 +54,12 @@ def no_blocking_errors_monkeypatch(monkeypatch):
 
 
 @pytest.fixture()
-def guifactory(display):
+def suppress_user_config(monkeypatch):
+    monkeypatch.setattr(ase.config, 'ASE_CONFIG_FILE', '')
+
+
+@pytest.fixture()
+def guifactory(display, suppress_user_config):
     guis = []
 
     def factory(images):
