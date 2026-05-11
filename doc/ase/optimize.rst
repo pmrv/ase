@@ -249,7 +249,7 @@ FIRE2.0 / ABC-FIRE
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
   | J. Guénolé, W.G. Nöhring, A. Vaid, F. Houllé, Z. Xie, A. Prakash, E. Bitzek,
-  | :doi:`Assessment and optimization of the fast inertial relaxation engine (fire) for energy minimization in atomistic simulations and its implementation in lammps <https://doi.org/10.1016/j.commatsci.2020.109584.>`
+  | :doi:`Assessment and optimization of the fast inertial relaxation engine (fire) for energy minimization in atomistic simulations and its implementation in lammps <https://doi.org/10.1016/j.commatsci.2020.109584>`
   | Comput. Mater. Sci. 175 (2020) 109584.
   |
   | S. Echeverri Restrepo, P. Andric,
