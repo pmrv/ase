@@ -71,7 +71,7 @@ def read_defaults():
     """Read ASE configuration files and return an object from which settings
     can be retrieved.
     """
-    
+
     # should look for .config/ase/gui.py
     # if 'XDG_CONFIG_HOME' in os.environ:
     #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
