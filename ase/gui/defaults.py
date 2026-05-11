@@ -30,7 +30,7 @@ gui_default_settings = {
     'movie_rate': 'auto',  # float or 'auto'
     'movie_skip': 'auto',  # int or 'auto'
     'movie_rock': False,
-}  # end
+}  # end (This is a marker for a literalinclude in the docs. Please do not remove
 
 
 class GUIConfig(Config):
