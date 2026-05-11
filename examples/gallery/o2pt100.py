@@ -1,4 +1,9 @@
-# creates: o2pt100.png
+"""
+Dissociation of oxygen on Pt(100)
+=================================
+
+"""
+
 import numpy as np
 
 from ase.build import add_adsorbate, fcc100

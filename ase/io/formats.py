@@ -231,11 +231,11 @@ class IOFormat:
 
 
 ioformats: dict[str, IOFormat] = {}  # These will be filled at run-time.
-extension2format = {}
+extension2format: dict[str, IOFormat] = {}
 
 
 all_formats = ioformats  # Aliased for compatibility only.  Please do not use.
-format2modulename = {}  # Left for compatibility only.
+format2modulename: dict[str, str] = {}  # Left for compatibility only.
 
 
 def define_io_format(name, desc, code, *, module=None, ext=None,

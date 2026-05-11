@@ -25,10 +25,7 @@ by specifying 6 layers in the (100) directions, 9 in the (110) directions and
   lc = 3.61000
   atoms = FaceCenteredCubic('Cu', surfaces, layers, latticeconstant=lc)
 
-|culayer|
-
-.. |culayer| image:: culayer.png
-
+To see the visualized structure using POV-Ray, see :ref:`gallery_nanoparticle`.
 
 Wulff construction
 ------------------
@@ -88,11 +85,7 @@ number of layers for the (-1,1,1) surface.  This is interpreted as a
 single surface, since it is part of a family that has already been
 specified.  Asking for a negative number of layers is allowed, this
 cause the particle to be truncated *before* its center point.  The
-result is seen below.
-
-|truncated|
-
-.. |truncated| image:: truncated.png
+result and code can be seen at :ref:`gallery_nanoparticle`.
 
 
 

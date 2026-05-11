@@ -1,4 +1,4 @@
-"""
+""".. _gallery_phase_diagram:
 
 Phase diagrams
 ==============

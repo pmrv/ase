@@ -181,7 +181,7 @@ special = {
 }
 
 
-external_calculators = {}
+external_calculators: dict[str, type] = {}
 
 
 def register_calculator_class(name, cls):

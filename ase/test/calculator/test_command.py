@@ -210,14 +210,15 @@ def get_expected_command(command, name, tmp_path, from_envvar):
 
 @pytest.mark.parametrize('name', list(envvars))
 def test_envvar_command(monkeypatch, name, tmp_path):
-    command = 'dummy shell command from environment'
+    from ase.config import Config, cfg
 
-    if name == 'cp2k':
-        command += 'cp2k_shell'  # circumvent sanity check
+    command = 'dummy shell command from environment'
 
     expected_command = get_expected_command(
         command, name, tmp_path, from_envvar=True
     )
+    new_cfg = Config()
+    monkeypatch.setattr(cfg, 'parser', new_cfg.parser)
     monkeypatch.setenv(envvars[name], command)
     actual_command = intercept_command(name)
     assert actual_command == expected_command
@@ -241,9 +242,6 @@ command_keywords = {'castep': 'castep_command'}
 def test_keyword_command(name, tmp_path):
     command = 'dummy command via keyword'
 
-    if name == 'cp2k':
-        command += ' cp2k_shell'  # circumvent sanity check
-
     expected_command = get_expected_command(
         command, name, tmp_path, from_envvar=False
     )
@@ -260,7 +258,7 @@ default_commands = {
         'sander -O  -i mm.in -o mm.out -p mm.top -c mm.crd -r mm_dummy.crd'
     ),
     'castep': 'castep castep',  # wth?
-    'cp2k': 'cp2k_shell',
+    'cp2k': 'cp2k.psmp -s',
     'dftb': 'dftb+ > dftb.out',
     'dftd3': f'dftd3 {dftd3_boilerplate}'.split(),
     'gamess_us': 'rungms gamess_us.inp > gamess_us.log 2> gamess_us.err',

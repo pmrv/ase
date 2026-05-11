@@ -1,4 +1,4 @@
-"""
+""".. _gallery_nanoparticle:
 
 Nanoparticle
 ============

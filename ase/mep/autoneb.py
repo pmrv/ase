@@ -78,7 +78,7 @@ class AutoNEB:
 
     attach_calculators:
         Function which adds valid calculators to the list of images supplied.
-    prefix: string or path
+    prefix: string or pathlib.Path
         All files that the AutoNEB method reads and writes are prefixed with
         prefix
     n_simul: int

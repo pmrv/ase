@@ -556,7 +556,7 @@ class SocketClient:
                 elif msg == 'GETFORCE':
                     assert self.state == 'HAVEDATA', self.state
                     self.protocol.sendforce(energy, forces, virial)
-                    self.state = 'NEEDINIT'
+                    self.state = 'READY'
                 elif msg == 'INIT':
                     assert self.state == 'NEEDINIT'
                     bead_index, initbytes = self.protocol.recvinit()
