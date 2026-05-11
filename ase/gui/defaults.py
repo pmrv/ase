@@ -30,7 +30,7 @@ gui_default_settings = {
     'movie_rate': 'auto',  # float or 'auto'
     'movie_skip': 'auto',  # int or 'auto'
     'movie_rock': False,
-}  # end (This is a marker for a literalinclude in the docs. Please do not remove
+}  # end (Marker for a literalinclude in the docs. Please do not remove)
 
 
 class GUIConfig(Config):
@@ -71,12 +71,14 @@ def read_defaults():
     """Read ASE configuration files and return an object from which settings
     can be retrieved.
     """
+    
     # should look for .config/ase/gui.py
     # if 'XDG_CONFIG_HOME' in os.environ:
     #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
     old_configfile = os.path.expanduser('~/.ase/gui.py')
     if os.path.exists(old_configfile):
         from ase.config import ASE_CONFIG_FILE
+
         warnings.warn(
             'Found GUI configuration file gui.py which is deprecated'
             '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',
