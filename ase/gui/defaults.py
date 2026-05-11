@@ -58,10 +58,10 @@ class GUIConfig(Config):
         return self.parser.getboolean('gui', option, fallback=fallback)
 
     def getliteral(self, option, fallback=None):
-        try:
-            return ast.literal_eval(self.get(option, fallback))
-        except ValueError:
-            return self.get(option, fallback=fallback)
+        value = self.get(option, fallback)
+        if value.lower() == 'auto':
+            return 'auto'
+        return ast.literal_eval(value)
 
     def set(self, option, value):
         self.parser.set('gui', option, value)
