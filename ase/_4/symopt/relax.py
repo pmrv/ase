@@ -873,7 +873,6 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         tstr = time.strftime('%H:%M:%S')
         E = self.actual_atoms.get_potential_energy()
-        F = gradient_obj.backF_av
         g = gradient_obj.gradient  # XXX clean up
         Fmax = gradient_obj.fnorm
         sFmax = f'{Fmax:7.3f}'
