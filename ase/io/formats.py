@@ -967,7 +967,7 @@ def filetype(
         fd.seek(0)
 
     if len(data) == 0:
-        raise UnknownFileTypeError('Empty file: ' + filename)
+        raise UnknownFileTypeError(f'Empty file: {filename}')
 
     try:
         return match_magic(data).name

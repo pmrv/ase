@@ -2,7 +2,9 @@
 Calculate
 =========
 
-(currently disabled)
+.. attention::
+    
+    This functionality is currently disabled
 
 Set calculator
 --------------

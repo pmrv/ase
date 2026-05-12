@@ -335,7 +335,7 @@ Height={self.canvas_height}
 Antialias=True
 Antialias_Threshold=0.1
 Display={self.display}
-Display_Gamma=2.2
+Display_Gamma=sRGB
 Pause_When_Done={self.pause}
 Verbose=False
 """

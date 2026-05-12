@@ -1047,6 +1047,8 @@ class MinModeTranslate(Optimizer):
         direction = f0p.copy()
         if self.cg_on:
             direction = self.get_cg_direction(direction)
+        if norm(direction) == np.inf:
+            raise RuntimeError('Dimer calculation diverged')
         direction = normalize(direction)
         if curv > 0.0:
             step = direction * self.max_step
@@ -1056,7 +1058,7 @@ class MinModeTranslate(Optimizer):
             F = np.vdot((f0tp + f0p), direction) / 2.0
             C = np.vdot((f0tp - f0p), direction) / self.trial_step
             step = (-F / C + self.trial_step / 2.0) * direction
-            if norm(step) > self.max_step:
+            if norm(step) > self.max_step or np.isnan(norm(step)):
                 step = direction * self.max_step
         self.log(f0p, norm(step))
 

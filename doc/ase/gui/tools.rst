@@ -2,20 +2,18 @@
 Tools
 =====
 
+.. _gui-tools graphs:
+
 Graphs
 ------
 
-Allows to graph different quantities for a given trajectory. A 'save' button
-also gives the opportunity to save the data to file.
+For graphing different quantities for a given trajectory. ASE uses
+matplotlib as a backend, allowing some manipulation of the generated plot
+and for the plot to be saved to a file.
 
-This example plots the maximal force for each image i and could help in
-investigating the convergence properties for relaxations:
-
-::
-
-  i, e-min(E), fmax
-
-These are the symbols that can be used:
+The :guilabel:`Graphs` window requires an instruction string that controls
+what is plotted. The following expressions can be used to create the 
+instructions:
 
 ================ ==================================================
  Symbol          Interpretation
@@ -33,31 +31,49 @@ F[n,0-2]         force on atom number n
 M[n]             magnetic moment of atom number n
 A[0-2,0-2]       unit-cell basis vectors
 s                path length
-a(n1,n2,n3)      tangle between atoms n1, n2 and n3, centered on n2
+a(n1,n2,n3)      angle between atoms n1, n2 and n3, centered on n2
 dih(n1,n2,n3,n4) dihedral angle between n1, n2, n3, and n4
 T                temperature (requires velocity)
 ================ ==================================================
 
+Variables should be separated by commas. The window presents two
+:guilabel:`Plot` buttons. The first (``x, y1, y2, ...``) places the first
+variable in the list as the x-axis. The other (``y1, y2, ...``) plots all
+variables on the y-axis and uses the current image number as the x-axis.
+
+This example plots the energy and the maximal force for each image i (e.g.
+to help in investigating the convergence properties for geometry
+relaxations):
+
+::
+
+  i, e-min(E), fmax
+
+
+.. _gui-tools movie:
 
 Movie
 -----
 
-Allows to play the current trajectory as a movie using a number of
-different settings. Default duration is 5 s.
+For navigating between images when several of them are open at the same
+time or for animating said navigation. Allows one to play the current
+trajectory as a movie using a number of different settings such as the
+frame rate. By default, the frame rate and number of structures skipped is
+adjusted to cycle through all images in ca. 5 s.
 
 
 Constraints
 -----------
 
-Allows to set (or remove) constraints based on the currently selected atoms.
+For setting (or removing) the :class:`ase.constraints.FixAtoms` to/from the
+currently selected atoms. These constraints will be then be saved to a file
+with the structure if the chosen file type allows it.
 
 
 Render scene
 ------------
 
-(Currently disabled)
-
-Graphical interface to the ASE povray interface, ideally it requires
+Graphical interface to the ASE povray interface. Ideally it requires
 that povray is installed on your computer to function, but it also can
 be used just to export the complete set of povray files.
 
@@ -81,10 +97,46 @@ For this particular application it might be a good idea to use a white
 background instead of the default transparent option.
 
 
-Move atoms
-----------
+Move / Rotate selected atoms
+----------------------------
+:kbd:`ctrl+M` (Move) / :kbd:`ctrl+R` (Rotate)
 
-Allows selected atoms to be moved using the arrow keys. The direction
-is always parallel to the plane of the screen. Two possible movements
-are available: Just pressing the arrow keys will move by 0.1
-Angstrom, ``shift`` + arrow keys will move by 0.01 Angstrom.
+Allows selected atoms to be manipulated using the arrow keys. The default
+direction of movement is parallel to the plane of the screen. Holding down
+:kbd:`ctrl` will enable movement/rotation along the view axis instead.
+Furthermore, :kbd:`shift` + arrow keys will slow down the speed of the
+movement/roration by a factor of 10. It is also possible to move/rotate the
+selection using the mouse by holding down both :kbd:`shift` and the right
+mouse button.
+
+
+NEB plot
+--------
+
+Assuming you have opened a series of images corresponding to a NEB
+trajectory, use :menuselection:`Tools --> NEB` to plot the energy barrier.
+
+.. ::
+
+..   $ ase gui --interpolate 3 initial.xyz final.xyz -o interpolated_path.traj
+
+
+Bulk modulus
+------------
+
+Interface to :func:`ase.eos.plot`
+
+
+Reciprocal space
+----------------
+
+For visualizing the irreducible Brillouin zone and band path in an
+interactive graph window.
+
+
+Wrap atoms
+----------
+:kbd:`ctrl+W`
+
+Brings atoms that are outside of the cell area into the cell, if possible
+within the periodic boundary conditions set.

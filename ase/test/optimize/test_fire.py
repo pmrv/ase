@@ -1,4 +1,3 @@
-# fmt: off
 import numpy as np
 import pytest
 
@@ -24,8 +23,14 @@ def test_fire(distorted_bulk_gold):
     def callback(a, r, e, e_last):
         reset_history.append([e - e_last])
 
-    opt = FIRE(a, dtmax=1.0, dt=1.0, maxstep=100.0, downhill_check=True,
-               position_reset_callback=callback)
+    opt = FIRE(
+        a,
+        dtmax=1.0,
+        dt=1.0,
+        maxstep=100.0,
+        downhill_check=True,
+        position_reset_callback=callback,
+    )
     opt.run(fmax=0.001)
     e2 = a.get_potential_energy()
     n2 = opt.nsteps

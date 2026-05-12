@@ -158,7 +158,7 @@ The calculators included in ASE are used like this:
 where ``abc`` is the module name and ``ABC`` is the class name.
 
 .. _Abacus: https://gitlab.com/1041176461/ase-abacus
-.. _ALIGNN: https://github.com/usnistgov/alignn?tab=readme-ov-file#alignnff
+.. _ALIGNN: https://github.com/atomgptlab/alignn?tab=readme-ov-file#alignnff
 .. _AMS: https://www.scm.com/doc/plams/examples/AMSCalculator/ASECalculator.html#asecalculatorexample
 .. _Asap: https://wiki.fysik.dtu.dk/asap
 .. _BigDFT: https://l_sim.gitlab.io/bigdft-suite/tutorials/Interoperability-Simulation.html#ASE-Interoperability

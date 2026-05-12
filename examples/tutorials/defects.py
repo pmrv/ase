@@ -355,17 +355,10 @@ print(f'The length deviation for P_2 is {dev2}')
 #
 # .. note::
 #    For unit cells with more complex space groups,
-#    this approach can be cumbersome due
-#    to the implementation which loops over many possible
-#    transformation matrices. The
-#    `find_optimal_cell_shape <https://doped.readthedocs.io/en/latest/doped.utils.html
-#    doped.utils.supercells.find_optimal_cell_shape>`_
-#    function in `doped <https://doped.readthedocs.io>`_ implements
-#    the same algorithm with
-#    some efficiency improvements (~100x compute time speedup),
-#    and offers an efficient
-#    `algorithm <https://doped.readthedocs.io/en/latest/doped.utils.html
-#    doped.utils.supercells.find_ideal_supercell>`_
+#    this indirect cell-metric approach may not give the best possible
+#    result (i.e. minimum image distance). The `doped <https://doped.readthedocs.io>`__`
+#    code offers an efficient
+#    `algorithm <https://doped.readthedocs.io/en/latest/doped.utils.html#doped.utils.supercells.find_ideal_supercell>`__
 #    for *directly* optimising the periodic defect-defect distance
 #    (~10-50% improvements);
 #    see [Kavanagh]_ or the ``doped`` `tutorials

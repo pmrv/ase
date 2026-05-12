@@ -1,0 +1,61 @@
+.. A new scriv changelog fragment.
+..
+.. Uncomment the header that is right (remove the leading dots).
+..
+.. I/O
+.. ---
+..
+.. - A bullet item for the I/O category.
+..
+.. Calculators
+.. -----------
+..
+.. - A bullet item for the Calculators category.
+..
+.. Optimizers
+.. ----------
+..
+.. - A bullet item for the Optimizers category.
+..
+Molecular dynamics
+------------------
+
+- Add :func:`~ase.md.thermalize_momenta` to supersede
+  :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`.
+  The new function takes temperature only in K (ASE standard),
+  both as positional and keyword arguments.
+  (:mr:`4016`)
+
+- Deprecate :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`
+  in favor of :func:`~ase.md.thermalize_momenta`.
+  (:mr:`4016`)
+
+- Remove the deprecated parameter ``temp`` (temperature in eV) from
+  :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`.
+  (:mr:`4016`)
+..
+.. GUI
+.. ---
+..
+.. - A bullet item for the GUI category.
+..
+.. Development
+.. -----------
+..
+.. - A bullet item for the Development category.
+..
+.. Documentation
+.. -------------
+..
+.. - A bullet item for the Documentation category.
+..
+.. Other changes
+.. -------------
+..
+.. - A bullet item for the Other changes category.
+..
+.. Bugfixes
+.. --------
+..
+.. - A bullet item for the Bugfixes category.
+..

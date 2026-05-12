@@ -216,8 +216,9 @@ Contents
     install
     examples_generated/index
     gettingstarted/gettingstarted
-    ase/ase
     cmdline
+    ase/gui/gui
+    ase/ase
     tips
     gallery/gallery
     releasenotes

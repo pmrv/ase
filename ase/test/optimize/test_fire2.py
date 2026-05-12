@@ -1,4 +1,3 @@
-# fmt: off
 import numpy as np
 import pytest
 
@@ -12,17 +11,18 @@ def test_fire2(distorted_bulk_gold):
     a = distorted_bulk_gold.copy()
     a.calc = EMT()
 
-    fire_parameters = {'dt': 0.1,
-                       'maxstep': 0.2,
-                       'dtmax': 1.0,
-                       'Nmin': 20,
-                       'finc': 1.1,
-                       'fdec': 0.5,
-                       'astart': 0.25,
-                       'fa': 0.99}
+    fire_parameters = {
+        'dt': 0.1,
+        'maxstep': 0.2,
+        'dtmax': 1.0,
+        'Nmin': 20,
+        'finc': 1.1,
+        'fdec': 0.5,
+        'astart': 0.25,
+        'fa': 0.99,
+    }
 
-    opt = FIRE2(a,
-                **fire_parameters)
+    opt = FIRE2(a, **fire_parameters)
     opt.run(fmax=0.001)
     e1 = a.get_potential_energy()
     n1 = opt.nsteps
@@ -35,10 +35,9 @@ def test_fire2(distorted_bulk_gold):
     def callback(a, r, e, e_last):
         reset_history.append([e - e_last])
 
-    opt = FIRE2(a,
-                use_abc=True,
-                position_reset_callback=callback,
-                **fire_parameters)
+    opt = FIRE2(
+        a, use_abc=True, position_reset_callback=callback, **fire_parameters
+    )
     opt.run(fmax=0.001)
     e2 = a.get_potential_energy()
     n2 = opt.nsteps
