@@ -8,6 +8,7 @@ import pytest
 import ase.build
 import ase.units
 from ase import Atoms
+from ase.constraints import FixAtoms, FixBondLengths, FixConstraint
 from ase.md import thermalize_momenta
 from ase.md.nose_hoover_chain import (
     MTKNPT,
@@ -229,9 +230,15 @@ def test_anisotropic_barostat(
     assert np.allclose(barostat._p_xi, p_xi_start, atol=1e-6)
 
 
+@pytest.mark.parametrize(
+    'constraints',
+    [None, FixAtoms([0, 1, 2, 3]), FixBondLengths([[0, 1], [2, 3]])],
+    ids=lambda val: type(val),
+)
 @pytest.mark.parametrize('tchain', [1, 3])
-def test_nose_hoover_chain_nvt(asap3, tchain: int):
+def test_nose_hoover_chain_nvt(asap3, tchain: int, constraints: FixConstraint):
     atoms = ase.build.bulk('Cu').repeat((2, 2, 2))
+    atoms.constraints = constraints
     atoms.calc = asap3.EMT()
 
     temperature_K = 300
@@ -250,8 +257,10 @@ def test_nose_hoover_chain_nvt(asap3, tchain: int):
     conserved_energy1 = md.get_conserved_energy()
     md.run(100)
     conserved_energy2 = md.get_conserved_energy()
-    assert np.allclose(np.sum(atoms.get_momenta(), axis=0), 0.0)
     assert np.isclose(conserved_energy1, conserved_energy2, atol=1e-3)
+
+    if constraints is None:
+        assert np.allclose(np.sum(atoms.get_momenta(), axis=0), 0.0)
 
 
 @pytest.mark.parametrize('tchain', [1, 3])
