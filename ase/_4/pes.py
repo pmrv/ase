@@ -23,7 +23,7 @@ class PotentialEnergySurface:
         self,
         atoms: Atoms,
         calc: BaseCalculator,
-        properties: tuple[str, ...] | None = None,
+        requested_properties: tuple[str, ...] | None = None,
     ):
         """Initialize the potential energy surface.
 
@@ -33,19 +33,19 @@ class PotentialEnergySurface:
             Atomic configuration to evaluate.
         calc: BaseCalculator
             Calculator used to compute properties of ``atoms``.
-        properties: tuple of str, optional
+        requested_properties: tuple of str, optional
             Properties to request from ``calc`` on each evaluate().
             Defaults to ``('free_energy', 'forces')`` if the calculator
             implements ``free_energy``, otherwise ``('energy', 'forces')``.
         """
         self.atoms = atoms
         self.calc = calc
-        if properties is None:
+        if requested_properties is None:
             if 'free_energy' in calc.implemented_properties:
-                properties = ('free_energy', 'forces')
+                requested_properties = ('free_energy', 'forces')
             else:
-                properties = ('energy', 'forces')
-        self.requested_properties = tuple(properties)
+                requested_properties = ('energy', 'forces')
+        self.requested_properties = tuple(requested_properties)
         self._results = None
         self._stale = True
 
