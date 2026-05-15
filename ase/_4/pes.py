@@ -46,6 +46,15 @@ class PotentialEnergySurface:
             else:
                 requested_properties = ('energy', 'forces')
         self.requested_properties = tuple(requested_properties)
+        unsupported = set(self.requested_properties) - set(
+            calc.implemented_properties
+        )
+        if unsupported:
+            raise ValueError(
+                f'requested_properties {sorted(unsupported)} not in '
+                f'calc.implemented_properties '
+                f'{sorted(calc.implemented_properties)}'
+            )
         self._results = None
         self._stale = True
 

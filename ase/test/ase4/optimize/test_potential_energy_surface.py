@@ -1,3 +1,5 @@
+import pytest
+
 from ase._4.optimize.optimize import OptimizablePES
 from ase._4.pes import PotentialEnergySurface
 from ase.optimize import BFGS
@@ -39,6 +41,19 @@ def test_set_positions_invalidates(v4atoms, calculator):
     pes.set_positions(pes.get_positions())
     pes.get_property('forces')
     assert counter[0] == 2
+
+
+def test_pes_rejects_unknown_requested_properties(v4atoms, calculator):
+    """PES construction fails fast if a requested property is not
+    supported by the calculator.
+    """
+    assert 'dipole' not in calculator.implemented_properties
+    with pytest.raises(ValueError, match='dipole'):
+        PotentialEnergySurface(
+            v4atoms,
+            calculator,
+            requested_properties=('energy', 'forces', 'dipole'),
+        )
 
 
 def test_bfgs_one_evaluate_per_step(v4atoms, calculator):

@@ -324,6 +324,10 @@ class Version4Adaptor(BaseCalculator):
     def parameters(self):
         return self._v3_calculator.parameters
 
+    @property
+    def implemented_properties(self) -> list[str]:
+        return self._v3_calculator.implemented_properties
+
     def evaluate(
         self, atoms: V3Atoms, properties: list[str] | None = None
     ) -> CalculationResults:
