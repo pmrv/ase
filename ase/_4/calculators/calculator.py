@@ -325,7 +325,7 @@ class Version4Adaptor(BaseCalculator):
         return self._v3_calculator.parameters
 
     @property
-    def implemented_properties(self) -> list[str]:
+    def implemented_properties(self) -> list[str]:  # type: ignore[override]
         return self._v3_calculator.implemented_properties
 
     def evaluate(
