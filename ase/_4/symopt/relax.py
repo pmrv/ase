@@ -18,38 +18,6 @@ def green(text: str) -> str:
     return f'\x1b[32m{text}\x1b[0m'
 
 
-def minimize_l1(dof_zac):
-    nz = len(dof_zac)
-    if nz < 2:
-        # Nothing to minimize with just 1 dof
-        return
-    from scipy.linalg import expm
-    from scipy.optimize import fmin
-
-    basis = []
-    for i in range(nz):
-        for j in range(i + 1, nz):
-            b = np.zeros((nz, nz))
-            b[i, j] = 1
-            b[j, i] = -1
-            basis.append(b)
-
-    nb = len(basis)
-
-    def U_zz(x):
-        x = np.array(x).reshape((-1,))
-        M = np.zeros((nz, nz))
-        for i, e in enumerate(x):
-            M += e * basis[i]
-        return expm(M)
-
-    def function(x):
-        return np.sum(np.abs(np.einsum('zw,wac->zac', U_zz(x), dof_zac)))
-
-    xopt, *args = fmin(function, np.zeros((nb,)), xtol=1e-7, ftol=1e-7)
-    dof_zac[:] = np.einsum('zw,wac->zac', U_zz(np.array(xopt)), dof_zac)
-
-
 def chol_derivative(A, dA, L=None):
     """
     Compute the derivative of the Cholesky factorization.
@@ -439,7 +407,6 @@ class SymmetryAdaptedScaledCoordinates:
             dof_zac /= np.max(np.linalg.norm(dof_zav, axis=2), axis=1)[
                 :, None, None
             ]
-            # minimize_l1(dof_zac)
 
         sasc = SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
 
