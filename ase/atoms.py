@@ -1557,6 +1557,36 @@ class _LimitedAtoms:
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
 
+    def mirror(self, v, center=(0, 0, 0), mask=None, mirror_cell=False):
+        """Reflect atoms across a plane.
+
+        Parameters
+        ----------
+
+        v
+            Normal vector of the plane of reflection, i.e. the direction in
+            which the atoms are mirrored. Vectors can be specified numerically
+            e.g.: (1, 0, 0); or as a string: 'x', 'y', 'z'
+
+        center = (0, 0, 0):
+            The plane of reflection is shifted to include the center point. Use
+            'COM' to fix the center of mass, 'COP' to fix the center of
+            positions or 'COU' to fix the center of cell.
+        
+        mask = None:
+            Select which atoms are moved. If None, then all atoms are affected.
+
+        mirror_cell = False:
+            If true the cell is also transformed.
+        """
+        v = string2vector(v)
+        v = v / np.linalg.norm(v)
+        center = self._centering_as_array(center)
+
+        tmp_pos = self.positions.copy()
+        # tmp_pos[mask] = whatever ...
+        self.set_positions(tmp_pos)
+
     def rattle(self, stdev=0.001, seed=None, rng=None):
         """Randomly displace atoms.
 
