@@ -1563,20 +1563,20 @@ class _LimitedAtoms:
         Parameters
         ----------
 
-        v
+        v : array_like or {'x', 'y', 'z'}
             Normal vector of the plane of reflection, i.e. the direction in
             which the atoms are mirrored. Vectors can be specified numerically
             e.g.: (1, 0, 0); or as a string: 'x', 'y', 'z'
 
-        center = (0, 0, 0):
+        center : array_like or {'COM', 'COP', 'COU'}, default: (0, 0, 0)
             The plane of reflection is shifted to include the center point. Use
             'COM' to fix the center of mass, 'COP' to fix the center of
             positions or 'COU' to fix the center of cell.
         
-        mask = None:
+        mask : array_like or None, default: None
             Select which atoms are moved. If None, then all atoms are affected.
 
-        mirror_cell = False:
+        mirror_cell : bool, default: False
             If true the cell is also transformed.
         """
         v = string2vector(v)
