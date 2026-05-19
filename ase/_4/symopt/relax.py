@@ -83,12 +83,12 @@ def symmetrize_atoms(
     exp(2πi x) to correctly average periodic fractional coordinates.
     """
     ns, na = atommap_sa.shape
-    Ssym_ac = np.zeros_like(S_ac, dtype=np.complex128)
+    tmp_Ssym_ac = np.zeros_like(S_ac, dtype=np.complex128)
     for a in range(na):
         for s in range(ns):
             new = U_scc[s].T @ S_ac[a] - f_sc[s]
-            Ssym_ac[atommap_sa[s, a]] += np.exp(2j * np.pi * new)
-    Ssym_ac = (np.angle(Ssym_ac) / (2 * np.pi)) % 1.0 % 1.0
+            tmp_Ssym_ac[atommap_sa[s, a]] += np.exp(2j * np.pi * new)
+    Ssym_ac = (np.angle(tmp_Ssym_ac) / (2 * np.pi)) % 1.0 % 1.0
     Ssym_ac[np.abs(Ssym_ac) < tol] = 0.0
     Ssym_ac[np.abs(Ssym_ac - 1.0) < tol] = 0.0
     return Ssym_ac
