@@ -1570,8 +1570,9 @@ class _LimitedAtoms:
 
         center : array_like or {'COM', 'COP', 'COU'}, default: (0, 0, 0)
             The plane of reflection is shifted to include the center point. Use
-            'COM' to fix the center of mass, 'COP' to fix the center of
-            positions or 'COU' to fix the center of cell.
+            'COM' to fix the center of mass (of all atoms), 'COP' to fix the
+            center of positions (all atoms) or 'COU' to fix the center of the
+            cell.
         
         mask : array_like or None, default: None
             Select which atoms are moved. If None, then all atoms are affected.
@@ -1583,9 +1584,28 @@ class _LimitedAtoms:
         v = v / np.linalg.norm(v)
         center = self._centering_as_array(center)
 
+        if mask is None:
+            mask = np.ones(len(self), int)
+        indices = []
+        for i, tv in enumerate(mask):
+            if tv:
+                indices.append(i)
+
         tmp_pos = self.positions.copy()
-        # tmp_pos[mask] = whatever ...
+        tmp_pos -= center
+        tmp_pos[indices, :] = self._mirror_array(tmp_pos[indices, :], v)
+        tmp_pos += center
         self.set_positions(tmp_pos)
+
+        if mirror_cell:
+            self.set_cell(self._mirror_array(self.get_cell(), v))
+
+    def _mirror_array(self, a, v):
+        """Mirror given array of coordinates across v, relative to origin
+        
+        Following Ref_a(v) = v - 2 * (v·a)/(a·a) * a
+        """
+        return a - (a*v).sum(1, keepdims=True)/np.dot(v, v) * 2*v.reshape(1, 3)
 
     def rattle(self, stdev=0.001, seed=None, rng=None):
         """Randomly displace atoms.
