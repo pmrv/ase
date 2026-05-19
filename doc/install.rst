@@ -7,13 +7,14 @@ Installation
 Requirements
 ============
 
-* Python_ 3.9 or newer
+* Python_ 3.10 or newer
 * NumPy_ (base N-dimensional array package)
 * SciPy_ (library for scientific computing)
 * Matplotlib_ (plotting)
 
 Optional:
 
+* Tkinter_ for the graphical user interface
 * Flask_ for :mod:`ase.db` web-interface
 * pytest_ for running tests
 * pytest-mock_ for running some more tests
@@ -131,12 +132,12 @@ from Git.
 :Tar-file:
 
     You can get the source as a `tar-file <http://xkcd.com/1168/>`__ for the
-    latest stable release here: ase-3.27.0.tar.gz_
+    latest stable release here: ase-3.28.0.tar.gz_
 
     Unpack and make a soft link::
 
-        $ tar -xf ase-3.27.0.tar.gz
-        $ ln -s ase-3.27.0 ase
+        $ tar -xf ase-3.28.0.tar.gz
+        $ ln -s ase-3.28.0 ase
 
     Here is a `list of tarballs <https://pypi.org/simple/ase/>`__.
 
@@ -145,7 +146,7 @@ from Git.
     Alternatively, you can get the source for the latest stable release from
     https://gitlab.com/ase/ase like this::
 
-        $ git clone -b 3.27.0 https://gitlab.com/ase/ase.git
+        $ git clone -b 3.28.0 https://gitlab.com/ase/ase.git
 
     or if you want the development version::
 
@@ -183,7 +184,7 @@ number hasn't changed.
     dates of older releases can be found there.
 
 
-.. _ase-3.27.0.tar.gz: https://pypi.org/packages/source/a/ase/ase-3.27.0.tar.gz
+.. _ase-3.28.0.tar.gz: https://pypi.org/packages/source/a/ase/ase-3.28.0.tar.gz
 
 .. index:: test
 .. _running tests:
@@ -199,3 +200,21 @@ Run the tests like this::
     $ ase test  # takes 1 min.
 
 and send us the output if there are failing tests.
+
+
+.. _Tkinter:
+
+Making the GUI work
+===================
+
+Depending on you operating system and your Python installation, :ref:`ase-gui`
+could work out of the box. However, in some cases, such as when using the
+pre-installed Python on Debian/Ubuntu, it may fail if Tk/Tkinter is not
+installed by default. The necessary dependency is available from many system
+package managers under a name such as ``python3-tk``. See e.g. TkDocs_ for
+more comprehensive instructions.
+
+ASE has some options for :ref:`configuring the GUI <gui configuration>` that
+can provide a more customized experience.
+
+.. _TkDocs: https://tkdocs.com/tutorial/install.html

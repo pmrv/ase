@@ -3,8 +3,10 @@ import numpy as np
 from ase import units
 from ase.build import bulk
 from ase.calculators.emt import EMT
+from ase.constraints import FixCom
+from ase.md import thermalize_momenta
 from ase.md.langevin import Langevin
-from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary
+from ase.md.velocitydistribution import Stationary
 
 
 def test_langevin_com():
@@ -15,15 +17,16 @@ def test_langevin_com():
     """
     # parameters
     size = 2
-    T = 300
+    temperature = 300.0  # K
     dt = 0.01
 
     # setup
     atoms = bulk('CuAg', 'rocksalt', a=4.0).repeat(size)
     atoms.pbc = False
     atoms.calc = EMT()
+    atoms.set_constraint(FixCom())
 
-    MaxwellBoltzmannDistribution(atoms, temperature_K=T)
+    thermalize_momenta(atoms, temperature)
     Stationary(atoms)
 
     mtot = atoms.get_momenta().sum(axis=0)
@@ -31,7 +34,13 @@ def test_langevin_com():
     print('initial forces', atoms.get_forces().sum(axis=0))
 
     # run NVT
-    with Langevin(atoms, dt * units.fs, temperature_K=T, friction=0.02) as dyn:
+    with Langevin(
+        atoms,
+        dt * units.fs,
+        temperature_K=temperature,
+        friction=0.02,
+        fixcm=False,
+    ) as dyn:
         dyn.run(10)
 
     m2 = atoms.get_momenta().sum(axis=0)

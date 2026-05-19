@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import math
+from collections.abc import Iterable
+from math import pi
 
 import numpy as np
 
 from ase import Atoms
 from ase.cell import Cell
 from ase.neighborlist import NeighborList
+from ase.symbols import symbols2numbers
 
 
 class CellTooSmall(Exception):
@@ -20,11 +22,11 @@ class VolumeNotDefined(Exception):
 
 
 def get_rdf(
-    atoms: Atoms,
+    atoms: Atoms | Iterable[Atoms],
     rmax: float,
     nbins: int,
     distance_matrix: np.ndarray | None = None,
-    elements: list[int] | tuple | None = None,
+    elements: Iterable[int | str] | None = None,
     no_dists: bool = False,
     volume: float | None = None,
 ):
@@ -38,8 +40,13 @@ def get_rdf(
 
     Parameters
     ----------
-    atoms : Atoms
-        ASE ``Atoms`` object for which the RDF is computed.
+    atoms : Atoms | Iterable[Atoms]
+        :class:`~ase.Atoms` or their iterable for which the RDF is computed.
+
+        .. versionadded:: 3.28.0
+            This can accept an iterable of :class:`~ase.Atoms`
+            to compute the average RDF over the images.
+
     rmax : float
         The maximum distance that will contribute to the RDF.
         The unit cell should be large enough so that it encloses a
@@ -50,9 +57,13 @@ def get_rdf(
         An array of distances between atoms, typically
         obtained by atoms.get_all_distances().
         Default None meaning that a NeighborList will be used.
-    elements : list[int] | tuple[int, int]
-        List of two atomic numbers. If elements is not None the partial
+    elements : Iterable[int | str] | None, default: None
+        Two atomic numbers of chemical symbols. If not None, the partial
         RDF for the supplied elements will be returned.
+
+        .. versionadded:: 3.28.0
+            Each item of ``elements`` can be a chemical element symbol.
+
     no_dists : bool
         If True then the second array with RDF distances will not be returned.
     volume : float or None
@@ -74,24 +85,53 @@ def get_rdf(
     non-periodic.
 
     """
+    images = [atoms] if isinstance(atoms, Atoms) else atoms
+    rdfs = []
+    bin_edges = np.linspace(0.0, rmax, nbins + 1)
+    for atoms in images:
+        rdf = _get_rdf_per_frame(
+            atoms,
+            bin_edges,
+            distance_matrix=distance_matrix,
+            elements=elements,
+            volume=volume,
+        )
+        rdfs.append(rdf)
+    rdf = np.mean(rdfs, axis=0)
+    rr = 0.5 * (bin_edges[:-1] + bin_edges[1:])  # mid point of each bin
+    return rdf if no_dists else (rdf, rr)
 
+
+def _get_rdf_per_frame(
+    atoms: Atoms,
+    bin_edges: np.ndarray,
+    *,
+    elements: Iterable[int | str] | None = None,
+    distance_matrix: np.ndarray | None = None,
+    volume: float | None = None,
+) -> np.ndarray:
     # First check whether the cell is sufficiently large
     vol = atoms.cell.volume if volume is None else volume
     if vol < 1.0e-10:
         raise VolumeNotDefined
+
+    rmax = bin_edges.max()
+    nbins = bin_edges.size - 1
 
     check_cell_and_r_max(atoms, rmax)
 
     natoms = len(atoms)
     dr = float(rmax / nbins)
 
-    if elements is None:
+    atomic_numbers = None if elements is None else symbols2numbers(elements)
+
+    if atomic_numbers is None:
         i_indices = np.arange(natoms)
         n = natoms  # number of center atoms
         rho = natoms / vol  # average number density
     else:
-        i_indices = np.where(atoms.numbers == elements[0])[0]
-        j_indices = np.where(atoms.numbers == elements[1])[0]
+        i_indices = np.where(atoms.numbers == atomic_numbers[0])[0]
+        j_indices = np.where(atoms.numbers == atomic_numbers[1])[0]
         n = len(i_indices)  # number of center atoms
         rho = len(j_indices) / vol  # average number density
 
@@ -102,8 +142,8 @@ def get_rdf(
         rdf = np.zeros(nbins + 1)
         for i in i_indices:
             j_indices, offsets = nl.get_neighbors(i)
-            if elements is not None:
-                mask = atoms.numbers[j_indices] == elements[1]
+            if atomic_numbers is not None:
+                mask = atoms.numbers[j_indices] == atomic_numbers[1]
                 j_indices = j_indices[mask]
                 offsets = offsets[mask]
 
@@ -118,20 +158,16 @@ def get_rdf(
             rdf += np.bincount(indices, minlength=nbins + 1)[: nbins + 1]
     else:
         indices = np.asarray(np.ceil(distance_matrix / dr), dtype=int)
-        if elements is None:
+        if atomic_numbers is None:
             x = indices.ravel()
         else:
             x = indices[i_indices][:, j_indices].ravel()
         rdf = np.bincount(x, minlength=nbins + 1)[: nbins + 1].astype(float)
 
-    rr = np.arange(dr / 2, rmax, dr)
-    shell_volumes = 4.0 * math.pi * dr * (rr * rr + (dr * dr / 12))
-    rdf[1:] /= n * rho * shell_volumes
+    shell_vols = 4.0 * pi * dr * (bin_edges**2 + bin_edges * dr + dr**2 / 3.0)
+    rdf[1:] /= n * rho * shell_vols[:-1]
 
-    if no_dists:
-        return rdf[1:]
-
-    return rdf[1:], rr
+    return rdf[1:]
 
 
 def check_cell_and_r_max(atoms: Atoms, rmax: float) -> None:

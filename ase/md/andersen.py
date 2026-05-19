@@ -1,7 +1,5 @@
 """Andersen dynamics class."""
 
-import warnings
-
 from numpy import cos, log, ones, pi, random, repeat
 
 from ase import Atoms, units
@@ -9,7 +7,11 @@ from ase.md.md import MolecularDynamics
 
 
 class Andersen(MolecularDynamics):
-    """Andersen (constant N, V, T) molecular dynamics."""
+    """Andersen (constant N, V, T) molecular dynamics.
+
+    Andersen, J. Chem. Phys. 72, 2384–2393 (1980).
+    https://doi.org/10.1063/1.439486
+    """
 
     def __init__(
         self,
@@ -50,20 +52,14 @@ class Andersen(MolecularDynamics):
             :class:`~ase.md.md.MolecularDynamics`
             base class.
 
+        Notes
+        -----
         The temperature is imposed by stochastic collisions with a heat bath
         that acts on velocity components of randomly chosen particles.
         The algorithm randomly decorrelates velocities, so dynamical properties
         like diffusion or viscosity cannot be properly measured.
 
-        H. C. Andersen, J. Chem. Phys. 72 (4), 2384–2393 (1980)
         """
-        if 'communicator' in kwargs:
-            msg = (
-                '`communicator` has been deprecated since ASE 3.25.0 '
-                'and will be removed in ASE 3.26.0. Use `comm` instead.'
-            )
-            warnings.warn(msg, FutureWarning)
-            kwargs['comm'] = kwargs.pop('communicator')
         self.temp = units.kB * temperature_K
         self.andersen_prob = andersen_prob
         self.fix_com = fixcm

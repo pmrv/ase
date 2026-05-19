@@ -1,0 +1,6 @@
+I/O
+---
+
+- Changed :func:`~ase.io.vasp.write_vasp_xdatcar` so that it writes unwrapped
+  scaled positions (:mr:`4040`)
+

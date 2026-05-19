@@ -3,9 +3,9 @@
 import json
 import sys
 from collections import defaultdict
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterable, Iterator
 
 import ase.io
 from ase.db import connect
@@ -25,6 +25,76 @@ def count_keys(db, query):
     for key, number in keys.items():
         print('{:{}} {}'.format(key + ':', n, number))
     return
+
+
+def show_values(args, db, query):
+    keys = args.show_values.split(',')
+    values = {key: defaultdict(int) for key in keys}
+    numbers = set()
+    for row in db.select(query):
+        kvp = row.key_value_pairs
+        for key in keys:
+            value = kvp.get(key)
+            if value is not None:
+                values[key][value] += 1
+                if not isinstance(value, str):
+                    numbers.add(key)
+
+    n = max(len(key) for key in keys) + 1
+    for key in keys:
+        vals = values[key]
+        if key in numbers:
+            print('{:{}} [{}..{}]'
+                  .format(key + ':', n, min(vals), max(vals)))
+        else:
+            print('{:{}} {}'
+                  .format(key + ':', n,
+                          ', '.join(f'{v}({n})'
+                                    for v, n in vals.items())))
+
+
+def insert_into(args, db, query, out, add_key_value_pairs):
+    if args.limit == -1:
+        args.limit = 0
+
+    progressbar = no_progressbar
+    length = None
+
+    if args.progress_bar:
+        # Try to import the one from click.
+        # People using ase.db will most likely have flask installed
+        # and therfore also click.
+        try:
+            from click import progressbar
+        except ImportError:
+            pass
+        else:
+            length = db.count(query)
+
+    nkvp = 0
+    nrows = 0
+    with connect(args.insert_into,
+                 use_lock_file=not args.no_lock_file) as db2:
+        with progressbar(db.select(query,
+                                   sort=args.sort,
+                                   limit=args.limit,
+                                   offset=args.offset),
+                         length=length) as rows:
+            for row in rows:
+                kvp = row.get('key_value_pairs', {})
+                nkvp -= len(kvp)
+                kvp.update(add_key_value_pairs)
+                nkvp += len(kvp)
+                if args.strip_data:
+                    db2.write(row.toatoms(), **kvp)
+                else:
+                    db2.write(row, data=row.get('data'), **kvp)
+                nrows += 1
+
+    out('Added %s (%s updated)' %
+        (plural(nkvp, 'key-value pair'),
+         plural(len(add_key_value_pairs) * nrows - nkvp, 'pair')))
+    out(f'Inserted {plural(nrows, "row")}')
 
 
 def main(args):
@@ -65,29 +135,7 @@ def main(args):
         return
 
     if args.show_values:
-        keys = args.show_values.split(',')
-        values = {key: defaultdict(int) for key in keys}
-        numbers = set()
-        for row in db.select(query):
-            kvp = row.key_value_pairs
-            for key in keys:
-                value = kvp.get(key)
-                if value is not None:
-                    values[key][value] += 1
-                    if not isinstance(value, str):
-                        numbers.add(key)
-
-        n = max(len(key) for key in keys) + 1
-        for key in keys:
-            vals = values[key]
-            if key in numbers:
-                print('{:{}} [{}..{}]'
-                      .format(key + ':', n, min(vals), max(vals)))
-            else:
-                print('{:{}} {}'
-                      .format(key + ':', n,
-                              ', '.join(f'{v}({n})'
-                                        for v, n in vals.items())))
+        show_values(args, db, query)
         return
 
     if args.add_from_file:
@@ -106,47 +154,7 @@ def main(args):
         return
 
     if args.insert_into:
-        if args.limit == -1:
-            args.limit = 0
-
-        progressbar = no_progressbar
-        length = None
-
-        if args.progress_bar:
-            # Try to import the one from click.
-            # People using ase.db will most likely have flask installed
-            # and therfore also click.
-            try:
-                from click import progressbar
-            except ImportError:
-                pass
-            else:
-                length = db.count(query)
-
-        nkvp = 0
-        nrows = 0
-        with connect(args.insert_into,
-                     use_lock_file=not args.no_lock_file) as db2:
-            with progressbar(db.select(query,
-                                       sort=args.sort,
-                                       limit=args.limit,
-                                       offset=args.offset),
-                             length=length) as rows:
-                for row in rows:
-                    kvp = row.get('key_value_pairs', {})
-                    nkvp -= len(kvp)
-                    kvp.update(add_key_value_pairs)
-                    nkvp += len(kvp)
-                    if args.strip_data:
-                        db2.write(row.toatoms(), **kvp)
-                    else:
-                        db2.write(row, data=row.get('data'), **kvp)
-                    nrows += 1
-
-        out('Added %s (%s updated)' %
-            (plural(nkvp, 'key-value pair'),
-             plural(len(add_key_value_pairs) * nrows - nkvp, 'pair')))
-        out(f'Inserted {plural(nrows, "row")}')
+        insert_into(args, db, query, out, add_key_value_pairs)
         return
 
     if args.limit == -1:
@@ -322,7 +330,7 @@ def row2str(row) -> str:
 
 @contextmanager
 def no_progressbar(iterable: Iterable,
-                   length: int = None) -> Iterator[Iterable]:
+                   length: int | None = None) -> Iterator[Iterable]:
     """A do-nothing implementation."""
     yield iterable
 

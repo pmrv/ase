@@ -1,6 +1,6 @@
-# fmt: off
 """Tests for Octopus outputs."""
-from typing import Any, Dict
+
+from typing import Any
 
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ from ase.units import Bohr, Debye, Hartree
 
 
 @pytest.fixture(name='info_iron')
-def fixture_info_iron(datadir) -> Dict[str, Any]:
+def fixture_info_iron(datadir) -> dict[str, Any]:
     """`info` of 'periodic_systems/25-Fe_polarized.01-gs'"""
     file = datadir / 'octopus/periodic_systems_25-Fe_polarized.01-gs_info'
     with file.open(encoding='utf-8') as fd:
@@ -54,7 +54,7 @@ def test_eigenvalues(datadir):
     np.testing.assert_allclose(occsarr, occsarr_ref)
 
 
-def test_fermi_level(info_iron: Dict[str, Any]):
+def test_fermi_level(info_iron: dict[str, Any]):
     """Test if the Fermi level is parsed correctly."""
     efermi_ref = 0.153766 * Hartree
     np.testing.assert_allclose(info_iron['fermi_level'], efermi_ref)
@@ -65,11 +65,11 @@ def test_dipole_moment(datadir):
     file = datadir / 'octopus/linear_response_02-h2o_pol_lr.01_h2o_gs_info'
     with file.open(encoding='utf-8') as fd:
         results = read_static_info(fd)
-    dipole_ref = np.array((7.45151E-16, 9.30594E-01, 3.24621E-15)) * Debye
+    dipole_ref = np.array((7.45151e-16, 9.30594e-01, 3.24621e-15)) * Debye
     np.testing.assert_allclose(results['dipole'], dipole_ref)
 
 
-def test_magnetic_moment(info_iron: Dict[str, Any]):
+def test_magnetic_moment(info_iron: dict[str, Any]):
     """Test if the magnetic moment is parsed correctly."""
     magmom_ref = 7.409638
     magmoms_ref = [3.385730, 3.385730]
@@ -83,15 +83,15 @@ def test_stress(datadir):
     with file.open(encoding='utf-8') as fd:
         results = read_static_info(fd)
     stress_ref = (
-        (-5.100825936E-04, -9.121282047E-16, +4.495864617E-16),
-        (-9.121277710E-16, -5.100825936E-04, -1.086184124E-15),
-        (+4.496421897E-16, -1.086295146E-15, -5.100825937E-04),
+        (-5.100825936e-04, -9.121282047e-16, +4.495864617e-16),
+        (-9.121277710e-16, -5.100825936e-04, -1.086184124e-15),
+        (+4.496421897e-16, -1.086295146e-15, -5.100825937e-04),
     )
     stress_ref = np.array(stress_ref) * Hartree / Bohr**3
     np.testing.assert_allclose(results['stress'], stress_ref)
 
 
-def test_kpoints(info_iron: Dict[str, Any]):
+def test_kpoints(info_iron: dict[str, Any]):
     """Test if the kpoints are parsed correctly."""
     nkpts_ref = 4
     kpoint_weights_ref = [0.25, 0.25, 0.25, 0.25]

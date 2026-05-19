@@ -1,49 +1,44 @@
-=======================================
-ase-gui basics and command line options
-=======================================
+===================================
+GUI basics and command line options
+===================================
 
-General use
------------
-
-Visualizing a system with ASE's GUI is straight-forward using a regular
-mouse. The scroll function allows to change the magnification, the
-left mouse button selects atoms, the right mouse button allows to
-rotate, and the middle button allows to translate the system on the
-screen.
-
-Depending on the number of selected atoms, :ref:`ase-gui` automatically measures
-different quantities:
-
-================================= ======================================
-Selection                         measurement
-================================= ======================================
-single atom                       xyz position and atomic symbol
-two atoms                         interatomic distance and symbols
-three atoms                       all three internal angles and
-                                  symbols
-four atoms, selected sequentially Measures the dihedral angle,
-                                  e.g. the angle between bonds 12 and 34
-more than four atoms              chemical composition of selection.
-================================= ======================================
-
-
-Files
------
-
-The :ref:`ase-gui` program can read all the file formats the ASE's
-:func:`~ase.io.read` function can understand.
+ASE has a built-in graphical user interface (GUI) which can be invoked from
+a terminal with the :command:`ase gui` subcommand and which can read all
+the same file formats that the ASE's :func:`~ase.io.read` function
+understands:
 
 ::
 
   $ ase gui N2Fe110-path.traj
 
+Type :command:`ase gui -h` for a description of all command line options.
 
-Selecting part of a trajectory
-------------------------------
+Alternatively, the GUI can be launched from a Python script or an
+interactive session by using :func:`ase.visualize.view`. For example, to
+view an Atoms object in the GUI *via* Python, do:
 
-A Python-like syntax for selecting a subset of configurations can be
-used.  Instead of the Python syntax ``list[start:stop:step]``, you use
-:file:`filaname@start:stop:step`::
+>>> from ase.visualize import view
+>>> atoms = ...
+>>> view(atoms)
+
+.. or
+
+.. >>> view(atoms, repeat=(3, 3, 2))
+
+The methods above open and modify a copy of the Atoms object which can
+then be saved to a file. In order to make direct changes to the atoms that
+are open in a Python session, use:
+
+>>> atoms.edit()
+
+
+Selecting a part of a trajectory
+................................
+
+When opening files that contain multiple atomic structures, a subset of
+the configurations can be selected using Python-like indexing
+separated with the @ character, i.e.
+:file:`filename@{start}:{stop}:{step}`::
 
   $ ase gui x.traj@0:10:1  # first 10 images
   $ ase gui x.traj@0:10    # first 10 images
@@ -53,76 +48,67 @@ used.  Instead of the Python syntax ``list[start:stop:step]``, you use
   $ ase gui x.traj@-1      # last image
   $ ase gui x.traj@::2     # every second image
 
-If you want to select the same range from many files, the you can use
-the ``-n`` or ``--image-number`` option::
+To simultaneously select the same range from many files, use the ``-n``
+or ``--image-number`` option::
 
-  $ ase gui -n -1 *.traj   # last image from all files
-  $ ase gui -n 0 *.traj    # first image from all files
-
-.. tip::
-
-  Type :command:`ase gui -h` for a description of all command line options.
+  $ ase gui -n -1 *.traj   # last image from all .traj files
+  $ ase gui -n 0 *.traj    # first image from all .traj files
 
 
-Writing files
--------------
+Basic controls
+--------------
 
-::
+Analyzing a system with ASE's GUI is straightforward. The primary (left)
+mouse button is used to select/unselect atoms and several atoms can be
+selected by holding down the :kbd:`ctrl` modifier key. Clicking and
+dragging with the secondary mouse button manipulates the view, rotating by
+default or panning around when the :kbd:`shift` modifier is held. Scrolling
+with the mouse wheel or touchpad zooms the view in and out. The
+:ref:`gui-view` menu contains additional options for efficient view
+manipulation.
 
-  $ ase gui -n -1 a*.traj -o new.traj
+Depending on how many atoms are selected, the :ref:`ase-gui` automatically
+displays certain information in the status bar on the bottom left of the
+window:
 
-Possible formats are: ``traj``, ``xyz``, ``cube``, ``pdb``, ``eps``,
-``png``, and ``pov``.  For details, see the :mod:`~ase.io` module
-documentation.
+================================= ======================================
+Selection                         Display
+================================= ======================================
+single atom                       position (x,y,z) and chemical symbol
+                                  of the atom
+two atoms                         interatomic distance and chemical
+                                  symbols
+three atoms                       internal angles between the atoms and
+                                  chemical symbols
+four atoms                        dihedral angle, i.e. the angle between
+                                  bonds 1-2 and 3-4, and chemical
+                                  symbols
+more than four atoms              chemical composition (formula) of
+                                  selection
+================================= ======================================
 
-
-Interactive use
----------------
-
-The :ref:`ase-gui` program can also be launched directly from a Python
-script or interactive session:
-
->>> from ase import *
->>> atoms = ...
->>> view(atoms)
-
-or
-
->>> view(atoms, repeat=(3, 3, 2))
-
-or, to keep changes to your atoms:
-
->>> atoms.edit()
-
-Use :meth:`ase.gui.gui.GUI.repeat_poll` to interact programmatically
-with the GUI, for example to monitor an ongoing calculation
-and update the display on the fly.
-
-.. automethod:: ase.gui.gui.GUI.repeat_poll
-
-NEB calculations
-----------------
-
-Use :menuselection:`Tools --> NEB` to plot energy barrier.
-
-::
-
-  $ ase gui --interpolate 3 initial.xyz final.xyz -o interpolated_path.traj
+Explore the :ref:`gui-edit` menu to find ways to manipulate the selected
+atoms as well as their corresponding keyboard shortcuts.
 
 
 Plotting data from the command line
 -----------------------------------
-Plot the energy relative to the energy of the first image as a
-function of the distance between atom 0 and 5::
+It is possible to make plots using the data in trajectory files directly
+from the command line. For example, to plot the energy relative to the
+energy of the first image as a function of the distance between
+atoms 0 and 5::
 
   $ ase gui -g "d(0,5),e-E[0]" x.traj
   $ ase gui -t -g "d(0,5),e-E[0]" x.traj > x.dat  # No GUI, write data to stdout
 
-The symbols are the same as used in the plotting data function.
+For instructions on creating valid graphing strings, refer to
+:ref:`gui-tools graphs`.
 
 
-Defaults
---------
+.. _gui configuration:
+
+Configuring the GUI
+-------------------
 
 Certain defaults for the GUI can be set using a file ``~/.ase/gui.py``.
 If the file exists, it is executed after initializing the variables and
@@ -140,8 +126,8 @@ dictionary, and atoms can be referred to using atomic symbols.
   gui_default_settings['gui_graphs_string'] = "i, e - min(E), fmax"
   gui_default_settings['covalent_radii'] = [[29,1.6]]  # or {29: 1.6}
 
-To see a list of all settings that can be changed, along with their stock
-values, do
+To see a list of all settings that can be changed, along with their
+default values, do:
 
 ::
 
@@ -152,20 +138,25 @@ values, do
 .. _high contrast:
 
 High contrast settings
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
-In revision 2600 or later, it is possible to change the foreground and
-background colors used to draw the atoms, for instance to draw white
-graphics on a black background. This can be done in ``~/.ase/gui.py``.
+It is possible to change the foreground and background colors used to draw the
+atoms, for instance to draw white graphics on a black background. This can be
+done in ``~/.ase/gui.py``:
 
 ::
 
   gui_default_settings['gui_foreground_color'] = '#ffffff' #white
   gui_default_settings['gui_background_color'] = '#000000' #black
 
-To change the color scheme of graphs it is necessary to change the
-default behaviour of Matplotlib in a similar way by using a file
-``~/.matplotlib/matplotlibrc``.
+The color scheme of the windows themselves (i.e. menus, buttons
+and text etc.) can be changed by choosing a different desktop theme. In
+Ubuntu it is possible to get white on a dark background by selecting the
+theme HighContrastInverse under Appearances in the system settings dialog.
+
+To change the color scheme of graphs, configure the default behaviour of
+Matplotlib in a similar way by using a file ``~/.matplotlib/matplotlibrc``.
+For example:
 
 ::
 
@@ -181,7 +172,14 @@ default behaviour of Matplotlib in a similar way by using a file
   figure.facecolor : 0.1
   figure.edgecolor : black
 
-Finally, the color scheme of the windows themselves (i.e. menus, buttons
-and text etc.) can be changed by choosing a different desktop theme. In
-Ubuntu it is possible to get white on a dark background by selecting the
-theme HighContrastInverse under Appearances in the system settings dialog.
+
+.. _polling:
+
+Polling the GUI
+---------------
+
+Use :meth:`ase.gui.gui.GUI.repeat_poll` to interact programmatically
+with the GUI, for example to monitor an ongoing calculation
+and update the display on the fly.
+
+.. automethod:: ase.gui.gui.GUI.repeat_poll

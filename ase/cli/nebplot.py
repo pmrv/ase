@@ -37,6 +37,8 @@ class CLICommand:
 
     @staticmethod
     def run(args, parser):
+        import matplotlib
+        matplotlib.use('Agg')  # headless operation
         from ase.gui.images import Images
         from ase.mep import NEBTools
 

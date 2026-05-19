@@ -477,6 +477,15 @@ Full Martyna-Tobias-Klein (MTK) dynamics
 .. autoclass:: MTKNPT
 
 
+Masked Martyna-Tobias-Klein (MTK) dynamics
+------------------------------------------
+
+.. module:: ase.md.nose_hoover_chain
+   :no-index:
+
+.. autoclass:: MaskedMTKNPT
+
+
 Langevin-Hoover BAOAB dynamics
 ------------------------------
 
@@ -551,6 +560,8 @@ A selection of functions are provided to initialize atomic velocities
 to the correct temperature.
 
 .. module:: ase.md.velocitydistribution
+
+.. autofunction:: thermalize_momenta
 
 .. autofunction:: MaxwellBoltzmannDistribution
 

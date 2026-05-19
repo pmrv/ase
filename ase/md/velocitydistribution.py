@@ -6,14 +6,14 @@ atoms according to a Maxwell-Boltzmann distribution at a given
 temperature.
 """
 
-import warnings
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 
 from ase import Atoms, units
 from ase.md.md import process_temperature
-from ase.parallel import DummyMPI, world
+from ase.parallel import world
+from ase.utils import deprecated
 
 # define a ``zero'' temperature to avoid divisions by zero
 eps_temp = 1e-12
@@ -94,25 +94,27 @@ def _maxwellboltzmanndistribution(masses, temp, comm=world, rng=None):
     return momenta
 
 
+@deprecated('Use thermalize_momenta', DeprecationWarning)
 def MaxwellBoltzmannDistribution(
     atoms: Atoms,
-    temp: Optional[float] = None,
     *,
-    temperature_K: Optional[float] = None,
+    temperature_K: float,
     comm=world,
-    communicator=None,
     force_temp: bool = False,
     rng=None,
 ):
     """Set the atomic momenta to a Maxwell-Boltzmann distribution.
 
+    .. versionremoved:: 3.29.0
+        The ``temp`` argument is removed. Use ``temperature_K`` instead.
+
+    .. deprecated:: 3.29.0
+        Use :func:`thermalize_momenta` instead.
+
     Parameters
     ----------
     atoms: Atoms object
         The atoms.  Their momenta will be modified.
-
-    temp: float (deprecated)
-        The temperature in eV.  Deprecated, use ``temperature_K`` instead.
 
     temperature_K: float
         The temperature in Kelvin.
@@ -122,11 +124,9 @@ def MaxwellBoltzmannDistribution(
 
         .. versionadded:: 3.26.0
 
-    communicator
+        .. versionremoved:: 3.29.0
 
-        .. deprecated:: 3.26.0
-
-           To be removed in ASE 3.27.0 in favor of ``comm``.
+           ``communicator`` has been removed in favor of ``comm``.
 
     force_temp: bool (optional, default: False)
         If True, the random momenta are rescaled so the kinetic energy is
@@ -139,25 +139,56 @@ def MaxwellBoltzmannDistribution(
         supply a random seed like ``rng=numpy.random.RandomState(seed)``, where
         seed is an integer.
     """
-    if communicator is not None:
-        msg = (
-            '`communicator` has been deprecated since ASE 3.26.0 '
-            'and will be removed in ASE 3.27.0. Use `comm` instead.'
-        )
-        warnings.warn(msg, FutureWarning)
-        comm = communicator
-    if comm == 'serial':
-        msg = (
-            '`comm=="serial"` has been deprecated since ASE 3.26.0 '
-            'and will be removed in ASE 3.27.0. Use `comm=DummyMPI()` instead.'
-        )
-        warnings.warn(msg, FutureWarning)
-        comm = DummyMPI()
-    temp = units.kB * process_temperature(temp, temperature_K, 'eV')
+    thermalize_momenta(
+        atoms,
+        temperature_K,
+        comm=comm,
+        exact_temperature=force_temp,
+        rng=rng,
+    )
+
+
+def thermalize_momenta(
+    atoms: Atoms,
+    temperature_K: float,
+    *,
+    comm=world,
+    exact_temperature: bool = False,
+    rng=None,
+) -> None:
+    """Set the atomic momenta to a Maxwell-Boltzmann distribution.
+
+    See :func:`MaxwellBoltzmannDistribution` for details of parameters.
+
+    .. versionadded:: 3.29.0
+
+    Parameters
+    ----------
+    atoms: Atoms object
+        The atoms.  Their momenta will be modified.
+
+    temperature_K: float
+        The temperature in Kelvin.
+
+    comm: MPI communicator, default: :data:`ase.parallel.world`
+        Communicator used to distribute an identical distribution to all tasks.
+
+    exact_temperature: bool, default: False
+        If True, the random momenta are rescaled so the kinetic energy is
+        exactly 3/2 N k T.  This is a slight deviation from the correct
+        Maxwell-Boltzmann distribution.
+
+    rng: Numpy RNG (optional)
+        Random number generator.  Default: numpy.random
+        If you would like to always get the identical distribution, you can
+        supply a random seed like ``rng=numpy.random.RandomState(seed)``, where
+        seed is an integer.
+    """
+    temp = units.kB * temperature_K  # K -> eV
     masses = atoms.get_masses()
     momenta = _maxwellboltzmanndistribution(masses, temp, comm=comm, rng=rng)
-    atoms.set_momenta(momenta)
-    if force_temp:
+    atoms.set_momenta(momenta, apply_constraint=True)
+    if exact_temperature:
         force_temperature(atoms, temperature=temp, unit='eV')
 
 
@@ -211,7 +242,8 @@ def n_BE(temp, omega):
         temp: temperature converted to eV (*units.kB)
         omega: sequence of frequencies converted to eV
 
-    Returns:
+    Returns
+    -------
         Value of Bose-Einstein distribution function for each energy
 
     """
@@ -240,8 +272,8 @@ def phonon_harmonics(
 ):
     r"""Return displacements and velocities that produce a given temperature.
 
-    Parameters:
-
+    Parameters
+    ----------
     force_constants: array of size 3N x 3N
         force constants (Hessian) of the system in eV/Å²
 
@@ -272,13 +304,13 @@ def phonon_harmonics(
         True for sanity checking the phonon spectrum for negative
         frequencies at Gamma
 
-    Returns:
-
+    Returns
+    -------
     Displacements, velocities generated from the eigenmodes,
     (optional: eigenvalues, eigenvectors of dynamical matrix)
 
-    Purpose:
-
+    Notes
+    -----
     Excite phonon modes to specified temperature.
 
     This excites all phonon modes randomly so that each contributes,
@@ -312,7 +344,11 @@ def phonon_harmonics(
         a    \  m  /     ---  ai        i                i
                  a        i
 
-    Reference: [West, Estreicher; PRL 96, 22 (2006)]
+    References
+    ----------
+    D. West and S. K. Estreicher, Phys. Rev. Lett. 96, 115504 (2006).
+    https://doi.org/10.1103/PhysRevLett.96.115504
+
     """
 
     # Handle the temperature units
@@ -421,9 +457,9 @@ def PhononHarmonics(
     to produce a random, phononically correct state with the requested
     temperature.
 
-    Parameters:
-
-    atoms: ase.atoms.Atoms() object
+    Parameters
+    ----------
+    atoms: :class:`~ase.Atoms`
         Positions and momenta of this object are perturbed.
 
     force_constants: ndarray of size 3N x 3N

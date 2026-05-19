@@ -1,7 +1,8 @@
 import datetime
 
 extensions = [
-    'ase.utils.sphinx',
+    'ase.utils.sphinx_assert',
+    'ase.utils.sphinx_create_png',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -25,7 +26,7 @@ project = 'ASE'
 author = 'ASE developers'
 copyright = f'{datetime.date.today().year}, ASE-developers'
 exclude_patterns = ['build']
-default_role = 'math'
+default_role = 'code'
 pygments_style = 'sphinx'
 autoclass_content = 'both'
 modindex_common_prefix = ['ase.']
@@ -41,6 +42,7 @@ nitpick_ignore = [
 ]
 sphinx_gallery_conf = {
     'filename_pattern': r'/*\.py',
+    'ignore_pattern': r'/*prerequisites\.py',
     # "copyfile_regex": r".*\.(xyz|dat)",
     'examples_dirs': ['../examples'],
     'gallery_dirs': ['examples_generated'],
@@ -50,6 +52,10 @@ sphinx_gallery_conf = {
     'prefer_full_module': ['ase'],
     'matplotlib_animations': (True, 'mp4'),
     'within_subsection_order': 'FileNameSortKey',
+    'image_scrapers': (
+        'matplotlib',
+        'ase.utils.sphinx_create_png.png_scraper',
+    ),
 }
 
 html_theme = 'sphinx_book_theme'
