@@ -78,10 +78,10 @@ def surface(lattice, indices, layers, vacuum=None, tol=1e-10, periodic=False):
         if vacuum == 0:
             import warnings
             warnings.warn(
-                "Passing vacuum=0 shrinks the Z-axis to the atomic bounding box, "
-                "which will cause overlapping atoms if the system is periodic. "
-                "To create a continuous bulk-like slab, use vacuum=None. "
-                "Falling back to vacuum=None.",
+                "Passing vacuum=0 shrinks the Z-axis to the atomic bounding "
+                "box, which will cause overlapping atoms if the system is "
+                "periodic. To create a continuous bulk-like slab, use "
+                "vacuum=None. Falling back to vacuum=None.",
                 UserWarning
             )
         else:
