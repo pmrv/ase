@@ -1,6 +1,10 @@
 import numpy as np
+import pytest
 
 from ase._4.symopt.relax import chol_derivative
+
+
+pytestmark = pytest.mark.calculator_lite
 
 
 def numerical_chol_derivative(A, dA, eps=1e-10):

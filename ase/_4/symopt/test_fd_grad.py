@@ -1,10 +1,14 @@
 import numpy as np
+import pytest
 
 from ase._4.symopt.relax import Relax
 from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.optimize.bfgs import BFGS
 from ase.parallel import world
+
+
+pytestmark = pytest.mark.calculator_lite
 
 
 def test_generalized_coordinate_units():
