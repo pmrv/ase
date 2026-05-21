@@ -5,8 +5,8 @@ from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.data import chemical_symbols
 
-
 pytestmark = pytest.mark.calculator_lite
+
 
 def generate_all_bulk_structures():
     cases = []

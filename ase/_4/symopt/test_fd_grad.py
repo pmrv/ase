@@ -7,7 +7,6 @@ from ase.calculators.emt import EMT
 from ase.optimize.bfgs import BFGS
 from ase.parallel import world
 
-
 pytestmark = pytest.mark.calculator_lite
 
 

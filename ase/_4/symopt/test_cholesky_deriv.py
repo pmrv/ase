@@ -3,7 +3,6 @@ import pytest
 
 from ase._4.symopt.relax import chol_derivative
 
-
 pytestmark = pytest.mark.calculator_lite
 
 

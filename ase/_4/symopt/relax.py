@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import numpy as np
+import scipy
 
 from ase import Atoms
 from ase._4.symopt.relax_print import (
@@ -11,6 +12,7 @@ from ase._4.symopt.relax_print import (
     pretty_header,
     pretty_subheader,
 )
+from ase.cell import Cell
 from ase.utils.abc import Optimizable
 
 
@@ -175,7 +177,7 @@ class SymmeryAdaptedCellCoordinates:
         except np.linalg.LinAlgError:
             raise RuntimeError('Failed to create cell from metric', M_cc)
 
-        return Atoms(cell=C_cv).cell
+        return Cell(C_cv)
 
     def get_M_cc(self, cell_z):
         """
@@ -236,8 +238,6 @@ class SymmeryAdaptedCellCoordinates:
         assert np.allclose(C_cv @ F_vv, symC_cv)
 
         # Do a polar decomposition to rotate the symmetrized cell back
-        import scipy
-
         rot_vv, P_vv = scipy.linalg.polar(F_vv)
         osymC_cv = symC_cv @ rot_vv.T
 
