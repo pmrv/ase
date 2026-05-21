@@ -17,7 +17,7 @@ Registration
 ============
 
 Please register on the `CECAM webpage`_. The registration
-will close April 15, 2026.
+closed on April 15, 2026.
 
 
 Organizers
@@ -28,7 +28,7 @@ Organizers
 *  Elena Gelžinytė, CuspAI, UK
 *  Petr Grigorev, CNRS, MatéIS, INSA Lyon, France
 *  Yair Litman, Max Planck Institute for Polymer Research, Germany
-*  Auguste TETENOIRE, École Polytechnique Fédérale de Lausanne, Switzerland
+*  Auguste Tetenoire, École Polytechnique Fédérale de Lausanne, Switzerland
 *  Hanna Türk, École Polytechnique Fédérale de Lausanne, Switzerland
 
 For questions, please contact the organizers at

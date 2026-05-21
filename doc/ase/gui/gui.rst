@@ -6,9 +6,9 @@
 
 .. _ase-gui:
 
-=========
-ASE's GUI
-=========
+==============================
+Graphical user interface (GUI)
+==============================
 
 The graphical user-interface allows users to visualize, manipulate,
 and render molecular systems and atoms objects. It also allows to

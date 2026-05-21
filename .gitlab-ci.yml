@@ -105,12 +105,12 @@ calculators-lite:
   before_script:
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
     - pip install --no-deps --editable .
-    - export ASE_CONFIG_PATH=/home/ase/aseconfig.ini
     - sed 's/binary = /command = /' -i /home/ase/aseconfig.ini
+    - export ASE_CONFIG_PATH=/home/ase/aseconfig.ini
   script:
     - >
       pytest $COVERAGE_OPTS -n 8 -m calculator_lite
-      ase/test/calculator/ --calculators auto
+      ase/test/calculator/ --calculators auto ase/_4/symopt
   after_script:
     - coverage xml
     - mv .coverage coverage-calculators-lite.dat
@@ -139,8 +139,8 @@ calculators:
   before_script:
     - pip install --no-deps --editable .
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
-    - export ASE_CONFIG_PATH=/home/ase/aseconfig.ini
     - sed 's/binary = /command = /' -i /home/ase/aseconfig.ini
+    - export ASE_CONFIG_PATH=/home/ase/aseconfig.ini
     - ase info --calculators
   script:
     - >
@@ -190,13 +190,16 @@ doc:
   before_script:
     - pip install scriv sphinx_book_theme sphinx-gallery sphinxcontrib-video
     - pip install --no-deps .[docs]
+    - export ASE_CONFIG_PATH=/home/ase/aseconfig.ini
+    - sed 's/binary = /command = /' -i /home/ase/aseconfig.ini
     - ase info
     - which sphinx-build
   script:
     - scriv collect --keep || echo Not compiling changelog then  # Avoid error
-    - python -m ase.utils.sphinx run # test scripts
+    - python -m ase.utils.sphinx_create_png run # test scripts
     - sphinx-build -W doc doc/build
     - mv doc/build web-html
+    - '! grep -n "^ \* " doc/releasenotes.rst || { echo "Wrong indent in front of star. Use either zero or two spaces" >&2; exit 1; }'
   cache:
     paths:
       - $PIP_CACHE_DIR

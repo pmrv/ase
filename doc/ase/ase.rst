@@ -68,7 +68,6 @@ Modules
    geometry
    db/db
    mep
-   gui/gui
    lattice
    cluster/cluster
    visualize/visualize

@@ -5,9 +5,8 @@ import unittest
 import numpy as np
 import pytest
 
-import ase.build
 import ase.io
-from ase.build import graphene_nanoribbon
+from ase.build import bulk, graphene_nanoribbon
 from ase.calculators.calculator import compare_atoms
 from ase.constraints import (
     FixAtoms,
@@ -23,7 +22,7 @@ class TestXdatcarRoundtrip(unittest.TestCase):
     def setUp(self):
         self.outfile = 'NaCl.XDATCAR'
 
-        self.NaCl = ase.build.bulk('NaCl', 'rocksalt', a=5.64)
+        self.NaCl = bulk('NaCl', 'rocksalt', a=5.64)
 
     def tearDown(self):
         if os.path.isfile(self.outfile):
@@ -39,14 +38,14 @@ class TestXdatcarRoundtrip(unittest.TestCase):
             )
 
     def test_roundtrip_single_atoms(self):
-        atoms = ase.build.bulk('Ge')
+        atoms = bulk('Ge')
         ase.io.write(self.outfile, atoms, format='vasp-xdatcar')
         roundtrip_atoms = ase.io.read(self.outfile)
         self.assert_atoms_almost_equal(atoms, roundtrip_atoms)
 
     def test_typeerror(self):
         with self.assertRaises(TypeError):
-            atoms = ase.build.bulk('Ge')
+            atoms = bulk('Ge')
             write_vasp_xdatcar(self.outfile, atoms)
         with self.assertRaises(TypeError):
             not_atoms = 1
@@ -70,7 +69,7 @@ def cell(request):
 @pytest.fixture
 def trajectory(cell):
     # Create a series of translated cells
-    atoms = ase.build.bulk('NaCl', 'rocksalt', a=5.64)
+    atoms = bulk('NaCl', 'rocksalt', a=5.64)
     images = [atoms.copy() for _ in range(5)]
     for i, atoms in enumerate(images):
         if cell:
@@ -92,7 +91,7 @@ def test_xdatcar_roundtrip_multiple_images(trajectory) -> None:
 
 def test_index():
     """Test if the `index` option works correctly"""
-    atoms0 = ase.build.bulk('X', 'sc', a=1.0)
+    atoms0 = bulk('X', 'sc', a=1.0)
     atoms1 = atoms0.copy()
     atoms1.positions += 0.1
     images = (atoms0, atoms1)
@@ -114,6 +113,19 @@ def test_index():
         buf.seek(0)
         images = read_vasp_xdatcar(buf, index=':')  # (atoms0, atoms1)
         assert isinstance(images, list)
+
+
+def test_unwrapped_scaled_positions() -> None:
+    """Test if `write_vasp_xdatcar` prints unwrapped scaled positions."""
+    atoms_ref = bulk('Ge')
+    # Shift atomic positions to get negative coordinates
+    atoms_ref.wrap(center=(-1, -1, -1))
+
+    with io.StringIO() as buf:
+        write_vasp_xdatcar(buf, [atoms_ref])
+        buf.seek(0)
+        atoms = read_vasp_xdatcar(buf)
+        np.testing.assert_allclose(atoms_ref.positions, atoms.positions)
 
 
 # Start of tests for constraints

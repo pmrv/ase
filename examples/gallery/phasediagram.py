@@ -1,5 +1,9 @@
-# creates: ktao-2d.png, ktao-3d.png
-import matplotlib.pyplot as plt
+""".. _gallery_phase_diagram:
+
+Phase diagrams
+==============
+
+"""
 
 from ase.phasediagram import PhaseDiagram
 
@@ -19,5 +23,4 @@ references = [
 ]
 pd = PhaseDiagram(references)
 for d in [2, 3]:
-    pd.plot(dims=d, show=False)
-    plt.savefig(f'ktao-{d}d.png')
+    pd.plot(dims=d, show=False, fontsize=20)
