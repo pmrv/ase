@@ -110,7 +110,7 @@ calculators-lite:
   script:
     - >
       pytest $COVERAGE_OPTS -n 8 -m calculator_lite
-      ase/test/calculator/ --calculators auto
+      ase/test/calculator/ --calculators auto ase/_4/symopt
   after_script:
     - coverage xml
     - mv .coverage coverage-calculators-lite.dat
