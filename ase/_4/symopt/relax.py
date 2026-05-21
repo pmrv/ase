@@ -18,7 +18,7 @@ def green(text: str) -> str:
     return f'\x1b[32m{text}\x1b[0m'
 
 
-def chol_derivative(A, dA, L=None):
+def chol_derivative(A, dA):
     """
     Compute the derivative of the Cholesky factorization.
 
@@ -35,8 +35,7 @@ def chol_derivative(A, dA, L=None):
     A = (A + A.T) / 2
     dA = (dA + dA.T) / 2
 
-    if A is not None:
-        L = np.linalg.cholesky(A)
+    L = np.linalg.cholesky(A)
     Linv = np.linalg.inv(L)
     S = Linv @ dA @ Linv.T
     X = np.tril(S)
