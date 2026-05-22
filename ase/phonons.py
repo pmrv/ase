@@ -319,6 +319,10 @@ class Phonons(Displacement):
         if 'name' not in kwargs:
             kwargs['name'] = 'phonon'
 
+        self.mean_minimum_image_phase = kwargs.pop(
+            'mean_minimum_image_phase',
+            False,
+        )
         self.deprecate_refcell(kwargs)
 
         Displacement.__init__(self, *args, **kwargs)
@@ -326,6 +330,7 @@ class Phonons(Displacement):
         # Attributes for force constants and dynamical matrix in real space
         self.C_N = None  # in units of eV / Ang**2
         self.D_N = None  # in units of eV / Ang**2 / amu
+        self._minimum_image_vectors = None
 
         # Attributes for born charges and static dielectric tensor
         self.Z_avv = None
@@ -670,6 +675,60 @@ class Phonons(Displacement):
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
 
+    @property
+    def minimum_image_vectors(self):
+        """Shortest periodic images for each cell and atom pair."""
+        if self._minimum_image_vectors is None:
+            self._minimum_image_vectors = self._compute_minimum_image_vectors()
+        return self._minimum_image_vectors
+
+    def _compute_minimum_image_vectors(self):
+        scaled_positions = self.atoms.get_scaled_positions(wrap=True) % 1.0
+        scaled_positions[np.isclose(scaled_positions, 1.0, atol=1e-12)] = 0.0
+        supercell_c = np.asarray(self.supercell)
+        shifts_cc = np.indices((3, 3, 3)).reshape(3, -1).T - 1
+
+        vectors = []
+        for R_c in self._lattice_vectors_array.T:
+            atom_pair_vectors = []
+            for a in self.indices:
+                atom_vectors = []
+                for b in self.indices:
+                    vector_c = R_c + scaled_positions[b] - scaled_positions[a]
+                    images = vector_c + supercell_c * shifts_cc
+                    image_v = images @ self.atoms.cell.array
+                    lengths2 = np.einsum('ij,ij->i', image_v, image_v)
+                    minimum = lengths2.min()
+                    shortest = images[
+                        np.isclose(lengths2, minimum, rtol=0.0, atol=1e-12)
+                    ]
+                    atom_vectors.append(shortest)
+                atom_pair_vectors.append(atom_vectors)
+            vectors.append(atom_pair_vectors)
+
+        return vectors
+
+    def _compute_dynamical_matrix_mean_minimum_image_phase(
+        self,
+        q_scaled: np.ndarray,
+        D_N: np.ndarray,
+    ):
+        natoms = len(self.indices)
+        R_cN = self._lattice_vectors_array
+        D_Navav = D_N.reshape((len(D_N), natoms, 3, natoms, 3))
+        D_qavav = np.zeros((natoms, 3, natoms, 3), dtype=complex)
+        minimum_image_vectors = self.minimum_image_vectors
+
+        for n in range(len(R_cN.T)):
+            for i, a in enumerate(self.indices):
+                for j, b in enumerate(self.indices):
+                    vectors = minimum_image_vectors[n][i][j]
+                    phase = np.exp(-2.0j * pi * (vectors @ q_scaled)).mean()
+                    D_qavav[i, :, j, :] += phase * D_Navav[n, i, :, j, :]
+
+        D_q = D_qavav.reshape((3 * natoms, 3 * natoms))
+        return (D_q + D_q.conj().T) / 2.0
+
     def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_ab(q).
             This is a Fourier transform from real-space dynamical matrix D_N
@@ -692,6 +751,11 @@ class Phonons(Displacement):
             2D complex-valued array D(q) with shape=(3 * natoms, 3 * natoms).
 
         """
+        if self.mean_minimum_image_phase:
+            return self._compute_dynamical_matrix_mean_minimum_image_phase(
+                q_scaled, D_N
+            )
+
         # Evaluate fourier sum
         R_cN = self._lattice_vectors_array
         phase_N = np.exp(-2.0j * pi * np.dot(q_scaled, R_cN))
