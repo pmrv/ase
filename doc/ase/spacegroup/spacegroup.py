@@ -1,4 +1,4 @@
-# creates: spacegroup-al.png spacegroup-fe.png spacegroup-rutile.png spacegroup-cosb3.png spacegroup-mg.png spacegroup-skutterudite.png spacegroup-diamond.png spacegroup-nacl.png
+# creates: spacegroup-al.png spacegroup-fe.png spacegroup-rutile.png  spacegroup-mg.png spacegroup-skutterudite.png spacegroup-diamond.png spacegroup-nacl.png
 # flake8: noqa
 import runpy
 
@@ -20,5 +20,3 @@ for name in ['al', 'mg', 'fe', 'diamond', 'nacl', 'rutile', 'skutterudite']:
         ),
     )
     renderer.render()
-
-runpy.run_path('spacegroup-cosb3.py')

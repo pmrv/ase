@@ -1,3 +1,17 @@
+"""
+
+POV-Ray rendered crystal structure
+==================================
+
+Here, we show POV-Ray rendered images as shown in :mod:`ase.spacegroup`.
+As an example, we start from a skutterudite structure.
+This structure is visualised with the Cobalt atoms on the
+corners. This can easily be accomplished with ASE using
+:func:`ase.build.cut`. Below is the *origo* argument used to
+put the Cobalt atom on the corners and *extend* to include all corner
+and edge atoms, even those belonging to neighbouring unit cells.
+"""
+
 import ase.io as io
 from ase.build import cut
 from ase.spacegroup import crystal

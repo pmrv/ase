@@ -7,6 +7,8 @@ from ase.calculators.emt import EMT
 from ase.optimize.bfgs import BFGS
 from ase.parallel import world
 
+pytestmark = pytest.mark.calculator_lite
+
 
 def test_generalized_coordinate_units():
     """Test that displacements are in Å and stresses in eV/Å^3.

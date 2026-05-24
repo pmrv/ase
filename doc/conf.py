@@ -1,7 +1,8 @@
 import datetime
 
 extensions = [
-    'ase.utils.sphinx',
+    'ase.utils.sphinx_assert',
+    'ase.utils.sphinx_create_png',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.extlinks',
@@ -41,6 +42,7 @@ nitpick_ignore = [
 ]
 sphinx_gallery_conf = {
     'filename_pattern': r'/*\.py',
+    'ignore_pattern': r'/*prerequisites\.py',
     # "copyfile_regex": r".*\.(xyz|dat)",
     'examples_dirs': ['../examples'],
     'gallery_dirs': ['examples_generated'],
@@ -52,7 +54,7 @@ sphinx_gallery_conf = {
     'within_subsection_order': 'FileNameSortKey',
     'image_scrapers': (
         'matplotlib',
-        'ase.utils.sphinx.png_scraper',
+        'ase.utils.sphinx_create_png.png_scraper',
     ),
 }
 

@@ -2,17 +2,27 @@
 Atomic Simulation Environment
 =============================
 
-.. admonition:: ASE Event
+.. admonition:: ASE User Experience Poll
    :class: tip
 
-   The CECAM Flagship workshop *The Atomic Simulation Environment: Integration into Wider Community Projects*
-   is taking place **June 15-19, 2026 in Mainz, Germany**.
-   It is now open for registration (deadline: April 15, 2026).
-   Please find more information and register on the `CECAM event webpage`_.
+   In preparation of the
+   CECAM Flagship workshop *The Atomic Simulation Environment: Integration into Wider Community Projects*
+   taking place June 15-19, 2026 in Mainz, Germany (registration closed),
+   we are conducting a user survey: 
 
-.. _CECAM event webpage: https://www.cecam.org/
+   **Please take part by filling out the** `ASE User Experience Poll`_ **by 1st of June 2026.**
+
+   It targets all ASE users and people interested in ASE
+   and aims to give us an overview on how ASE user experience and performance can be improved in the future,
+   as well as what features are desirable. Results will be discussed at the `ASE CECAM workshop 2026`_.
+
+.. _ASE User Experience Poll: https://docs.google.com/
+ forms/d/e/1FAIpQLSedlkU2n1sS9pNPsZqWTNDhrgLojQt2UpJCMO505FAI_wfOAQ/viewform
+
+.. _ASE CECAM workshop 2026: https://www.cecam.org/
  workshop-details/the-atomic-simulation-environment-
  integration-into-wider-community-projects-1509
+
 
 
 The Atomic Simulation Environment (ASE) is a set of tools and Python_
@@ -220,7 +230,6 @@ Contents
     ase/gui/gui
     ase/ase
     tips
-    gallery/gallery
     releasenotes
     contact
     ecosystem

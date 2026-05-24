@@ -137,7 +137,7 @@ class CLIViewer(AbstractViewer):
         return proc
 
 
-VIEWERS = {}
+VIEWERS: dict[str, type] = {}
 
 
 def _pipe_to_ase_gui(atoms, repeat, **kwargs):

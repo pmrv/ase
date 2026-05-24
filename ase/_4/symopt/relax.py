@@ -1,6 +1,7 @@
 from dataclasses import asdict, dataclass
 
 import numpy as np
+import scipy
 
 from ase import Atoms
 from ase._4.symopt.relax_print import (
@@ -11,44 +12,13 @@ from ase._4.symopt.relax_print import (
     pretty_header,
     pretty_subheader,
 )
+from ase.cell import Cell
 from ase.utils import spglib_new_errorhandling
 from ase.utils.abc import Optimizable
 
 
 def green(text: str) -> str:
     return f'\x1b[32m{text}\x1b[0m'
-
-
-def minimize_l1(dof_zac):
-    nz = len(dof_zac)
-    if nz < 2:
-        # Nothing to minimize with just 1 dof
-        return
-    from scipy.linalg import expm
-    from scipy.optimize import fmin
-
-    basis = []
-    for i in range(nz):
-        for j in range(i + 1, nz):
-            b = np.zeros((nz, nz))
-            b[i, j] = 1
-            b[j, i] = -1
-            basis.append(b)
-
-    nb = len(basis)
-
-    def U_zz(x):
-        x = np.array(x).reshape((-1,))
-        M = np.zeros((nz, nz))
-        for i, e in enumerate(x):
-            M += e * basis[i]
-        return expm(M)
-
-    def function(x):
-        return np.sum(np.abs(np.einsum('zw,wac->zac', U_zz(x), dof_zac)))
-
-    xopt, *args = fmin(function, np.zeros((nb,)), xtol=1e-7, ftol=1e-7)
-    dof_zac[:] = np.einsum('zw,wac->zac', U_zz(np.array(xopt)), dof_zac)
 
 
 def argsort_rotations(rotations):
@@ -70,7 +40,7 @@ def snap_translations_to_zero(translations, tol=1e-13):
     return cleaned_translations
 
 
-def chol_derivative(A, dA, L=None):
+def chol_derivative(A, dA):
     """
     Compute the derivative of the Cholesky factorization.
 
@@ -87,8 +57,7 @@ def chol_derivative(A, dA, L=None):
     A = (A + A.T) / 2
     dA = (dA + dA.T) / 2
 
-    if A is not None:
-        L = np.linalg.cholesky(A)
+    L = np.linalg.cholesky(A)
     Linv = np.linalg.inv(L)
     S = Linv @ dA @ Linv.T
     X = np.tril(S)
@@ -295,7 +264,7 @@ class SymmetryAdaptedCellCoordinates:
         except np.linalg.LinAlgError:
             raise RuntimeError('Failed to create cell from metric', M_cc)
 
-        return Atoms(cell=C_cv).cell
+        return Cell(C_cv)
 
     def get_M_cc(self, cell_z):
         """
@@ -356,8 +325,6 @@ class SymmetryAdaptedCellCoordinates:
         assert np.allclose(C_cv @ F_vv, symC_cv)
 
         # Do a polar decomposition to rotate the symmetrized cell back
-        import scipy
-
         rot_vv, P_vv = scipy.linalg.polar(F_vv)
         osymC_cv = symC_cv @ rot_vv.T
 
@@ -520,7 +487,6 @@ class SymmetryAdaptedScaledCoordinates:
             dof_zac /= np.max(np.linalg.norm(dof_zav, axis=2), axis=1)[
                 :, None, None
             ]
-            # minimize_l1(dof_zac)
 
         return SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
 

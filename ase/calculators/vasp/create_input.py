@@ -1405,7 +1405,7 @@ class GenerateVaspInput:
         if 'pp' not in p or p['pp'] is None:
             if self.string_params['gga'] is None:
                 p.update({'pp': 'lda'})
-            elif self.string_params['gga'] == 'PE':
+            elif self.string_params['gga'].lower() == 'pe':
                 p.update({'pp': 'pbe'})
             else:
                 raise NotImplementedError(

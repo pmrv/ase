@@ -89,16 +89,6 @@ in the unit cell.
 
 .. literalinclude:: spacegroup-skutterudite.py
 
-Often this structure is visualised with the Cobalt atoms on the
-corners. This can easily be accomplished with ASE using
-:func:`ase.build.cut`. Below is the *origo* argument used to
-put the Cobalt atom on the corners and *extend* to include all corner
-and edge atoms, even those belonging to neighbouring unit cells.
-
-.. image:: spacegroup-cosb3.png
-
-.. literalinclude:: spacegroup-cosb3.py
-
 
 The Spacegroup class
 ====================

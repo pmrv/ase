@@ -47,10 +47,10 @@ latex:
 
 clean:
 	rm -rf $(BUILDDIR)/*
-	python3 -m ase.utils.sphinx clean
+	python3 -m ase.utils.sphinx_create_png clean
 
 inspect:
-	python3 -m ase.utils.sphinx inspect
+	python3 -m ase.utils.sphinx_create_png inspect
 
 linkcheck:
 	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) $(BUILDDIR)/linkcheck
