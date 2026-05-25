@@ -505,7 +505,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         actual_atoms: Atoms,
         symmetries: AtomsSymmetries,
         log=print,
-        cell_coordinates=None,
+        cell_coordinates: SymmetryAdaptedCellCoordinates | None = None,
         atom_coordinates=None,
         value_z=None,
     ):
@@ -518,7 +518,7 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         if cell_coordinates is None:
             pretty_subheader('Symmetry adapted cell coordinates', log)
-            cell_coordinates: SymmetryAdaptedCellCoordinates = (
+            cell_coordinates = (
                 SymmetryAdaptedCellCoordinates.build(
                     self.actual_atoms.cell,
                     self.actual_atoms.pbc,
