@@ -1557,7 +1557,7 @@ class _LimitedAtoms:
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
 
-    def mirror(self, v, center=(0, 0, 0), mask=None, mirror_cell=False):
+    def mirror(self, v, center='COU', mask=None, mirror_cell=False):
         """Reflect atoms across a plane.
 
         Parameters
@@ -1568,11 +1568,11 @@ class _LimitedAtoms:
             which the atoms are mirrored. Vectors can be specified numerically
             e.g.: (1, 0, 0); or as a string: 'x', 'y', 'z'
 
-        center : array_like or {'COM', 'COP', 'COU'}, default: (0, 0, 0)
+        center : array_like or {'COM', 'COP', 'COU'}, default: 'COU'
             The plane of reflection is shifted to include the center point. Use
             'COM' to fix the center of mass (of all atoms), 'COP' to fix the
             center of positions (all atoms) or 'COU' to fix the center of the
-            cell.
+            cell (or origin if cell is not defined).
         
         mask : array_like or None, default: None
             Select which atoms are moved. If None, then all atoms are affected.
