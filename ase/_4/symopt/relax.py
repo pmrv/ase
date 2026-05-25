@@ -518,13 +518,11 @@ class SymmetryAdaptedAtoms(Optimizable):
 
         if cell_coordinates is None:
             pretty_subheader('Symmetry adapted cell coordinates', log)
-            cell_coordinates = (
-                SymmetryAdaptedCellCoordinates.build(
-                    self.actual_atoms.cell,
-                    self.actual_atoms.pbc,
-                    self.symmetries.rotation_scc,
-                    log=log,
-                )
+            cell_coordinates = SymmetryAdaptedCellCoordinates.build(
+                self.actual_atoms.cell,
+                self.actual_atoms.pbc,
+                self.symmetries.rotation_scc,
+                log=log,
             )
 
         self.cell_coordinates = cell_coordinates
