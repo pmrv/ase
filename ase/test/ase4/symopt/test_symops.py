@@ -41,6 +41,9 @@ def symop_dict(rotations, translations):
     return dct
 
 
+@pytest.mark.skip(
+    'Will pass only gpaw dev version due to translations sign change'
+)
 def test_compare_symops_gpaw_vs_spglib(diamond):
     """Ensure that we understand the differences between spglib/GPAW symops."""
     pytest.importorskip('gpaw')
