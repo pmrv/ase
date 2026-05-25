@@ -41,3 +41,7 @@ def test_metadata(name, testdir):
 
     with connect(name) as conn:
         assert conn.metadata['title'] == 'TEST'
+
+    # Should also work without a context-manager:
+    conn = connect(name)
+    assert conn.metadata['title'] == 'TEST'
