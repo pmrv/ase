@@ -43,8 +43,11 @@
 ..
 .. - A bullet item for the Other changes category.
 ..
-.. Bugfixes
-.. --------
-..
-.. - A bullet item for the Bugfixes category.
-..
+Bugfixes
+--------
+
+* Snap near-integer coordinates in `build()` to absorb floating-point noise,
+  preventing boundary atoms from erroneously splitting into an extra layer.
+* Intercept `vacuum=0.0` in `surface()`, which unphysically shrinks the Z-axis
+  to the atomic bounding box and causes layers to overlap. Now warns and falls
+  back to `vacuum=None`.
