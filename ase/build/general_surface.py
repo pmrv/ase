@@ -24,10 +24,10 @@ def surface(lattice, indices, layers, vacuum=None, tol=1e-10, periodic=False):
     vacuum: float or None
         Amount of vacuum added on both sides of the slab. If ``None`` (default),
         the Z-axis length is determined strictly by the bulk interlayer
-        spacing, creating a continuous, bulk-like cell. Passing ``vacuum=0.0``
-        will emit a warning and fall back to ``None`` to prevent the Z-axis
-        from shrinking to the atomic bounding box, which causes the top and
-        bottom layers to unphysically overlap under periodic boundary
+        spacing, creating a continuous, bulk-like cell. Passing ``vacuum <= 0.0``
+        is deprecated and will result in an error in a future version.
+        It will shrink the cell to the atomic bounding box, which may cause the
+        top and bottom layers to unphysically overlap under periodic boundary
         conditions.
     periodic: bool
         Whether the surface is periodic in the normal to the surface
@@ -75,17 +75,17 @@ def surface(lattice, indices, layers, vacuum=None, tol=1e-10, periodic=False):
     surf = build(lattice, np.array([c1, c2, c3]), layers, tol, periodic)
 
     if vacuum is not None:
-        if vacuum == 0:
+        if vacuum <= 0.0:
             import warnings
             warnings.warn(
-                "Passing vacuum=0 shrinks the Z-axis to the atomic bounding "
-                "box, which will cause overlapping atoms if the system is "
-                "periodic. To create a continuous bulk-like slab, use "
-                "vacuum=None. Falling back to vacuum=None.",
-                UserWarning
+                "Passing vacuum <= 0 is deprecated and will raise a ValueError "
+                "in a future release. To create a continuous bulk-like slab "
+                "without adding extra space, use vacuum=None.",
+                FutureWarning,
+                stacklevel=2
             )
-        else:
-            surf.center(vacuum=vacuum, axis=2)
+
+        surf.center(vacuum=vacuum, axis=2)
 
     return surf
 
