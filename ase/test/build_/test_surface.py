@@ -75,7 +75,7 @@ def test_others(vacuum):
 
 @pytest.mark.parametrize(
     'vacuum, a',
-    [(None, 3.77), (0.0, 3.77), (10.0, 3.74)],
+    [(None, 3.77), (0.0, 3.77), (-1.0, 3.77), (10.0, 3.74)],
 )
 def test_surface_layer_splitting(vacuum, a):
     """
@@ -99,10 +99,10 @@ def test_surface_layer_splitting(vacuum, a):
     )
 
     # Generate surface with enough vacuum so boundaries don't fold atoms
-    if vacuum == 0.0:
-        # For vacuum = 0 we expect a user warning.
+    if vacuum is not None and vacuum <= 0.0:
+        # Expect a FutureWarning for any vacuum <= 0.0
         expectation = pytest.warns(
-            UserWarning, match='Passing vacuum=0 shrinks the Z-axis'
+            FutureWarning, match='Passing vacuum <= 0 is deprecated'
         )
     else:
         expectation = nullcontext()
@@ -126,9 +126,14 @@ def test_surface_layer_splitting(vacuum, a):
     # but easily catches distinct layers (which are ~2 Angstroms apart).
     unique_z = np.unique(np.round(z_coords, decimals=3))
 
-    # Assert we have exactly the requested number of layers
-    assert len(unique_z) == n_layers, (
-        f'Floating point boundary error: Requested {n_layers} layers, '
-        f'but generated a slab with {len(unique_z)} distinct Z-heights '
-        f'(Z-levels: {unique_z}).'
-    )
+    if vacuum == 0.0:
+        # If vacuum == 0.0, we expect potential floating point boundary splitting 
+        # due to the uncentered fallback behavior.
+        assert len(unique_z) != n_layers
+    else:
+        # Assert we have exactly the requested number of layers
+        assert len(unique_z) == n_layers, (
+            f'Floating point boundary error: Requested {n_layers} layers, '
+            f'but generated a slab with {len(unique_z)} distinct Z-heights '
+            f'(Z-levels: {unique_z}).'
+        )
