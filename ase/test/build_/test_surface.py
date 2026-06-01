@@ -127,8 +127,8 @@ def test_surface_layer_splitting(vacuum, a):
     unique_z = np.unique(np.round(z_coords, decimals=3))
 
     if vacuum == 0.0:
-        # If vacuum == 0.0, we expect potential floating point boundary splitting 
-        # due to the uncentered fallback behavior.
+        # If vacuum == 0.0, we expect potential floating point boundary
+        # splitting due to the uncentered fallback behavior.
         assert len(unique_z) != n_layers
     else:
         # Assert we have exactly the requested number of layers

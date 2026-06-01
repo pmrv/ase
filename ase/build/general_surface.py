@@ -22,9 +22,9 @@ def surface(lattice, indices, layers, vacuum=None, tol=1e-10, periodic=False):
     layers: int
         Number of equivalent layers of the slab.
     vacuum: float or None
-        Amount of vacuum added on both sides of the slab. If ``None`` (default),
+        Amount of vacuum added on both sides of the slab. If `None` (default),
         the Z-axis length is determined strictly by the bulk interlayer
-        spacing, creating a continuous, bulk-like cell. Passing ``vacuum <= 0.0``
+        spacing, creating a continuous, bulk-like cell. Passing `vacuum <= 0.0`
         is deprecated and will result in an error in a future version.
         It will shrink the cell to the atomic bounding box, which may cause the
         top and bottom layers to unphysically overlap under periodic boundary
