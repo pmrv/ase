@@ -120,8 +120,7 @@ max-complexity = 50
 
 [tool.ruff.lint.per-file-ignores]
 "!doc/tutorials/**.py" = ["UP"]  # Only pyupgrade tutorials (for now)
-"examples/tutorials/*.py" = ["E402"]
-"examples/gettingstarted/*.py" = ["E402"]
+"examples/**.py" = ["E402"]
 "examples/**_prerequisites.py"= ["F401"]
 
 [tool.ruff.lint.pycodestyle]
