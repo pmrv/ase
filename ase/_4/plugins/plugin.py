@@ -78,8 +78,7 @@ class Plugin(metaclass=ABCMeta):
             if isinstance(self.module, ModuleType)
             else self.module
         )
-
-        return f'{self.name:<20} ({module_name})'
+        return f'{self.name:<20} ({module_name} {self.version})'
 
     @cached_property
     def package(self) -> str:
@@ -87,10 +86,15 @@ class Plugin(metaclass=ABCMeta):
             return self.module.__name__.split('.')[0]
         return ''
 
+    @cached_property
     def package_data(self) -> PackageMetadata | None:
         if not self.package:
             return None
         return metadata(self.package)
+
+    @property
+    def version(self) -> str:
+        return self.package_data.get('Version', '')
 
     @singledispatchmethod
     @staticmethod

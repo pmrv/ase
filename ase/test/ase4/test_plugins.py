@@ -85,11 +85,13 @@ def test_build_from_entry_points():
 
 def test_display(sample_calc_plugins):
     """Check that plugin listing looks correct"""
-    assert PluginCollection(sample_calc_plugins).display() == textwrap.dedent(
+    import re
+    assert re.match(textwrap.dedent(
         """\
-        emt                  (ase.test.ase4.sample_plugins)
-        lj                   (ase.test.ase4.sample_plugins)"""
-    )
+        emt \\s+ \\(ase.test.ase4.sample_plugins \\d\\.\\d+\\.\\w+\\)
+        lj  \\s+ \\(ase.test.ase4.sample_plugins \\d\\.\\d+\\.\\w+\\)"""),
+        PluginCollection(sample_calc_plugins).display()
+        )
 
 
 def test_cache_invalidation(sample_calc_plugins):
