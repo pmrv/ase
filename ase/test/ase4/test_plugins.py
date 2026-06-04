@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-import ase.test.ase_4.sample_plugins as sample_plugins
+import ase.test.ase4.sample_plugins as sample_plugins
 from ase import Atoms
 from ase._4.plugins import PluginCollection
 from ase._4.plugins import plugins as auto_plugins
@@ -87,8 +87,8 @@ def test_display(sample_calc_plugins):
     """Check that plugin listing looks correct"""
     assert PluginCollection(sample_calc_plugins).display() == textwrap.dedent(
         """\
-        emt                  (ase.test.ase_4.sample_plugins)
-        lj                   (ase.test.ase_4.sample_plugins)"""
+        emt                  (ase.test.ase4.sample_plugins)
+        lj                   (ase.test.ase4.sample_plugins)"""
     )
 
 
