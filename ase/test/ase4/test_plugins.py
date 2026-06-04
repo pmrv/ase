@@ -3,6 +3,7 @@
 """Tests for experimental ASE v4 plugin system."""
 
 import os
+import re
 import textwrap
 from pathlib import Path
 
@@ -85,13 +86,14 @@ def test_build_from_entry_points():
 
 def test_display(sample_calc_plugins):
     """Check that plugin listing looks correct"""
-    import re
-    assert re.match(textwrap.dedent(
-        """\
+    assert re.match(
+        textwrap.dedent(
+            """\
         emt \\s+ \\(ase.test.ase4.sample_plugins \\d\\.\\d+\\.\\w+\\)
-        lj  \\s+ \\(ase.test.ase4.sample_plugins \\d\\.\\d+\\.\\w+\\)"""),
-        PluginCollection(sample_calc_plugins).display()
-        )
+        lj  \\s+ \\(ase.test.ase4.sample_plugins \\d\\.\\d+\\.\\w+\\)"""
+        ),
+        PluginCollection(sample_calc_plugins).display(),
+    )
 
 
 def test_cache_invalidation(sample_calc_plugins):
