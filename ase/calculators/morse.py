@@ -30,7 +30,7 @@ def fcut(r: np.ndarray, r0: float, r1: float) -> np.ndarray:
     np.ndarray
         Sigmoid-like function smoothly interpolating (r0, 1) and (r1, 0).
 
-    """""
+    """
     s = 1.0 - (r - r0) / (r1 - r0)
     return (s >= 1.0) + ((s > 0.0) & (s < 1.0)) * (
         6.0 * s**5 - 15.0 * s**4 + 10.0 * s**3
