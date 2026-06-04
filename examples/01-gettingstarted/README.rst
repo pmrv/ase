@@ -1,7 +1,7 @@
 .. _introductionexamples:
 
-Introductory examples
----------------------
+Introductory tutorials
+----------------------
 
 This is a collection of starting examples.
 
