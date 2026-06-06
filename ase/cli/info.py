@@ -29,6 +29,8 @@ class CLICommand:
         parser.add_argument('--calculators', nargs='*', metavar='NAME',
                             help='List all or specified calculators known to '
                             'ASE and their configuration.')
+        parser.add_argument('--plugins', action='store_true',
+                            help='List all installed plugin packages')
 
     @staticmethod
     def run(args):
@@ -49,6 +51,9 @@ class CLICommand:
         if args.formats:
             print()
             print_formats()
+
+        if args.plugins:
+            print_plugins()
 
 
 def print_file_info(args):
@@ -148,5 +153,33 @@ def print_formats():
     from ase._4.plugins import plugins
 
     print('Supported formats:')
-    for fmt in sorted(plugins.io_formats, key=attrgetter("name")):
+    for fmt in sorted(plugins.io_formats, key=attrgetter('name')):
         print(IOFormatInfo(fmt))
+
+
+def _underlined(s: str, style='-') -> str:
+    return f'{s}\n{style * len(s)}'
+
+
+def print_plugins():
+    from ase._4.plugins import plugins
+
+    for package_name, package_plugins in plugins.by_package.items():
+        plugin = next(iter(package_plugins))
+        package_data = plugin.package_data
+
+        if package_data:
+            print('\n')
+            title = (
+                f'{package_name} ({plugin.module.__name__})'
+                f'{package_data.get("version")} — '
+                f'{package_data.get("Summary")}'
+                )
+            print(_underlined(title, style='='))
+
+        print("\nProvides:")
+        for plugin_type, plugin_collection in package_plugins.by_type.items():
+            if not plugin_collection:
+                continue
+            print(f'\n{_underlined(plugin_type.__name__)}')
+            print(', '.join(plugin.name for plugin in plugin_collection))

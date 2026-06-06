@@ -80,7 +80,7 @@ class PluginCollection(Collection[P]):
     def by_package(self) -> defaultdict[str, PluginCollection[Plugin]]:
         plugins_by_package = defaultdict(set)
         for plugin in self:
-            plugins_by_package[self._get_package(plugin)].add(plugin)
+            plugins_by_package[plugin.package].add(plugin)
 
         plugincollections_by_package: defaultdict[
             str, PluginCollection[Plugin]
