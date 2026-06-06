@@ -36,13 +36,13 @@ class IOFormatPlugin(Plugin):
         ]
         | None,
         encoding: str | None = None,
-        metadata: dict[str, str] | None = None,
+        citation: str = '',
         extensions: list[str] | None = None,
         globs: list[str] | None = None,
         magic: list[str] | None = None,
         magic_regex: bytes | None | None = None,
     ):
-        super().__init__(name=name, metadata=metadata)
+        super().__init__(name=name, citation=citation)
 
         if not any((reader, writer)):
             raise ValueError('IOFormatPlugin must provide a reader or a writer')
@@ -201,9 +201,8 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
     def from_legacy_io_format(
         cls,
         io_format: IOFormat,
-        metadata: dict[str, str] | None = None,
+        citation: str = '',
     ) -> Self:
-        metadata = metadata if metadata else {}
 
         reader = cls._legacy_function_loader(
             io_format.name,
@@ -225,7 +224,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             encoding=io_format.encoding,
             reader=reader,
             writer=writer,
-            metadata={'note': 'Imported from legacy IOFormat'} | metadata,
+            citation='Imported from legacy IOFormat',
             extensions=io_format.extensions,
             globs=io_format.globs,
             magic=io_format.magic,
@@ -262,7 +261,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             code=fmt.code,
             reader=reader,
             writer=writer,
-            metadata={'note': 'Imported from legacy ExternalIOFormat'},
+            citation='Imported from legacy ExternalIOFormat',
             extensions=fmt.ext,
             globs=fmt.glob,
             magic=fmt.magic,

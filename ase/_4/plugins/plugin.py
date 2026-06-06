@@ -28,10 +28,12 @@ class MissingFunction(ValueError):
 
 class Plugin(metaclass=ABCMeta):
     def __init__(
-        self, *, name: str, metadata: dict[str, str] | None = None
+            self,
+            name: str,
+            citation: str,
     ) -> None:
         self.name = name
-        self.metadata: dict[str, str] = metadata if metadata else {}
+        self.citation = citation
         self.module = self._get_module()
 
     @classmethod
@@ -116,10 +118,10 @@ class CalculatorPlugin(Plugin):
         self,
         *,
         name: str,
+        citation: dict[str, str] | None = None,
         implementation: str | Callable[[], type[BaseCalculator]],
-        metadata: dict[str, str] | None = None,
     ) -> None:
-        super().__init__(name=name, metadata=metadata)
+        super().__init__(name=name, citation=citation)
         self._implementation = implementation
 
     @cached_property

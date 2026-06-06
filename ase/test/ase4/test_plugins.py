@@ -40,7 +40,7 @@ def sample_mixed_plugins():
 def two_instances_plugins():
     another_emt_plugin = CalculatorPlugin(
         name='emt',
-        metadata={},
+        citation='',
         implementation='ase.calculators.emt.EMT',
     )
 
@@ -74,7 +74,7 @@ def cat_plugin():
 
     class CatPlugin(Plugin): ...
 
-    return CatPlugin(name='Felix', metadata={'fur': 'black'})
+    return CatPlugin(name='Felix', citation={'Fur et al. (1996)'})
 
 
 def test_build_from_entry_points():

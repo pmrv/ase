@@ -17,13 +17,10 @@ if TYPE_CHECKING:
     from ase.calculators.vasp import Vasp
 
 
-Metadata = dict[str, str]
-metadata: Metadata = {'project': 'ase-plugin-demo', 'authors': 'ajjackson'}
-
 # Calculator plugin using string to defer import
 emt_plugin = CalculatorPlugin(
     name='emt',
-    metadata=metadata,
+    citation='Big Prof',
     implementation='ase.calculators.emt.EMT',
 )
 
@@ -37,24 +34,23 @@ def get_lj_calc() -> type[LennardJones]:
 
 lj_plugin = CalculatorPlugin(
     name='lj',
-    metadata=metadata | {'warning': 'This is pretty basic'},
+    citation='Other Big Prof',
     implementation=get_lj_calc,
 )
 
 
 def get_ase_io_format(name: str) -> IOFormat:
     from ase.io.formats import ioformats
-
     return ioformats[name]
 
 
 # Calculator plugin using a custom class (Not generally needed!)
 class VaspCalculatorPlugin(CalculatorPlugin):
-    def __init__(self, metadata: Metadata):
+    def __init__(self, citation: str):
         super().__init__(
             name='vasp',
             implementation='',  # To be overriden
-            metadata=metadata,
+            citation=citation,
         )
 
     @cached_property
@@ -68,7 +64,9 @@ class VaspCalculatorPlugin(CalculatorPlugin):
         return calc_class
 
 
-vasp_plugin = VaspCalculatorPlugin(metadata)
+vasp_plugin = VaspCalculatorPlugin(
+    citation=('ASE developer community, based on modules by '
+              'Jussi Enkovaara and John Kitchin'))
 
 # IOFormat plugin created using __init__
 poscar_plugin = IOFormatPlugin(
@@ -83,12 +81,14 @@ poscar_plugin = IOFormatPlugin(
 
 # IOFormat plugin converted from existing ASE setup
 extxyz_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
-    get_ase_io_format('extxyz'), metadata=metadata
+    get_ase_io_format('extxyz'),
+    citation='James Kermode',
 )
 
 # A read-only format from existing ASE setup
 castep_castep_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
-    get_ase_io_format('castep-castep'), metadata=metadata
+    get_ase_io_format('castep-castep'),
+    citation='',
 )
 
 
@@ -96,20 +96,22 @@ castep_castep_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
 # this shouldn't impact the module/file detection
 def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
     return LegacyIOFormatPlugin.from_legacy_io_format(
-        io_format=get_ase_io_format('dftb'), metadata=metadata
+        io_format=get_ase_io_format('dftb'), citation='',
     )
 
 
 # Viewer plugins; wrap viewers from ase.visualize.viewers
 avogadro_plugin = ViewerPlugin(
     name='Cloned avogadro viewer',
+    citation='N/A: Mock Viewer plugin',
     implementation=(lambda: VIEWERS['avogadro']),
-    metadata={'Note': 'Mock Viewer plugin'},
-)
+
+    )
+
 ase_gui_plugin = ViewerPlugin(
     name='ASE GUI',
-    implementation=(lambda: VIEWERS['ase']),
-    metadata={},
+    citation='ASE developers',
+    implementation=(lambda: VIEWERS['ase']),    
 )
 
 

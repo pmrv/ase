@@ -17,15 +17,16 @@ if TYPE_CHECKING:
 
 
 class ViewerPlugin(Plugin):
-    """Container for a Viewer with metadata about where it came from"""
+    """Container for a Viewer with access to citation and package info"""
 
     def __init__(
         self,
         name: str,
+        *,
+        citation: str,
         implementation: str | Callable[[], AbstractViewer],
-        metadata: dict[str, str] | None = None,
     ) -> None:
-        super().__init__(name=name, metadata=metadata)
+        super().__init__(name=name, citation=citation)
         self._implementation = implementation
 
     @cached_property
@@ -44,11 +45,12 @@ class LegacyViewerPlugin(ViewerPlugin):
     def __init__(
         self,
         name: str,
+        *,
+        citation: str,
         implementation: str | Callable[[], AbstractViewer],
-        metadata: dict[str, str] | None = None,
     ) -> None:
         super().__init__(
-            name=name, implementation=implementation, metadata=metadata
+            name=name, citation=citation, implementation=implementation
         )
 
     @classmethod
@@ -56,12 +58,9 @@ class LegacyViewerPlugin(ViewerPlugin):
         cls,
         name: str,
         ext_viewer: ExternalViewer,
-        metadata: dict[str, str] | None = None,
+        citation: str = 'Imported from legacy ExternalViewer',
     ) -> Self:
         from ase.visualize.viewers import CLIViewer, PyViewer
-
-        metadata = {} if metadata is None else metadata
-        metadata.setdefault('note', 'Imported from legacy ExternalViewer')
 
         implementation: AbstractViewer
         if ext_viewer.cli:
@@ -73,8 +72,8 @@ class LegacyViewerPlugin(ViewerPlugin):
 
         return cls(
             name=name,
+            citation=citation,
             implementation=(lambda: implementation),
-            metadata=metadata,
         )
 
     @classmethod
