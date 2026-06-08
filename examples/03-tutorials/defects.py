@@ -361,7 +361,7 @@ print(f'The length deviation for P_2 is {dev2}')
 #    `algorithm <https://doped.readthedocs.io/en/latest/doped.utils.html#doped.utils.supercells.find_ideal_supercell>`__
 #    for *directly* optimising the periodic defect-defect distance
 #    (~10-50% improvements);
-#    see [Kavanagh]_ or the ``doped`` 
+#    see [Kavanagh]_ or the ``doped``
 #    `tutorials <https://doped.readthedocs.io/en/latest/generation_tutorial.html>`__.
 #
 # Generation of supercell
