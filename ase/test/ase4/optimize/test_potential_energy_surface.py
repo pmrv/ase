@@ -31,7 +31,7 @@ def test_caches_within_same_state(v4atoms, calculator):
 
 
 def test_set_positions_invalidates(v4atoms, calculator):
-    """set_positions flips the stale flag so the next evaluate() recomputes."""
+    """set_positions invalidates the cache so the next evaluate() recomputes."""
     counter = _wrap_with_counter(calculator)
     pes = PotentialEnergySurface(v4atoms, calculator)
 
@@ -39,6 +39,32 @@ def test_set_positions_invalidates(v4atoms, calculator):
     assert counter[0] == 1
 
     pes.set_positions(pes.get_positions())
+    pes.get_property('forces')
+    assert counter[0] == 2
+
+
+def test_setting_atoms_invalidates(v4atoms, calculator):
+    """Replacing pes.atoms invalidates the cache so evaluate() recomputes."""
+    counter = _wrap_with_counter(calculator)
+    pes = PotentialEnergySurface(v4atoms, calculator)
+
+    pes.get_property('forces')
+    assert counter[0] == 1
+
+    pes.atoms = v4atoms
+    pes.get_property('forces')
+    assert counter[0] == 2
+
+
+def test_setting_calc_invalidates(v4atoms, calculator):
+    """Replacing pes.calc invalidates the cache so evaluate() recomputes."""
+    counter = _wrap_with_counter(calculator)
+    pes = PotentialEnergySurface(v4atoms, calculator)
+
+    pes.get_property('forces')
+    assert counter[0] == 1
+
+    pes.calc = calculator
     pes.get_property('forces')
     assert counter[0] == 2
 

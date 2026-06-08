@@ -1,5 +1,8 @@
+import numpy as np
+
 from ase._4.atoms import Atoms
 from ase._4.calculators.calculator import BaseCalculator
+from ase._4.calculators.results import CalculationResults
 from ase.calculators.calculator import PropertyNotImplementedError
 
 
@@ -9,12 +12,13 @@ class PotentialEnergySurface:
     Used by geometry optimisation, molecular dynamics, and
     similar, wherever caching is required.
 
-    Operations that invalidate the cache (e.g., setting atoms'
-    positions) must be set via PotentialEnergySurface methods
-    (e.g., pes.set_positions) and not directly
-    (NOT atoms.set_positions).
+    Replacing ``pes.atoms`` or ``pes.calc`` invalidates the cache
+    automatically. Mutating the existing atoms in place, however,
+    bypasses the cache, so such operations must go through
+    PotentialEnergySurface methods (e.g., ``pes.set_positions``)
+    and not directly (NOT ``atoms.set_positions``).
 
-    DEV: Requested properties need to be defined at initialization,
+    DEV: Some requested properties are pre-set at initialization,
          but we might want to rethink this.
 
     """
@@ -40,6 +44,10 @@ class PotentialEnergySurface:
         """
         self.atoms = atoms
         self.calc = calc
+
+        # requested properties follow general ASEv3 behaviour
+        # for picking "energy" vs "free_energy". Likely to be
+        # reconsidered in the future, but keeping it faithfully here.
         if requested_properties is None:
             if 'free_energy' in calc.implemented_properties:
                 requested_properties = ('free_energy', 'forces')
@@ -55,29 +63,45 @@ class PotentialEnergySurface:
                 f'calc.implemented_properties '
                 f'{sorted(calc.implemented_properties)}'
             )
-        self._results = None
-        self._stale = True
+        self.results: CalculationResults | None = None
 
-    def evaluate(self):
-        if self._stale:
-            self._results = self.calc.evaluate(
+    @property
+    def atoms(self) -> Atoms:
+        return self._atoms
+
+    @atoms.setter
+    def atoms(self, atoms: Atoms) -> None:
+        self.invalidate()
+        self._atoms = atoms
+
+    @property
+    def calc(self) -> BaseCalculator:
+        return self._calc
+
+    @calc.setter
+    def calc(self, calc: BaseCalculator) -> None:
+        self.invalidate()
+        self._calc = calc
+
+    def evaluate(self) -> CalculationResults:
+        if self.results is None:
+            self.results = self.calc.evaluate(
                 self.atoms, properties=list(self.requested_properties)
             )
-            self._stale = False
-        return self._results
+        return self.results
 
-    def invalidate(self):
-        self._stale = True
+    def invalidate(self) -> None:
+        self.results = None
 
-    def get_positions(self):
+    def get_positions(self) -> np.ndarray:
         return self.atoms.get_positions()
 
-    def set_positions(self, x):
+    def set_positions(self, x: np.ndarray) -> None:
         """Assumes x is positions-shaped. Invalidates the cache."""
-        self.atoms.set_positions(x)
         self.invalidate()
+        self.atoms.set_positions(x)
 
-    def get_property(self, prop):
+    def get_property(self, prop: str):
         results = self.evaluate()
         if prop not in results.properties:
             raise PropertyNotImplementedError(
