@@ -563,7 +563,7 @@ End EAM Interface Documentation
                 self.q_data[j, i] = data[d:d + self.nr]
                 d += self.nr
 
-    def write_potential(self, filename, nc=1, numformat='%.8e'):
+    def write_potential(self, filename, nc=1, numformat='%.17e'):
         """Writes out the potential in the format given by the form
         variable to 'filename' with a data format that is nc columns
         wide.  Note: array lengths need to be an exact multiple of nc
