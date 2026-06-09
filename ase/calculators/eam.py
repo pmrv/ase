@@ -554,14 +554,14 @@ End EAM Interface Documentation
         # should be non symmetrical combinations of 2
         for i in range(self.Nelements):
             for j in range(i + 1):
-                self.d_data[j, i] = data[d:d + self.nr]
+                self.d_data[i, j] = self.d_data[j, i] = data[d:d + self.nr]
                 d += self.nr
 
         self.q_data = np.zeros([self.Nelements, self.Nelements, self.nr])
         # should be non symmetrical combinations of 2
         for i in range(self.Nelements):
             for j in range(i + 1):
-                self.q_data[j, i] = data[d:d + self.nr]
+                self.q_data[i, j] = self.q_data[j, i] = data[d:d + self.nr]
                 d += self.nr
 
     def write_potential(self, filename, nc=1, numformat='%.17e'):
