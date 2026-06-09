@@ -169,6 +169,7 @@ Restart the calculation like this::
   images = io.read('A2B.traj@-5:')
 
 
+.. _climbingimage:
 
 Climbing image
 ==============
