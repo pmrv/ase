@@ -616,7 +616,7 @@ End EAM Interface Documentation
         # write out the pair potentials in Lammps DYNAMO setfl format
         # as r*phi for alloy format
         for i in range(self.Nelements):
-            for j in range(i, self.Nelements):
+            for j in range(i + 1):
                 np.savetxt(fd,
                            (rs * self.phi[i, j](rs)).reshape(self.nr // nc,
                                                              nc),
