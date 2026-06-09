@@ -1,6 +1,3 @@
-# fmt: off
-
-
 from ase.utils import (
     get_python_package_path_description,
     search_current_git_hash,
@@ -36,6 +33,15 @@ def format_dependency(modname: str) -> tuple[str, str]:
 
 
 def all_dependencies() -> list[tuple[str, str]]:
-    names = ['ase', 'numpy', 'scipy', 'matplotlib', 'spglib',
-             'ase_ext', 'flask', 'psycopg2', 'pyamg']
+    names = [
+        'ase',
+        'numpy',
+        'scipy',
+        'matplotlib',
+        'spglib',
+        'ase_ext',
+        'flask',
+        'psycopg2',
+        'pyamg',
+    ]
     return [format_dependency(name) for name in names]
