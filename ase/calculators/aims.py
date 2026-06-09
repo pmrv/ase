@@ -1,5 +1,3 @@
-# fmt: off
-
 """This module defines an ASE interface to FHI-aims.
 
 Felix Hanke hanke@liverpool.ac.uk
@@ -223,7 +221,7 @@ class Aims(GenericFileIOCalculator):
 
 
 class AimsCube:
-    'Object to ensure the output of cube files, can be attached to Aims object'
+    "Object to ensure the output of cube files, can be attached to Aims object"
 
     def __init__(
         self,
