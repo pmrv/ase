@@ -582,7 +582,8 @@ End EAM Interface Documentation
         fd.write(f'{self.Nelements} '.encode())
         fd.write(' '.join(self.elements).encode() + b'\n')
 
-        fd.write(('%d %f %d %f %f \n' %
+        fmt = f"%d {numformat} %d {numformat} {numformat}\n"
+        fd.write((fmt %
                   (self.nrho, self.drho, self.nr,
                    self.dr, self.cutoff)).encode())
 
