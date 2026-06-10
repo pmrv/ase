@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from functools import cached_property
 import sys
+from functools import cached_property
 from typing import TYPE_CHECKING
 
 from ase._4.plugins.io import (
@@ -109,6 +109,7 @@ def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
     return LegacyIOFormatPlugin.from_legacy_io_format(
         io_format=get_ase_io_format('dftb'), citation='', module=THIS_MODULE,
     )
+
 
 # Viewer plugins; wrap viewers from ase.visualize.viewers
 avogadro_plugin = ViewerPlugin(

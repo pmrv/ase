@@ -257,8 +257,6 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             f"Can't write to {entry_point.name}-format",
         )
 
-        mod = importlib.import_module(entry_point.module)
-
         # Note that the "module" attribute of a Plugin should represent where
         # the *plugin* comes from, rather than its underlying implementation
         #
