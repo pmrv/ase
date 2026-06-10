@@ -257,11 +257,16 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             f"Can't write to {entry_point.name}-format",
         )
 
+        mod = importlib.import_module(entry_point.module)
+
         # Note that the "module" attribute of a Plugin should represent where
         # the *plugin* comes from, rather than its underlying implementation
+        #
+        # Wrapped legacy plugins are a slight grey area but is seems much more
+        # informative to use the external package
         plugin = cls(
             name=entry_point.name,
-            module=importlib.import_module(fmt.__module__),
+            module=importlib.import_module(entry_point.module),
             citation='Imported from legacy ExternalIOFormat',
             description=fmt.desc,
             code=fmt.code,
@@ -272,5 +277,4 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             magic=fmt.magic,
             magic_regex=fmt.magic_regex,
         )
-
         return plugin
