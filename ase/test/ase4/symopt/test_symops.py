@@ -18,8 +18,6 @@ def spglib_dataset(atoms):
     )
 
 
-
-
 def symop_dict(rotations, translations):
     assert len(rotations) == len(translations)
     dct = {}
