@@ -8,6 +8,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
   PYTEST_ADDOPTS: "--color=yes --durations=20 -r s"
   COVERAGE_OPTS: "--cov=ase --cov-config=pyproject.toml --junit-xml=report.xml"
+  DOCKERSUFFIX: ""  # set this to "-staging" to run on the staging dockers
 
 stages:
   - test
@@ -33,7 +34,7 @@ workflow:
 # Check oldest supported Python with oldest supported libraries.
 # Does not install any optional libraries except matplotlib.
 oldlibs:
-  image: registry.gitlab.com/ase/ase:ase-oldlibs
+  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
   before_script:
     - pwd
     - whoami
@@ -69,7 +70,7 @@ pipinstall:
 # the coverage script to correctly resolve the OMIT paths (a bit hacky).
 # It would be better to install it for real, and for things to just work.
 main:
-  image: registry.gitlab.com/ase/ase:ase-main
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
   before_script:
     - python --version
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
@@ -101,7 +102,7 @@ main:
 # Encompasses those tests marked as @pytest.mark.calculator_lite.
 # Please make sure these tests are cheap.
 calculators-lite:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
     - pip install --no-deps --editable .
@@ -135,7 +136,7 @@ calculators-lite:
 #
 # It would be great if someone could enable more calculators with this.
 calculators:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install --no-deps --editable .
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
@@ -186,7 +187,7 @@ bleeding-edge:
 
 
 doc:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install scriv sphinx_book_theme sphinx-gallery sphinxcontrib-video
     - pip install --no-deps .[docs]
@@ -210,7 +211,7 @@ doc:
     expire_in: 1 week
 
 distribution-package:
-  image: registry.gitlab.com/ase/ase:ase-main
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
   before_script:
     - mkdir dist
     - pip install setuptools build
