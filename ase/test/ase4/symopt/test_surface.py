@@ -26,16 +26,16 @@ ref_energy = 0.4185949
 
 
 @pytest.fixture
-def atoms0():
+def atoms():
     return fcc111('Au', size=(1, 1, 2), vacuum=4.0)
 
 
 @pytest.fixture
-def dataset(atoms0):
+def dataset(atoms):
     import spglib
 
     dataset = spglib_new_errorhandling(spglib.get_symmetry_dataset)(
-        (atoms0.cell, atoms0.get_scaled_positions(), atoms0.numbers),
+        (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
         symprec=symprec,
     )
 
@@ -44,8 +44,7 @@ def dataset(atoms0):
     return dataset
 
 
-def test_relaxation_old(atoms0):
-    atoms = atoms0.copy()
+def test_relaxation_old(atoms):
     target = FrechetCellFilter(
         atoms, mask=[1, 1, 0, 0, 0, 1], exp_cell_factor=1.0
     )
@@ -76,8 +75,7 @@ def seventy(target):
 @pytest.mark.parametrize(
     'initialize_hessian, nsteps', [(seventy, 7), (fd_hessian, 6)]
 )
-def test_relaxation_ase4(atoms0, dataset, initialize_hessian, nsteps):
-    atoms = atoms0.copy()
+def test_relaxation_ase4(atoms, dataset, initialize_hessian, nsteps):
     atoms.calc = EMT()
 
     symmatoms = SymmetryAdaptedAtoms.from_atoms(
@@ -120,9 +118,7 @@ def get_atoms_symmetries_nonperiodic(atoms, symprec):
     )
 
 
-def test_relaxation_symopt(atoms0, dataset, tmp_path):
-    atoms = atoms0.copy()
-
+def test_relaxation_symopt(atoms, dataset, tmp_path):
     logfile = tmp_path / 'opt.log'
 
     atoms_symmetries = get_atoms_symmetries_nonperiodic(atoms, symprec)
