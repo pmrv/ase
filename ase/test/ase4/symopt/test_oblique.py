@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from ase import Atoms
-from ase._4.symopt.relax import (
+from ase._4.optimize._symopt.relax import (
     AtomsSymmetries,
     SymmetryAdaptedAtoms,
     chol_derivative,

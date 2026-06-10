@@ -47,7 +47,7 @@ def test_symmetry_constrained_relaxation_emt(system):
     atoms = atoms_ref.copy()
 
     # Symmetry adapted relaxation
-    from ase._4.symopt.relax import Relax
+    from ase._4.optimize._symopt.relax import Relax
     from ase.optimize.bfgs import BFGS
     from ase.parallel import world
 

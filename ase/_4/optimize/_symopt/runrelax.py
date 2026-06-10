@@ -2,7 +2,7 @@
 
 from sys import argv
 
-from ase._4.symopt.relax import Relax
+from ase._4.optimize._symopt.relax import Relax
 from ase.parallel import world
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ase._4.symopt.relax import chol_derivative
+from ase._4.optimize._symopt.relax import chol_derivative
 
 pytestmark = pytest.mark.calculator_lite
 

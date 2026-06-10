@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ase._4.symopt.relax import Relax
+from ase._4.optimize._symopt.relax import Relax
 from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.optimize.bfgs import BFGS

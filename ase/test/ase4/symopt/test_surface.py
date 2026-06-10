@@ -6,7 +6,11 @@ import pytest
 from ase._4.optimize.bfgs import BFGSMethod, fd_hessian
 from ase._4.optimize.run import Optimizer
 from ase._4.optimize.symopt import SymOpt
-from ase._4.symopt.relax import Relax, SymmetryAdaptedAtoms, apply_pbc_to_symops
+from ase._4.optimize._symopt.relax import (
+    Relax,
+    SymmetryAdaptedAtoms,
+    apply_pbc_to_symops,
+)
 from ase.build import fcc111
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
@@ -93,8 +97,8 @@ def test_relaxation_ase4(atoms0, dataset, initialize_hessian, nsteps):
 def get_atoms_symmetries_nonperiodic(atoms, symprec):
     from spglib import get_symmetry_dataset
 
-    from ase._4.symopt.atommap import build_atommaps
-    from ase._4.symopt.relax import AtomsSymmetries
+    from ase._4.optimize._symopt.atommap import build_atommaps
+    from ase._4.optimize._symopt.relax import AtomsSymmetries
 
     scaled_pos = atoms.get_scaled_positions()
     assert (scaled_pos < 1.0).all(), 'please wrap atoms'

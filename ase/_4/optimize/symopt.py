@@ -3,7 +3,7 @@ from typing import ClassVar
 
 import numpy as np
 
-from ase._4.symopt.relax import SymmetryAdaptedAtoms
+from ase._4.optimize._symopt.relax import SymmetryAdaptedAtoms
 
 
 @dataclass

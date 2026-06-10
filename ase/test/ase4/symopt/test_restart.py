@@ -4,7 +4,7 @@ import pytest
 from ase._4.optimize.bfgs import BFGSMethod
 from ase._4.optimize.run import Optimizer
 from ase._4.optimize.symopt import SymOpt
-from ase._4.symopt.relax import SymmetryAdaptedAtoms
+from ase._4.optimize._symopt.relax import SymmetryAdaptedAtoms
 from ase.build import bulk
 from ase.calculators.emt import EMT
 

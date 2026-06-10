@@ -4,7 +4,7 @@ import numpy as np
 import scipy
 
 from ase import Atoms
-from ase._4.symopt.relax_print import (
+from ase._4.optimize._symopt.relax_print import (
     pprint_atoms,
     pretty,
     pretty_atomic_dofs,
@@ -179,7 +179,7 @@ class AtomsSymmetries:
 
     @classmethod
     def from_spglib(cls, atoms, dataset):
-        from ase._4.symopt.atommap import build_atommaps
+        from ase._4.optimize._symopt.atommap import build_atommaps
 
         args = argsort_rotations(dataset.rotations.transpose(0, 2, 1))
 
