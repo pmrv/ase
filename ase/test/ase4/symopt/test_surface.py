@@ -3,14 +3,14 @@ from io import StringIO
 import numpy as np
 import pytest
 
-from ase._4.optimize.bfgs import BFGSMethod, fd_hessian
-from ase._4.optimize.run import Optimizer
-from ase._4.optimize.symopt import SymOpt
 from ase._4.optimize._symopt.relax import (
     Relax,
     SymmetryAdaptedAtoms,
     apply_pbc_to_symops,
 )
+from ase._4.optimize.bfgs import BFGSMethod, fd_hessian
+from ase._4.optimize.run import Optimizer
+from ase._4.optimize.symopt import SymOpt
 from ase.build import fcc111
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
