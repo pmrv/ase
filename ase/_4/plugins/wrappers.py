@@ -10,8 +10,10 @@ from ase.visualize.viewers import CLI_VIEWERS, PY_VIEWERS
 _this_module = sys.modules[__name__]
 
 wrapped_ioformats = {
+    # Wrap all _internal_ formats from ase.io.formats;
+    # skip formats from legacy entry-point, they are handled in legacy_plugins
     LegacyIOFormatPlugin.from_legacy_io_format(ioformat, module=_this_module)
-    for ioformat in ioformats.values()
+    for ioformat in ioformats.values() if ioformat.module_name[:7] == 'ase.io.'
 }
 
 wrapped_cli_viewers = {
