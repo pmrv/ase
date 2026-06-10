@@ -3,6 +3,7 @@ import re
 from collections.abc import Sequence
 from functools import cached_property
 from importlib.metadata import EntryPoint
+from types import ModuleType
 from typing import (
     Any,
     BinaryIO,
@@ -23,8 +24,10 @@ from .plugin import MissingFunction, Plugin
 class IOFormatPlugin(Plugin):
     def __init__(
         self,
-        *,
         name: str,
+        *,
+        citation: str,
+        module: ModuleType | None = None,
         description: str,
         code: str,
         reader: str
@@ -36,13 +39,12 @@ class IOFormatPlugin(Plugin):
         ]
         | None,
         encoding: str | None = None,
-        citation: str = '',
         extensions: list[str] | None = None,
         globs: list[str] | None = None,
         magic: list[str] | None = None,
         magic_regex: bytes | None | None = None,
     ):
-        super().__init__(name=name, citation=citation)
+        super().__init__(name=name, citation=citation, module=module)
 
         if not any((reader, writer)):
             raise ValueError('IOFormatPlugin must provide a reader or a writer')
@@ -201,6 +203,7 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
     def from_legacy_io_format(
         cls,
         io_format: IOFormat,
+        module: ModuleType | None,
         citation: str = '',
     ) -> Self:
 
@@ -219,19 +222,18 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
 
         plugin = cls(
             name=io_format.name,
+            module=module,
+            citation='Imported from legacy IOFormat',
             description=io_format.description,
             code=io_format.code,
             encoding=io_format.encoding,
             reader=reader,
             writer=writer,
-            citation='Imported from legacy IOFormat',
             extensions=io_format.extensions,
             globs=io_format.globs,
             magic=io_format.magic,
             magic_regex=io_format.magic_regex,
         )
-
-        plugin.module = cls._get_module(levels=2)
         return plugin
 
     @classmethod
@@ -255,18 +257,20 @@ class LegacyIOFormatPlugin(IOFormatPlugin):
             f"Can't write to {entry_point.name}-format",
         )
 
+        # Note that the "module" attribute of a Plugin should represent where
+        # the *plugin* comes from, rather than its underlying implementation
         plugin = cls(
             name=entry_point.name,
+            module=importlib.import_module(fmt.__module__),
+            citation='Imported from legacy ExternalIOFormat',
             description=fmt.desc,
             code=fmt.code,
             reader=reader,
             writer=writer,
-            citation='Imported from legacy ExternalIOFormat',
             extensions=fmt.ext,
             globs=fmt.glob,
             magic=fmt.magic,
             magic_regex=fmt.magic_regex,
         )
 
-        plugin.module = importlib.import_module(fmt.module)
         return plugin

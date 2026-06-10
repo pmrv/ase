@@ -171,7 +171,7 @@ def print_plugins():
         if package_data:
             print('\n')
             title = (
-                f'{package_name} ({plugin.module.__name__})'
+                f'{package_name} '
                 f'{package_data.get("version")} — '
                 f'{package_data.get("Summary")}'
                 )

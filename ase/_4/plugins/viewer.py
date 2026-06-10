@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from functools import cached_property
+from importlib import import_module
+from types import ModuleType
 from typing import (
     TYPE_CHECKING,
 )
@@ -24,9 +26,10 @@ class ViewerPlugin(Plugin):
         name: str,
         *,
         citation: str,
+        module: ModuleType | None = None,
         implementation: str | Callable[[], AbstractViewer],
     ) -> None:
-        super().__init__(name=name, citation=citation)
+        super().__init__(name=name, module=module, citation=citation)
         self._implementation = implementation
 
     @cached_property
@@ -47,10 +50,14 @@ class LegacyViewerPlugin(ViewerPlugin):
         name: str,
         *,
         citation: str,
+        module: ModuleType | None = None,
         implementation: str | Callable[[], AbstractViewer],
     ) -> None:
         super().__init__(
-            name=name, citation=citation, implementation=implementation
+            name=name,
+            citation=citation,
+            module=module,
+            implementation=implementation,
         )
 
     @classmethod
@@ -58,7 +65,9 @@ class LegacyViewerPlugin(ViewerPlugin):
         cls,
         name: str,
         ext_viewer: ExternalViewer,
+        *,
         citation: str = 'Imported from legacy ExternalViewer',
+        module: ModuleType | None = None,
     ) -> Self:
         from ase.visualize.viewers import CLIViewer, PyViewer
 
@@ -88,4 +97,9 @@ class LegacyViewerPlugin(ViewerPlugin):
                 f'in format {entry_point.name}, expected '
                 'ExternalViewer'
             )
-        return cls.from_externalviewer(entry_point.name, external_viewer)
+
+        module = import_module(external_viewer.__module__)
+
+        return cls.from_externalviewer(
+            entry_point.name, external_viewer, module=module
+        )

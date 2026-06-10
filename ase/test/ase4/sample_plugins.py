@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import cached_property
+import sys
 from typing import TYPE_CHECKING
 
 from ase._4.plugins.io import (
@@ -17,10 +18,15 @@ if TYPE_CHECKING:
     from ase.calculators.vasp import Vasp
 
 
+# Plugins should generally set their module to the place they are defined;
+# this is optional and will be done automatically for entrypoint imports
+THIS_MODULE = sys.modules[__name__]
+
 # Calculator plugin using string to defer import
 emt_plugin = CalculatorPlugin(
     name='emt',
     citation='Big Prof',
+    module=THIS_MODULE,
     implementation='ase.calculators.emt.EMT',
 )
 
@@ -35,6 +41,7 @@ def get_lj_calc() -> type[LennardJones]:
 lj_plugin = CalculatorPlugin(
     name='lj',
     citation='Other Big Prof',
+    module=THIS_MODULE,
     implementation=get_lj_calc,
 )
 
@@ -51,6 +58,7 @@ class VaspCalculatorPlugin(CalculatorPlugin):
             name='vasp',
             implementation='',  # To be overriden
             citation=citation,
+            module=THIS_MODULE,
         )
 
     @cached_property
@@ -71,6 +79,8 @@ vasp_plugin = VaspCalculatorPlugin(
 # IOFormat plugin created using __init__
 poscar_plugin = IOFormatPlugin(
     name='vasp',
+    citation=vasp_plugin.citation,
+    # no module, lets pretend this is an interactive shell
     description='VASP POSCAR/CONTCAR',
     code='1F',
     extensions=['poscar'],
@@ -83,27 +93,28 @@ poscar_plugin = IOFormatPlugin(
 extxyz_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
     get_ase_io_format('extxyz'),
     citation='James Kermode',
+    module=THIS_MODULE,
 )
 
 # A read-only format from existing ASE setup
 castep_castep_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
     get_ase_io_format('castep-castep'),
     citation='',
+    module=THIS_MODULE,
 )
 
 
-# Plugin creation wrapped by a function:
-# this shouldn't impact the module/file detection
+# Plugin creation wrapped by a function
 def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
     return LegacyIOFormatPlugin.from_legacy_io_format(
-        io_format=get_ase_io_format('dftb'), citation='',
+        io_format=get_ase_io_format('dftb'), citation='', module=THIS_MODULE,
     )
-
 
 # Viewer plugins; wrap viewers from ase.visualize.viewers
 avogadro_plugin = ViewerPlugin(
     name='Cloned avogadro viewer',
     citation='N/A: Mock Viewer plugin',
+    module=THIS_MODULE,
     implementation=(lambda: VIEWERS['avogadro']),
 
     )
@@ -111,7 +122,8 @@ avogadro_plugin = ViewerPlugin(
 ase_gui_plugin = ViewerPlugin(
     name='ASE GUI',
     citation='ASE developers',
-    implementation=(lambda: VIEWERS['ase']),    
+    # no module, lets pretend this is an interactive shell
+    implementation=(lambda: VIEWERS['ase']),
 )
 
 

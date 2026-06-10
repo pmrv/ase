@@ -107,10 +107,10 @@ def test_cache_invalidation(sample_calc_plugins):
     new_calculators = plugins.calculators
     new_by_package = plugins.by_package
 
-    assert len(initial_by_package['ase']) != len(new_by_package['ase'])
-
     assert len(initial_calculators) == 2
     assert len(new_calculators) == 1
+
+    assert len(initial_by_package['ase']) != len(new_by_package['ase'])
 
 
 def test_missing_writer():

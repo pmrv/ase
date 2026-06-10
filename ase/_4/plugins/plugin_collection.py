@@ -4,7 +4,8 @@ from collections import defaultdict
 from collections.abc import Collection, Iterator
 from functools import cached_property
 from importlib.metadata import entry_points
-from typing import Any, TypeGuard, TypeVar, cast
+from types import ModuleType
+from typing import Any, Callable, TypeVar, cast
 
 from typing_extensions import Self
 
@@ -59,6 +60,15 @@ class PluginCollection(Collection[P]):
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({repr(self.plugins)})'
 
+    @staticmethod
+    def _modulesetter(module: ModuleType) -> Callable[[P], P]:
+        def set_module(plugin: P) -> None:
+            if plugin.module is not None:
+                plugin.module = module
+            return plugin
+
+        return set_module
+
     @classmethod
     def from_entry_points(cls, group: str = 'ase.plugins') -> Self:
         """Instantiate collection from Plugins registered as entry points
@@ -70,9 +80,12 @@ class PluginCollection(Collection[P]):
 
         modules = (e_p.load() for e_p in group_entry_points)
         plugin_set: set[P] = set()
+
         for module in modules:
             plugins: Collection[P] = getattr(module, '__ase_plugins__', set())
-            plugin_set = plugin_set | set(plugins)
+            plugin_set = plugin_set | set(
+                map(cls._modulesetter(module), plugins)
+            )
 
         return cls(plugin_set)
 
@@ -149,14 +162,6 @@ class PluginCollection(Collection[P]):
     def viewers(self) -> PluginCollection[ViewerPlugin]:
         """Get a PluginCollection containing only ViewerPlugins"""
         return cast(PluginCollection[ViewerPlugin], self.by_type[ViewerPlugin])
-
-    @staticmethod
-    def _get_package(plugin: Plugin) -> str:
-        return plugin.__module__.split('.', maxsplit=1)[0]
-
-    @staticmethod
-    def _is_plugin(item: Any) -> TypeGuard[Plugin]:
-        return isinstance(item, Plugin)
 
     def display(self) -> str:
         return '\n'.join(sorted(plugin.display() for plugin in self))

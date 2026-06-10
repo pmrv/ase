@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 import importlib
-import inspect
 from abc import ABCMeta
 from collections.abc import Callable
 from functools import cached_property, singledispatchmethod
 from importlib.metadata import metadata
-from types import FrameType, ModuleType
+from types import ModuleType
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -28,51 +27,11 @@ class MissingFunction(ValueError):
 
 class Plugin(metaclass=ABCMeta):
     def __init__(
-            self,
-            name: str,
-            citation: str,
+        self, name: str, *, citation: str, module: ModuleType | None = None
     ) -> None:
         self.name = name
         self.citation = citation
-        self.module = self._get_module()
-
-    @classmethod
-    def _get_module(cls, levels: int = 3) -> ModuleType | None:
-        """
-        Detect module in which class is instantiated
-
-        This is a good default value for the plugin .module attribute, but can
-        be overriden if appropriate.
-
-        The "levels" parameter can also be tweaked to get the expected result
-        if more abstraction layers are involved.
-
-        If the plugin is defined in a Python interpreter, return None
-        """
-
-        # mypy is convinced that currentframe() can be None.
-        # From docs, None is allowed for non-CPython interpreters. Pypy seems
-        # to also work fine, so let's just raise an error if it happens.
-        frame = inspect.currentframe()
-        assert isinstance(frame, FrameType)
-
-        for _ in range(levels):
-            frame = cls._f_back(frame)
-
-        module_name = frame.f_globals['__name__']
-
-        if module_name != '__main__':
-            return importlib.import_module(module_name)
-
-        return None
-
-    @staticmethod
-    def _f_back(frame: FrameType) -> FrameType:
-        """Wrap frame.f_back with a guarantee it won't return None"""
-        f_back = frame.f_back
-        if f_back is None:
-            raise ValueError('Could not determine module context')
-        return f_back
+        self.module = module
 
     def display(self) -> str:
         module_name = (
@@ -96,6 +55,8 @@ class Plugin(metaclass=ABCMeta):
 
     @property
     def version(self) -> str:
+        if self.package_data is None:
+            return ''
         return self.package_data.get('Version', '')
 
     @singledispatchmethod
@@ -116,12 +77,13 @@ class CalculatorPlugin(Plugin):
 
     def __init__(
         self,
-        *,
         name: str,
+        *,
         citation: dict[str, str] | None = None,
+        module: ModuleType | None = None,
         implementation: str | Callable[[], type[BaseCalculator]],
     ) -> None:
-        super().__init__(name=name, citation=citation)
+        super().__init__(name=name, module=module, citation=citation)
         self._implementation = implementation
 
     @cached_property
