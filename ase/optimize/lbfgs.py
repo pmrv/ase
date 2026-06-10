@@ -209,8 +209,8 @@ class LBFGS(Optimizer):
         # The last element is not added, as we get that for free when taking
         # the first qn-step after the replay
         for i in range(len(traj) - 1):
-            pos = traj[i].get_positions()
-            forces = traj[i].get_forces()
+            pos = traj[i].get_positions().ravel()
+            forces = traj[i].get_forces().ravel()
             self.update(pos, forces, r0, f0)
             r0 = pos.copy()
             f0 = forces.copy()
