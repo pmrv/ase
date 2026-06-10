@@ -18,15 +18,6 @@ def spglib_dataset(atoms):
     )
 
 
-@pytest.mark.skip
-def test_spglib_atommap(diamond):
-    pass
-    # from spglib import get_symmetry_dataset
-
-    # dataset = spglib_dataset(diamond)
-    # atommaps = build_atommaps(diamond, dataset.rotations,
-    # dataset.translations)
-    # print(atommaps)
 
 
 def symop_dict(rotations, translations):
