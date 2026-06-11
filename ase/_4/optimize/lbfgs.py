@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import sparray
+from scipy.sparse import coo_array, sparray
 
 from .method import BaseOptimizationMethod
 
@@ -12,7 +12,7 @@ class LBFGSMethod(BaseOptimizationMethod):
         self,
         *,
         memory: int = 100,
-        initial_inverse_hessian: np.ndarray | sparray,
+        initial_inverse_hessian: sparray,
     ):
         self.memory = memory
         self.H0 = initial_inverse_hessian
@@ -61,3 +61,33 @@ class LBFGSMethod(BaseOptimizationMethod):
             self.s.pop(0)
             self.y.pop(0)
             self.rho.pop(0)
+
+    def datafy(self) -> dict:
+        arr = self.H0
+        rows = arr.row.tolist()
+        cols = arr.col.tolist()
+        vals = arr.data.tolist()
+        d = {'data': list(zip(rows, cols, vals)), 'shape': arr.shape}
+        return {
+            'memory': self.memory,
+            'initial_inverse_hessian': d,
+            'shape': arr.shape,
+            's': [_.tolist() for _ in self.s],
+            'y': [_.tolist() for _ in self.y],
+            'rho': np.array(self.rho).tolist(),
+            'iteration': self.iteration,
+        }
+
+    @classmethod
+    def undatafy(cls, method_data: dict):
+        memory = method_data['memory']
+        data = method_data['initial_inverse_hessian']['data']
+        shape = method_data['initial_inverse_hessian']['shape']
+        rows, cols, data = zip(*[(i, j, v) for i, j, v in data])
+        arr = coo_array((data, (rows, cols)), shape=shape)
+        self = cls(memory=memory, initial_inverse_hessian=arr)
+        self.y = [np.array(_) for _ in method_data['y']]
+        self.s = [np.array(_) for _ in method_data['s']]
+        self.rho = method_data['rho']
+        self.iteration = method_data['iteration']
+        return self

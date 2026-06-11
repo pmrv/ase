@@ -126,13 +126,14 @@ def test_new_optimizer_frechet(algorithm_name: str) -> None:
     assert target.get_value() == pytest.approx(old_energy)
 
 
-def test_new_bfgs_frechet_files(tmp_path):
+@pytest.mark.parametrize('algorithm_name', algorithm_names)
+def test_restart(tmp_path, algorithm_name) -> None:
+    """Test if `Optimizer.restart` works as expected."""
     atoms = setup_surface()
     fmax = 0.001
     smax = 0.0001
     target = FrechetTarget(atoms, fmax=fmax, smax=smax)
-    hessian = target.initial_hessian()
-    method = BFGSMethod(hessian)
+    method = _make_algorithm_ase4(target, algorithm_name)
 
     restartpath = tmp_path / 'restart.json'
     trajpath = tmp_path / 'opt.traj'
@@ -167,8 +168,6 @@ def test_new_bfgs_frechet_files(tmp_path):
 
     assert len(images) == 18
     assert last_atoms.get_potential_energy() == ref
-
-    from ase.calculators.emt import EMT
 
     print('done relaxing, now restart from checkpoint')
     lastpart_traj = tmp_path / 'lastpart.traj'

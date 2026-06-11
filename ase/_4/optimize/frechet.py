@@ -8,6 +8,7 @@ from scipy.sparse import block_diag, eye_array, sparray
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
+from ase._4.optimize.run import Target
 from ase.units import GPa
 
 
@@ -101,7 +102,7 @@ def default_mask(pbc) -> np.ndarray:
     return mask
 
 
-class FrechetTarget:
+class FrechetTarget(Target):
     iotype = 'frechet'
 
     def __init__(

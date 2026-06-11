@@ -303,8 +303,7 @@ def write_restartfile(restartfile, method, target, step):
     restartfile.write_text(json_text)
 
 
-def read_restartfile(restartfile, calc):
-    restartfile = Path(restartfile)
+def read_restartfile(restartfile, calc) -> tuple:
     json_text = restartfile.read_text()
     dct = json.loads(json_text, object_hook=object_hook)
 
@@ -316,6 +315,10 @@ def read_restartfile(restartfile, calc):
         from ase._4.optimize.bfgs import BFGSMethod
 
         method = BFGSMethod.undatafy(method_data)
+    elif method_iotype == 'lbfgs':
+        from ase._4.optimize.lbfgs import LBFGSMethod
+
+        method = LBFGSMethod.undatafy(method_data)
     else:
         raise ValueError(f'No such method: {method_iotype!r}')
 

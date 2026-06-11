@@ -15,3 +15,9 @@ class BaseOptimizationMethod(ABC):
         pos0: np.ndarray,
         gradient0: np.ndarray,
     ) -> None: ...
+
+    @abstractmethod
+    def datafy(self): ...
+
+    @abstractmethod
+    def undatafy(self, *args, **kwargs): ...
