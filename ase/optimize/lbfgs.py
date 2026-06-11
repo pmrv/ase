@@ -3,6 +3,7 @@
 from typing import IO
 
 import numpy as np
+from scipy.sparse import eye_array
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import LBFGSMethod
@@ -75,9 +76,12 @@ class LBFGS(Optimizer):
             :class:`~ase.optimize.optimize.Optimizer`.
 
         """
-        self.state = LBFGSMethod(memory=memory, alpha=alpha)
-
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)
+
+        # Initial approximation of inverse Hessian 1./70. is to emulate the
+        # behaviour of BFGS. Note that this is never changed!
+        H0 = 1.0 / alpha * eye_array(self.optimizable.ndofs())
+        self.state = LBFGSMethod(memory=memory, initial_inverse_hessian=H0)
 
         if maxstep is not None:
             self.maxstep = maxstep

@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.sparse import sparray
 
 from .method import BaseOptimizationMethod
 
@@ -9,13 +10,12 @@ class LBFGSMethod(BaseOptimizationMethod):
 
     def __init__(
         self,
+        *,
         memory: int = 100,
-        alpha: float = 70.0,
+        initial_inverse_hessian: np.ndarray | sparray,
     ):
         self.memory = memory
-        # Initial approximation of inverse Hessian 1./70. is to emulate the
-        # behaviour of BFGS. Note that this is never changed!
-        self.H0 = 1.0 / alpha
+        self.H0 = initial_inverse_hessian
         self.iteration = 0
         self.s: list[np.ndarray] = []
         self.y: list[np.ndarray] = []
@@ -31,7 +31,7 @@ class LBFGSMethod(BaseOptimizationMethod):
         for i in range(loopmax - 1, -1, -1):
             a[i] = self.rho[i] * np.dot(self.s[i], q)
             q -= a[i] * self.y[i]
-        z = self.H0 * q
+        z = self.H0 @ q
 
         for i in range(loopmax):
             b = self.rho[i] * np.dot(self.y[i], z)

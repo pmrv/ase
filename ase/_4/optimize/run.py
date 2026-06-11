@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Iterator
 
 import numpy as np
+from scipy.sparse import eye_array, sparray
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import BaseOptimizationMethod
@@ -67,6 +68,9 @@ class Target:
 
     def initial_hessian(self, alpha: float = 70.0) -> np.ndarray:
         return initial_position_hessian(self.optimizable.ndofs(), alpha)
+
+    def initial_inverse_hessian(self, alpha: float = 70.0) -> sparray:
+        return initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
 
 
 def get_maxforce(forces: np.ndarray) -> float:
@@ -186,6 +190,13 @@ class ForceGradient:
 
 def initial_position_hessian(ndofs: int, alpha: float = 70.0) -> np.ndarray:
     return np.diag(np.full(ndofs, 70.0))
+
+
+def initial_inverse_position_hessian(
+    ndofs: int,
+    alpha: float = 70.0,
+) -> sparray:
+    return 1.0 / alpha * eye_array(ndofs, format='bsr')
 
 
 @dataclass

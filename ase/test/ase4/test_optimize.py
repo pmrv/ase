@@ -59,7 +59,8 @@ def _make_algorithm_ase4(
     if algorithm_name == 'BFGS':
         return BFGSMethod(target.initial_hessian(alpha=alpha))
     if algorithm_name == 'LBFGS':
-        return LBFGSMethod(alpha=alpha)
+        initial_inverse_hessian = target.initial_inverse_hessian(alpha=alpha)
+        return LBFGSMethod(initial_inverse_hessian=initial_inverse_hessian)
     raise ValueError(algorithm_name)
 
 
@@ -103,12 +104,19 @@ def old_frechet_energy(atoms, fmax, smax):
     return atoms.get_potential_energy()
 
 
-def test_new_bfgs_frechet():
+@pytest.mark.parametrize('algorithm_name', algorithm_names)
+def test_new_optimizer_frechet(algorithm_name: str) -> None:
+    """Test if the ASE3- and ASE4-style optimizers for `FrechetTarget`.
+
+    At present, BFGS and LBGFS are tested.
+    Within the history size, LBFGS should provide mathematically the same
+    results as BFGS, and therefore we can use the same reference energy.
+    """
     atoms = setup_surface()
     fmax = 0.01
     smax = 0.00001
     target = FrechetTarget(atoms, fmax=fmax, smax=smax)
-    method = BFGSMethod(target.initial_hessian())
+    method = _make_algorithm_ase4(target, algorithm_name)
     opt = Optimizer(target, method)
     step = opt.run()
     assert step.gradient_obj.converged
