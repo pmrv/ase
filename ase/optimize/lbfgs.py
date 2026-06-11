@@ -3,10 +3,10 @@
 from typing import IO
 
 import numpy as np
-from scipy.sparse import eye_array
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import LBFGSMethod
+from ase._4.optimize.target import initial_inverse_position_hessian
 from ase.optimize.optimize import Optimizer
 from ase.utils.linesearch import LineSearch
 
@@ -80,7 +80,7 @@ class LBFGS(Optimizer):
 
         # Initial approximation of inverse Hessian 1./70. is to emulate the
         # behaviour of BFGS. Note that this is never changed!
-        H0 = 1.0 / alpha * eye_array(self.optimizable.ndofs())
+        H0 = initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
         self.state = LBFGSMethod(memory=memory, initial_inverse_hessian=H0)
 
         if maxstep is not None:

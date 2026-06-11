@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import coo_array, sparray
+from scipy.sparse import coo_array
 
 from .method import BaseOptimizationMethod
 
@@ -12,7 +12,7 @@ class LBFGSMethod(BaseOptimizationMethod):
         self,
         *,
         memory: int = 100,
-        initial_inverse_hessian: sparray,
+        initial_inverse_hessian: coo_array,
     ):
         self.memory = memory
         self.H0 = initial_inverse_hessian

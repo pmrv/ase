@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any, Iterator
 
 import numpy as np
-from scipy.sparse import block_diag, sparray
+from scipy.sparse import block_diag, coo_array
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
@@ -245,7 +245,7 @@ class FrechetTarget(BaseTarget):
         bulk_modulus: float = 145 * GPa,
         poisson_ratio: float = 0.3,
         alpha: float = 70.0,
-    ) -> sparray:
+    ) -> coo_array:
         ndofs = len(self.atoms) * 3
         inv_position_hessian = initial_inverse_position_hessian(ndofs, alpha)
         cell_hessian = _make_initial_cell_hessian(
@@ -256,7 +256,10 @@ class FrechetTarget(BaseTarget):
             alpha=alpha,
         )
         inv_cell_hessian = np.linalg.inv(cell_hessian)
-        return block_diag((inv_position_hessian, inv_cell_hessian))
+        return block_diag(
+            (inv_position_hessian, inv_cell_hessian),
+            format='coo',
+        )
 
     def iterimages(self) -> Iterator[Atoms]:
         yield self.atoms

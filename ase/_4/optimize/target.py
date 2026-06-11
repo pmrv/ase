@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.sparse import eye_array, sparray
+from scipy.sparse import coo_array
 
 from ase import Atoms
 from ase.optimize.optimize import OptimizableAtoms
@@ -42,7 +42,7 @@ class BaseTarget(ABC):
     def initial_hessian(self, *args, **kwargs) -> np.ndarray: ...
 
     @abstractmethod
-    def initial_inverse_hessian(self, *args, **kwargs) -> sparray: ...
+    def initial_inverse_hessian(self, *args, **kwargs) -> coo_array: ...
 
 
 class Target(BaseTarget):
@@ -74,7 +74,7 @@ class Target(BaseTarget):
     def initial_hessian(self, alpha: float = 70.0) -> np.ndarray:
         return initial_position_hessian(self.optimizable.ndofs(), alpha)
 
-    def initial_inverse_hessian(self, alpha: float = 70.0) -> sparray:
+    def initial_inverse_hessian(self, alpha: float = 70.0) -> coo_array:
         return initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
 
 
@@ -89,5 +89,7 @@ def initial_position_hessian(ndofs: int, alpha: float = 70.0) -> np.ndarray:
 def initial_inverse_position_hessian(
     ndofs: int,
     alpha: float = 70.0,
-) -> sparray:
-    return 1.0 / alpha * eye_array(ndofs, format='coo')
+) -> coo_array:
+    diags = np.full(ndofs, 1.0 / alpha)
+    rows = cols = np.arange(ndofs)
+    return coo_array((diags, (rows, cols)), shape=(ndofs, ndofs))
