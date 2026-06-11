@@ -76,12 +76,15 @@ class LBFGS(Optimizer):
             :class:`~ase.optimize.optimize.Optimizer`.
 
         """
-        super().__init__(atoms, restart, logfile, trajectory, **kwargs)
-
         # Initial approximation of inverse Hessian 1./70. is to emulate the
         # behaviour of BFGS. Note that this is never changed!
-        H0 = initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
+        H0 = initial_inverse_position_hessian(0, alpha)
         self.state = LBFGSMethod(memory=memory, initial_inverse_hessian=H0)
+
+        super().__init__(atoms, restart, logfile, trajectory, **kwargs)
+
+        H0 = initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
+        self.state.H0 = H0
 
         if maxstep is not None:
             self.maxstep = maxstep
