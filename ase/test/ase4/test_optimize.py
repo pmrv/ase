@@ -1,8 +1,11 @@
 import numpy as np
 import pytest
 
+from ase import Atoms
 from ase._4.optimize.bfgs import BFGSMethod
 from ase._4.optimize.frechet import FrechetTarget
+from ase._4.optimize.lbfgs import LBFGSMethod
+from ase._4.optimize.method import BaseOptimizationMethod
 from ase._4.optimize.run import (
     Optimizer,
     Target,
@@ -13,6 +16,8 @@ from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
 from ase.optimize.bfgs import BFGS as OldBFGS
 from ase.optimize.cellawarebfgs import CellAwareBFGS
+from ase.optimize.lbfgs import LBFGS as OldLBFGS
+from ase.optimize.optimize import Optimizer as OldOptimizer
 
 
 def setup_surface():
@@ -28,32 +33,65 @@ def setup_surface():
     return atoms
 
 
-def run_old_bfgs(atoms, fmax):
-    bfgs = OldBFGS(atoms)
-    for i, _ in enumerate(bfgs.irun(fmax=fmax)):
+algorithm_names = [
+    'BFGS',
+    'LBFGS',
+]
+
+
+def _make_optimizer_ase3(
+    atoms: Atoms,
+    algorithm_name: str,
+) -> OldOptimizer:
+    alpha = 70.0
+    if algorithm_name == 'BFGS':
+        return OldBFGS(atoms, alpha=alpha)
+    if algorithm_name == 'LBFGS':
+        return OldLBFGS(atoms, alpha=alpha)
+    raise ValueError(algorithm_name)
+
+
+def _make_algorithm_ase4(
+    target: Target,
+    algorithm_name: str,
+) -> BaseOptimizationMethod:
+    alpha = 70.0
+    if algorithm_name == 'BFGS':
+        return BFGSMethod(target.initial_hessian(alpha=alpha))
+    if algorithm_name == 'LBFGS':
+        return LBFGSMethod(alpha=alpha)
+    raise ValueError(algorithm_name)
+
+
+@pytest.mark.parametrize('algorithm_name', algorithm_names)
+def test_optimizer(algorithm_name: str) -> None:
+    """Test if the ASE3- and ASE4-style optimizers give the same energy.
+
+    At present, BFGS and LBGFS are tested.
+    Within the history size, LBFGS should provide mathematically the same
+    results as BFGS, and therefore we can use the same reference energy.
+    """
+    fmax = 0.01
+
+    atoms_opt3 = setup_surface()
+    opt3 = _make_optimizer_ase3(atoms_opt3, algorithm_name)
+    for opt3_i, _ in enumerate(opt3.irun(fmax=fmax)):
         pass
 
-    assert i == 10
-    return i, atoms
-
-
-def test_new_bfgs():
-    atoms = setup_surface()
-    fmax = 0.01
-    target = Target(atoms, fmax=fmax)
-    hessian = BFGSMethod(target.initial_hessian())
-    opt = Optimizer(target, hessian)
-    step = opt.run()
-
-    oldsteps, oldatoms = run_old_bfgs(setup_surface(), fmax)
+    atoms_opt4 = setup_surface()
+    target = Target(atoms_opt4, fmax=fmax)
+    method = _make_algorithm_ase4(target, algorithm_name)
+    opt4 = Optimizer(target, method)
+    step = opt4.run()
 
     assert step.gradient_obj.converged
+
+    assert opt3_i == 10
     assert step.i == 10
-    assert oldsteps == 10
 
     ref_energy = 0.9133826276
-    assert atoms.get_potential_energy() == pytest.approx(ref_energy)
-    assert oldatoms.get_potential_energy() == pytest.approx(ref_energy)
+    assert atoms_opt3.get_potential_energy() == pytest.approx(ref_energy)
+    assert atoms_opt4.get_potential_energy() == pytest.approx(ref_energy)
 
 
 def old_frechet_energy(atoms, fmax, smax):
