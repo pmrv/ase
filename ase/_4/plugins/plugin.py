@@ -79,7 +79,7 @@ class CalculatorPlugin(Plugin):
         self,
         name: str,
         *,
-        citation: dict[str, str] | None = None,
+        citation: str = '',
         module: ModuleType | None = None,
         implementation: str | Callable[[], type[BaseCalculator]],
     ) -> None:

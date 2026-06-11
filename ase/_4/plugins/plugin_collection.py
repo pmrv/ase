@@ -62,7 +62,7 @@ class PluginCollection(Collection[P]):
 
     @staticmethod
     def _modulesetter(module: ModuleType) -> Callable[[P], P]:
-        def set_module(plugin: P) -> None:
+        def set_module(plugin: P) -> P:
             if plugin.module is None:
                 plugin.module = module
             return plugin

@@ -48,6 +48,7 @@ lj_plugin = CalculatorPlugin(
 
 def get_ase_io_format(name: str) -> IOFormat:
     from ase.io.formats import ioformats
+
     return ioformats[name]
 
 
@@ -73,8 +74,11 @@ class VaspCalculatorPlugin(CalculatorPlugin):
 
 
 vasp_plugin = VaspCalculatorPlugin(
-    citation=('ASE developer community, based on modules by '
-              'Jussi Enkovaara and John Kitchin'))
+    citation=(
+        'ASE developer community, based on modules by '
+        'Jussi Enkovaara and John Kitchin'
+    )
+)
 
 # IOFormat plugin created using __init__
 poscar_plugin = IOFormatPlugin(
@@ -107,7 +111,9 @@ castep_castep_plugin = LegacyIOFormatPlugin.from_legacy_io_format(
 # Plugin creation wrapped by a function
 def create_dftb_input_plugin() -> LegacyIOFormatPlugin:
     return LegacyIOFormatPlugin.from_legacy_io_format(
-        io_format=get_ase_io_format('dftb'), citation='', module=THIS_MODULE,
+        io_format=get_ase_io_format('dftb'),
+        citation='',
+        module=THIS_MODULE,
     )
 
 
@@ -117,8 +123,7 @@ avogadro_plugin = ViewerPlugin(
     citation='N/A: Mock Viewer plugin',
     module=THIS_MODULE,
     implementation=(lambda: VIEWERS['avogadro']),
-
-    )
+)
 
 ase_gui_plugin = ViewerPlugin(
     name='ASE GUI',

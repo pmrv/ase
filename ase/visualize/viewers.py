@@ -137,7 +137,7 @@ class CLIViewer(AbstractViewer):
         return proc
 
 
-VIEWERS: dict[str, type] = {}
+VIEWERS: dict[str, AbstractViewer] = {}
 
 
 def _pipe_to_ase_gui(atoms, repeat, **kwargs):
@@ -248,10 +248,13 @@ define_viewer(
 
 register_external_viewer_formats("ase.visualize")
 
-CLI_VIEWERS = {key: value for key, value in VIEWERS.items()
-               if isinstance(value, CLIViewer)}
-PY_VIEWERS = {key: value for key, value in VIEWERS.items()
-              if isinstance(value, PyViewer)}
+CLI_VIEWERS: dict[str, CLIViewer] = {
+    key: value for key, value in VIEWERS.items()
+    if isinstance(value, CLIViewer)}
+
+PY_VIEWERS: dict[str, PyViewer] = {
+    key: value for key, value in VIEWERS.items()
+    if isinstance(value, PyViewer)}
 
 
 def cli_main():
