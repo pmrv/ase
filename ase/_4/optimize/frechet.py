@@ -4,12 +4,17 @@ from dataclasses import asdict, dataclass
 from typing import Any, Iterator
 
 import numpy as np
-from scipy.sparse import block_diag, eye_array, sparray
+from scipy.sparse import block_diag, sparray
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
-from ase._4.optimize.run import ForceGradient
-from ase._4.optimize.target import BaseTarget
+from ase._4.optimize.target import (
+    BaseTarget,
+    ForceGradient,
+    get_maxforce,
+    initial_inverse_position_hessian,
+    initial_position_hessian,
+)
 from ase.units import GPa
 
 
@@ -25,7 +30,6 @@ def initial_frechet_hessian(
     poisson_ratio: float = 0.3,
     alpha: float = 70.0,
 ) -> np.ndarray:
-    from ase._4.optimize.run import initial_position_hessian
 
     ndofs = position_dofs + 9
     hessian = initial_position_hessian(ndofs, alpha)
@@ -164,8 +168,6 @@ class FrechetTarget(BaseTarget):
         )
 
     def get_gradient(self) -> FrechetGradient:
-        from ase._4.optimize.run import get_maxforce
-
         atoms_forces = self.atoms.get_forces()
         if self._utility.mask3x3.any():
             stress = self.atoms.get_stress()
@@ -244,7 +246,8 @@ class FrechetTarget(BaseTarget):
         poisson_ratio: float = 0.3,
         alpha: float = 70.0,
     ) -> sparray:
-        inv_position_hessian = 1.0 / alpha * eye_array(len(self.atoms) * 3)
+        ndofs = len(self.atoms) * 3
+        inv_position_hessian = initial_inverse_position_hessian(ndofs, alpha)
         cell_hessian = _make_initial_cell_hessian(
             volume=self.atoms.cell.volume,
             mask3x3=self._utility.mask3x3,

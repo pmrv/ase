@@ -8,12 +8,10 @@ from ase._4.optimize.lbfgs import LBFGSMethod
 from ase._4.optimize.method import BaseOptimizationMethod
 from ase._4.optimize.run import (
     Optimizer,
-    Step,
-    Target,
     read_images,
     write_restartfile,
 )
-from ase._4.optimize.target import BaseTarget
+from ase._4.optimize.target import BaseTarget, Target
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
 from ase.optimize.bfgs import BFGS as OldBFGS
