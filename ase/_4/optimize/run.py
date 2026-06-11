@@ -8,6 +8,7 @@ from typing import Any, Iterator
 import numpy as np
 
 from ase import Atoms
+from ase._4.optimize.lbfgs import BaseOptimizationMethod
 from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
@@ -75,14 +76,14 @@ def get_maxforce(forces: np.ndarray) -> float:
 class Optimizer:
     def __init__(
         self,
-        target,
-        method,
+        target: Target,
+        method: BaseOptimizationMethod,
         trajectory=None,
         restartfile=None,
         comm=world,
         logfile='-',
-        step=None,
-        maxstep=0.2,
+        step: Step | None = None,
+        maxstep: float = 0.2,
     ):
         from ase.optimize.optimize import Log
 
@@ -195,7 +196,7 @@ class Step:
     value: float
 
     @classmethod
-    def start(cls, target) -> Step:
+    def start(cls, target: Target) -> Step:
         step = cls(0, target.get_x(), target.get_gradient(), target.get_value())
         assert step.gradient_obj.gradient.shape == (len(step.x),)
         return step
@@ -218,7 +219,12 @@ class Step:
         )
 
 
-def next_step(target, method, step, maxstep: float | None) -> Step:
+def next_step(
+    target: Target,
+    method: BaseOptimizationMethod,
+    step: Step,
+    maxstep: float | None,
+) -> Step:
     dx = method.compute_step(step.gradient_obj.gradient)
     # TODO We do not have maxstep right now.  This will not run the same
     # as legacy optimizations until we apply a maxstep.

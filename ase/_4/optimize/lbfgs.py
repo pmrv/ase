@@ -1,7 +1,9 @@
 import numpy as np
 
+from .method import BaseOptimizationMethod
 
-class LBFGSMethod:
+
+class LBFGSMethod(BaseOptimizationMethod):
     iotype = 'lbfgs'
     methodname = 'LBFGS'
 
