@@ -14,6 +14,7 @@ from .plugin import CalculatorPlugin, Plugin
 from .viewer import ViewerPlugin
 
 P = TypeVar('P', bound=Plugin, covariant=True)
+_P = TypeVar('_P', bound=Plugin)
 
 
 class PluginCollection(Collection[P]):
@@ -61,8 +62,8 @@ class PluginCollection(Collection[P]):
         return f'{self.__class__.__name__}({repr(self.plugins)})'
 
     @staticmethod
-    def _modulesetter(module: ModuleType) -> Callable[[P], P]:
-        def set_module(plugin: P) -> P:
+    def _modulesetter(module: ModuleType) -> Callable[[_P], _P]:
+        def set_module(plugin: _P) -> _P:
             if plugin.module is None:
                 plugin.module = module
             return plugin
