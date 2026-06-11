@@ -46,3 +46,59 @@ class Atoms(_LimitedAtoms):
                 self.arrays[prefix + prop_name + suffix] = prop_val
             else:
                 self.info[prefix + prop_name + suffix] = prop_val
+
+    def get_potential_energy(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['energy']) in ASE v4."
+        )
+
+    def get_potential_energies(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['energies']) in ASE v4."
+        )
+
+    def get_forces(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['forces']) in ASE v4."
+        )
+
+    def get_stress(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['stress']) in ASE v4."
+        )
+
+    def get_stresses(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['stresses']) in ASE v4."
+        )
+
+    def get_charges(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['charges']) in ASE v4."
+        )
+
+    def get_magnetic_moments(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['magmoms']) in ASE v4."
+        )
+
+    def get_magnetic_moment(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['magmom']) in ASE v4."
+        )
+
+    def get_dipole_moment(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['dipole']) in ASE v4."
+        )
+
+    def get_total_energy(self, **kwargs):
+        raise NotImplementedError(
+            "Use calculator.evaluate(atoms, properties=['energy']) in ASE v4 "
+            'and add atoms.get_kinetic_energy().'
+        )
+
+    def get_properties(self, *args, **kwargs):
+        raise NotImplementedError(
+            'Use calculator.evaluate(atoms, properties=[...]) in ASE v4.'
+        )

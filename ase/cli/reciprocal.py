@@ -1,5 +1,3 @@
-# fmt: off
-
 # Note:
 # Try to avoid module level import statements here to reduce
 # import time during CLI execution
@@ -72,8 +70,11 @@ class CLICommand:
     @staticmethod
     def add_arguments(parser):
         add = parser.add_argument
-        add('name', metavar='input-file',
-            help='Input file containing unit cell.')
+        add(
+            'name',
+            metavar='input-file',
+            help='Input file containing unit cell.',
+        )
         add('output', nargs='?', help='Write plot to file (.png, .svg, ...).')
 
     @staticmethod
