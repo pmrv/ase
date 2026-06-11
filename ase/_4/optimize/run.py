@@ -10,9 +10,11 @@ from scipy.sparse import eye_array, sparray
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import BaseOptimizationMethod
+from ase._4.optimize.target import BaseTarget
 from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
+from ase.optimize.optimize import OptimizableAtoms
 from ase.parallel import world
 
 
@@ -34,9 +36,9 @@ def toplevel_header(target, method):
     )
 
 
-class Target:
+class Target(BaseTarget):
     def __init__(self, atoms: Atoms, fmax: float):
-        self.optimizable = atoms.__ase_optimizable__()
+        self.optimizable: OptimizableAtoms = atoms.__ase_optimizable__()
         self.fmax = fmax
 
     def get_value(self) -> float:
@@ -60,12 +62,6 @@ class Target:
     def set_x(self, x: np.ndarray) -> None:
         self.optimizable.set_x(x)
 
-    def gradient_norm(self, gradient: np.ndarray) -> float:
-        return self.optimizable.gradient_norm(gradient)
-
-    def converged(self, gradient: np.ndarray) -> bool:
-        return self.gradient_norm(gradient) < self.fmax
-
     def initial_hessian(self, alpha: float = 70.0) -> np.ndarray:
         return initial_position_hessian(self.optimizable.ndofs(), alpha)
 
@@ -80,7 +76,7 @@ def get_maxforce(forces: np.ndarray) -> float:
 class Optimizer:
     def __init__(
         self,
-        target: Target,
+        target: BaseTarget,
         method: BaseOptimizationMethod,
         trajectory=None,
         restartfile=None,
@@ -108,7 +104,7 @@ class Optimizer:
         # pass the step to run(), which may be awkward.
         # But having self.step is also awkward.
 
-    def run(self, *, steps: int | None = None) -> Step:
+    def run(self, *, steps: int | None = None) -> Step | None:
         for _ in self.irun(steps=steps):
             pass
         # Note: This may take zero steps, but self.step is always non-None
@@ -207,7 +203,7 @@ class Step:
     value: float
 
     @classmethod
-    def start(cls, target: Target) -> Step:
+    def start(cls, target: BaseTarget) -> Step:
         step = cls(0, target.get_x(), target.get_gradient(), target.get_value())
         assert step.gradient_obj.gradient.shape == (len(step.x),)
         return step
@@ -231,7 +227,7 @@ class Step:
 
 
 def next_step(
-    target: Target,
+    target: BaseTarget,
     method: BaseOptimizationMethod,
     step: Step,
     maxstep: float | None,

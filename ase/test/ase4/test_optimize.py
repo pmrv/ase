@@ -8,10 +8,12 @@ from ase._4.optimize.lbfgs import LBFGSMethod
 from ase._4.optimize.method import BaseOptimizationMethod
 from ase._4.optimize.run import (
     Optimizer,
+    Step,
     Target,
     read_images,
     write_restartfile,
 )
+from ase._4.optimize.target import BaseTarget
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
 from ase.optimize.bfgs import BFGS as OldBFGS
@@ -52,7 +54,7 @@ def _make_optimizer_ase3(
 
 
 def _make_algorithm_ase4(
-    target: Target,
+    target: BaseTarget,
     algorithm_name: str,
 ) -> BaseOptimizationMethod:
     alpha = 70.0
@@ -84,6 +86,9 @@ def test_optimizer(algorithm_name: str) -> None:
     method = _make_algorithm_ase4(target, algorithm_name)
     opt4 = Optimizer(target, method)
     step = opt4.run()
+
+    if step is None:
+        raise RuntimeError
 
     assert step.gradient_obj.converged
 
@@ -119,6 +124,10 @@ def test_new_optimizer_frechet(algorithm_name: str) -> None:
     method = _make_algorithm_ase4(target, algorithm_name)
     opt = Optimizer(target, method)
     step = opt.run()
+
+    if step is None:
+        raise RuntimeError
+
     assert step.gradient_obj.converged
     assert step.i == 18
 
@@ -155,6 +164,9 @@ def test_restart(tmp_path, algorithm_name) -> None:
     write_restartfile(halfway, opt.method, opt.target, opt.step)
 
     step = opt.run()
+
+    if step is None:
+        raise RuntimeError
 
     ref = pytest.approx(0.837190)
     gradient_obj = step.gradient_obj
