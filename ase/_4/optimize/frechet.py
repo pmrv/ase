@@ -8,6 +8,7 @@ from scipy.sparse import block_diag, eye_array, sparray
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
+from ase._4.optimize.run import ForceGradient
 from ase._4.optimize.target import BaseTarget
 from ase.units import GPa
 
@@ -69,14 +70,10 @@ def _make_initial_cell_hessian(
 
 
 @dataclass
-class FrechetGradient:
-    gradient: np.ndarray
-    forces: np.ndarray
+class FrechetGradient(ForceGradient):
     stress: np.ndarray
     conv_crit_stress: np.ndarray
-    fnorm: float
     snorm: float
-    converged: bool
     volume: float
 
     def loginfo(self) -> dict[str, float]:
