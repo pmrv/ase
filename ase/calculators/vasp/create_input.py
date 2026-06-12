@@ -296,7 +296,6 @@ float_keys = [
     # group at UT Austin
     'jacobian',  # Weight of lattice to atomic motion
     'ddr',  # (DdR) dimer separation
-    'drotmax',  # (DRotMax) number of rotation steps per translation step
     'dfnmin',  # (DFNMin) rotational force below which dimer is not rotated
     'dfnmax',  # (DFNMax) rotational force below which dimer rotation stops
     'sltol',  # convergence ratio for minimum eigenvalue
@@ -544,6 +543,7 @@ int_keys = [
     # IBRION and POTIM are automatically set in the INCAR file
     'iopt',  # Controls which optimizer to use.  for iopt > 0, ibrion = 3
     # and potim = 0.0
+    'drotmax',  # (DRotMax) number of rotation steps per translation step
     'snl',  # Maximum dimentionality of the Lanczos matrix
     'lbfgsmem',  # Steps saved for inverse Hessian for IOPT = 1 (LBFGS)
     'fnmin',  # Max iter. before adjusting dt and alpha for IOPT = 7 (FIRE)
