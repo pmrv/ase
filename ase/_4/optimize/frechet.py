@@ -4,9 +4,17 @@ from dataclasses import asdict, dataclass
 from typing import Any, Iterator
 
 import numpy as np
+from scipy.sparse import block_diag, coo_array
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
+from ase._4.optimize.optimizable import (
+    ForceGradient,
+    Optimizable4,
+    get_maxforce,
+    initial_inverse_position_hessian,
+    initial_position_hessian,
+)
 from ase.units import GPa
 
 
@@ -22,16 +30,37 @@ def initial_frechet_hessian(
     poisson_ratio: float = 0.3,
     alpha: float = 70.0,
 ) -> np.ndarray:
-    from ase._4.optimize.run import initial_position_hessian
-    from ase.optimize.cellawarebfgs import calculate_isotropic_elasticity_tensor
-
-    C_ijkl = calculate_isotropic_elasticity_tensor(
-        bulk_modulus, poisson_ratio, suppress_rotation=alpha
-    )
 
     ndofs = position_dofs + 9
     hessian = initial_position_hessian(ndofs, alpha)
     hessian[:-9, :-9] = initial_position_hessian(position_dofs)
+
+    cell_hessian = _make_initial_cell_hessian(
+        volume=volume,
+        mask3x3=mask3x3,
+        bulk_modulus=bulk_modulus,
+        poisson_ratio=poisson_ratio,
+        alpha=alpha,
+    )
+    hessian[position_dofs:, position_dofs:] = cell_hessian
+    return hessian
+
+
+def _make_initial_cell_hessian(
+    *,
+    volume: float,
+    mask3x3: np.ndarray,
+    bulk_modulus: float,
+    poisson_ratio: float,
+    alpha: float,
+) -> np.ndarray:
+    from ase.optimize.cellawarebfgs import calculate_isotropic_elasticity_tensor
+
+    C_ijkl = calculate_isotropic_elasticity_tensor(
+        bulk_modulus,
+        poisson_ratio,
+        suppress_rotation=alpha,
+    )
 
     mask_ind = np.where(mask3x3.ravel() != 0)[0]
     indices = np.ix_(mask_ind, mask_ind)
@@ -39,21 +68,16 @@ def initial_frechet_hessian(
     # optimizing all cell DOFs?
     # Also, instead of not assigning masked cell DOFs, can't we just assign
     # them unconditionally and rely on the algorithm to do what it likes?
-    cell_hessian = hessian[-9:, -9:]
+    cell_hessian = alpha * np.eye(9)
     cell_hessian[indices] = C_ijkl.reshape((9, 9))[indices] * volume
-    hessian[position_dofs:, position_dofs:] = cell_hessian
-    return hessian
+    return cell_hessian
 
 
 @dataclass
-class FrechetGradient:
-    gradient: np.ndarray
-    forces: np.ndarray
+class FrechetGradient(ForceGradient):
     stress: np.ndarray
     conv_crit_stress: np.ndarray
-    fnorm: float
     snorm: float
-    converged: bool
     volume: float
 
     def loginfo(self) -> dict[str, float]:
@@ -79,7 +103,7 @@ def default_mask(pbc) -> np.ndarray:
     return mask
 
 
-class FrechetTarget:
+class FrechetOptimizable(Optimizable4):
     iotype = 'frechet'
 
     def __init__(
@@ -117,7 +141,7 @@ class FrechetTarget:
         }
 
     @classmethod
-    def undatafy(cls, dct: dict, calc) -> FrechetTarget:
+    def undatafy(cls, dct: dict, calc) -> FrechetOptimizable:
         # XXX Here we depend directly on calculator since it's the only thing
         # we don't know how to restore.
         atoms = dct['atoms'].copy()
@@ -144,8 +168,6 @@ class FrechetTarget:
         )
 
     def get_gradient(self) -> FrechetGradient:
-        from ase._4.optimize.run import get_maxforce
-
         atoms_forces = self.atoms.get_forces()
         if self._utility.mask3x3.any():
             stress = self.atoms.get_stress()
@@ -216,6 +238,27 @@ class FrechetTarget:
             bulk_modulus,
             poisson_ratio,
             alpha,
+        )
+
+    def initial_inverse_hessian(
+        self,
+        bulk_modulus: float = 145 * GPa,
+        poisson_ratio: float = 0.3,
+        alpha: float = 70.0,
+    ) -> coo_array:
+        ndofs = len(self.atoms) * 3
+        inv_position_hessian = initial_inverse_position_hessian(ndofs, alpha)
+        cell_hessian = _make_initial_cell_hessian(
+            volume=self.atoms.cell.volume,
+            mask3x3=self._utility.mask3x3,
+            bulk_modulus=bulk_modulus,
+            poisson_ratio=poisson_ratio,
+            alpha=alpha,
+        )
+        inv_cell_hessian = np.linalg.inv(cell_hessian)
+        return block_diag(
+            (inv_position_hessian, inv_cell_hessian),
+            format='coo',
         )
 
     def iterimages(self) -> Iterator[Atoms]:

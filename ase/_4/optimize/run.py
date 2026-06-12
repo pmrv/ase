@@ -7,7 +7,8 @@ from typing import Any, Iterator
 
 import numpy as np
 
-from ase import Atoms
+from ase._4.optimize.lbfgs import OptimizerMethod
+from ase._4.optimize.optimizable import Optimizable4
 from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
@@ -32,57 +33,17 @@ def toplevel_header(target, method):
     )
 
 
-class Target:
-    def __init__(self, atoms: Atoms, fmax: float):
-        self.optimizable = atoms.__ase_optimizable__()
-        self.fmax = fmax
-
-    def get_value(self) -> float:
-        return self.optimizable.get_value()
-
-    def get_gradient(self) -> ForceGradient:
-        forces = self.optimizable.atoms.get_forces()
-        gradient = -forces.ravel()
-        fnorm = get_maxforce(forces)
-        converged = fnorm < self.fmax
-        return ForceGradient(
-            gradient=gradient,
-            forces=forces,
-            fnorm=fnorm,
-            converged=converged,
-        )
-
-    def get_x(self) -> np.ndarray:
-        return self.optimizable.get_x()
-
-    def set_x(self, x: np.ndarray) -> None:
-        self.optimizable.set_x(x)
-
-    def gradient_norm(self, gradient: np.ndarray) -> float:
-        return self.optimizable.gradient_norm(gradient)
-
-    def converged(self, gradient: np.ndarray) -> bool:
-        return self.gradient_norm(gradient) < self.fmax
-
-    def initial_hessian(self, alpha: float = 70.0) -> np.ndarray:
-        return initial_position_hessian(self.optimizable.ndofs(), alpha)
-
-
-def get_maxforce(forces: np.ndarray) -> float:
-    return np.linalg.norm(forces, axis=1).max()
-
-
 class Optimizer:
     def __init__(
         self,
-        target,
-        method,
+        target: Optimizable4,
+        method: OptimizerMethod,
         trajectory=None,
         restartfile=None,
         comm=world,
         logfile='-',
-        step=None,
-        maxstep=0.2,
+        step: Step | None = None,
+        maxstep: float = 0.2,
     ):
         from ase.optimize.optimize import Log
 
@@ -107,6 +68,7 @@ class Optimizer:
         for _ in self.irun(steps=steps):
             pass
         # Note: This may take zero steps, but self.step is always non-None
+        assert self.step is not None
         return self.step
 
     def irun(self, *, steps: int | None = None) -> Iterator[Step]:
@@ -173,21 +135,6 @@ class Optimizer:
 
 
 @dataclass
-class ForceGradient:
-    gradient: np.ndarray
-    forces: np.ndarray
-    fnorm: float
-    converged: bool
-
-    def loginfo(self) -> dict[str, float]:
-        return {'fmax': self.fnorm}
-
-
-def initial_position_hessian(ndofs: int, alpha: float = 70.0) -> np.ndarray:
-    return np.diag(np.full(ndofs, 70.0))
-
-
-@dataclass
 class Step:
     i: int
     x: np.ndarray
@@ -195,7 +142,7 @@ class Step:
     value: float
 
     @classmethod
-    def start(cls, target) -> Step:
+    def start(cls, target: Optimizable4) -> Step:
         step = cls(0, target.get_x(), target.get_gradient(), target.get_value())
         assert step.gradient_obj.gradient.shape == (len(step.x),)
         return step
@@ -218,7 +165,12 @@ class Step:
         )
 
 
-def next_step(target, method, step, maxstep: float | None) -> Step:
+def next_step(
+    target: Optimizable4,
+    method: OptimizerMethod,
+    step: Step,
+    maxstep: float | None,
+) -> Step:
     dx = method.compute_step(step.gradient_obj.gradient)
     # TODO We do not have maxstep right now.  This will not run the same
     # as legacy optimizations until we apply a maxstep.
@@ -286,8 +238,7 @@ def write_restartfile(restartfile, method, target, step):
     restartfile.write_text(json_text)
 
 
-def read_restartfile(restartfile, calc):
-    restartfile = Path(restartfile)
+def read_restartfile(restartfile, calc) -> tuple:
     json_text = restartfile.read_text()
     dct = json.loads(json_text, object_hook=object_hook)
 
@@ -299,13 +250,17 @@ def read_restartfile(restartfile, calc):
         from ase._4.optimize.bfgs import BFGSMethod
 
         method = BFGSMethod.undatafy(method_data)
+    elif method_iotype == 'lbfgs':
+        from ase._4.optimize.lbfgs import LBFGSMethod
+
+        method = LBFGSMethod.undatafy(method_data)
     else:
         raise ValueError(f'No such method: {method_iotype!r}')
 
     if target_iotype == 'frechet':
-        from ase._4.optimize.frechet import FrechetTarget
+        from ase._4.optimize.frechet import FrechetOptimizable
 
-        target = FrechetTarget.undatafy(target_dct, calc)
+        target = FrechetOptimizable.undatafy(target_dct, calc)
     elif target_iotype == 'symopt':
         from ase._4.optimize.symopt import SymOpt
 
