@@ -150,104 +150,75 @@ def register_codes():
 
     reg('abinit', 'Abinit',
         'ase.calculators.abinit.AbinitTemplate', config=True)
-    reg('ace', 'ACE molecule',
-        'ase.calculators.acemolecule.ACE', config=True)
-    reg('acn', 'ACN force field',
-        'ase.calculators.acn.ACN')
-    reg('aims', 'FHI-Aims',
-        'ase.calculators.aims.AimsTemplate', config=True)
-    reg('amber', 'Amber',
-        'ase.calculators.amber.Amber', config=True)
+    reg('ace', 'ACE molecule', 'ase.calculators.acemolecule.ACE', config=True)
+    reg('acn', 'ACN force field', 'ase.calculators.acn.ACN')
+    reg('aims', 'FHI-Aims', 'ase.calculators.aims.AimsTemplate', config=True)
+    reg('amber', 'Amber', 'ase.calculators.amber.Amber', config=True)
     reg('average', 'AverageCalculator',
         'ase.calculators.mixing.AverageCalculator', wrapper=True)
-    reg('castep', 'Castep',
-        'ase.calculators.castep.Castep', config=True)
+    reg('castep', 'Castep', 'ase.calculators.castep.Castep', config=True)
     reg('checkpoint', 'CheckpointCalculator',
-        'ase.calculators.checkpoint.CheckpointCalculator',
-        wrapper=True)
+        'ase.calculators.checkpoint.CheckpointCalculator', wrapper=True)
     reg('combine_mm', 'CombineMM',
         'ase.calculators.combine_mm.CombineMM', wrapper=True)
     reg('counterion', 'AtomicCounterIon',
         'ase.calculators.counterions.AtomicCounterIon')
-    reg('cp2k', 'CP2K',
-        'ase.calculators.cp2k.CP2K', config=True)
-    reg('crystal', 'CRYSTAL',
-        'ase.calculators.crystal.CRYSTAL', config=True)
-    reg('demon', 'deMon',
-        'ase.calculators.demon.Demon', config=True)
+    reg('cp2k', 'CP2K', 'ase.calculators.cp2k.CP2K', config=True)
+    reg('crystal', 'CRYSTAL', 'ase.calculators.crystal.CRYSTAL', config=True)
+    reg('demon', 'deMon', 'ase.calculators.demon.Demon', config=True)
     reg('demonnano', 'deMon-nano',
         'ase.calculators.demonnano.DemonNano', config=True)
-    reg('dftb', 'DFTB+',
-        'ase.calculators.dftb.Dftb', config=True)
-    reg('dftd3', 'DFT-D3',
-        'ase.calculators.dftd3.DFTD3', config=True)
-    reg('dmol', 'DMol3',
-        'ase.calculators.dmol.DMol3', config=True)
-    reg('eam', 'EAM',
-        'ase.calculators.eam.EAM')
+    reg('dftb', 'DFTB+', 'ase.calculators.dftb.Dftb', config=True)
+    reg('dftd3', 'DFT-D3', 'ase.calculators.dftd3.DFTD3', config=True)
+    reg('dmol', 'DMol3', 'ase.calculators.dmol.DMol3', config=True)
+    reg('eam', 'EAM', 'ase.calculators.eam.EAM')
     reg('eiqmmmm', 'Explicit interaction QMMM',
         'ase.calculators.qmmm.EIQMMM', wrapper=True)
-    reg('elk', 'ELK',
-        'ase.calculators.elk.ELK', config=True)
-    reg('emt', 'EMT potential',
-        'ase.calculators.emt.EMT')
+    reg('elk', 'ELK', 'ase.calculators.elk.ELK', config=True)
+    reg('emt', 'EMT potential', 'ase.calculators.emt.EMT')
     reg('espresso', 'Quantum Espresso',
-        'ase.calculators.espresso.EspressoTemplate',
-        config=True)
+        'ase.calculators.espresso.EspressoTemplate', config=True)
     reg('exciting', 'Exciting',
-        'ase.calculators.exciting.exciting.'
-        'ExcitingGroundStateTemplate', config=True)
-    reg('ff', 'FF',
-        'ase.calculators.ff.ForceField')
+        'ase.calculators.exciting.exciting.ExcitingGroundStateTemplate',
+        config=True)
+    reg('ff', 'FF', 'ase.calculators.ff.ForceField')
     reg('fd', 'Finite Difference',
-        'ase.calculators.fd.FiniteDifferenceCalculator',
-        wrapper=True)
+        'ase.calculators.fd.FiniteDifferenceCalculator', wrapper=True)
     reg('forceconstant', 'ForceConstantCalculator',
-        'ase.calculators.qmmm.ForceConstantCalculator',
-        wrapper=True)
+        'ase.calculators.qmmm.ForceConstantCalculator', wrapper=True)
     reg('force-qmmmm', 'Force-based QM/MM Calculator',
         'ase.calculators.qmmm.ForceQMMM', wrapper=True)
     reg('gamess_us', 'GAMESS-US',
         'ase.calculators.gamess_us.GAMESSUS', config=True)
     reg('gaussian', 'Gaussian',
         'ase.calculators.gaussian.Gaussian', config=True)
-    reg('gromacs', 'Gromacs',
-        'ase.calculators.gromacs.Gromacs', config=True)
-    reg('gulp', 'GULP',
-        'ase.calculators.gulp.GULP', config=True)
+    reg('gromacs', 'Gromacs', 'ase.calculators.gromacs.Gromacs', config=True)
+    reg('gulp', 'GULP', 'ase.calculators.gulp.GULP', config=True)
     reg('harmonic', 'Harmonic potential',
         'ase.calculators.harmonic.HarmonicCalculator')
-    reg('idealgas', 'Ideal gas (dummy)',
-        'ase.calculators.idealgas.IdealGas')
+    reg('idealgas', 'Ideal gas', 'ase.calculators.idealgas.IdealGas')
     reg('lammpslib', 'Lammps (python library)',
         'ase.calculators.lammpslib.LAMMPSlib', config=True)
     reg('lammpsrun', 'Lammps (external)',
         'ase.calculators.lammpsrun.LAMMPS', config=True)
     reg('linearcombination', 'LinearCombinationCalculator',
-        'ase.calculators.mixing.LinearCombinationCalculator',
-        wrapper=True)
+        'ase.calculators.mixing.LinearCombinationCalculator', wrapper=True)
     reg('lj', 'Lennard–Jones potential',
         'ase.calculators.lj.LennardJones', wrapper=True)
     reg('logging', 'LoggingCalculator',
-        'ase.calculators.loggingcalc.LoggingCalculator',
-        wrapper=True)
+        'ase.calculators.loggingcalc.LoggingCalculator', wrapper=True)
     reg('mixed', 'MixedCalculator',
         'ase.calculators.mixing.MixedCalculator', wrapper=True)
-    reg('mopac', 'MOPAC',
-        'ase.calculators.mopac.MOPAC', config=True)
+    reg('mopac', 'MOPAC', 'ase.calculators.mopac.MOPAC', config=True)
     reg('morse', 'Morse potential', 'ase.calculators.morse.MorsePotential')
-    reg('nwchem', 'NWChem',
-        'ase.calculators.nwchem.NWChem', config=True)
+    reg('nwchem', 'NWChem', 'ase.calculators.nwchem.NWChem', config=True)
     reg('octopus', 'Octopus',
         'ase.calculators.octopus.OctopusTemplate', config=True)
     reg('onetep', 'Onetep',
         'ase.calculators.onetep.OnetepTemplate', config=True)
-    reg('openmx', 'OpenMX',
-        'ase.calculators.openmx.OpenMX', config=True)
-    reg('orca', 'ORCA',
-        'ase.calculators.orca.OrcaTemplate', config=True)
-    reg('plumed', 'Plumed',
-        'ase.calculators.plumed.Plumed', config=True)
+    reg('openmx', 'OpenMX', 'ase.calculators.openmx.OpenMX', config=True)
+    reg('orca', 'ORCA', 'ase.calculators.orca.OrcaTemplate', config=True)
+    reg('plumed', 'Plumed', 'ase.calculators.plumed.Plumed', config=True)
     reg('psi4', 'Psi4', 'ase.calculators.psi4.Psi4', config=True)
     reg('python-subprocess', 'PythonSubProcessCalculator',
         'ase.calculators.subprocesscalculator.PythonSubProcessCalculator',
@@ -255,8 +226,7 @@ def register_codes():
     reg('qchem', 'QChem', 'ase.calculators.qchem.QChem', config=True)
     reg('rescaled', 'Rescaled Calculator',
         'ase.calculators.qmmm.RescaledCalculator', wrapper=True)
-    reg('siesta', 'SIESTA',
-        'ase.calculators.siesta.Siesta', config=True)
+    reg('siesta', 'SIESTA', 'ase.calculators.siesta.Siesta', config=True)
     reg('simple-qmmmm', 'Simple QMMM',
         'ase.calculators.qmmm.SimpleQMMM', wrapper=True)
     reg('singlepoint', 'SinglePoint',
