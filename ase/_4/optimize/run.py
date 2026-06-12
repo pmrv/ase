@@ -64,10 +64,11 @@ class Optimizer:
         # pass the step to run(), which may be awkward.
         # But having self.step is also awkward.
 
-    def run(self, *, steps: int | None = None) -> Step | None:
+    def run(self, *, steps: int | None = None) -> Step:
         for _ in self.irun(steps=steps):
             pass
         # Note: This may take zero steps, but self.step is always non-None
+        assert self.step is not None
         return self.step
 
     def irun(self, *, steps: int | None = None) -> Iterator[Step]:
