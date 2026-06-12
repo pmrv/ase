@@ -1,10 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 import numpy as np
 import scipy
 
 from ase import Atoms
-from ase._4.symopt.relax_print import (
+from ase._4.optimize._symopt.relax_print import (
     pprint_atoms,
     pretty,
     pretty_atomic_dofs,
@@ -13,11 +13,31 @@ from ase._4.symopt.relax_print import (
     pretty_subheader,
 )
 from ase.cell import Cell
+from ase.utils import spglib_new_errorhandling
 from ase.utils.abc import Optimizable
 
 
 def green(text: str) -> str:
     return f'\x1b[32m{text}\x1b[0m'
+
+
+def argsort_rotations(rotations):
+    return sorted(
+        range(len(rotations)),
+        key=lambda i: tuple(rotations[i].reshape(9).tolist()),
+    )
+
+
+def snap_translations_to_zero(translations, tol=1e-13):
+    # spglib may produce translations that are +/- 1e-15, we want those to be 0
+    # It may also produce 1 (+/- 1e-15), and we want those to be zero as well.
+
+    # If a translation is 1, it means a whole lattice vector and that we
+    # can also use 0 instead (no matter the corresponding rotation).
+    cleaned_translations = translations - np.rint(translations)
+    cleaned_translations[abs(cleaned_translations) < tol] = 0.0
+    assert (abs(cleaned_translations) <= 0.5).all()
+    return cleaned_translations
 
 
 def chol_derivative(A, dA):
@@ -84,15 +104,48 @@ def symmetrize_atoms(
     exp(2πi x) to correctly average periodic fractional coordinates.
     """
     ns, na = atommap_sa.shape
-    tmp_Ssym_ac = np.zeros_like(S_ac, dtype=np.complex128)
+    complex_Ssym_ac = np.zeros_like(S_ac, dtype=np.complex128)
     for a in range(na):
         for s in range(ns):
             new = U_scc[s].T @ S_ac[a] - f_sc[s]
-            tmp_Ssym_ac[atommap_sa[s, a]] += np.exp(2j * np.pi * new)
-    Ssym_ac = (np.angle(tmp_Ssym_ac) / (2 * np.pi)) % 1.0 % 1.0
+            complex_Ssym_ac[atommap_sa[s, a]] += np.exp(2j * np.pi * new)
+    Ssym_ac = (np.angle(complex_Ssym_ac) / (2 * np.pi)) % 1.0 % 1.0
     Ssym_ac[np.abs(Ssym_ac) < tol] = 0.0
     Ssym_ac[np.abs(Ssym_ac - 1.0) < tol] = 0.0
     return Ssym_ac
+
+
+def apply_pbc_to_symops(rotations, translations, pbc):
+    """spglib thinks we are a 3d system, but actually we may be 2D/1D.
+
+    spglib will produce symops that involve e.g. a z-flip, but that
+    flips the positions to negative z-values, and we need to apply the
+    full z axis as translation vector in order to map the position back
+    into the cell.
+
+    This function equips such operations with the necessary translations.
+
+    We also do some sanity checking.
+    """
+    translations = translations.copy()
+    assert len(rotations) == len(translations)
+
+    for i in range(3):
+        if pbc[i]:
+            continue
+
+        for s in range(len(rotations)):
+            nonpbc_rot = rotations[s, i, i]
+            assert nonpbc_rot in (-1, 1)
+            nonpbc_op_row = np.zeros(3, int)
+            nonpbc_op_row[i] = nonpbc_rot
+            assert (rotations[s, :, i] == nonpbc_op_row).all()
+            assert (rotations[s, i, :] == nonpbc_op_row).all()
+            if nonpbc_rot == -1:
+                assert abs(translations[s, i]) < 1e-15, translations[s, i]
+                translations[s, i] = 1.0
+
+    return translations
 
 
 @dataclass
@@ -107,36 +160,82 @@ class AtomsSymmetries:
     rotation_scc: np.ndarray
     atommap_sa: np.ndarray
     translation_sc: np.ndarray
-    symmorphic: bool
-    symprec: float
+
+    def __post_init__(self):
+        ns = len(self.rotation_scc)
+        assert self.rotation_scc.shape == (ns, 3, 3)
+        assert len(self.atommap_sa) == ns
+        assert self.translation_sc.shape == (ns, 3)
 
     @classmethod
-    def from_GPAW(cls, atoms, log=None, *, tolerance, symmorphic):
+    def from_spglib_auto(cls, atoms, *, symprec=1e-4):
+        from spglib import get_symmetry_dataset
+
+        dataset = spglib_new_errorhandling(get_symmetry_dataset)(
+            (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
+            symprec=symprec,
+        )
+        return cls.from_spglib(atoms, dataset)
+
+    @classmethod
+    def from_spglib(cls, atoms, dataset):
+        from ase._4.optimize._symopt.atommap import build_atommaps
+
+        args = argsort_rotations(dataset.rotations.transpose(0, 2, 1))
+
+        rotations = dataset.rotations[args]
+        translations = apply_pbc_to_symops(
+            dataset.rotations, dataset.translations, pbc=atoms.pbc
+        )[args]
+        translations = snap_translations_to_zero(translations)
+
+        return cls(
+            rotation_scc=rotations.transpose(0, 2, 1).copy(),
+            translation_sc=-translations,
+            atommap_sa=build_atommaps(
+                atoms.copy(),
+                rotations,
+                translations.copy(),
+            ),
+        )
+
+    @classmethod
+    def from_GPAW(cls, atoms, *, log, tolerance, symmorphic):
         from gpaw.new.symmetry import create_symmetries_object
 
         gpaw_symmetries = create_symmetries_object(
             atoms, tolerance=tolerance, symmorphic=symmorphic
         )
+        args = argsort_rotations(gpaw_symmetries.rotation_scc)
         log(gpaw_symmetries)
-        sym = AtomsSymmetries(
-            gpaw_symmetries.rotation_scc,
-            gpaw_symmetries.atommap_sa,
-            gpaw_symmetries.translation_sc,
-            symmorphic,
-            tolerance,
+        return cls(
+            gpaw_symmetries.rotation_scc[args],
+            gpaw_symmetries.atommap_sa[args],
+            gpaw_symmetries.translation_sc[args],
         )
-        return sym
+
+
+# The symmetry-reduced coordinates for positions and cell
+# have an arbitrary scale.
+#
+# It is nice that both sets of coordinates produce human-friendly
+# numbers of approximately the same magnitude in typical cases.  To
+# this effect, we scale the cell coordinates by this number.  This
+# actually affects the run if there's a specific initial Hessian, step
+# limitation using "maxstep", etc., but any value is in principle
+# valid.
+CELL_COORDINATE_SCALING_FACTOR = 40
 
 
 @dataclass
-class SymmeryAdaptedCellCoordinates:
+class SymmetryAdaptedCellCoordinates:
     """Class for defining symmetry adapted cell coordinates
 
     Note: This is not symmetry adapted cell, it just provides the set of
     generalized coordinates for the symmetry adapted cell.
     To get the cell, call C_cv = get_cell(cell_z).
 
-    sacc = SymmeryAdaptedCellCoordinates(...)
+    sacc = SymmetryAdaptedCellCoordinates(...)
     sacc.get_cell(cell_z), where cell_z is 1D array of the cell coordinates.
 
     Thus, the M_cc and C_cv here is just the origin of the coordinate system.
@@ -244,9 +343,7 @@ class SymmeryAdaptedCellCoordinates:
         return osymC_cv, symC_cv, M_cc, rot_vv
 
     @classmethod
-    def unit_cell_symmetry(
-        cls, C_cv, rotation_scc, pbc_c, units='Å^2', log=None
-    ):
+    def unit_cell_symmetry(cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log):
         pretty(
             C_cv @ C_cv.T, "Cell metric (M_cc' = C_cv C_c'v)", units, log=log
         )
@@ -286,11 +383,12 @@ class SymmeryAdaptedCellCoordinates:
             rows = []
             for k in range(6):
                 row = U_vv @ eps_ijk[:, :, k] @ U_vv.T - eps_ijk[:, :, k]
-                rows.append(row.reshape((9,)))
+                rows.append(row.reshape(9))
             A_blocks.append(np.vstack(rows))
         for c in range(3):
             if not pbc_c[c]:
-                A_blocks.append(e(c, c).reshape((9,)))
+                for cprime in range(3):
+                    A_blocks.append(e(c, cprime).reshape(9))
         A = np.vstack(A_blocks)
         A = A @ eps_ijk.reshape((9, 6))
         # Compute null space via SVD
@@ -321,7 +419,7 @@ class SymmeryAdaptedCellCoordinates:
             eps = 0.5 * (Cinv @ dC + dC.T @ Cinv.T)
 
             dM_zcc[z] /= np.sum(np.abs(eps)) * np.linalg.det(C_cv)
-            dM_zcc[z] *= 40
+            dM_zcc[z] *= CELL_COORDINATE_SCALING_FACTOR
             # Define the direction of the tangent vector such that
             # it increases the volume. Sign cannot be used because of shear
             if np.trace(np.linalg.inv(C_cv) @ dC) < 0:
@@ -348,7 +446,6 @@ class SymmetryAdaptedScaledCoordinates:
         rotation_scc,
         translation_sc,
         atommap_sa,
-        symprec,
         C_cv,
         *,
         log,
@@ -366,10 +463,6 @@ class SymmetryAdaptedScaledCoordinates:
         for a in range(na):
             B_A[(a * 3) : (a * 3 + 3), :] = np.eye(3)
         B_EA = np.vstack([B_EA, B_A.T])
-        # import sympy as sp
-
-        # nullspace = np.array(sp.Matrix(np.array(B_EA,
-        # dtype=int)).nullspace(), dtype=float)
 
         # Make sure the old svd code reproduces the same result
         U, S, Vh = np.linalg.svd(B_EA, False)
@@ -407,9 +500,7 @@ class SymmetryAdaptedScaledCoordinates:
                 :, None, None
             ]
 
-        sasc = SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
-
-        return sasc
+        return SymmetryAdaptedScaledCoordinates(dof_zac, s0_ac)
 
 
 class SymmetryAdaptedAtoms(Optimizable):
@@ -422,38 +513,47 @@ class SymmetryAdaptedAtoms(Optimizable):
     """
 
     def __init__(
-        self, actual_atoms: Atoms, symmetries: AtomsSymmetries, log=print
+        self,
+        actual_atoms: Atoms,
+        symmetries: AtomsSymmetries,
+        log=print,
+        cell_coordinates: SymmetryAdaptedCellCoordinates | None = None,
+        atom_coordinates=None,
+        value_z=None,
     ):
         self.actual_atoms = actual_atoms
         self.symmetries = symmetries
+
+        # XXX remove these attributes:
         self.symmetry_force_violation = np.inf
         self.fmax = 0.01
 
-        pretty_subheader('Symmetry adapted cell coordinates', log)
-        self.cell_coordinates: SymmeryAdaptedCellCoordinates = (
-            SymmeryAdaptedCellCoordinates.build(
+        if cell_coordinates is None:
+            pretty_subheader('Symmetry adapted cell coordinates', log)
+            cell_coordinates = SymmetryAdaptedCellCoordinates.build(
                 self.actual_atoms.cell,
                 self.actual_atoms.pbc,
                 self.symmetries.rotation_scc,
                 log=log,
             )
-        )
 
-        pretty_subheader('Symmetry adapted atomic coordinates', log)
-        self.atom_coordinates = SymmetryAdaptedScaledCoordinates.build(
-            self.actual_atoms.get_scaled_positions(),
-            self.symmetries.rotation_scc,
-            self.symmetries.translation_sc,
-            self.symmetries.atommap_sa,
-            self.symmetries.symprec,
-            self.cell_coordinates.C_cv,
-            log=log,
-        )
-        pretty_atomic_dofs(actual_atoms, self.atom_coordinates.dof_zac, log=log)
+        self.cell_coordinates = cell_coordinates
 
-        assert isinstance(
-            self.atom_coordinates, SymmetryAdaptedScaledCoordinates
-        )
+        if atom_coordinates is None:
+            pretty_subheader('Symmetry adapted atomic coordinates', log)
+            atom_coordinates = SymmetryAdaptedScaledCoordinates.build(
+                self.actual_atoms.get_scaled_positions(),
+                self.symmetries.rotation_scc,
+                self.symmetries.translation_sc,
+                self.symmetries.atommap_sa,
+                self.cell_coordinates.C_cv,
+                log=log,
+            )
+            pretty_atomic_dofs(actual_atoms, atom_coordinates.dof_zac, log=log)
+
+        assert isinstance(atom_coordinates, SymmetryAdaptedScaledCoordinates)
+        self.atom_coordinates = atom_coordinates
+
         # s_ac = dof_zac s_z -> ds_ac/d_sz = dof_zac
         # dR_av / dsz = dR_av / d_sac ds_ac / ds_z
         # R_av = s_ac C_cv
@@ -463,27 +563,68 @@ class SymmetryAdaptedAtoms(Optimizable):
         #
         # self.actual_atoms.wrap()
         # self.actual_atoms.set_scaled_positions(self.S_ac)
-        if 1:
-            log('Skipping sanity checks for now')
-        else:
-            pass
-            # new_positions = atoms.get_positions()
-            # dR_av = new_positions - old_positions
-            # s_ac = np.linalg.solve(self.C_cv, dR_av.T)
-            # assert (
-            #     np.max(np.abs(new_positions.flatten() -
-            #                   old_positions.flatten()))
-            #     < symprec
-            # )
+        # if 1:
+        #     log('Skipping sanity checks for now')
+        # else:
+        #     pass
+        #    # new_positions = atoms.get_positions()
+        #    # dR_av = new_positions - old_positions
+        #    # s_ac = np.linalg.solve(self.C_cv, dR_av.T)
+        #    # assert (
+        #    #     np.max(np.abs(new_positions.flatten() -
+        #    #                   old_positions.flatten()))
+        #    #     < symprec
+        #    # )
 
         self._ndofs_cell = len(self.cell_coordinates.dM_zcc)
         self._ndofs_atoms = len(self.atom_coordinates.dof_zac)
         self._ndofs = self._ndofs_cell + self._ndofs_atoms
 
-        self.value_z = np.zeros((self._ndofs))
+        if value_z is None:
+            value_z = np.zeros((self._ndofs))
+
+        self.value_z = value_z
         # !!! This actually symmetrizes actual atoms
         self.set_x(self.value_z)
         self.actual_atoms.wrap()
+
+    def datafy(self):
+        return {
+            'actual_atoms': self.actual_atoms,
+            'symmetries': asdict(self.symmetries),
+            'value_z': self.value_z,
+            'cell_coordinates': asdict(self.cell_coordinates),
+            'atom_coordinates': asdict(self.atom_coordinates),
+        }
+
+    @classmethod
+    def undatafy(cls, dct, calc):
+        dct = dct.copy()
+        dct['symmetries'] = AtomsSymmetries(**dct['symmetries'])
+        dct['cell_coordinates'] = SymmetryAdaptedCellCoordinates(
+            **dct['cell_coordinates']
+        )
+        dct['atom_coordinates'] = SymmetryAdaptedScaledCoordinates(
+            **dct['atom_coordinates']
+        )
+        dct['actual_atoms'].calc = calc
+        return cls(**dct, log=lambda *args, **kwargs: None)
+
+    @classmethod
+    def from_atoms_spglib(cls, atoms, log=print, *, symprec):
+        symmetries = AtomsSymmetries.from_spglib_auto(atoms, symprec=symprec)
+        return cls(atoms, symmetries, log=log)
+
+    @classmethod
+    def from_spglib_dataset(cls, atoms, dataset, log=print):
+        # XXX This will fail in atommaps if atoms are not exactly symmetrized.
+        # Better to not fail now, but rather wait until after the
+        # symmetrization and then check the atommaps against the
+        # symmetrized atoms with a fine tolerance.
+        #
+        # Here we can only promise ~symprec tolerance.
+        symmetries = AtomsSymmetries.from_spglib(atoms, dataset)
+        return cls(atoms, symmetries, log=log)
 
     @classmethod
     def from_atoms(cls, atoms, log=print, *, symprec, symmorphic):
@@ -506,7 +647,7 @@ class SymmetryAdaptedAtoms(Optimizable):
             S_cc[c, :] = 0.0
             S_cc[:, c] = 0.0
         S_vv = np.linalg.inv(C_cv) @ S_cc @ C_cv
-        return np.max(np.max(np.linalg.norm(S_vv)))
+        return np.linalg.norm(S_vv)
 
     # Properties for internal degrees of freedom
     @property
@@ -528,34 +669,7 @@ class SymmetryAdaptedAtoms(Optimizable):
             self.atom_coordinates.get_scaled_coordinates(self.atoms_z)
         )
 
-    def get_gradient(self):
-        grad_z = np.zeros(self._ndofs_cell)
-        S_vv = self.actual_atoms.get_stress(voigt=False)
-        C_cv = self.cell_coordinates.get_cell(self.cell_z)
-        V = np.linalg.det(C_cv)
-        Cinv = np.linalg.inv(C_cv)
-
-        M_cc = self.cell_coordinates.get_M_cc(self.cell_z)
-
-        # TODO: Move to SymmetryAdaptedCellCoordinates
-        # dE/deps_vv deps_vv/dC_cv dC_cv/dz
-
-        ncellz = len(self.cell_coordinates.dM_zcc)
-        for z in range(ncellz):
-            dC_cv = (
-                chol_derivative(M_cc, self.cell_coordinates.dM_zcc[z])
-                @ self.cell_coordinates.rot_vv.T
-            )
-            grad_z[z] = V * np.sum(S_vv * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2)
-
-        F_av = self.actual_atoms.get_forces()
-        # dE/ds_z = dE/dR_av dR_av/ds_ac ds_ac/ds_z
-        # R_av = ds_ac C_cv
-        # ds_ac = self.dof_zac S_z
-        atoms_grad_z = -np.einsum(
-            'av,cv,zac->z', F_av, C_cv, self.atom_coordinates.dof_zac
-        )
-
+    def get_Fback_av(self, F_av, C_cv, atoms_grad_z):
         natomz = len(self.atom_coordinates.dof_zac)
         # For sanity check, we want to project the atomic gradient back
         # minimizing the Cartesian metrix.
@@ -570,20 +684,89 @@ class SymmetryAdaptedAtoms(Optimizable):
             # Even if there is degrees of freedom, it is possible to
             # get symmetry violation
             back_Fav = np.zeros_like(F_av)
+        return back_Fav
+
+    def get_Sback_vv(self, S_vv, A_zV, grad_z):
+        ncellz = len(A_zV)
+        if ncellz > 0:
+            return (A_zV.T @ np.linalg.inv(A_zV @ A_zV.T) @ grad_z).reshape(
+                (3, 3)
+            )
+
+        # Even if there are no cell degrees of freedom, the stress can
+        # still violate the imposed symmetry in Cartesian space.
+        return np.zeros((3, 3))
+
+    def _get_gradient(self, fmax, smax):
+        grad_z = np.zeros(self._ndofs_cell)
+        S_vv = self.actual_atoms.get_stress(voigt=False)
+        C_cv = self.cell_coordinates.get_cell(self.cell_z)
+        V = np.linalg.det(C_cv)
+        Cinv = np.linalg.inv(C_cv)
+
+        M_cc = self.cell_coordinates.get_M_cc(self.cell_z)
+
+        # TODO: Move to SymmetryAdaptedCellCoordinates
+        # dE/deps_vv deps_vv/dC_cv dC_cv/dz
+
+        ncellz = len(self.cell_coordinates.dM_zcc)
+        A_zV = np.zeros((ncellz, 9))
+        for z in range(ncellz):
+            dC_cv = (
+                chol_derivative(M_cc, self.cell_coordinates.dM_zcc[z])
+                @ self.cell_coordinates.rot_vv.T
+            )
+            A_zV[z] = (V * (Cinv @ dC_cv + dC_cv.T @ Cinv.T) / 2).reshape(9)
+
+        grad_z[:] = np.dot(A_zV, S_vv.reshape(9))
+        back_Svv = self.get_Sback_vv(S_vv, A_zV, grad_z)
+
+        def get_mask_3x3(pbc):
+            from ase._4.optimize.frechet import default_mask
+            from ase.stress import voigt_6_to_full_3x3_stress
+
+            mask_6 = default_mask(pbc)
+            return voigt_6_to_full_3x3_stress(mask_6)
+
+        mask_3x3 = get_mask_3x3(self.actual_atoms.pbc)
+
+        dS_vv = S_vv * mask_3x3 - back_Svv
+        symmetry_stress_violation = np.linalg.norm(dS_vv)
+
+        if symmetry_stress_violation > smax:
+            import warnings
+
+            warnings.warn(
+                'Warning!!! Back projection of symmetry adapted '
+                'stresses to Cartesian space failed by '
+                f'{symmetry_stress_violation:7.13f}\n'
+                f'Cartesian stress:\n{S_vv * mask_3x3}\n'
+                f'Back projected stress:\n{back_Svv}'
+            )
+
+        F_av = self.actual_atoms.get_forces()
+        # dE/ds_z = dE/dR_av dR_av/ds_ac ds_ac/ds_z
+        # R_av = ds_ac C_cv
+        # ds_ac = self.dof_zac S_z
+
+        atoms_grad_z = -np.einsum(
+            'av,cv,zac->z', F_av, C_cv, self.atom_coordinates.dof_zac
+        )
+
+        back_Fav = self.get_Fback_av(F_av, C_cv, atoms_grad_z)
 
         dF_av = F_av - back_Fav
-        dF = np.max(np.linalg.norm(dF_av, axis=1))
-        self.symmetry_force_violation = dF
-        self.back_Fav = back_Fav
+        symmetry_force_violation = np.max(np.linalg.norm(dF_av, axis=1))
 
-        if dF > self.fmax / 20:
+        if symmetry_force_violation > fmax / 20:
             # Should probably be logged somehow instead of being a warning
             # as such.  This may happen if the code's forces are noisy.
             import warnings
 
             warning_chunks = [
                 'Warning!!! Back projection of symmetry adapted'
-                f' forces to Cartesian space failed by {dF:7.13f}\n'
+                ' forces to Cartesian space failed by '
+                f'{symmetry_force_violation:7.13f}\n'
                 'atom Obtained force           Back projected force'
             ]
 
@@ -595,7 +778,29 @@ class SymmetryAdaptedAtoms(Optimizable):
 
             warnings.warn('\n'.join(warning_chunks))
 
-        return np.hstack([grad_z, atoms_grad_z])
+        converged = self._converged(back_Fav, fmax, back_Svv, smax)
+
+        from ase._4.optimize.symopt import SymGradient
+
+        return SymGradient(
+            gradient=np.hstack([grad_z, atoms_grad_z]),
+            backF_av=back_Fav,
+            backS_vv=back_Svv,
+            symmetry_force_violation=symmetry_force_violation,
+            symmetry_stress_violation=symmetry_stress_violation,
+            converged=converged,
+            fnorm=self._fnorm(back_Fav),
+            snorm=self._snorm(back_Svv),
+            volume=self.actual_atoms.cell.volume,
+        )
+
+    def get_gradient(self):
+        grad_obj = self._get_gradient(fmax=self.fmax, smax=self.smax)
+        self.back_Fav = grad_obj.backF_av
+        self.back_Svv = grad_obj.backS_vv
+        self.symmetry_force_violation = grad_obj.symmetry_force_violation
+        self.symmetry_stress_violation = grad_obj.symmetry_stress_violation
+        return grad_obj.gradient
 
     def gradient_norm(self, grad_z):
         # Go actually to cell metric
@@ -610,12 +815,92 @@ class SymmetryAdaptedAtoms(Optimizable):
     def converged(self, gradient, fmax):
         # Convergence needs to be from the back projected forces.
         # The symmetry violating forces will never converge.
-        Fconv = np.max(np.linalg.norm(self.back_Fav, axis=1))
-        return Fconv < self.fmax and self.stress_conv < self.smax
+        return self._converged(
+            backF_av=self.back_Fav,
+            fmax=self.fmax,
+            smax=self.smax,
+            backS_av=self.stress_conv,
+        )  # XXX use backS_av
+
+    def _fnorm(self, backF_av):
+        return np.max(np.linalg.norm(backF_av, axis=1))
+
+    def _snorm(self, backS_av):
+        return abs(backS_av).max()
+
+    def _converged(self, backF_av, fmax, backS_av, smax):
+        Fconv = self._fnorm(backF_av)
+        return Fconv < fmax and self._snorm(backS_av) < smax
 
     @property
     def atoms_z(self):
         return self.get_x()[self._ndofs_cell :]
+
+    def logheaders(self):
+        dtitles = '    '.join([f'q{i:02d}' for i in range(len(self.atoms_z))])
+        return (
+            f'iter  time     E           maxF   maxS     maxG   a1    a2'
+            f'    a3    L1      L2       L3     {dtitles}'
+            '   log_10 viol. (F / S)'
+        )
+
+    def step_to_string(self, i, fmax, smax, gradient_obj):
+        import time
+
+        tstr = time.strftime('%H:%M:%S')
+        E = self.actual_atoms.get_potential_energy()
+        g = gradient_obj.gradient  # XXX clean up
+        Fmax = gradient_obj.fnorm
+        sFmax = f'{Fmax:7.3f}'
+
+        if Fmax < fmax:
+            sFmax = green(sFmax)
+
+        Smax = gradient_obj.snorm
+        sSmax = f'{Smax:7.4f}'
+        if Smax < smax:
+            sSmax = green(sSmax)
+
+        gmax = np.max(np.abs(g))
+
+        cell = self.actual_atoms.cell
+        a = cell.angles()
+        l = cell.lengths()
+        cell = f'{a[0]:5.1f} {a[1]:5.1f} {a[2]:5.1f} '
+        cell += f'{l[0]:7.3f} {l[1]:7.3f} {l[2]:7.3f}'
+
+        dofs = ''
+        for Z in self.atoms_z:
+            dofs += f' {Z:6.3f}'
+        if gradient_obj.symmetry_force_violation:
+            syviol = np.log10(gradient_obj.symmetry_force_violation)
+        else:
+            syviol = -np.inf
+        symviol = f'{syviol:4.1f}'
+        if syviol < fmax:
+            symviol = green(symviol)
+        if gradient_obj.symmetry_stress_violation:
+            syviol2 = np.log10(gradient_obj.symmetry_stress_violation)
+        else:
+            syviol2 = -np.inf
+        symviol2 = f'{syviol2:4.1f}'
+        if syviol2 < smax:
+            symviol2 = green(symviol2)
+        return (
+            f'{i:5d} {tstr} {E:9.5f} {sFmax} {sSmax} {gmax:7.3f}'
+            f' {cell}{dofs} {symviol} {symviol2}'
+        )
+
+
+def print_headers(atoms, log):
+    pretty_header('Symmetry adapted Cell and Atomic Relaxation', log)
+    pretty_subheader('Original atoms', log)
+    pprint_atoms(atoms, log)
+
+
+def print_symmetrized_atoms(atoms, log):
+    pretty_subheader('Symmetrized atoms', log)
+    pprint_atoms(atoms, log)
 
 
 class Relax:
@@ -632,6 +917,7 @@ class Relax:
         optimizer_factory,
         symprec,
         comm,
+        atoms_symmetries=None,
     ):
         self.comm = comm
         self.logfile = logfile
@@ -646,14 +932,41 @@ class Relax:
 
         self.symprec = symprec
 
-        pretty_header('Symmetry adapted Cell and Atomic Relaxation', self.log)
-        pretty_subheader('Original atoms', self.log)
         self.original_atoms = atoms.copy()
-        pprint_atoms(self.original_atoms, self.log)
+        print_headers(atoms, self.log)
 
         self.atoms = atoms
-        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms.from_atoms(
-            self.atoms, log=self.log, symmorphic=False, symprec=symprec
+        if atoms_symmetries is None:
+            atoms_symmetries1 = AtomsSymmetries.from_spglib_auto(
+                self.atoms, symprec=symprec
+            )
+            atoms_symmetries2 = AtomsSymmetries.from_GPAW(
+                self.atoms,
+                tolerance=symprec,
+                symmorphic=symmorphic,
+                log=self.log,
+            )
+
+            assert len(atoms_symmetries1.rotation_scc) == len(
+                atoms_symmetries2.rotation_scc
+            )
+
+            for rot1, rot2 in zip(
+                atoms_symmetries1.rotation_scc, atoms_symmetries2.rotation_scc
+            ):
+                assert (rot1.ravel() == rot2.ravel()).all()
+
+            # for T1, T2 in zip(
+            #    atoms_symmetries1.translation_sc,
+            #    atoms_symmetries2.translation_sc,
+            # ):
+            #    err = abs(T2 - T1).max()
+            #    assert err < 1e-13, err
+
+            atoms_symmetries = atoms_symmetries1
+
+        self.symmetry_adapted_atoms = SymmetryAdaptedAtoms(
+            self.atoms, atoms_symmetries
         )
 
         # Now, with cell and atoms symmetrized,
@@ -662,8 +975,9 @@ class Relax:
         self.calc = calc
         self.symmetry_adapted_atoms.actual_atoms.calc = calc()
 
-        pretty_subheader('Symmetrized atoms', self.log)
-        pprint_atoms(self.symmetry_adapted_atoms.actual_atoms, self.log)
+        print_symmetrized_atoms(
+            self.symmetry_adapted_atoms.actual_atoms, self.log
+        )
 
         self.optimizer_factory = optimizer_factory
         self.optimizer = self.optimizer_factory(self.symmetry_adapted_atoms)
@@ -684,57 +998,18 @@ class Relax:
         self.smax = smax
         self.fmax = fmax
         self.maxiter = steps
-        i = 0
-        dtitles = '    '.join(
-            [
-                f'q{i:02d}'
-                for i in range(len(self.symmetry_adapted_atoms.atoms_z))
-            ]
-        )
-        self.log(
-            f'iter  time     E           maxF   maxS     maxG   a1    a2'
-            f'    a3    L1      L2       L3     {dtitles}   log_10 viol.'
-        )
-        for _ in self.optimizer.irun(fmax=fmax):
-            import time
 
-            T = time.localtime()
-            tstr = '%02d:%02d:%02d' % (T[3], T[4], T[5])
-            E = self.symmetry_adapted_atoms.actual_atoms.get_potential_energy()
-            F = self.symmetry_adapted_atoms.back_Fav  # get_forces()
-            g = self.symmetry_adapted_atoms.get_gradient()
-            Fmax = np.max(np.linalg.norm(F, axis=1))
-            sFmax = f'{Fmax:7.3f}'
-            if Fmax < self.fmax:
-                sFmax = green(sFmax)
+        self.log(self.symmetry_adapted_atoms.logheaders())
 
-            Smax = self.symmetry_adapted_atoms.stress_conv
-            sSmax = f'{Smax:7.4f}'
-            if Smax < self.smax:
-                sSmax = green(sSmax)
-
-            gmax = np.max(np.abs(g))
-
-            cell = self.symmetry_adapted_atoms.actual_atoms.cell
-            a = cell.angles()
-            l = cell.lengths()
-            cell = f'{a[0]:5.1f} {a[1]:5.1f} {a[2]:5.1f} '
-            cell += f'{l[0]:7.3f} {l[1]:7.3f} {l[2]:7.3f}'
-
-            dofs = ''
-            for Z in self.symmetry_adapted_atoms.atoms_z:
-                dofs += f' {Z:6.3f}'
-            syviol = np.log10(
-                self.symmetry_adapted_atoms.symmetry_force_violation
+        for i, _ in enumerate(self.optimizer.irun(fmax=fmax)):
+            gradient_obj = self.symmetry_adapted_atoms._get_gradient(
+                fmax=fmax, smax=smax
             )
-            symviol = f'{syviol:4.1f}'
-            if syviol < self.fmax:
-                symviol = green(symviol)
-            self.log(
-                f'{i:5d} {tstr} {E:9.5f} {sFmax} {sSmax} {gmax:7.3f}'
-                f' {cell}{dofs} {symviol}'
+            line = self.symmetry_adapted_atoms.step_to_string(
+                i, self.fmax, self.smax, gradient_obj
             )
-            i += 1
+            self.log(line)
+
             if i > self.maxiter or i > 40:
                 self.log(f'Not converged in {self.maxiter} or 40 steps.')
                 return False
@@ -744,10 +1019,10 @@ class Relax:
     def visualize_modes(self):
         from ase.io.trajectory import Trajectory
 
-        traj = Trajectory('modes.traj', 'w')
-        for z in range(self.ndofs()):
-            x = np.zeros((self.ndofs(),))
-            for i in np.arange(0, 6 * np.pi, 0.1):
-                x[z] = np.sin(i) * 0.004
-                self.set_x(x)
-                traj.write(self.atoms.copy())
+        with Trajectory('modes.traj', 'w') as traj:
+            for z in range(self.ndofs()):
+                x = np.zeros((self.ndofs(),))
+                for i in np.arange(0, 6 * np.pi, 0.1):
+                    x[z] = np.sin(i) * 0.004
+                    self.set_x(x)
+                    traj.write(self.atoms.copy())

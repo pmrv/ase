@@ -8,9 +8,28 @@ from typing import Any, Iterator
 import numpy as np
 
 from ase import Atoms
+from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
 from ase.parallel import world
+
+
+def toplevel_header(target, method):
+    import datetime
+
+    now = datetime.datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    # Log initialization
+    # Log fmax/smax if known?
+    # Allow each object to write description of itself
+
+    return (
+        f'{ase_version_info()}\n'
+        f"Optimizing '{target.__class__.__name__}' "
+        f'using method {method.methodname!r} '
+        f'starting {timestamp}\n\n'
+    )
 
 
 class Target:
@@ -91,7 +110,12 @@ class Optimizer:
         return self.step
 
     def irun(self, *, steps: int | None = None) -> Iterator[Step]:
+        self.log.write(toplevel_header(self.target, self.method))
         if self.step is None:
+            # XXX does not allow the method to write anything.
+            if hasattr(self.target, 'log_headers'):
+                self.log.write(self.target.log_headers())
+                self.log.write('\n')
             self.step = Step.start(self.target)
             self._writefiles(self.step)
             yield self.step
@@ -113,8 +137,16 @@ class Optimizer:
             self._writefiles(self.step)
             yield self.step
 
+        self.log.write(f'\nOptimization ended with step {self.step.i}.')
+
     def _writefiles(self, step):
-        write_to_log(self.method, self.log, self.step)
+        # XXX Also need to pass method, at least.
+        # Or maybe method should log to a separate line.
+        if hasattr(self.target, 'step_to_string'):
+            self.log.write(self.target.step_to_string(step))
+            self.log.write('\n')
+        else:
+            write_to_log(self.method, self.log, self.step)
         if self.trajectory is not None:
             write_to_traj(self.target, self.trajectory, self.comm)
         if self.restartfile is not None and self.comm.rank == 0:
@@ -122,6 +154,17 @@ class Optimizer:
 
     @classmethod
     def restart(cls, restartfile, calc, **kwargs):
+        # We need these read behaviours:
+        #  * Start from scratch
+        #  * Read this file
+        #  * Read this file if it exists, else start from scratch
+        #
+        # ... and these write behaviours:
+        #
+        #  * Do not write
+        #  * Write to this file
+        #  * Write to file we restarted from
+
         # Since this method has "calc", it doesn't really belong on this
         # class (we know about Targets etc. but not calcs).
         # Maybe therefore this should be a standalone function.
@@ -244,6 +287,7 @@ def write_restartfile(restartfile, method, target, step):
 
 
 def read_restartfile(restartfile, calc):
+    restartfile = Path(restartfile)
     json_text = restartfile.read_text()
     dct = json.loads(json_text, object_hook=object_hook)
 
@@ -256,14 +300,18 @@ def read_restartfile(restartfile, calc):
 
         method = BFGSMethod.undatafy(method_data)
     else:
-        raise ValueError(f'No such method: {method_iotype}')
+        raise ValueError(f'No such method: {method_iotype!r}')
 
     if target_iotype == 'frechet':
         from ase._4.optimize.frechet import FrechetTarget
 
         target = FrechetTarget.undatafy(target_dct, calc)
+    elif target_iotype == 'symopt':
+        from ase._4.optimize.symopt import SymOpt
+
+        target = SymOpt.undatafy(target_dct, calc)
     else:
-        raise ValueError(f'No such target: {target_iotype}')
+        raise ValueError(f'No such target: {target_iotype!r}')
 
     gradient_obj = target.undatafy_gradient(dct['step']['gradient_obj'])
     step = Step.undatafy(dct['step'], gradient_obj)
