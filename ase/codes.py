@@ -19,6 +19,7 @@ class CodeMetadata:
     longname: str
     modulename: str
     classname: str
+    uses_config: bool = True
 
     def calculator_class(self):
         from importlib import import_module
@@ -27,15 +28,15 @@ class CodeMetadata:
         return cls
 
     @classmethod
-    def define_code(cls, name, longname, importpath):
+    def define_code(cls, name, longname, importpath, uses_config=True):
         modulename, classname = importpath.rsplit('.', 1)
-        return cls(name, longname, modulename, classname)
+        return cls(
+            name, longname, modulename, classname, uses_config=uses_config)
 
     def _description(self):
         yield f'Name:     {self.longname}'
         yield f'Import:   {self.modulename}.{self.classname}'
         yield f'Type:     {self.calculator_type()}'
-        yield ''
         yield from self._config_description()
 
     def description(self, indent=''):
@@ -94,6 +95,11 @@ class CodeMetadata:
         from ase.calculators.genericfileio import BadConfiguration
         from ase.config import cfg
 
+        if not self.uses_config:
+            return
+
+        yield ''
+
         parser = cfg.parser
         if self.name not in parser:
             yield f'Not configured: No [{self.name}] section in configuration'
@@ -122,56 +128,76 @@ def register_codes():
 
     codes = {}
 
-    def reg(name, *args):
-        code = CodeMetadata.define_code(name, *args)
+    def reg(name, *args, **kwargs):
+        code = CodeMetadata.define_code(name, *args, **kwargs)
         codes[name] = code
 
     reg('abinit', 'Abinit', 'ase.calculators.abinit.AbinitTemplate')
     reg('ace', 'ACE molecule', 'ase.calculators.acemolecule.ACE')
-    # internal: reg('acn', 'ACN force field', 'ase.calculators.acn.ACN')
+    reg('acn', 'ACN force field', 'ase.calculators.acn.ACN', uses_config=False)
     reg('aims', 'FHI-Aims', 'ase.calculators.aims.AimsTemplate')
     reg('amber', 'Amber', 'ase.calculators.amber.Amber')
+    reg('average', 'AverageCalculator (wrapper)',
+        'ase.calculators.mixing.AverageCalculator', uses_config=False)
     reg('castep', 'Castep', 'ase.calculators.castep.Castep')
-    # internal: combine_mm
-    # internal: counterions
+    reg('checkpoint', 'CheckpointCalculator (wrapper)',
+        'ase.calculators.checkpoint.CheckpointCalculator', uses_config=False)
+    reg('combine_mm', 'CombineMM (wrapper)',
+        'ase.calculators.combine_mm.CombineMM', uses_config=False)
+    reg('counterion', 'AtomicCounterIon',
+        'ase.calculators.counterions.AtomicCounterIon', uses_config=False)
     reg('cp2k', 'CP2K', 'ase.calculators.cp2k.CP2K')
     reg('crystal', 'CRYSTAL', 'ase.calculators.crystal.CRYSTAL')
     reg('demon', 'deMon', 'ase.calculators.demon.Demon')
     reg('demonnano', 'deMon-nano', 'ase.calculators.demonnano.DemonNano')
     reg('dftb', 'DFTB+', 'ase.calculators.dftb.Dftb')
     reg('dftd3', 'DFT-D3', 'ase.calculators.dftd3.DFTD3')
-    # reg('dftd3-pure', 'DFT-D3 (pure)', 'ase.calculators.dftd3.puredftd3')
+    # Implementation detail, best not advertised directly
+    # reg('dftd3-pure', 'DFT-D3 (pure)', 'ase.calculators.dftd3.PureDFTD3')
     reg('dmol', 'DMol3', 'ase.calculators.dmol.DMol3')
-    # internal: reg('eam', 'EAM', 'ase.calculators.eam.EAM')
+    reg('eam', 'EAM', 'ase.calculators.eam.EAM', uses_config=False)
+    reg('eiqmmmm', 'Explicit interaction QMMM (wrapper)',
+        'ase.calculators.qmmm.EIQMMM', uses_config=False)
     reg('elk', 'ELK', 'ase.calculators.elk.ELK')
-    # internal: reg('emt', 'EMT potential', 'ase.calculators.emt.EMT')
+    reg('emt', 'EMT potential', 'ase.calculators.emt.EMT', uses_config=False)
     reg('espresso', 'Quantum Espresso',
         'ase.calculators.espresso.EspressoTemplate')
     reg('exciting', 'Exciting',
         'ase.calculators.exciting.exciting.ExcitingGroundStateTemplate')
-    # internal: reg('ff', 'FF', 'ase.calculators.ff.ForceField')
+    reg('ff', 'FF', 'ase.calculators.ff.ForceField', uses_config=False)
+    reg('fd', 'Finite Difference (wrapper)',
+        'ase.calculators.fd.FiniteDifferenceCalculator', uses_config=False)
     # fleur <- external nowadays
+    reg('forceconstant', 'ForceConstantCalculator',
+        'ase.calculators.qmmm.ForceConstantCalculator', uses_config=False)
+    reg('force-qmmmm', 'Force-based QM/MM Calculator (wrapper)',
+        'ase.calculators.qmmm.ForceQMMM', uses_config=False)
     reg('gamess_us', 'GAMESS-US', 'ase.calculators.gamess_us.GAMESSUS')
     reg('gaussian', 'Gaussian', 'ase.calculators.gaussian.Gaussian')
     reg('gromacs', 'Gromacs', 'ase.calculators.gromacs.Gromacs')
     reg('gulp', 'GULP', 'ase.calculators.gulp.GULP')
     # h2morse.py do we need a specific H2 morse calculator when we have morse??
-    # internal: reg('harmonic', 'Harmonic potential',
-    #  'ase.calculators.harmonic.HarmonicCalculator')
-    # internal: reg('idealgas', 'Ideal gas (dummy)',
-    #             'ase.calculators.idealgas.IdealGas')
+    reg('harmonic', 'Harmonic potential',
+        'ase.calculators.harmonic.HarmonicCalculator', uses_config=False)
+    reg('idealgas', 'Ideal gas (dummy)',
+        'ase.calculators.idealgas.IdealGas', uses_config=False)
     # XXX cannot import without kimpy installed, fixme:
     # reg('kim', 'OpenKIM', 'ase.calculators.kim.kim.KIM')
     reg('lammpslib', 'Lammps (python library)',
         'ase.calculators.lammpslib.LAMMPSlib')
     reg('lammpsrun', 'Lammps (external)', 'ase.calculators.lammpsrun.LAMMPS')
-    # internal: reg('lj', 'Lennard–Jones potential',
-    #             'ase.calculators.lj.LennardJones')
-    # internal: loggingcalc.py
-    # internal: mixing.py
+    reg('linearcombination', 'LinearCombinationCalculator (wrapper)',
+        'ase.calculators.mixing.LinearCombinationCalculator',
+        uses_config=False)
+    reg('lj', 'Lennard–Jones potential', 'ase.calculators.lj.LennardJones',
+        uses_config=False)
+    reg('logging', 'LoggingCalculator (wrapper)',
+        'ase.calculators.loggingcalc.LoggingCalculator', uses_config=False)
+    reg('mixed', 'MixedCalculator (wrapper)',
+        'ase.calculators.mixing.MixedCalculator', uses_config=False)
     reg('mopac', 'MOPAC', 'ase.calculators.mopac.MOPAC')
-    # internal: reg('morse', 'Morse potential',
-    # 'ase.calculators.morse.MorsePotential')
+    reg('morse', 'Morse potential', 'ase.calculators.morse.MorsePotential',
+        uses_config=False)
     reg('nwchem', 'NWChem', 'ase.calculators.nwchem.NWChem')
     reg('octopus', 'Octopus', 'ase.calculators.octopus.OctopusTemplate')
     reg('onetep', 'Onetep', 'ase.calculators.onetep.OnetepTemplate')
@@ -179,15 +205,34 @@ def register_codes():
     reg('orca', 'ORCA', 'ase.calculators.orca.OrcaTemplate')
     reg('plumed', 'Plumed', 'ase.calculators.plumed.Plumed')
     reg('psi4', 'Psi4', 'ase.calculators.psi4.Psi4')
+    reg('python-subprocess', 'PythonSubProcessCalculator',
+        'ase.calculators.subprocesscalculator.PythonSubProcessCalculator',
+        uses_config=False)
     reg('qchem', 'QChem', 'ase.calculators.qchem.QChem')
-    # internal: qmmm.py
+    reg('rescaled', 'Rescaled Calculator (wrapper)',
+        'ase.calculators.qmmm.RescaledCalculator', uses_config=False)
     reg('siesta', 'SIESTA', 'ase.calculators.siesta.Siesta')
+    reg('simple-qmmmm', 'Simple QMMM (wrapper)',
+        'ase.calculators.qmmm.SimpleQMMM', uses_config=False)
+    reg('singlepoint', 'SinglePoint',
+        'ase.calculators.singlepoint.SinglePointCalculator', uses_config=False)
+    reg('singlepoint-dft', 'SinglePointDFTCalculator',
+        'ase.calculators.singlepoint.SinglePointDFTCalculator',
+        uses_config=False)
+    reg('socketio', 'SocketIOCalculator (wrapper)',
+        'ase.calculators.socketio.SocketIOCalculator', uses_config=False)
+    reg('spring', 'Spring Calculator',
+        'ase.calculators.harmonic.SpringCalculator', uses_config=False)
+    reg('sum', 'jsumCalculator (wrapper)',
+        'ase.calculators.mixing.SumCalculator', uses_config=False)
+    reg('tersoff', 'Tersoff potential',
+        'ase.calculators.tersoff.Tersoff', uses_config=False)
     # internal: test.py
-    # internal: reg('tip3p', 'TIP3P', 'ase.calculators.tip3p.TIP3P')
-    # internal: reg('tip4p', 'TIP4P', 'ase.calculators.tip4p.TIP4P')
+    reg('tip3p', 'TIP3P', 'ase.calculators.tip3p.TIP3P', uses_config=False)
+    reg('tip4p', 'TIP4P', 'ase.calculators.tip4p.TIP4P', uses_config=False)
     reg('turbomole', 'Turbomole', 'ase.calculators.turbomole.Turbomole')
     reg('vasp', 'VASP', 'ase.calculators.vasp.Vasp')
-    # internal: vdwcorrection
+    # internal: vdwcorrection  # This only really works with GPAW, could move?
     return codes
 
 
