@@ -194,7 +194,7 @@ def register_codes():
     reg('fd', 'Finite Difference',
         'ase.calculators.fd.FiniteDifferenceCalculator', is_wrapper=True)
     reg('forceconstant', 'ForceConstantCalculator',
-        'ase.calculators.qmmm.ForceConstantCalculator', is_wrapper=True)
+        'ase.calculators.qmmm.ForceConstantCalculator')
     reg('force-qmmmm', 'Force-based QM/MM Calculator',
         'ase.calculators.qmmm.ForceQMMM', is_wrapper=True)
     reg('gamess_us', 'GAMESS-US',
