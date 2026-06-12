@@ -461,6 +461,40 @@ F('qbox', 'QBOX output file', '+F',
   magic=b'*:simulation xmlns:')
 F('res', 'SHELX format', '1S', ext='shelx')
 F('rmc6f', 'RMCProfile', '1S', ext='rmc6f')
+
+# Regex for floating-point numbers (integers, decimals, scientific notation)
+float_re = br'[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?'
+# Regex for catching element symbols
+element_re = br'\b[A-Z][a-z]{0,1}\b'
+# Regex for comment lines: starts with #, !, or 'comment', safely reads to end
+# of line
+comment_re = br'^[ \t]*(?:[#!]|comment)[^\r\n]*\r?\n'
+# Regex for a lattice line
+lattice_re = br'^[ \t]*lattice(?:[ \t]+' + float_re + br'){3}[ \t]*\r?\n'
+
+F(
+    name='runnerdata',
+    desc='RuNNer input.data file',
+    code='+F',
+    module='runner',
+    ext='data',
+     # ?x turns on re.VERBOSE for this string (ignore whitespace and comments)
+    magic_regex=br"""(?x)
+        # Optional comment lines before the first 'begin'
+        (?:""" + comment_re + br""")*
+        # Start of line: 'begin'
+        ^begin
+        # Optional properties, mandatory start with position(3) element
+        (?:[ \t]+position\(3\)[ \t]+element(?:[ \t]+\S+)*)?
+        # End of the begin line (handles Windows & Unix)
+        [ \t]*\r?\n
+        # 0 or more lattice lines OR comment lines intermixed
+        (?:""" + comment_re + br"""|""" + lattice_re + br""")*
+        # At least 1 atom line
+        ^[ \t]*atom(?:[ \t]+""" + float_re + br"""){3}[ \t]+"""
+        + element_re + br"""
+        """
+)
 F('sdf', 'SDF format', '1F')
 F('siesta-xv', 'Siesta .XV file', '1F',
   glob='*.XV', module='siesta')
