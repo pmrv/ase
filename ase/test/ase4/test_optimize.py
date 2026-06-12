@@ -85,9 +85,6 @@ def test_optimizer(algorithm_name: str) -> None:
     opt4 = Optimizer(target, method)
     step = opt4.run()
 
-    if step is None:
-        raise RuntimeError
-
     assert step.gradient_obj.converged
 
     assert opt3_i == 10
@@ -122,9 +119,6 @@ def test_new_optimizer_frechet(algorithm_name: str) -> None:
     method = _make_algorithm_ase4(target, algorithm_name)
     opt = Optimizer(target, method)
     step = opt.run()
-
-    if step is None:
-        raise RuntimeError
 
     assert step.gradient_obj.converged
     assert step.i == 18
@@ -162,9 +156,6 @@ def test_restart(tmp_path, algorithm_name) -> None:
     write_restartfile(halfway, opt.method, opt.target, opt.step)
 
     step = opt.run()
-
-    if step is None:
-        raise RuntimeError
 
     ref = pytest.approx(0.837190)
     gradient_obj = step.gradient_obj
