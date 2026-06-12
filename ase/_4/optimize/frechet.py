@@ -8,9 +8,9 @@ from scipy.sparse import block_diag, coo_array
 
 from ase import Atoms
 from ase._4.optimize.cellutil import CellUtility
-from ase._4.optimize.target import (
-    BaseTarget,
+from ase._4.optimize.optimizable import (
     ForceGradient,
+    Optimizable4,
     get_maxforce,
     initial_inverse_position_hessian,
     initial_position_hessian,
@@ -103,7 +103,7 @@ def default_mask(pbc) -> np.ndarray:
     return mask
 
 
-class FrechetTarget(BaseTarget):
+class FrechetOptimizable(Optimizable4):
     iotype = 'frechet'
 
     def __init__(
@@ -141,7 +141,7 @@ class FrechetTarget(BaseTarget):
         }
 
     @classmethod
-    def undatafy(cls, dct: dict, calc) -> FrechetTarget:
+    def undatafy(cls, dct: dict, calc) -> FrechetOptimizable:
         # XXX Here we depend directly on calculator since it's the only thing
         # we don't know how to restore.
         atoms = dct['atoms'].copy()

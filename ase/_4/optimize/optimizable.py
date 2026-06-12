@@ -7,8 +7,8 @@ import numpy as np
 from scipy.sparse import coo_array
 
 from ase import Atoms
-from ase.optimize.optimize import OptimizableAtoms
-from ase.utils.abc import Optimizable
+from ase.optimize.optimize import OptimizableAtoms as OptimizableAtoms3
+from ase.utils.abc import Optimizable as Optimizable3
 
 
 @dataclass
@@ -22,9 +22,9 @@ class ForceGradient:
         return {'fmax': self.fnorm}
 
 
-class BaseTarget(ABC):
+class Optimizable4(ABC):
     def __init__(self, *args, **kwargs) -> None:
-        self.optimizable: Optimizable
+        self.optimizable: Optimizable3
 
     @abstractmethod
     def get_value(self) -> float: ...
@@ -45,9 +45,9 @@ class BaseTarget(ABC):
     def initial_inverse_hessian(self, *args, **kwargs) -> coo_array: ...
 
 
-class Target(BaseTarget):
+class OptimizableAtoms(Optimizable4):
     def __init__(self, atoms: Atoms, fmax: float):
-        self.optimizable: OptimizableAtoms = atoms.__ase_optimizable__()
+        self.optimizable: OptimizableAtoms3 = atoms.__ase_optimizable__()
         self.fmax = fmax
 
     def get_value(self) -> float:

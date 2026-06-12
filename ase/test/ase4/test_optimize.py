@@ -3,15 +3,15 @@ import pytest
 
 from ase import Atoms
 from ase._4.optimize.bfgs import BFGSMethod
-from ase._4.optimize.frechet import FrechetTarget
+from ase._4.optimize.frechet import FrechetOptimizable
 from ase._4.optimize.lbfgs import LBFGSMethod
-from ase._4.optimize.method import BaseOptimizationMethod
+from ase._4.optimize.method import OptimizerMethod
+from ase._4.optimize.optimizable import Optimizable4, OptimizableAtoms
 from ase._4.optimize.run import (
     Optimizer,
     read_images,
     write_restartfile,
 )
-from ase._4.optimize.target import BaseTarget, Target
 from ase.calculators.emt import EMT
 from ase.filters import FrechetCellFilter
 from ase.optimize.bfgs import BFGS as OldBFGS
@@ -52,9 +52,9 @@ def _make_optimizer_ase3(
 
 
 def _make_algorithm_ase4(
-    target: BaseTarget,
+    target: Optimizable4,
     algorithm_name: str,
-) -> BaseOptimizationMethod:
+) -> OptimizerMethod:
     alpha = 70.0
     if algorithm_name == 'BFGS':
         return BFGSMethod(target.initial_hessian(alpha=alpha))
@@ -80,7 +80,7 @@ def test_optimizer(algorithm_name: str) -> None:
         pass
 
     atoms_opt4 = setup_surface()
-    target = Target(atoms_opt4, fmax=fmax)
+    target = OptimizableAtoms(atoms_opt4, fmax=fmax)
     method = _make_algorithm_ase4(target, algorithm_name)
     opt4 = Optimizer(target, method)
     step = opt4.run()
@@ -115,7 +115,7 @@ def test_new_optimizer_frechet(algorithm_name: str) -> None:
     atoms = setup_surface()
     fmax = 0.01
     smax = 0.00001
-    target = FrechetTarget(atoms, fmax=fmax, smax=smax)
+    target = FrechetOptimizable(atoms, fmax=fmax, smax=smax)
     method = _make_algorithm_ase4(target, algorithm_name)
     opt = Optimizer(target, method)
     step = opt.run()
@@ -133,7 +133,7 @@ def test_restart(tmp_path, algorithm_name) -> None:
     atoms = setup_surface()
     fmax = 0.001
     smax = 0.0001
-    target = FrechetTarget(atoms, fmax=fmax, smax=smax)
+    target = FrechetOptimizable(atoms, fmax=fmax, smax=smax)
     method = _make_algorithm_ase4(target, algorithm_name)
 
     restartpath = tmp_path / 'restart.json'

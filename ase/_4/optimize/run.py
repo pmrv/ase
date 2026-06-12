@@ -7,8 +7,8 @@ from typing import Any, Iterator
 
 import numpy as np
 
-from ase._4.optimize.lbfgs import BaseOptimizationMethod
-from ase._4.optimize.target import BaseTarget
+from ase._4.optimize.lbfgs import OptimizerMethod
+from ase._4.optimize.optimizable import Optimizable4
 from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
@@ -36,8 +36,8 @@ def toplevel_header(target, method):
 class Optimizer:
     def __init__(
         self,
-        target: BaseTarget,
-        method: BaseOptimizationMethod,
+        target: Optimizable4,
+        method: OptimizerMethod,
         trajectory=None,
         restartfile=None,
         comm=world,
@@ -142,7 +142,7 @@ class Step:
     value: float
 
     @classmethod
-    def start(cls, target: BaseTarget) -> Step:
+    def start(cls, target: Optimizable4) -> Step:
         step = cls(0, target.get_x(), target.get_gradient(), target.get_value())
         assert step.gradient_obj.gradient.shape == (len(step.x),)
         return step
@@ -166,8 +166,8 @@ class Step:
 
 
 def next_step(
-    target: BaseTarget,
-    method: BaseOptimizationMethod,
+    target: Optimizable4,
+    method: OptimizerMethod,
     step: Step,
     maxstep: float | None,
 ) -> Step:
@@ -258,9 +258,9 @@ def read_restartfile(restartfile, calc) -> tuple:
         raise ValueError(f'No such method: {method_iotype!r}')
 
     if target_iotype == 'frechet':
-        from ase._4.optimize.frechet import FrechetTarget
+        from ase._4.optimize.frechet import FrechetOptimizable
 
-        target = FrechetTarget.undatafy(target_dct, calc)
+        target = FrechetOptimizable.undatafy(target_dct, calc)
     elif target_iotype == 'symopt':
         from ase._4.optimize.symopt import SymOpt
 

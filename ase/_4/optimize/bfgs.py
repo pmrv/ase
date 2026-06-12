@@ -1,6 +1,6 @@
 import numpy as np
 
-from .method import BaseOptimizationMethod
+from .method import OptimizerMethod
 
 
 def fd_hessian(target, eps=1e-5, tol=1e-8):
@@ -31,7 +31,7 @@ def fd_hessian(target, eps=1e-5, tol=1e-8):
     return symm_hessian
 
 
-class BFGSMethod(BaseOptimizationMethod):
+class BFGSMethod(OptimizerMethod):
     iotype = 'bfgs'
     methodname = 'BFGS'
 

@@ -6,7 +6,7 @@ import numpy as np
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import LBFGSMethod
-from ase._4.optimize.target import initial_inverse_position_hessian
+from ase._4.optimize.optimizable import initial_inverse_position_hessian
 from ase.optimize.optimize import Optimizer
 from ase.utils.linesearch import LineSearch
 

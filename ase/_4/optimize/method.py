@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class BaseOptimizationMethod(ABC):
+class OptimizerMethod(ABC):
     @abstractmethod
     def compute_step(self, gradient: np.ndarray) -> np.ndarray: ...
 

@@ -1,10 +1,10 @@
 import numpy as np
 from scipy.sparse import coo_array
 
-from .method import BaseOptimizationMethod
+from .method import OptimizerMethod
 
 
-class LBFGSMethod(BaseOptimizationMethod):
+class LBFGSMethod(OptimizerMethod):
     iotype = 'lbfgs'
     methodname = 'LBFGS'
 
