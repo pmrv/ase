@@ -2,28 +2,16 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterator
 
 import numpy as np
 
-import ase
 from ase import Atoms
+from ase.dependencies import ase_version_info
 from ase.io.jsonio import default, object_hook
 from ase.io.trajectory import Trajectory
 from ase.parallel import world
-from ase.utils import search_current_git_hash
-
-
-@lru_cache
-def ase_version() -> str:
-    githash = search_current_git_hash(ase)
-
-    version = f'ase-{ase.__version__}'
-    if githash is not None:
-        version = f'{version} @ {githash}'
-    return version
 
 
 def toplevel_header(target, method):
@@ -37,7 +25,7 @@ def toplevel_header(target, method):
     # Allow each object to write description of itself
 
     return (
-        f'{ase_version()}\n'
+        f'{ase_version_info()}\n'
         f"Optimizing '{target.__class__.__name__}' "
         f'using method {method.methodname!r} '
         f'starting {timestamp}\n\n'
