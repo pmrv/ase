@@ -73,7 +73,9 @@ class CLICommand:
                 names = args.calculators
             else:
                 names = [
-                    name for name, metadata in codes.items() if metadata.config
+                    name
+                    for name, metadata in codes.items()
+                    if metadata.configurable
                 ]
 
         if names:
