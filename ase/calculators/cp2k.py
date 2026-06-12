@@ -536,7 +536,17 @@ class Cp2kShell:
         self._child = subprocess.Popen(
             command, shell=True, universal_newlines=True,
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1)
-        self.expect('* READY')
+
+        # Check successful startup
+        # Ignore startup noise, like the banner on SIRIUS builds
+        max_startup_lines = 1000
+        for _ in range(max_startup_lines):
+            line = self.recv()
+            if line == '* READY':
+                break
+        else:
+            raise RuntimeError('Did not receive "* READY" after '
+                               'starting CP2K shell.')
 
         # check version of shell
         self.send('VERSION')
