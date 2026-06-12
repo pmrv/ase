@@ -215,6 +215,18 @@ class AtomsSymmetries:
         )
 
 
+# The symmetry-reduced coordinates for positions and cell
+# have an arbitrary scale.
+#
+# It is nice that both sets of coordinates produce human-friendly
+# numbers of approximately the same magnitude in typical cases.  To
+# this effect, we scale the cell coordinates by this number.  This
+# actually affects the run if there's a specific initial Hessian, step
+# limitation using "maxstep", etc., but any value is in principle
+# valid.
+CELL_COORDINATE_SCALING_FACTOR = 40
+
+
 @dataclass
 class SymmetryAdaptedCellCoordinates:
     """Class for defining symmetry adapted cell coordinates
@@ -407,7 +419,7 @@ class SymmetryAdaptedCellCoordinates:
             eps = 0.5 * (Cinv @ dC + dC.T @ Cinv.T)
 
             dM_zcc[z] /= np.sum(np.abs(eps)) * np.linalg.det(C_cv)
-            dM_zcc[z] *= 40
+            dM_zcc[z] *= CELL_COORDINATE_SCALING_FACTOR
             # Define the direction of the tangent vector such that
             # it increases the volume. Sign cannot be used because of shear
             if np.trace(np.linalg.inv(C_cv) @ dC) < 0:
