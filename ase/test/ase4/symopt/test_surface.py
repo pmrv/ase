@@ -72,14 +72,15 @@ def seventy(target):
     return 70.0 * np.identity(ndofs)
 
 
-@pytest.importorskip(
-    'gpaw',
-    reason='Work-in-progress ASE-4 feature; currently requires GPAW',
-)
 @pytest.mark.parametrize(
     'initialize_hessian, nsteps', [(seventy, 7), (fd_hessian, 6)]
 )
 def test_relaxation_ase4(atoms, dataset, initialize_hessian, nsteps):
+    pytest.importorskip(
+        'gpaw',
+        reason='Work-in-progress ASE-4 feature; currently requires GPAW',
+    )
+
     atoms.calc = EMT()
 
     symmatoms = SymmetryAdaptedAtoms.from_atoms(
