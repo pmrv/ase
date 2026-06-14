@@ -47,10 +47,10 @@ class SymOpt:
     def log_headers(self):
         return self.symmatoms.logheaders()
 
-    @property
-    def optimizable(self):
-        # Needed for gradient_norm()
-        return self.symmatoms
+    def gradient_norm(self, gradient):
+        # Symmetry-reduced coordinates need their own norm,
+        # not the Cartesian default.
+        return self.symmatoms.gradient_norm(gradient)
 
     def datafy(self):
         # What do we need to save?

@@ -222,6 +222,9 @@ class FrechetOptimizable(Optimizable4):
             self._exp_cell_factor,
         )
 
+    def gradient_norm(self, gradient: np.ndarray) -> float:
+        return self.optimizable.gradient_norm(gradient)
+
     def initial_hessian(
         self,
         bulk_modulus: float = 145 * GPa,
