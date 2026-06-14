@@ -178,7 +178,7 @@ def next_step(
     # Questionable: We are using the function for computing norm of
     # the gradient to compute norm of another vector.
     if maxstep is not None:
-        longest = target.optimizable.gradient_norm(dx)
+        longest = target.gradient_norm(dx)
         if longest > maxstep:
             scale = maxstep / longest
             dx *= scale

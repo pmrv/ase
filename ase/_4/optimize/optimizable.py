@@ -8,7 +8,6 @@ from scipy.sparse import coo_array
 
 from ase import Atoms
 from ase.optimize.optimize import OptimizableAtoms as OptimizableAtoms3
-from ase.utils.abc import Optimizable as Optimizable3
 
 
 @dataclass
@@ -23,9 +22,6 @@ class ForceGradient:
 
 
 class Optimizable4(ABC):
-    def __init__(self, *args, **kwargs) -> None:
-        self.optimizable: Optimizable3
-
     @abstractmethod
     def get_value(self) -> float: ...
 
@@ -43,6 +39,10 @@ class Optimizable4(ABC):
 
     @abstractmethod
     def initial_inverse_hessian(self, *args, **kwargs) -> coo_array: ...
+
+    def gradient_norm(self, gradient: np.ndarray) -> float:
+        """Max Cartesian (per-atom) norm of a flat gradient/step vector."""
+        return get_maxforce(gradient.reshape(-1, 3))
 
 
 class OptimizableAtoms(Optimizable4):
