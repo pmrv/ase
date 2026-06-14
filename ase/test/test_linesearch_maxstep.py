@@ -48,7 +48,7 @@ optimizers = [BFGS, BFGSLineSearch, PreconLBFGS, PreconLBFGS]
 @pytest.mark.optimize()
 @pytest.mark.parametrize(
     'optcls, name',
-    zip(optimizers, labels),
+    list(zip(optimizers, labels)),
 )
 def test_linesearch(optcls, name, atoms, positions):
     maxstep = 0.2
