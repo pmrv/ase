@@ -40,9 +40,8 @@ class Optimizable4(ABC):
     @abstractmethod
     def initial_inverse_hessian(self, *args, **kwargs) -> coo_array: ...
 
-    def gradient_norm(self, gradient: np.ndarray) -> float:
-        """Max Cartesian (per-atom) norm of a flat gradient/step vector."""
-        return get_maxforce(gradient.reshape(-1, 3))
+    @abstractmethod
+    def gradient_norm(self, gradient: np.ndarray) -> float: ...
 
 
 class OptimizableAtoms(Optimizable4):
@@ -76,6 +75,9 @@ class OptimizableAtoms(Optimizable4):
 
     def initial_inverse_hessian(self, alpha: float = 70.0) -> coo_array:
         return initial_inverse_position_hessian(self.optimizable.ndofs(), alpha)
+
+    def gradient_norm(self, gradient: np.ndarray) -> float:
+        return self.optimizable.gradient_norm(gradient)
 
 
 def get_maxforce(forces: np.ndarray) -> float:
