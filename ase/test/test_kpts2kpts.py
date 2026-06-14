@@ -12,7 +12,7 @@ from ase.lattice import all_variants
 # isn't fulfilled then it means that something
 # has gone wrong (most likely that the bravais
 # lattice wasn't correctly identified).
-@pytest.mark.parametrize('lat', all_variants())
+@pytest.mark.parametrize('lat', list(all_variants()))
 def test_kpts2kpts(lat):
     print()
     print(lat)

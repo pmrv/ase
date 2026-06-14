@@ -33,7 +33,7 @@ def test_niggli_2d():
 
 
 @pytest.mark.parametrize('npbc', [0, 1, 2, 3])
-@pytest.mark.parametrize('perm', itertools.permutations(range(3)))
+@pytest.mark.parametrize('perm', [*itertools.permutations(range(3))])
 def test_niggli_atoms_ndim(npbc, perm):
     from ase.build import fcc111, niggli_reduce
     from ase.calculators.emt import EMT

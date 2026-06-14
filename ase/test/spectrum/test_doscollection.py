@@ -258,7 +258,7 @@ class TestDOSCollection:
 
     @pytest.mark.parametrize(
         'collection_data, collection_info, expected',
-        zip(collection_data, collection_info, expected_sum),
+        list(zip(collection_data, collection_info, expected_sum)),
     )
     def test_sum_all(self, collection_data, collection_info, expected):
         dc = DOSCollection(
@@ -280,7 +280,7 @@ class TestDOSCollection:
 
     @pytest.mark.parametrize(
         'collection_data, collection_info',
-        zip(collection_data, collection_info),
+        list(zip(collection_data, collection_info)),
     )
     def test_total(self, collection_data, collection_info):
         dc = DOSCollection(
@@ -333,12 +333,14 @@ class TestDOSCollection:
     @pytest.mark.parametrize(
         'select_info, select_query, '
         'select_result, select_not_result, sum_by_result',
-        zip(
-            select_info,
-            select_query,
-            select_result,
-            select_not_result,
-            sum_by_result,
+        list(
+            zip(
+                select_info,
+                select_query,
+                select_result,
+                select_not_result,
+                sum_by_result,
+            )
         ),
     )
     def test_select(
