@@ -142,7 +142,7 @@ class AimsTemplate(CalculatorTemplate):
         write(
             geometry_in,
             atoms,
-            format="aims",
+            format='aims',
             scaled=scaled,
             geo_constrain=geo_constrain,
             write_velocities=write_velocities,
@@ -164,7 +164,7 @@ class AimsTemplate(CalculatorTemplate):
 
     def read_results(self, directory):
         dst = directory / self.outputname
-        return read(dst, format="aims-output", index=-1).calc.results
+        return read(dst, format='aims-output', index=-1).calc.results
 
     def load_profile(self, cfg, **kwargs):
         return AimsProfile.from_config(cfg, self.name, **kwargs)
