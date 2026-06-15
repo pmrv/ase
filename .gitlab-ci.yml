@@ -185,6 +185,13 @@ bleeding-edge:
     paths:
       - $PIP_CACHE_DIR
     key: bleeding-edge
+  rules:
+    # If this job fails it is (hopefully) because new libraries came out and
+    # we get some deprecations or otherwise need to update the code.
+    # It is okay for MRs to fail bleeding-edge, we should just make sure
+    # to fix the problem in master.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      allow_failure: true
 
 
 doc:
