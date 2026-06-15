@@ -255,12 +255,12 @@ def read_vasp_configuration(fd):
         atom_symbols.extend(numofatoms[i] * [atomtypes[i]])
 
     # Check if Selective dynamics is switched on
-    sdyn = fd.readline()
+    sdyn = fd.readline().strip()
     selective_dynamics = sdyn[0].lower() == 's'
 
     # Check if atom coordinates are cartesian or direct
     if selective_dynamics:
-        ac_type = fd.readline()
+        ac_type = fd.readline().strip()
     else:
         ac_type = sdyn
     cartesian = ac_type[0].lower() in ['c', 'k']
