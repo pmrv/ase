@@ -1,0 +1,6 @@
+Bugfixes
+--------
+
+- Fix :func:`~ase.io.vasp.read_vasp` to ignore the leading whitespace before
+  the keywords like `Selective`, `Cartesian` (or `K`), `Direct` to be consistent
+  with VASP (:mr:`4141`)
