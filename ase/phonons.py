@@ -1,6 +1,5 @@
 """Module for calculating phonons of periodic systems."""
 
-import warnings
 from math import pi, sqrt
 from pathlib import Path
 
@@ -8,7 +7,6 @@ import numpy as np
 import numpy.fft as fft
 import numpy.linalg as la
 
-import ase
 from ase import Atoms, units
 from ase.dft import monkhorst_pack
 from ase.io.trajectory import Trajectory
@@ -98,11 +96,6 @@ class Displacement:
         return self.offset
 
     @property
-    @ase.utils.deprecated('Please use phonons.supercell instead of .N_c')
-    def N_c(self):
-        return self._supercell
-
-    @property
     def supercell(self):
         return self._supercell
 
@@ -112,13 +105,6 @@ class Displacement:
         self._supercell = tuple(supercell)
         self.define_offset()
         self._lattice_vectors_array = self.compute_lattice_vectors()
-
-    @ase.utils.deprecated(
-        'Please use phonons.compute_lattice_vectors()'
-        ' instead of .lattice_vectors()'
-    )
-    def lattice_vectors(self):
-        return self.compute_lattice_vectors()
 
     def compute_lattice_vectors(self):
         """Return lattice vectors for cells in the supercell."""
@@ -313,41 +299,38 @@ class Phonons(Displacement):
 
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        atoms: Atoms,
+        calc=None,
+        supercell: tuple[int, int, int] = (1, 1, 1),
+        name: str = 'phonon',
+        delta: float = 0.01,
+        center_refcell: bool = False,
+        use_minimum_image_phase: bool = True,
+        comm=None,
+    ):
         """Initialize with base class args and kwargs."""
 
-        if 'name' not in kwargs:
-            kwargs['name'] = 'phonon'
-
-        self.mean_minimum_image_phase = kwargs.pop(
-            'mean_minimum_image_phase',
-            False,
+        super().__init__(
+            atoms=atoms,
+            calc=calc,
+            supercell=supercell,
+            name=name,
+            delta=delta,
+            center_refcell=center_refcell,
+            comm=comm,
         )
-        self.deprecate_refcell(kwargs)
-
-        Displacement.__init__(self, *args, **kwargs)
 
         # Attributes for force constants and dynamical matrix in real space
         self.C_N = None  # in units of eV / Ang**2
         self.D_N = None  # in units of eV / Ang**2 / amu
-        self._minimum_image_vectors = None
+        if use_minimum_image_phase:
+            self.minimum_image_vectors = self.compute_minimum_image_vectors()
 
         # Attributes for born charges and static dielectric tensor
         self.Z_avv = None
         self.eps_vv = None
-
-    @staticmethod
-    def deprecate_refcell(kwargs: dict):
-        if 'refcell' in kwargs:
-            warnings.warn(
-                'Keyword refcell of Phonons is deprecated.'
-                'Please use center_refcell (bool)',
-                FutureWarning,
-            )
-            kwargs['center_refcell'] = bool(kwargs['refcell'])
-            kwargs.pop('refcell')
-
-        return kwargs
 
     def __call__(self, atoms_N: Atoms):
         """Calculate forces on atoms in supercell."""
@@ -600,6 +583,36 @@ class Phonons(Displacement):
                 # Zero elements
                 D_Navav[n, i, :, i_a, :] = 0.0
 
+    def compute_minimum_image_vectors(self):
+        relpos_ac = self.atoms.get_scaled_positions(wrap=True)
+
+        supercellshifts_Lc = (np.indices((3, 3, 3)).reshape(3, -1).T - 1) * self.supercell
+        bools_L = np.logical_or(supercellshifts_Lc == 0, self.atoms.pbc).all(axis=1)
+        supercellshifts_Lc = supercellshifts_Lc[bools_L]
+
+        vectors = []
+        for R_c in self._lattice_vectors_array.T:
+            atom_pair_vectors = []
+            for a in self.indices:
+                atom_vectors = []
+                for b in self.indices:
+                    vector_c = R_c + relpos_ac[b] - relpos_ac[a]
+                    images = vector_c + supercellshifts_Lc
+                    image_v = images @ self.atoms.cell.array
+                    lengths2 = np.einsum('ij,ij->i', image_v, image_v)
+                    minimum = lengths2.min()
+                    shortest = images[
+                        np.isclose(lengths2, minimum, rtol=0.0, atol=1e-8)
+                    ]
+                    atom_vectors.append(shortest)
+                atom_pair_vectors.append(atom_vectors)
+            vectors.append(atom_pair_vectors)
+
+        print(vectors)
+        print(len(vectors))
+        cc
+        return vectors
+
     def get_force_constant(self) -> np.ndarray:
         """Return matrix of force constants."""
 
@@ -674,39 +687,6 @@ class Phonons(Displacement):
 
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
-
-    @property
-    def minimum_image_vectors(self):
-        """Shortest periodic images for each cell and atom pair."""
-        if self._minimum_image_vectors is None:
-            self._minimum_image_vectors = self._compute_minimum_image_vectors()
-        return self._minimum_image_vectors
-
-    def _compute_minimum_image_vectors(self):
-        scaled_positions = self.atoms.get_scaled_positions(wrap=True) % 1.0
-        scaled_positions[np.isclose(scaled_positions, 1.0, atol=1e-12)] = 0.0
-        supercell_c = np.asarray(self.supercell)
-        shifts_cc = np.indices((3, 3, 3)).reshape(3, -1).T - 1
-
-        vectors = []
-        for R_c in self._lattice_vectors_array.T:
-            atom_pair_vectors = []
-            for a in self.indices:
-                atom_vectors = []
-                for b in self.indices:
-                    vector_c = R_c + scaled_positions[b] - scaled_positions[a]
-                    images = vector_c + supercell_c * shifts_cc
-                    image_v = images @ self.atoms.cell.array
-                    lengths2 = np.einsum('ij,ij->i', image_v, image_v)
-                    minimum = lengths2.min()
-                    shortest = images[
-                        np.isclose(lengths2, minimum, rtol=0.0, atol=1e-12)
-                    ]
-                    atom_vectors.append(shortest)
-                atom_pair_vectors.append(atom_vectors)
-            vectors.append(atom_pair_vectors)
-
-        return vectors
 
     def _compute_dynamical_matrix_mean_minimum_image_phase(
         self,
@@ -940,52 +920,6 @@ class Phonons(Displacement):
             weights = ampl_sq[:, :, indices].sum(axis=2) / ampl_sq.sum(axis=2)
             dos = RawDOSData(omegas.ravel(), weights.ravel() / omegas.shape[0])
         return dos
-
-    @deprecated('Please use Phonons.get_dos() instead of Phonons.dos().')
-    def dos(
-        self,
-        kpts: tuple[int, int, int] = (10, 10, 10),
-        npts: int = 1000,
-        delta: float = 1e-3,
-    ):
-        """Calculate phonon dos as a function of energy.
-
-        Parameters
-        ----------
-        kpts: tuple
-            Shape of Monkhorst-Pack grid for sampling the Brillouin zone.
-        npts: int
-            Number of energy points.
-        delta: float
-            Broadening of Lorentzian line-shape in eV.
-
-        Returns
-        -------
-            Tuple of (frequencies, dos).  The frequencies are in units of eV.
-
-        .. deprecated:: 3.23.1
-            Please use the ``.get_dos()`` method instead, it returns a proper
-            RawDOSData object.
-        """
-
-        # Monkhorst-Pack grid
-        kpts_kc = monkhorst_pack(kpts)
-        N = np.prod(kpts)
-        # Get frequencies
-        omega_kl = self.band_structure(kpts_kc)
-        # Energy axis and dos
-        omega_e = np.linspace(0.0, np.amax(omega_kl) + 5e-3, num=npts)
-        dos_e = np.zeros_like(omega_e)
-
-        # Sum up contribution from all q-points and branches
-        for omega_l in omega_kl:
-            diff_el = (omega_e[:, np.newaxis] - omega_l[np.newaxis, :]) ** 2
-            dos_el = 1.0 / (diff_el + (0.5 * delta) ** 2)
-            dos_e += dos_el.sum(axis=1)
-
-        dos_e *= 1.0 / (N * pi) * 0.5 * delta
-
-        return omega_e, dos_e
 
     def write_modes(
         self,
