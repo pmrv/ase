@@ -259,11 +259,9 @@ def read_vasp_configuration(fd):
     selective_dynamics = sdyn[0].lower() == 's'
 
     # Check if atom coordinates are cartesian or direct
-    if selective_dynamics:
-        ac_type = fd.readline().strip()
-    else:
-        ac_type = sdyn
-    cartesian = ac_type[0].lower() in ['c', 'k']
+    ac_type = fd.readline().strip() if selective_dynamics else sdyn
+    cartesian = ac_type[0].lower() in {'c', 'k'}
+
     tot_natoms = sum(numofatoms)
     atoms_pos = np.empty((tot_natoms, 3))
     if selective_dynamics:
