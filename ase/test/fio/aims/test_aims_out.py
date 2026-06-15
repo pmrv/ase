@@ -11,6 +11,9 @@ from ase.stress import full_3x3_to_voigt_6_stress
 parent = Path(__file__).parents[2]
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_socketio(testdir):
     traj = read(parent / 'testdata/aims/socket.out', ':', format='aims-output')
     assert len(traj) == 6
@@ -49,6 +52,9 @@ def test_parse_socketio(testdir):
     assert np.allclose(traj[-1].get_forces(), f_end)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_md(testdir):
     traj = read(parent / 'testdata/aims/md.out', ':', format='aims-output')
     assert len(traj) == 5
@@ -87,6 +93,9 @@ def test_parse_md(testdir):
     assert np.allclose(traj[-1].get_forces(), f_end)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_relax(testdir):
     traj = read(parent / 'testdata/aims/relax.out', ':', format='aims-output')
     assert len(traj) == 8
@@ -125,6 +134,9 @@ def test_parse_relax(testdir):
     assert np.allclose(traj[-1].get_cell(), cell_end)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_singlepoint(testdir):
     atoms = read(parent / 'testdata/aims/singlepoint.out', format='aims-output')
     p0 = [[0.0, 0.0, 0.0], [0.9584, 0.0, 0.0], [-0.24, 0.9279, 0.0]]
@@ -144,6 +156,9 @@ def test_parse_singlepoint(testdir):
     assert np.abs(results['energy'] + 2.06302072675943e03) < 1e-15
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_dfpt_dielectric(testdir):
     outfile = parent / 'testdata/aims/DFPT_dielectric.out'
     atoms = read(outfile, format='aims-output')
@@ -159,6 +174,9 @@ def test_parse_dfpt_dielectric(testdir):
     assert np.allclose(diel, diel_0)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_polarization(testdir):
     outfile = parent / 'testdata/aims/polarization.out'
     atoms = read(outfile, format='aims-output')
@@ -170,12 +188,18 @@ def test_parse_polarization(testdir):
     assert np.allclose(polar, polar_0)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_preamble_failed(testdir):
     outfile = parent / 'testdata/aims/preamble_fail.out'
     with pytest.raises(ParseError, match='No SCF steps'):
         read(outfile, format='aims-output')
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_numerical_stress(testdir):
     outfile = parent / 'testdata/aims/numerical_stress.out'
 
@@ -193,6 +217,9 @@ def test_numerical_stress(testdir):
     assert np.allclose(stress, stress_actual)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_spin_collinear_w_md_light(testdir):
     """Issue 3345"""
     outfile = parent / 'testdata/aims/issue_3345_spin_md_light.out'
