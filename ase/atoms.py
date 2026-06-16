@@ -1572,16 +1572,19 @@ class _LimitedAtoms:
             The plane of reflection is shifted to include the center point. Use
             'COM' to fix the center of mass (of all atoms), 'COP' to fix the
             center of positions (all atoms) or 'COU' to fix the center of the
-            cell (or origin if cell is not defined).
+            cell (or origin if cell is not defined). Has no effect, if
+            mirror_cell is True.
         
         mask : array_like or None, default: None
             Select which atoms are moved. If None, then all atoms are affected.
 
         mirror_cell : bool, default: False
-            If true the cell is also transformed.
+            If True, transform the cell with its contents.
         """
         v = string2vector(v)
         v = v / np.linalg.norm(v)
+        if mirror_cell:
+            center = (0.0, 0.0, 0.0)
         center = self._centering_as_array(center)
 
         if mask is None:
