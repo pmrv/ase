@@ -101,7 +101,7 @@ def read_constraints_from_file(
     directory = Path(directory)
     constraint = None
     for filename in ('CONTCAR', 'POSCAR'):
-        if (directory / filename).is_file():
+        if (directory / filename).is_file() and (directory / filename).stat().st_size > 0:
             atoms = read(directory / filename,
                               format='vasp',
                               parallel=False)
