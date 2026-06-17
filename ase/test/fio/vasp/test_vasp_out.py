@@ -1,5 +1,7 @@
 # flake8: noqa
 import inspect
+import shutil
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -91,3 +93,11 @@ def test_read_vasp_multiple_times(outcar):
     print(result1)
     print(result2)
     assert len(compare_atoms(result1, result2)) == 0
+
+
+def test_with_empty_contcar(testdir, outcar) -> None:
+    """Test `read_vasp_out` with empty CONTCAR for reading constraints."""
+    Path('CONTCAR').touch()
+    shutil.copy2(outcar, 'OUTCAR')
+    atoms = read('OUTCAR')
+    assert isinstance(atoms, Atoms)
