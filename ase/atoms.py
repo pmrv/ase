@@ -1574,7 +1574,7 @@ class _LimitedAtoms:
             center of positions (all atoms) or 'COU' to fix the center of the
             cell (or origin if cell is not defined). Has no effect, if
             mirror_cell is True.
-        
+
         mask : array_like or None, default: None
             Select which atoms are moved. If None, then all atoms are affected.
 
@@ -1605,10 +1605,11 @@ class _LimitedAtoms:
 
     def _mirror_array(self, a, v):
         """Mirror given array of coordinates across v, relative to origin
-        
-        Following Ref_a(v) = v - 2 * (v·a)/(a·a) * a
+
+        Following Ref_b(w) = w - 2 * (w·b)/(b·b) * b
         """
-        return a - (a*v).sum(1, keepdims=True)/np.dot(v, v) * 2*v.reshape(1, 3)
+        vdota = (a * v).sum(1, keepdims=True)
+        return a - vdota / np.dot(v, v) * 2 * v.reshape(1, 3)
 
     def rattle(self, stdev=0.001, seed=None, rng=None):
         """Randomly displace atoms.
