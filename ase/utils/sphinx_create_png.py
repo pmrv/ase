@@ -191,7 +191,7 @@ def create_png_files(raise_exceptions=False):
 
                 plt.figure()
                 try:
-                    runpy.run_path(pyname)
+                    runpy.run_path(pyname, run_name='__main__')
                 except KeyboardInterrupt:
                     return
                 except Exception:
