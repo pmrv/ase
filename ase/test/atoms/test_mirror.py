@@ -14,9 +14,7 @@ def test_mirror_direction():
 
     a1_pos = atoms[1].position.copy().reshape((3, 1))
     atoms.mirror((0, 1, 1))
-    matrep = np.array([[1, 0, 0],
-                       [0, 0, -1],
-                       [0, -1, 0]])
+    matrep = np.array([[1, 0, 0], [0, 0, -1], [0, -1, 0]])
     assert pytest.approx(atoms[1].position) == (matrep @ a1_pos).ravel()
 
 
@@ -53,7 +51,5 @@ def test_mirror_cell():
 
     atoms_cell = atoms.get_cell().transpose()
     atoms.mirror((0, 1, 1), mirror_cell=True)
-    matrep = np.array([[1, 0, 0],
-                       [0, 0, -1],
-                       [0, -1, 0]])
+    matrep = np.array([[1, 0, 0], [0, 0, -1], [0, -1, 0]])
     assert pytest.approx(atoms.get_cell().transpose()) == matrep @ atoms_cell
