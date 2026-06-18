@@ -313,7 +313,11 @@ class LAMMPS(Calculator):
             #       "periodic s s s"
             # below
             cell = 2 * np.max(np.abs(self.atoms.get_positions())) * np.eye(3)
-        self.prism = Prism(cell)
+        self.prism = Prism(
+            cell,
+            pbc=self.atoms.get_pbc(),
+            reduce_cell=self.parameters['reduce_cell'],
+        )
 
         self.set_missing_parameters()
         self.calls += 1

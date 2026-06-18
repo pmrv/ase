@@ -561,7 +561,11 @@ def write_lammps_data(
         fd.write(f'{n_bond_types} bond types\n\n')
 
     if prismobj is None:
-        prismobj = Prism(atoms.get_cell(), reduce_cell=reduce_cell)
+        prismobj = Prism(
+            atoms.get_cell(),
+            pbc=atoms.get_pbc(),
+            reduce_cell=reduce_cell,
+        )
 
     # Get cell parameters and convert from ASE units to LAMMPS units
     xhi, yhi, zhi, xy, xz, yz = convert(
