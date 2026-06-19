@@ -3,6 +3,7 @@ import pytest
 
 from ase import Atoms
 from ase.build import bulk, make_supercell
+from ase.constraints import FixAtoms
 from ase.md import thermalize_momenta
 from ase.md.bussi import Bussi
 from ase.md.langevin import Langevin
@@ -116,10 +117,12 @@ def propagate(
     print(f'Target T = {temperature_ref} K')
 
     # In NVT, the reduced instant temperatures follow the reduced chi squared
-    # distribution, i.e., Gamma(alpha=df/2, theta=2/df), where df is the DOF.
-    # The standard deviation of this distribution is sqrt(2/df).
-    df = 3 * (len(atoms) - 1) if com_not_thermalized else 3 * len(atoms)
-    temperature_std_ref = np.sqrt(2.0 / df) * temperature_ref
+    # distribution, i.e., Gamma(alpha=ndof / 2, theta=2 / ndof), where ndof is
+    # the number of thermalized degrees of freedom. The standard deviation is
+    # sqrt(2 / ndof).
+    ndof = atoms.get_number_of_degrees_of_freedom()
+    thermalized_ndof = ndof - 3 if com_not_thermalized else ndof
+    temperature_std_ref = np.sqrt(2.0 / thermalized_ndof) * temperature_ref
     print(f'Expected std(T) = {temperature_std_ref} K')
 
     T = np.full(2000, np.nan)
@@ -140,7 +143,7 @@ def propagate(
     # For comparison with the target temperature, the instant temperatures are
     # rescaled here.
     if com_not_thermalized:
-        T *= len(atoms) / (len(atoms) - 1)
+        T *= ndof / thermalized_ndof
 
     p /= bar  # convert pressures in the ASE unit to bar
 
@@ -171,18 +174,34 @@ def propagate(
 
 
 NVT_PROPAGATE_TESTS = [
-    (NVTBerendsen, 'nvt'),
-    (Langevin, 'langevin'),
-    (Bussi, 'nvt'),
-    (NoseHooverChainNVT, 'nosehoover'),
+    (NVTBerendsen, 'nvt', None),
+    (NVTBerendsen, 'nvt', FixAtoms(0)),
+    (Langevin, 'langevin', None),
+    (Langevin, 'langevin', FixAtoms(0)),
+    (Bussi, 'nvt', None),
+    (Bussi, 'nvt', FixAtoms(0)),
+    (NoseHooverChainNVT, 'nosehoover', None),
+    pytest.param(
+        NoseHooverChainNVT,
+        'nosehoover',
+        FixAtoms(0),
+        marks=pytest.mark.xfail(
+            reason='NoseHooverChainNVT does not yet support constraints',
+            strict=True,
+        ),
+    ),
 ]
 
 
 NVT_PROPAGATE_IDS = [
     'nvtberendsen',
+    'nvtberendsen-fixatoms',
     'langevin',
+    'langevin-fixatoms',
     'bussi',
+    'bussi-fixatoms',
     'nosehoovernvt',
+    'nosehoovernvt-fixatoms',
 ]
 
 
@@ -211,7 +230,7 @@ NPT_PROPAGATE_IDS = [
 @pytest.mark.optimize()
 @pytest.mark.slow()
 @pytest.mark.parametrize(
-    ('algorithm', 'params_key'),
+    ('algorithm', 'params_key', 'constraints'),
     NVT_PROPAGATE_TESTS,
     ids=NVT_PROPAGATE_IDS,
 )
@@ -220,9 +239,13 @@ def test_propagate_nvt(
     dynamicsparams,
     algorithm,
     params_key,
+    constraints,
 ):
+    atoms = Atoms(equilibrated)
+    if constraints is not None:
+        atoms.set_constraint(constraints)
     propagate(
-        Atoms(equilibrated),
+        atoms,
         algorithm,
         dynamicsparams[params_key],
     )
