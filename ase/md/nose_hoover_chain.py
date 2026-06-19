@@ -78,9 +78,8 @@ class NoseHooverChainNVT(MolecularDynamics):
         )
         assert self.masses.shape == (len(self.atoms), 1)
 
-        num_atoms = self.atoms.get_global_number_of_atoms()
         self._thermostat = NoseHooverChainThermostat(
-            num_atoms_global=num_atoms,
+            ndof=self.atoms.get_number_of_degrees_of_freedom(),
             masses=self.masses,
             temperature_K=temperature_K,
             tdamp=tdamp,
@@ -95,9 +94,9 @@ class NoseHooverChainNVT(MolecularDynamics):
     def step(self) -> None:
         dt2 = self.dt / 2
         self._p = self._thermostat.integrate_nhc(self._p, dt2)
-        self._integrate_p(dt2)
-        self._integrate_q(self.dt)
-        self._integrate_p(dt2)
+        self._integrate_p(dt2, apply_constraint=False)
+        self._integrate_q(self.dt, apply_constraint=True)
+        self._integrate_p(dt2, apply_constraint=True)
         self._p = self._thermostat.integrate_nhc(self._p, dt2)
 
         self._update_atoms()
@@ -115,21 +114,36 @@ class NoseHooverChainNVT(MolecularDynamics):
         return float(conserved_energy)
 
     def _update_atoms(self) -> None:
-        self.atoms.set_positions(self._q)
-        self.atoms.set_momenta(self._p)
+        # Note: Constraints are applied in `_integrate_q` and `_integrate_p`.
+        self.atoms.set_positions(self._q, apply_constraint=False)
+        self.atoms.set_momenta(self._p, apply_constraint=False)
 
     def _get_forces(self) -> np.ndarray:
         self._update_atoms()
         return self.atoms.get_forces(md=True)
 
-    def _integrate_q(self, delta: float) -> None:
+    def _integrate_q(self, delta: float, apply_constraint: bool) -> None:
         """Integrate exp(i * L_1 * delta)"""
+        old_q = self._q.copy()
         self._q += delta * self._p / self.masses
 
-    def _integrate_p(self, delta: float) -> None:
+        # First part of the RATTLE algorithm: constrain the new positions and
+        # update momenta to reproduce it.
+        if apply_constraint and self.atoms.constraints:
+            self.atoms.set_positions(self._q, apply_constraint=True)
+            self._q = self.atoms.get_positions()
+            self._p = (self._q - old_q) * self.masses / delta
+            self.atoms.set_momenta(self._p, apply_constraint=False)
+
+    def _integrate_p(self, delta: float, apply_constraint: bool) -> None:
         """Integrate exp(i * L_2 * delta)"""
         forces = self._get_forces()
         self._p += delta * forces
+
+        # Second part of RATTLE: constrain the new momenta.
+        if apply_constraint and self.atoms.constraints:
+            self.atoms.set_momenta(self._p, apply_constraint=True)
+            self._p = self.atoms.get_momenta()
 
 
 class NoseHooverChainThermostat:
@@ -139,7 +153,8 @@ class NoseHooverChainThermostat:
     """
     def __init__(
         self,
-        num_atoms_global: int,
+        *,
+        ndof: int,
         masses: np.ndarray,
         temperature_K: float,
         tdamp: float,
@@ -147,7 +162,7 @@ class NoseHooverChainThermostat:
         tloop: int = 1,
     ):
         """See `NoseHooverChainNVT` for the parameters."""
-        self._num_atoms_global = num_atoms_global
+        self._ndof = ndof
         self._masses = masses  # (len(atoms), 1)
         self._tdamp = tdamp
         self._tchain = tchain
@@ -157,7 +172,7 @@ class NoseHooverChainThermostat:
 
         assert tchain >= 1
         self._Q = np.zeros(tchain)
-        self._Q[0] = 3 * self._num_atoms_global * self._kT * tdamp**2
+        self._Q[0] = self._ndof * self._kT * tdamp**2
         self._Q[1:] = self._kT * tdamp**2
 
         # The following variables are updated during self.step()
@@ -167,7 +182,7 @@ class NoseHooverChainThermostat:
     def get_thermostat_energy(self) -> float:
         """Return energy-like contribution from the thermostat variables."""
         energy = (
-            3 * self._num_atoms_global * self._kT * self._eta[0]
+            self._ndof * self._kT * self._eta[0]
             + self._kT * np.sum(self._eta[1:])
             + np.sum(0.5 * self._p_eta**2 / self._Q)
         )
@@ -191,8 +206,7 @@ class NoseHooverChainThermostat:
             )
 
         if j == 0:
-            g_j = np.sum(p**2 / self._masses) \
-                - 3 * self._num_atoms_global * self._kT
+            g_j = np.sum(p**2 / self._masses) - self._ndof * self._kT
         else:
             g_j = self._p_eta[j - 1] ** 2 / self._Q[j - 1] - self._kT
         self._p_eta[j] += delta2 * g_j
@@ -289,7 +303,7 @@ class IsotropicMTKNPT(MolecularDynamics):
 
         self._num_atoms_global = self.atoms.get_global_number_of_atoms()
         self._thermostat = NoseHooverChainThermostat(
-            num_atoms_global=self._num_atoms_global,
+            ndof=self.atoms.get_number_of_degrees_of_freedom(),
             masses=self.masses,
             temperature_K=temperature_K,
             tdamp=tdamp,
@@ -558,7 +572,7 @@ class MTKNPT(MolecularDynamics):
 
         self._num_atoms_global = self.atoms.get_global_number_of_atoms()
         self._thermostat = NoseHooverChainThermostat(
-            num_atoms_global=self._num_atoms_global,
+            ndof=self.atoms.get_number_of_degrees_of_freedom(),
             masses=self.masses,
             temperature_K=temperature_K,
             tdamp=tdamp,
