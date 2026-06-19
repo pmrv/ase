@@ -104,7 +104,6 @@ def equilibrated_lower_tri(asap3, dynamicsparams):
 
 def propagate(
     atoms: Atoms,
-    asap3,
     algorithm,
     algoargs,
     max_pressure_error=None,
@@ -171,99 +170,91 @@ def propagate(
         assert pmean == pytest.approx(targetpressure, abs=max_pressure_error)
 
 
+NVT_PROPAGATE_TESTS = [
+    (NVTBerendsen, 'nvt'),
+    (Langevin, 'langevin'),
+    (Bussi, 'nvt'),
+    (NoseHooverChainNVT, 'nosehoover'),
+]
+
+
+NVT_PROPAGATE_IDS = [
+    'nvtberendsen',
+    'langevin',
+    'bussi',
+    'nosehoovernvt',
+]
+
+
+NPT_PROPAGATE_TESTS = [
+    ('equilibrated', NPTBerendsen, 'npt', 25.0 * bar, False),
+    # Unlike NPTBerendsen, MelchionnaNPT assumes that the center of mass is not
+    # thermalized, so the kinetic energy should be 3/2 * kB * (N - 1) * T
+    # lower_tri is less accurate than upper_tri because the system is smaller
+    # and the unit cell is narrow in one direction.
+    ('equilibrated', MelchionnaNPT, 'nptold', 100 * bar, True),
+    ('equilibrated_upper_tri', MelchionnaNPT, 'nptold', 100 * bar, True),
+    ('equilibrated_lower_tri', MelchionnaNPT, 'nptold', 250 * bar, True),
+]
+
+
+NPT_PROPAGATE_IDS = [
+    'nptberendsen',
+    'melchionna-cubic',
+    'melchionna-upper-tri',
+    'melchionna-lower-tri',
+]
+
+
 # Not a real optimizer test but uses optimizers.
 # We should probably not mark this (in general)
 @pytest.mark.optimize()
 @pytest.mark.slow()
-def test_nvtberendsen(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(Atoms(equilibrated), asap3, NVTBerendsen, dynamicsparams['nvt'])
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_langevin(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(
-        Atoms(equilibrated),
-        asap3,
-        Langevin,
-        dynamicsparams['langevin'],
-    )
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_bussi(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(Atoms(equilibrated), asap3, Bussi, dynamicsparams['nvt'])
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_nosehoovernvt(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(
-        Atoms(equilibrated),
-        asap3,
-        NoseHooverChainNVT,
-        dynamicsparams['nosehoover'],
-    )
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_nptberendsen(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(
-        Atoms(equilibrated),
-        asap3,
-        NPTBerendsen,
-        dynamicsparams['npt'],
-        max_pressure_error=25.0 * bar,
-    )
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_melchionna_cubic(asap3, equilibrated, dynamicsparams, allraise):
-    propagate(
-        Atoms(equilibrated),
-        asap3,
-        MelchionnaNPT,
-        dynamicsparams['nptold'],
-        max_pressure_error=100 * bar,
-        com_not_thermalized=True,
-    )
-    # Unlike NPTBerendsen, MelchionnaNPT assumes that the center of mass is not
-    # thermalized, so the kinetic energy should be 3/2 ' kB * (N-1) * T
-
-
-@pytest.mark.optimize()
-@pytest.mark.slow()
-def test_melchionna_upper_tri(
-    asap3, equilibrated_upper_tri, dynamicsparams, allraise
+@pytest.mark.parametrize(
+    ('algorithm', 'params_key'),
+    NVT_PROPAGATE_TESTS,
+    ids=NVT_PROPAGATE_IDS,
+)
+def test_propagate_nvt(
+    equilibrated,
+    dynamicsparams,
+    algorithm,
+    params_key,
 ):
-    # Otherwise, parameters are the same as test_melchionna_cubic
     propagate(
-        Atoms(equilibrated_upper_tri),
-        asap3,
-        MelchionnaNPT,
-        dynamicsparams['nptold'],
-        max_pressure_error=100 * bar,
-        com_not_thermalized=True,
+        Atoms(equilibrated),
+        algorithm,
+        dynamicsparams[params_key],
     )
 
 
 @pytest.mark.optimize()
 @pytest.mark.slow()
-def test_melchionna_lower_tri(
-    asap3, equilibrated_lower_tri, dynamicsparams, allraise
+@pytest.mark.parametrize(
+    (
+        'atoms_fixture',
+        'algorithm',
+        'params_key',
+        'max_pressure_error',
+        'com_not_thermalized',
+    ),
+    NPT_PROPAGATE_TESTS,
+    ids=NPT_PROPAGATE_IDS,
+)
+def test_propagate_npt(
+    request,
+    dynamicsparams,
+    atoms_fixture,
+    algorithm,
+    params_key,
+    max_pressure_error,
+    com_not_thermalized,
 ):
-    # Otherwise, parameters are the same as test_melchionna_cubic
-    print('LOWER TRI')
+    atoms = request.getfixturevalue(atoms_fixture)
     propagate(
-        Atoms(equilibrated_lower_tri),
-        asap3,
-        MelchionnaNPT,
-        dynamicsparams['nptold'],
-        # Less accurate than upper tri because the system is smaller
-        # and the unit cell is narrow in one direction.
-        max_pressure_error=250 * bar,
-        com_not_thermalized=True,
+        Atoms(atoms),
+        algorithm,
+        dynamicsparams[params_key],
+        max_pressure_error=max_pressure_error,
+        com_not_thermalized=com_not_thermalized,
     )
