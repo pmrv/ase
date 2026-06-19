@@ -190,8 +190,9 @@ bleeding-edge:
     # we get some deprecations or otherwise need to update the code.
     # It is okay for MRs to fail bleeding-edge, we should just make sure
     # to fix the problem in master.
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "push"
       allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule"
 
 
 doc:
