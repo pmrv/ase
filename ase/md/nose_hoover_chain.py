@@ -39,6 +39,17 @@ class NoseHooverChainNVT(MolecularDynamics):
 
     - [4] M. E. Tuckerman, Statistical Mechanics: Theory and Molecular
           Simulation, 2nd ed. (Oxford University Press, 2009).
+
+    Constraints are applied with the RATTLE algorithm in the velocity-Verlet
+    part of the propagator.  In the notation of Zhang et al. [5], this is the
+    T-C2-p-C1-x-p-T factorization, applied from right to left.
+
+    - [5] Z. Zhang, X. Liu, K. Yan, M. E. Tuckerman, and J. Liu,
+      J. Phys. Chem. A 123, 6056 (2019).
+
+    .. versionadded:: 3.30.0
+        Constraints are applied based on the RATTLE algorithm.
+
     """
 
     def __init__(
