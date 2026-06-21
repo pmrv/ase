@@ -115,15 +115,15 @@ Bugfixes
 - Fixed :class:`~ase.mep.neb.NEB` so that it stores unconstrained forces
   as raw forces correctly (:mr:`4026`)
 
- - Added divergence check for infinite direction norm in :meth:`ase.mep.dimer.MinModeTranslate.step` (:mr:`4041`)
- - Prevent step in `ase.mep.dimer.MinModeTranslate.step` from becoming NaN (:mr:`4041`)
+- Added divergence check for infinite direction norm in :meth:`ase.mep.dimer.MinModeTranslate.step` (:mr:`4041`)
+- Prevent step in `ase.mep.dimer.MinModeTranslate.step` from becoming NaN (:mr:`4041`)
 
 - Fixed :class:`~ase.eos.EquationOfState` to provide the correct energy at the
   equilibrium volume for the Anton-Schmidt EOS (:mr:`4062`)
 
-* Snap near-integer coordinates in `build()` to absorb floating-point noise,
+- Snap near-integer coordinates in `build()` to absorb floating-point noise,
   preventing boundary atoms from erroneously splitting into an extra layer.
-* Intercept `vacuum=0.0` in `surface()`, which unphysically shrinks the Z-axis
+- Intercept `vacuum=0.0` in `surface()`, which unphysically shrinks the Z-axis
   to the atomic bounding box and causes layers to overlap. Now warns and falls
   back to `vacuum=None`.
 
