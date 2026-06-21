@@ -693,6 +693,8 @@ class Phonons(Displacement):
             Eigenvectors (only when ``modes`` is ``True``).
         """
 
+        nindices = self.nindices
+
         # Force constant matrices
         assert self.C_avNav is not None, print('Make sure you .read() your '
                                                'force constant matrices!')
@@ -701,12 +703,11 @@ class Phonons(Displacement):
         if born:
             assert self.Z_avv is not None
             assert self.eps_vv is not None
-            raise RuntimeError('Inclusion of non-analytic corrections '
-                               'to phonon energies currently does not function. '
+            raise RuntimeError('Inclusion of non-analytic corrections to '
+                               'phonon energies currently does not function. '
                                '(see work item 941)')
-
-            cell_cv = 2. * np.pi * self.atoms.cell.reciprocal()
-            vol = abs(la.det(self.atoms.cell)) / units.Bohr**3
+            # cell_cv = 2. * np.pi * self.atoms.cell.reciprocal()
+            # vol = abs(la.det(self.atoms.cell)) / units.Bohr**3
 
         # Multiply by mass prefactor
         m_inv_a = self.atoms.get_masses()[self.indices] ** -0.5
@@ -716,12 +717,13 @@ class Phonons(Displacement):
 
         # Lists for frequencies and modes along path
         nk = path_kc.shape[0]
-        omega_kl = np.zeros((nk, 3 * self.nindices))
-        u_klav = np.zeros((nk, 3 * self.nindices, 3 * self.nindices))
+        omega_kl = np.zeros((nk, 3 * nindices))
+        u_klav = np.zeros((nk, 3 * nindices, nindices, 3), dtype=complex)
 
         for q_index, q_c in enumerate(path_kc):
             # Add non-analytic part
             if born:
+                raise RuntimeError()
                 # # q-vector in cartesian coordinates
                 # q_v = np.dot(q_c, cell_cv)
                 # # Non-analytic contribution to force constants in atomic units
@@ -743,18 +745,17 @@ class Phonons(Displacement):
                 # self.D_na = D_na
                 # D_N = self.D_N + D_na / np.prod(self.supercell)
 
-            # Evaluate fourier sum
+            # Evaluate Fourier sum
             D_XX = self.compute_dynamical_matrix(q_c, D_avNav)
 
             if modes:
                 omega2_l, u_Xl = la.eigh(D_XX, UPLO='U')
-                # Sort eigenmodes according to eigenvalues (see below) and
-                # multiply with mass prefactor.  This gives the eigenmode
-                # (which is now not normalized!) with units 1/sqrt(amu).
-                u_lX = (
-                    self.m_inv_x[:, np.newaxis] * u_Xl[:, omega2_l.argsort()]
-                ).T.copy()
-                u_klX[q_index] = u_lX.reshape((-1, len(self.indices), 3))
+                # Sort eigenmodes according to eigenvalues and reshape
+                u_lav = u_Xl.T[omega2_l.argsort()].reshape(3 * nindices,
+                                                           nindices, 3)
+                # Multiply with mass prefactor. This gives the eigenmode
+                # (which is now not normalized!) in units of 1/sqrt(amu).
+                u_klav[q_index] = u_lav * m_inv_a[np.newaxis, :, np.newaxis]
             else:
                 omega2_l = la.eigvalsh(D_XX, UPLO='U')
 
@@ -790,7 +791,7 @@ class Phonons(Displacement):
         omega_kl *= s
 
         if modes:
-            return omega_kl, u_klX
+            return omega_kl, u_klav
 
         return omega_kl
 
