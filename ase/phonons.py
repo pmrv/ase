@@ -715,7 +715,7 @@ class Phonons(Displacement):
         omega_kl = np.zeros((nk, 3 * self.nindices))
         u_klX = np.zeros((nk, 3 * self.nindices, 3 * self.nindices))
 
-        for q_c in path_kc:
+        for q_index, q_c in enumerate(path_kc):
             # Add non-analytic part
             if born:
                 # q-vector in cartesian coordinates
@@ -747,10 +747,10 @@ class Phonons(Displacement):
                 # Sort eigenmodes according to eigenvalues (see below) and
                 # multiply with mass prefactor.  This gives the eigenmode
                 # (which is now not normalized!) with units 1/sqrt(amu).
-                u_lx = (
-                    self.m_inv_x[:, np.newaxis] * u_xl[:, omega2_l.argsort()]
+                u_lX = (
+                    self.m_inv_x[:, np.newaxis] * u_Xl[:, omega2_l.argsort()]
                 ).T.copy()
-                u_kl.append(u_lx.reshape((-1, len(self.indices), 3)))
+                u_klX[q_index] = u_lX.reshape((-1, len(self.indices), 3))
             else:
                 omega2_l = la.eigvalsh(D_XX, UPLO='U')
 
@@ -761,31 +761,32 @@ class Phonons(Displacement):
 
             # Take care of imaginary frequencies
             if not np.all(omega2_l >= 0.0):
-                indices = np.where(omega2_l < 0)[0]
+                complex_indices = np.where(omega2_l < 0)[0]
 
                 if verbose:
                     print(
                         'WARNING, %i imaginary frequencies at '
                         'q = (% 5.2f, % 5.2f, % 5.2f) ; (omega_q =% 5.3e*i)'
                         % (
-                            len(indices),
+                            len(complex_indices),
                             q_c[0],
                             q_c[1],
                             q_c[2],
-                            omega_l[indices][0].imag,
+                            omega_l[complex_indices][0].imag,
                         )
                     )
 
-                omega_l[indices] = -1 * np.sqrt(np.abs(omega2_l[indices].real))
+                omega_l[complex_indices] = -1 * np.sqrt(
+                    np.abs(omega2_l[complex_indices].real))
 
-            omega_kl.append(omega_l.real)
+            omega_kl[q_index] = omega_l.real
 
         # Conversion factor: sqrt(eV / Ang^2 / amu) -> eV
         s = units._hbar * 1e10 / sqrt(units._e * units._amu)
-        omega_kl = s * np.asarray(omega_kl)
+        omega_kl *= s
 
         if modes:
-            return omega_kl, np.asarray(u_kl)
+            return omega_kl, u_klX
 
         return omega_kl
 
