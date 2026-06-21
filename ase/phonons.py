@@ -346,7 +346,7 @@ class Phonons(Displacement):
     @deprecated(
         'Current implementation of non-analytical correction is '
         'likely incorrect, see '
-        'https://gitlab.com/ase/ase/-/issues/941'
+        'https://gitlab.com/ase/ase/-/work_items/941'
     )
     def read_born_charges(self, name='born', neutrality=True):
         r"""Read Born charges and dieletric tensor from JSON file.
@@ -371,7 +371,7 @@ class Phonons(Displacement):
 
         .. deprecated:: 3.22.1
             Current implementation of non-analytical correction is likely
-            incorrect, see :issue:`941`
+            incorrect, see work item 941
         """
 
         # Load file with Born charges and dielectric tensor for atoms in the
@@ -689,7 +689,7 @@ class Phonons(Displacement):
         -------
         omega_kl: np.ndarray
             Phonon band energies.
-        u_klx: np.ndarray
+        u_klav: np.ndarray
             Eigenvectors (only when ``modes`` is ``True``).
         """
 
@@ -701,6 +701,10 @@ class Phonons(Displacement):
         if born:
             assert self.Z_avv is not None
             assert self.eps_vv is not None
+            raise RuntimeError('Inclusion of non-analytic corrections '
+                               'to phonon energies currently does not function. '
+                               '(see work item 941)')
+
             cell_cv = 2. * np.pi * self.atoms.cell.reciprocal()
             vol = abs(la.det(self.atoms.cell)) / units.Bohr**3
 
@@ -713,31 +717,31 @@ class Phonons(Displacement):
         # Lists for frequencies and modes along path
         nk = path_kc.shape[0]
         omega_kl = np.zeros((nk, 3 * self.nindices))
-        u_klX = np.zeros((nk, 3 * self.nindices, 3 * self.nindices))
+        u_klav = np.zeros((nk, 3 * self.nindices, 3 * self.nindices))
 
         for q_index, q_c in enumerate(path_kc):
             # Add non-analytic part
             if born:
-                # q-vector in cartesian coordinates
-                q_v = np.dot(q_c, cell_cv)
-                # Non-analytic contribution to force constants in atomic units
+                # # q-vector in cartesian coordinates
+                # q_v = np.dot(q_c, cell_cv)
+                # # Non-analytic contribution to force constants in atomic units
 
-                # XXX What is this dot product? It looks like it
-                # will always crash because of a mismatch in dimensions
-                qdotZ_av = np.dot(q_v, self.Z_avv).ravel()
-                C_na = (
-                    4
-                    * pi
-                    * np.outer(qdotZ_av, qdotZ_av)
-                    / np.dot(q_v, np.dot(self.eps_vv, q_v))
-                    / vol
-                )
-                self.C_na = C_na / units.Bohr**2 * units.Hartree
+                # # XXX What is this dot product? It looks like it
+                # # will always crash because of a mismatch in dimensions
+                # qdotZ_av = np.dot(q_v, self.Z_avv).ravel()
+                # C_na = (
+                #     4
+                #     * pi
+                #     * np.outer(qdotZ_av, qdotZ_av)
+                #     / np.dot(q_v, np.dot(self.eps_vv, q_v))
+                #     / vol
+                # )
+                # self.C_na = C_na / units.Bohr**2 * units.Hartree
                 # Add mass prefactor and convert to eV / (Ang^2 * amu)
-                M_inv = np.outer(self.m_inv_x, self.m_inv_x)
-                D_na = C_na * M_inv / units.Bohr**2 * units.Hartree
-                self.D_na = D_na
-                D_N = self.D_N + D_na / np.prod(self.supercell)
+                # M_inv = np.outer(self.m_inv_x, self.m_inv_x)
+                # D_na = C_na * M_inv / units.Bohr**2 * units.Hartree
+                # self.D_na = D_na
+                # D_N = self.D_N + D_na / np.prod(self.supercell)
 
             # Evaluate fourier sum
             D_XX = self.compute_dynamical_matrix(q_c, D_avNav)
