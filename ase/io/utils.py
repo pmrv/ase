@@ -58,12 +58,13 @@ def get_cell_vertex_points(cell, disp=(0.0, 0.0, 0.0)):
     """Returns 8x3 list of the cell vertex coordinates"""
     cell_vertices = np.empty((2, 2, 2, 3))
     displacement = np.array(disp)
+
     for c1 in range(2):
         for c2 in range(2):
             for c3 in range(2):
                 cell_vertices[c1, c2, c3] = [c1, c2, c3] @ cell + displacement
-    cell_vertices.shape = (8, 3)
-    return cell_vertices
+
+    return cell_vertices.reshape((8, 3))
 
 
 def update_line_order_for_atoms(L, T, D, atoms, radii):
