@@ -1,11 +1,13 @@
 import io
 import os
 import unittest
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 import ase.io
+from ase import Atoms
 from ase.build import bulk, graphene_nanoribbon
 from ase.calculators.calculator import compare_atoms
 from ase.constraints import (
@@ -15,7 +17,7 @@ from ase.constraints import (
     FixScaled,
     constrained_indices,
 )
-from ase.io.vasp import read_vasp_xdatcar, write_vasp_xdatcar
+from ase.io.vasp import read_vasp, read_vasp_xdatcar, write_vasp_xdatcar
 
 
 class TestXdatcarRoundtrip(unittest.TestCase):
@@ -155,6 +157,29 @@ def test_with_whitespace(graphene_atoms, whitespace):
     with open('POSCAR', 'a') as fd:
         fd.write(whitespace)
     assert str(ase.io.read('POSCAR').symbols) == str(graphene_atoms.symbols)
+
+
+@pytest.mark.parametrize('keyword', ['Direct', 'Selective'])
+def test_leading_whitespace_before_keyword(
+    graphene_atoms: Atoms,
+    keyword: str,
+    tmp_path: Path,
+) -> None:
+    """Test that leading whitespace before POSCAR keywords is ignored."""
+    file_path = tmp_path / 'POSCAR'
+
+    graphene_atoms.set_constraint(FixAtoms(indices=indices_to_constrain))
+    graphene_atoms.write(file_path, direct=True)
+
+    atoms_old = read_vasp(file_path)
+    string_old = file_path.read_text()
+    string_new = string_old.replace(keyword, f' {keyword}')
+    assert string_new != string_old
+
+    file_path.write_text(string_new)
+    atoms_new = read_vasp(file_path)
+
+    assert not compare_atoms(atoms_new, atoms_old)
 
 
 def test_FixAtoms(graphene_atoms):

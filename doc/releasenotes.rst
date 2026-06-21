@@ -9,6 +9,15 @@ A comprehensive list of changes can be found in the :ref:`changelog`.
 
 .. auto-newrelease-insert-version-header-here
 
+Version 3.29.0
+==============
+
+21 June 2026: :git:`3.29.0 <../3.29.0>`
+
+Release notes still to be written.
+
+
+
 Version 3.28.0
 ==============
 

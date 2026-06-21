@@ -704,7 +704,7 @@ class Pfrommer(Precon):
         # position DoF
         omega = self.phonon_frequency
         mass = atoms.get_masses().mean()
-        block = np.eye(3) / (mass * omega**2)
+        block = sparse.eye(3, format='coo') / (mass * omega**2)
         blocks = [block] * len(atoms)
 
         # cell DoF
@@ -712,7 +712,7 @@ class Pfrommer(Precon):
             coeff = 1.0
             if self.apply_cell:
                 coeff = 1.0 / (3 * self.bulk_modulus)
-            blocks.append(np.diag([coeff] * 9))
+            blocks.append(sparse.eye(9, format='coo') * coeff)
 
         self.H0 = sparse.block_diag(blocks, format='csr')
         return

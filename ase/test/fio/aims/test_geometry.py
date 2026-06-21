@@ -32,6 +32,9 @@ def H2O():
     )
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_cartesian_Si(Si):
     """write cartesian coords and check if structure was preserved"""
     Si.write(file, format=format)
@@ -39,6 +42,9 @@ def test_cartesian_Si(Si):
     assert np.allclose(Si.positions, new_atoms.positions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_scaled_Si(Si):
     """write fractional coords and check if structure was preserved"""
     Si.write(file, format=format, scaled=True, wrap=False)
@@ -46,6 +52,9 @@ def test_scaled_Si(Si):
     assert np.allclose(Si.positions, new_atoms.positions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_param_const_Si(Si):
     """Check to ensure parametric constraints are passed to crystal systems"""
     param_lat = ['a']
@@ -88,7 +97,7 @@ def test_param_const_Si(Si):
 
         # Attempt to write a molecular system with geo_constrain=True
         Si.write(file, geo_constrain=True)
-        assert len(w) == 1
+        assert len(w) == 2
         assert (
             str(w[-1].message)
             == 'Setting scaled to True because a symmetry_block is detected.'
@@ -101,6 +110,9 @@ def test_param_const_Si(Si):
     assert str(Si.constraints[1]) == str(new_atoms.constraints[0])
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_wrap_Si(Si):
     """write fractional coords and check if structure was preserved"""
     Si.positions[0, 0] -= 0.015625
@@ -112,6 +124,9 @@ def test_wrap_Si(Si):
     assert np.allclose(Si.positions, new_atoms.positions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_constraints_Si(Si):
     """Test that non-parmetric constraints are written and read in properly"""
     Si.set_constraint([FixAtoms(indices=[0]), FixCartesian(1, [1, 0, 1])])
@@ -123,6 +138,9 @@ def test_constraints_Si(Si):
     assert str(Si.constraints[1]) == str(new_atoms.constraints[1])
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_cartesian_H2O(H2O):
     """write cartesian coords and check if structure was preserved for
     molecular systems"""
@@ -131,6 +149,9 @@ def test_cartesian_H2O(H2O):
     assert np.allclose(H2O.positions, new_atoms.positions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_scaled_H2O(H2O):
     """Attempt to write fractional coordinates and see if scaled is set to
     False and can be written properly"""
@@ -142,6 +163,9 @@ def test_scaled_H2O(H2O):
         H2O.write(file, format=format, scaled=True, wrap=False)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_param_const_H2O(H2O):
     """Check to ensure if geo_constrain is True it does not affect the
     final geometry.in file for molecular systems"""
@@ -151,7 +175,7 @@ def test_param_const_H2O(H2O):
 
         # Attempt to write a molecular system with geo_constrain=True
         H2O.write(file, geo_constrain=True)
-        assert len(w) == 1
+        assert len(w) == 2
         assert (
             str(w[-1].message)
             == 'Parameteric constraints can only be used in periodic systems.'
@@ -161,6 +185,9 @@ def test_param_const_H2O(H2O):
     assert np.allclose(H2O.positions, new_atoms.positions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_velocities_H2O(H2O):
     """Confirm that the velocities are passed to the geometry.in file and
     can be read back in"""
@@ -172,6 +199,9 @@ def test_velocities_H2O(H2O):
     assert np.allclose(H2O.get_velocities(), new_atoms.get_velocities())
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_info_str(H2O):
     """Confirm that the passed info_str is passed to the geometry.in file"""
     H2O.write(file, format=format, info_str='TEST INFO STR')
@@ -233,6 +263,9 @@ expected_lattice_vectors = np.array(
 )
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_geometry_lines():
     lines = sample_geometry_1.splitlines()
     atoms = parse_geometry_lines(lines, 'sample_geometry_1.in')
