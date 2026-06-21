@@ -157,11 +157,8 @@ class BFGS(Optimizer):
         # but (awkwardly) this method gets 'forces' for backwards compatibility
         self.state.update(pos, -forces, pos0, -forces0)
 
-    def replay_trajectory(self, traj):
-        """Initialize hessian from old trajectory."""
-        if isinstance(traj, str):
-            from ase.io.trajectory import Trajectory
-            traj = Trajectory(traj, 'r')
+    def _replay_trajectory(self, traj):
+        """Initialize Hessian from old trajectory."""
         self.state = None
         atoms = traj[0]
         pos0 = atoms.get_positions().ravel()

@@ -1,5 +1,0 @@
-Bugfixes
---------
-
-- Fix :meth:`ase.optimize.lbfgs.LBFGS.replay_trajectory` broken since ASE 3.27.0
-  (:mr:`4125`)
