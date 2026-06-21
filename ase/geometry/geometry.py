@@ -400,10 +400,7 @@ def get_distances(p1, p2=None, cell=None, pbc=None):
         return Dout, Dout_len
 
     # Expand back to matrix indexing
-    D.shape = (-1, len(p2), 3)
-    D_len.shape = (-1, len(p2))
-
-    return D, D_len
+    return D.reshape((-1, len(p2), 3)), D_len.reshape((-1, len(p2)))
 
 
 def get_distances_derivatives(v0, cell=None, pbc=None):
