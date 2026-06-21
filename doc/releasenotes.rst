@@ -21,10 +21,10 @@ nor are they likely to be complete or resemble a final design.
 
 Highlights:
 
- * Read and write support for the RuNNer input format
- * The SocketIO calculator client supports future defaults from the i-PI:
-   If you run new i-PI as a server with an older ASE as client,
-   you may need to upgrade to this version.
+* Read and write support for the RuNNer input format
+* The SocketIO calculator client supports future defaults from the i-PI:
+  If you run new i-PI as a server with an older ASE as client,
+  you may need to upgrade to this version.
 
 Version 3.28.0
 ==============
