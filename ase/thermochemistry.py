@@ -496,8 +496,7 @@ class BaseThermoChem(ABC):
         given in eV and a temperature given in Kelvin.  Returns the entropy
         in eV/K."""
         kT = units.kB * temperature
-        energies = np.array(self.vib_energies)
-        energies /= kT  # eV/ eV/K*K
+        energies = np.array(self.vib_energies) / kT  # eV/ eV/K*K
         S_v = energies / (np.exp(energies) - 1.) - \
             np.log(1. - np.exp(-energies))
         S_v *= units.kB
