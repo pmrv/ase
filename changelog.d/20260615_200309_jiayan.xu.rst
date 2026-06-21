@@ -1,5 +1,0 @@
-Bugfixes
---------
-
-- Fix vasp parser read constraints error when contcar is empty.
-

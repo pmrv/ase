@@ -64,6 +64,8 @@ Supported :mod:`Calculators <ase.calculators>`
 News
 ====
 
+* :ref:`ASE version 3.29.0 <releasenotes>` released (21 June 2026).
+
 * :ref:`ASE version 3.28.0 <releasenotes>` released (17 March 2026).
 
 * :ref:`ASE version 3.27.0 <releasenotes>` released (28 December 2025).
