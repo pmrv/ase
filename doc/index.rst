@@ -64,6 +64,9 @@ Supported :mod:`Calculators <ase.calculators>`
 News
 ====
 
+* The website https://ase-lib.org/ now represents the broader ASE community,
+  whereas the ASE documentation has been moved to https://docs.ase-lib.org. (23 Jun 2026)
+
 * :ref:`ASE version 3.29.0 <releasenotes>` released (21 June 2026).
 
 * Workshop on
