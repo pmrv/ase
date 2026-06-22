@@ -139,7 +139,8 @@ print('second and third number:', (d, e))
 # .. note::
 #
 #    Another very important type is the ``ndarray`` type described here:
-#    `Numeric arrays in Python <https://docs.ase-lib.org/numpy.html#numpy>`_. It is
+#    `Numeric arrays in Python
+#    <https://docs.ase-lib.org/numpy.html#numpy>`_. It is
 #    an array type for efficient numerics, and is heavily used in ASE.
 #
 # Loops
