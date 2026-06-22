@@ -891,7 +891,7 @@ class Phonons(Displacement):
             branch_l = list(branches)
 
         # Calculate modes
-        omega_l, u_l = self.band_structure(q_c, modes=True, born=born)
+        omega_l, u_l = self.band_structure(q_c[np.newaxis, :], modes=True, born=born)
         # Repeat atoms
         atoms = self.atoms * repeat
         # Center
