@@ -429,7 +429,7 @@ class _LimitedAtoms:
         if dtype is not None:
             a = np.array(a, dtype, order='C')
             if len(a) == 0 and shape is not None:
-                a.shape = (-1,) + shape
+                a = a.reshape((-1, *shape))
         else:
             if not a.flags['C_CONTIGUOUS']:
                 a = np.ascontiguousarray(a)
@@ -1545,11 +1545,9 @@ class _LimitedAtoms:
         D, D_len = get_distances(p1, p2, cell=cell, pbc=pbc)
 
         if vector:
-            D.shape = (-1, 3)
-            return D
+            return D.reshape((-1, 3))
         else:
-            D_len.shape = (-1,)
-            return D_len
+            return D_len.ravel()
 
     def get_all_distances(self, mic=False, vector=False):
         """Return distances of all of the atoms with all of the atoms.
