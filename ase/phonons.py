@@ -182,7 +182,7 @@ class Displacement:
         # Positions of atoms to be displaced in the reference cell
         natoms = len(self.atoms)
         offset = natoms * self.refcell_offset
-        pos_av = atoms_N.positions[offset:offset + natoms].copy()
+        pos_av = atoms_N.positions[offset : offset + natoms].copy()
 
         # Loop over all displacements
         for a in self.indices:
@@ -449,7 +449,7 @@ class Phonons(Displacement):
                 C_raw_Nav = (
                     cache[basename + '-']['forces']
                     - cache[basename + '+']['forces']
-                    ).reshape(ncells, natoms, 3)
+                ).reshape(ncells, natoms, 3)
                 C_raw_Nav /= 2 * self.delta
 
                 if method == 'frederiksen':
@@ -496,8 +496,10 @@ class Phonons(Displacement):
         n1, n2, n3 = 1 - np.asarray(supercell) % 2
         C_nnnXX[n1:, n2:, n3:] *= 0.5
         C_nnnXX[n1:, n2:, n3:] += (
-            C_nnnXX[n1:, n2:, n3:][::-1, ::-1, ::-1]
-            ).transpose(0, 1, 2, 4, 3).copy()
+            (C_nnnXX[n1:, n2:, n3:][::-1, ::-1, ::-1])
+            .transpose(0, 1, 2, 4, 3)
+            .copy()
+        )
         if self.refcell_offset == 0:
             C_nnnXX = fft.ifftshift(C_nnnXX, axes=(0, 1, 2)).copy()
 
@@ -532,9 +534,11 @@ class Phonons(Displacement):
         pos_av = self.atoms.get_positions()[self.indices]
 
         # Maybe calculate mean minimum image vector here instead..
-        vectors_aNav = (pos_av[np.newaxis, np.newaxis]
-                        + R_Nv[np.newaxis, :, np.newaxis]
-                        - pos_av[:, np.newaxis, np.newaxis])
+        vectors_aNav = (
+            pos_av[np.newaxis, np.newaxis]
+            + R_Nv[np.newaxis, :, np.newaxis]
+            - pos_av[:, np.newaxis, np.newaxis]
+        )
 
         dist_aNa = np.linalg.norm(vectors_aNav, axis=-1)
         bools_aNa = dist_aNa <= r_c
@@ -616,11 +620,7 @@ class Phonons(Displacement):
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
 
-    def compute_dynamical_matrix(
-        self,
-        q_c: np.ndarray,
-        D_avNav: np.ndarray
-    ):
+    def compute_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_XX(q).
             This is a Fourier transform from real-space force constants
             for a given momentum vector q.
@@ -647,14 +647,16 @@ class Phonons(Displacement):
         R_Nc = self.lattice_vectors_array
         pos_ac = self.atoms.get_scaled_positions()[self.indices]
 
-        vectors_aNac = (pos_ac[np.newaxis, np.newaxis]
-                        + R_Nc[np.newaxis, :, np.newaxis]
-                        - pos_ac[:, np.newaxis, np.newaxis])
+        vectors_aNac = (
+            pos_ac[np.newaxis, np.newaxis]
+            + R_Nc[np.newaxis, :, np.newaxis]
+            - pos_ac[:, np.newaxis, np.newaxis]
+        )
 
-        phase_aNa = np.exp(2.j * np.pi * np.dot(vectors_aNac, q_c))
-        D_avav = (
-            D_avNav * phase_aNa[:, np.newaxis, :, :, np.newaxis]
-            ).sum(axis=2)
+        phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
+        D_avav = (D_avNav * phase_aNa[:, np.newaxis, :, :, np.newaxis]).sum(
+            axis=2
+        )
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)
 
     def band_structure(self, path_kc, modes=False, born=False, verbose=True):
@@ -695,16 +697,19 @@ class Phonons(Displacement):
         nindices = self.nindices
 
         # Force constant matrices
-        assert self.C_avNav.size != 0, print('Make sure you have .read() your '
-                                             'force constant matrices!')
+        assert self.C_avNav.size != 0, print(
+            'Make sure you have .read() your force constant matrices!'
+        )
         C_avNav = self.C_avNav
 
         if born:
             assert self.Z_avv is not None
             assert self.eps_vv is not None
-            raise RuntimeError('Inclusion of non-analytic corrections to '
-                               'phonon energies currently does not function. '
-                               '(see work item 941)')
+            raise RuntimeError(
+                'Inclusion of non-analytic corrections to '
+                'phonon energies currently does not function. '
+                '(see work item 941)'
+            )
             # cell_cv = 2. * np.pi * self.atoms.cell.reciprocal()
             # vol = abs(la.det(self.atoms.cell)) / units.Bohr**3
 
@@ -750,8 +755,9 @@ class Phonons(Displacement):
             if modes:
                 omega2_l, u_Xl = la.eigh(D_XX, UPLO='U')
                 # Sort eigenmodes according to eigenvalues and reshape
-                u_lav = u_Xl.T[omega2_l.argsort()].reshape(3 * nindices,
-                                                           nindices, 3)
+                u_lav = u_Xl.T[omega2_l.argsort()].reshape(
+                    3 * nindices, nindices, 3
+                )
                 # Multiply with mass prefactor. This gives the eigenmode
                 # (which is now not normalized!) in units of 1/sqrt(amu).
                 u_klav[q_index] = u_lav * m_inv_a[np.newaxis, :, np.newaxis]
@@ -781,7 +787,8 @@ class Phonons(Displacement):
                     )
 
                 omega_l[complex_indices] = -1 * np.sqrt(
-                    np.abs(omega2_l[complex_indices].real))
+                    np.abs(omega2_l[complex_indices].real)
+                )
 
             omega_kl[q_index] = omega_l.real
 
