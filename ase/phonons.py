@@ -315,8 +315,7 @@ class Phonons(Displacement):
         )
 
         # Attributes for force constants and dynamical matrix in real space
-        self.C_avNav = None  # in units of eV / Ang**2
-        self.D_N = None  # in units of eV / Ang**2 / amu
+        self.C_avNav = np.empty(0)  # in units of eV / Ang**2
 
         # Attributes for born charges and static dielectric tensor
         self.Z_avv = None
@@ -545,7 +544,7 @@ class Phonons(Displacement):
     def get_force_constant(self) -> np.ndarray:
         """Return matrix of force constants."""
 
-        assert self.C_avNav is not None
+        assert self.C_avNav.size != 0
         return self.C_avNav
 
     def get_band_structure(
@@ -696,8 +695,8 @@ class Phonons(Displacement):
         nindices = self.nindices
 
         # Force constant matrices
-        assert self.C_avNav is not None, print('Make sure you .read() your '
-                                               'force constant matrices!')
+        assert self.C_avNav.size != 0, print('Make sure you have .read() your '
+                                             'force constant matrices!')
         C_avNav = self.C_avNav
 
         if born:
@@ -787,8 +786,7 @@ class Phonons(Displacement):
             omega_kl[q_index] = omega_l.real
 
         # Conversion factor: sqrt(eV / Ang^2 / amu) -> eV
-        s = units._hbar * 1e10 / sqrt(units._e * units._amu)
-        omega_kl *= s
+        omega_kl *= units._hbar * 1e10 / sqrt(units._e * units._amu)
 
         if modes:
             return omega_kl, u_klav
@@ -886,7 +884,7 @@ class Phonons(Displacement):
             branch_l = list(branches)
 
         # Calculate modes
-        omega_l, u_l = self.band_structure([q_c], modes=True, born=born)
+        omega_l, u_l = self.band_structure(q_c, modes=True, born=born)
         # Repeat atoms
         atoms = self.atoms * repeat
         # Center
