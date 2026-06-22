@@ -216,7 +216,6 @@ Contents
     tips
     releasenotes
     contact
-    ecosystem
     development/development
     faq
     events/events
