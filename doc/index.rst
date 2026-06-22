@@ -218,7 +218,6 @@ Contents
     contact
     development/development
     faq
-    events/events
 
 .. |ABACUS| image:: static/abacus.png
    :target: https://gitlab.com/1041176461/ase-abacus
