@@ -956,7 +956,7 @@ class _OnetepHelper:
                 tmp = np.loadtxt(
                     self.fdo_lines[idx + offset : idx + n], dtype='str'
                 ).reshape(-1, 4)
-                els = np.char.array(tmp[:, 0])
+                els = tmp[:, 0]
                 if offset == 2:
                     pos = tmp[:, 1:].astype(np.float64)
                 else:
@@ -1004,7 +1004,7 @@ class _OnetepHelper:
                     dtype='str',
                     usecols=(1, 3, 4, 5),
                 )
-                els = np.char.array(tmp[:, 0])
+                els = tmp[:, 0]
                 pos = tmp[:, 1:].astype(np.float64) * units['Bohr']
                 try:
                     atoms = Atoms(els, pos)

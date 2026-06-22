@@ -176,7 +176,7 @@ class SQLite3Database(Database):
             if not np.little_endian:
                 array = array.byteswap()
         if shape is not None:
-            array.shape = shape
+            array = array.reshape(shape)
         return array
 
     def _connect(self):

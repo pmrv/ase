@@ -14,19 +14,30 @@ Version 3.29.0
 
 21 June 2026: :git:`3.29.0 <../3.29.0>`
 
-Release notes still to be written.
+This is an ordinary feature release but includes
+prototypes of interfaces planned for ASE 4.0 in :mod:`ase._4`.
+These features are not intended for production use currently,
+nor are they likely to be complete or resemble a final design.
 
+Highlights:
 
+* Read and write support for the RuNNer input format
+* The SocketIO calculator client supports future defaults from the i-PI:
+  If you run new i-PI as a server with an older ASE as client,
+  you may need to upgrade to this version.
 
 Version 3.28.0
 ==============
 
 17 March 2026: :git:`3.28.0 <../3.28.0>`
 
-Release notes still to be written.
+This is an ordinary feature release.  Highlights:
 
+* NEB uses the "improvedtangent" method by default.
 
-
+* Porting of tutorials to sphinx-gallery is mostly complete.
+  This provides a cleaner experience, fixes bugs, and means that
+  tutorials are actively tested in the future.
 
 Version 3.27.0
 ==============

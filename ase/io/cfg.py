@@ -112,7 +112,7 @@ def write_clr(fd, atoms):
         for a in atoms:
             radius[a.index] = default_radius[a.symbol]
 
-    radius.shape = (-1, 1)
+    radius = radius.reshape((-1, 1))
 
     for c1, c2, c3, r in np.append(color, radius, axis=1):
         fd.write(f'{c1:f} {c2:f} {c3:f} {r:f}\n')

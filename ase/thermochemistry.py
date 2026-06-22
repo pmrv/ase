@@ -491,14 +491,12 @@ class BaseThermoChem(ABC):
     def get_vib_entropy_contribution(self,
                                      temperature: float,
                                      return_list: bool = False
-                                     ) -> float | Sequence[float]:
+                                     ) -> float | np.ndarray:
         """Calculates the entropy due to vibrations for a set of vibrations
         given in eV and a temperature given in Kelvin.  Returns the entropy
         in eV/K."""
         kT = units.kB * temperature
-        S_v = 0.
-        energies = np.array(self.vib_energies)
-        energies /= kT  # eV/ eV/K*K
+        energies = np.array(self.vib_energies) / kT  # eV/ eV/K*K
         S_v = energies / (np.exp(energies) - 1.) - \
             np.log(1. - np.exp(-energies))
         S_v *= units.kB

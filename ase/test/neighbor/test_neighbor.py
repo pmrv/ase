@@ -95,7 +95,7 @@ def test_supercell(sorted):
                 nl2.update(atoms2)
                 d2, c2 = count(nl2, atoms2)
 
-                c2.shape = (-1, 10)  # row: images, column: atoms
+                c2 = c2.reshape((-1, 10))  # row: images, column: atoms
 
                 # if the sum of nearest-neighbor distances gets larger
                 # according to the supercell size
