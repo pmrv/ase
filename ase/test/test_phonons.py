@@ -196,7 +196,7 @@ def test_frequencies_amplitudes(testdir):
     )
 
     for kk, br, hbaromega in checkmodes:
-        print(f'Ckecking k-point {kk} branch {br}')
+        print(f'Checking k-point {kk} branch {br}')
         ph.write_modes(
             kk, branches=(br,), repeat=(repeat, 1, 1), kT=T * units.kB
         )
