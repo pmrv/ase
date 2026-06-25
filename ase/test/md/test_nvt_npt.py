@@ -3,7 +3,7 @@ import pytest
 
 from ase import Atoms
 from ase.build import bulk, make_supercell
-from ase.constraints import FixAtoms
+from ase.constraints import FixAtoms, FixBondLengths
 from ase.md import thermalize_momenta
 from ase.md.bussi import Bussi
 from ase.md.langevin import Langevin
@@ -176,15 +176,27 @@ def propagate(
 NVT_PROPAGATE_TESTS = [
     (NVTBerendsen, 'nvt', None),
     (NVTBerendsen, 'nvt', FixAtoms(0)),
+    (NVTBerendsen, 'nvt', FixBondLengths([[0, 1]])),
     (Langevin, 'langevin', None),
     (Langevin, 'langevin', FixAtoms(0)),
+    (Langevin, 'langevin', FixBondLengths([[0, 1]])),
     (Bussi, 'nvt', None),
     (Bussi, 'nvt', FixAtoms(0)),
+    (Bussi, 'nvt', FixBondLengths([[0, 1]])),
     (NoseHooverChainNVT, 'nosehoover', None),
     pytest.param(
         NoseHooverChainNVT,
         'nosehoover',
         FixAtoms(0),
+        marks=pytest.mark.xfail(
+            reason='NoseHooverChainNVT does not yet support constraints',
+            strict=True,
+        ),
+    ),
+    pytest.param(
+        NoseHooverChainNVT,
+        'nosehoover',
+        FixBondLengths([[0, 1]]),
         marks=pytest.mark.xfail(
             reason='NoseHooverChainNVT does not yet support constraints',
             strict=True,
@@ -196,12 +208,16 @@ NVT_PROPAGATE_TESTS = [
 NVT_PROPAGATE_IDS = [
     'nvtberendsen',
     'nvtberendsen-fixatoms',
+    'nvtberendsen-fixbondlengths',
     'langevin',
     'langevin-fixatoms',
+    'langevin-fixbondlengths',
     'bussi',
     'bussi-fixatoms',
+    'bussi-fixbondlengths',
     'nosehoovernvt',
     'nosehoovernvt-fixatoms',
+    'nosehoovernvt-fixbondlengths',
 ]
 
 
