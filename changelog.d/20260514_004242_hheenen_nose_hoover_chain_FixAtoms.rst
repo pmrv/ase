@@ -21,7 +21,8 @@
 Molecular dynamics
 ------------------
 
-- added compatibility of nose_hoover_chain with FixAtoms
+- Update :class:`~ase.md.nose_hoover_chain.NoseHooverChain` to be compatible
+  with constraints (:mr:`4099`, :mr:`4179`)
 ..
 .. GUI
 .. ---
