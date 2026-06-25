@@ -37,7 +37,7 @@ def test_thermostat_round_trip(hcp_Cu: Atoms, tchain: int, tloop: int):
 
     timestep = 1.0 * ase.units.fs
     thermostat = NoseHooverChainThermostat(
-        num_atoms_global=len(atoms),
+        ndof=atoms.get_number_of_degrees_of_freedom(),
         masses=atoms.get_masses()[:, None],
         temperature_K=1000,
         tdamp=100 * timestep,
@@ -89,7 +89,7 @@ def test_thermostat_truncation_error(hcp_Cu: Atoms, tchain: int, tloop: int):
     for i in range(m):
         delta = delta0 * (2**-i)
         thermostat = NoseHooverChainThermostat(
-            num_atoms_global=len(atoms),
+            ndof=atoms.get_number_of_degrees_of_freedom(),
             masses=atoms.get_masses()[:, None],
             temperature_K=1000,
             tdamp=100 * delta0,
