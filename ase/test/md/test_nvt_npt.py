@@ -125,14 +125,14 @@ def propagate(
     temperature_std_ref = np.sqrt(2.0 / thermalized_ndof) * temperature_ref
     print(f'Expected std(T) = {temperature_std_ref} K')
 
-    T = np.full(2000, np.nan)
-    p = np.full(2000, np.nan)
+    T = np.full(5000, np.nan)
+    p = np.full(5000, np.nan)
     with algorithm(
         atoms, timestep=20 * fs, logfile='-', loginterval=1000, **algoargs
     ) as md:
-        # Gather 2000 data points for decent statistics
-        for _ in range(2000):
-            md.run(5)
+        # Gather 5000 data points for decent statistics
+        for _ in range(5000):
+            md.run(1)
             T[_] = atoms.get_temperature()
             pres = -atoms.get_stress(include_ideal_gas=True)[:3].sum() / 3
             p[_] = pres
