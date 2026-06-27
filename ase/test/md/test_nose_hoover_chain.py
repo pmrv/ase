@@ -238,6 +238,8 @@ def test_anisotropic_barostat(
 @pytest.mark.parametrize('tchain', [1, 3])
 def test_nose_hoover_chain_nvt(asap3, tchain: int, constraints: FixConstraint):
     atoms = ase.build.bulk('Cu').repeat((2, 2, 2))
+    atoms_ref = atoms.copy()  # for comparision later
+
     atoms.constraints = constraints
     atoms.calc = asap3.EMT()
 
@@ -261,6 +263,16 @@ def test_nose_hoover_chain_nvt(asap3, tchain: int, constraints: FixConstraint):
 
     if constraints is None:
         assert np.allclose(np.sum(atoms.get_momenta(), axis=0), 0.0)
+    elif isinstance(constraints, FixAtoms):
+        mask = np.zeros(len(atoms), dtype=bool)
+        mask[constraints.index] = True
+        np.all(atoms_ref.positions[mask] == atoms.positions[mask])
+        np.all(atoms_ref.positions[~mask] != atoms.positions[~mask])
+    elif isinstance(constraints, FixBondLengths):
+        for pair in constraints.pairs:
+            d_ref = atoms_ref.get_distance(pair[0], pair[1], mic=True)
+            d = atoms.get_distance(pair[0], pair[1], mic=True)
+            assert d == pytest.approx(d_ref)
 
 
 @pytest.mark.parametrize('tchain', [1, 3])
