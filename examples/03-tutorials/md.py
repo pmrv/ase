@@ -336,7 +336,7 @@ from ase.md.bussi import Bussi
 from ase.md.velocitydistribution import Stationary, thermalize_momenta
 from ase.units import fs
 
-cu_fcc = bulk("Cu", "fcc") * (2, 2, 2)
+cu_fcc = bulk('Cu', 'fcc') * (2, 2, 2)
 cu_fcc.calc = EMT()
 
 # CSVR thermostat requires initial velocity.
@@ -348,5 +348,7 @@ bussi_dyn = Bussi(cu_fcc, 1.0 * fs, temperature_K=300, taut=50)
 # It is possible to run the dynamics interactively,
 # performing custom actions between steps.
 for step in bussi_dyn.irun(100):
-    print(f"Cumul. energy transfered to the thermostat"
-          f" {bussi_dyn.transferred_energy} eV")
+    print(
+        f'Cumul. energy transfered to the thermostat'
+        f' {bussi_dyn.transferred_energy} eV'
+    )
