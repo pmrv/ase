@@ -37,9 +37,9 @@ def test_phonon_md_init(asap3, testdir):
         phonons.read()  # Why all this boilerplate?
     finally:
         phonons.clean()
-    matrices = phonons.get_force_constant()
+    C_avNav = phonons.get_force_constant()
 
-    K = matrices[0]
+    K = C_avNav[:, :, 0].reshape(len(atoms) * 3, len(atoms) * 3)
     T = 300
 
     atoms.calc = EMT()
