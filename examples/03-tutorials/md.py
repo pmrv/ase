@@ -21,7 +21,7 @@ The key objectives are:
 - Understand how to set up a crystal structure (Cu atoms on an FCC lattice).
 - Initialize velocities from Maxwell–Boltzmann distribution corresponding to a
   chosen temperature.
-- Integrate Newton’s equations of motion using Velocity-Verlet algorithm and we
+- Integrate Newton’s equations of motion using Velocity-Verlet algorithm and
   monitor the temperature using Langevin thermostat.
 - Monitor and analyze thermodynamic quantities (potential energy, kinetic
   energy, total energy, temperature).
@@ -34,8 +34,8 @@ The key objectives are:
 By the end of this tutorial, you should be able to set up your own MD
 simulations, monitor energy conservation, and visualize system evolution.
 
-Part 1: Basic Molecular Dynamics Simulation
-===========================================
+Basic Molecular Dynamics Simulation
+===================================
 
 We start by creating a copper crystal, assigning random velocities
 corresponding to Maxwell Boltzmann Distribution at 300 K, and running dynamics
@@ -59,9 +59,9 @@ from ase.io.trajectory import Trajectory
 from ase.lattice.cubic import FaceCenteredCubic as LatticeFCC
 from ase.md.langevin import Langevin  # for later NPT simulations
 from ase.md.velocitydistribution import (
-    MaxwellBoltzmannDistribution,
     Stationary,
     ZeroRotation,
+    thermalize_momenta,
 )
 from ase.md.verlet import VelocityVerlet
 from ase.optimize import QuasiNewton
@@ -95,7 +95,7 @@ atoms.calc = EMT()
 
 # Set the initial velocities corresponding to T=300K from Maxwell Boltzmann
 # Distribution
-MaxwellBoltzmannDistribution(atoms, temperature_K=300)
+thermalize_momenta(atoms, temperature_K=300)
 
 # We use Velocity Verlet algorithm to integrate the Newton's equations.
 timestep_fs = 5
@@ -162,8 +162,8 @@ plt.show()
 
 
 # %%
-# Part 2: Constant temperature MD
-# ===============================
+# Constant temperature MD
+# =======================
 #
 # In many cases, you want to control temperature (NVT ensemble). This
 # can be done using a thermostat, like -- in this tutorial -- Langevin
@@ -264,12 +264,12 @@ plt.show()
 #   just setting momenta corresponding to a temperature, as we did before.
 #
 #
-# Part 3: Isolated particle MD
-# ============================
+# Isolated particle MD
+# ====================
 #
 # When simulating isolated particles with MD, it is sometimes preferable
 # to set random momenta corresponding to a specific temperature and let the
-# system evolve freely. With a relatively high temperature, the is however
+# system evolve freely. With a relatively high temperature, there is however
 # a risk that the collection of atoms will drift out of the simulation box
 # because the randomized momenta gave the center of mass a small but
 # non-zero velocity too.
@@ -296,7 +296,7 @@ qn = QuasiNewton(atoms)
 qn.run(fmax=0.001, steps=10)
 
 # Set the momenta corresponding to T=1200 K
-MaxwellBoltzmannDistribution(atoms, temperature_K=1200)
+thermalize_momenta(atoms, temperature_K=1200)
 Stationary(atoms)  # zero linear momentum
 ZeroRotation(atoms)  # zero angular momentum
 
@@ -321,3 +321,32 @@ for i in range(200):
 #
 # Try playing the movie with a high frame rate and set frame skipping to a
 # low number. Can you spot the subtle difference?
+
+# %%
+
+# Other thermostats are available in ASE,
+# the Canonical Sampling Velocity Rescaling (CVSR)
+# is one of them. Below you can find example of how to use it.
+# An important thing to know is that the atoms object should have
+# non-zero velocities before instanciating the dynamics object
+
+# %%
+from ase.build.bulk import bulk
+from ase.md.bussi import Bussi
+from ase.md.velocitydistribution import Stationary, thermalize_momenta
+from ase.units import fs
+
+cu_fcc = bulk("Cu", "fcc") * (2, 2, 2)
+cu_fcc.calc = EMT()
+
+# CSVR thermostat requires initial velocity.
+thermalize_momenta(cu_fcc, temperature_K=300)
+Stationary(cu_fcc)
+
+bussi_dyn = Bussi(cu_fcc, 1.0 * fs, temperature_K=300, taut=50)
+
+# It is possible to run the dynamics interactively,
+# performing custom actions between steps.
+for step in bussi_dyn.irun(100):
+    print(f"Cumul. energy transfered to the thermostat"
+          f" {bussi_dyn.transferred_energy} eV")
