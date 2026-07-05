@@ -1,0 +1,5 @@
+Calculators
+-----------
+
+- Remove outmoded attributes like `energy_free` in
+  :class:`~ase.calculator.vasp.Vasp` (:mr:`XXXX`)
