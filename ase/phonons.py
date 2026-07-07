@@ -654,9 +654,8 @@ class Phonons(Displacement):
         )
 
         phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
-        D_avav = (D_avNav * phase_aNa[:, np.newaxis, :, :, np.newaxis]).sum(
-            axis=2
-        )
+        D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
+
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)
 
     def band_structure(self, path_kc, modes=False, born=False, verbose=True):
