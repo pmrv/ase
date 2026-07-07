@@ -201,7 +201,8 @@ class XrDebye:
         """
         Initilize the calculation of X-ray diffraction patterns
 
-        Parameters:
+        Parameters
+        ----------
 
         atoms: ase.Atoms
             atoms object for which calculation will be performed.
@@ -250,12 +251,14 @@ class XrDebye:
         r"""Get the powder x-ray (XRD) scattering intensity
         using the Debye-Formula at single point.
 
-        Parameters:
+        Parameters
+        ----------
 
         s: float, in inverse Angstrom
             scattering vector value (`s = q / 2\pi`).
 
-        Returns:
+        Returns
+        -------
             Intensity at given scattering vector `s`.
         """
 
@@ -302,7 +305,8 @@ class XrDebye:
     def get_waasmaier(self, symbol, s):
         r"""Scattering factor for free atoms.
 
-        Parameters:
+        Parameters
+        ----------
 
         symbol: string
             atom element symbol.
@@ -310,7 +314,8 @@ class XrDebye:
         s: float, in inverse Angstrom
             scattering vector value (`s = q / 2\pi`).
 
-        Returns:
+        Returns
+        -------
             Intensity at given scattering vector `s`.
 
         Note:
@@ -334,7 +339,8 @@ class XrDebye:
         Calculate X-ray diffraction pattern or
         small angle X-ray scattering pattern.
 
-        Parameters:
+        Parameters
+        ----------
 
         x: float array
             points where intensity will be calculated.
@@ -347,7 +353,8 @@ class XrDebye:
             the mode of calculation: X-ray diffraction (XRD) or
             small-angle scattering (SAXS).
 
-        Returns:
+        Returns
+        -------
             list of intensities calculated for values given in ``x``.
         """
         self.mode = mode.upper()
@@ -409,7 +416,8 @@ class XrDebye:
         show the figure and *filename='abc.png'* or
         *filename='abc.eps'* to save the figure to a file.
 
-        Returns:
+        Returns
+        -------
             ``matplotlib.axes.Axes`` object."""
 
         import matplotlib.pyplot as plt
