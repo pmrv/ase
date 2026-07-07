@@ -11,7 +11,7 @@ Atomic Simulation Environment
     :target: https://pypi.org/project/ase/
 
 .. image:: https://gitlab.com/ase/ase/badges/master/coverage.svg?job=coverage-combine
-    :target: https://ase-lib.org/coverage-html/
+    :target: https://docs.ase-lib.org/coverage-html/
 
 
 ASE is a set of tools and Python modules for setting up, manipulating,
