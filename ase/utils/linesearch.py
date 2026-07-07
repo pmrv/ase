@@ -81,7 +81,7 @@ class LineSearch:
                 phi0 = fval
                 derphi0 = np.dot(gval, pk)
                 self.old_stp = alpha1
-                if self.no_update == True:
+                if self.no_update:
                     break
             else:
                 break
