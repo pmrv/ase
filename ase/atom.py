@@ -1,5 +1,3 @@
-# fmt: off
-
 """This module defines the Atom object."""
 
 import numpy as np
@@ -7,13 +5,15 @@ import numpy as np
 from ase.data import atomic_masses, atomic_numbers, chemical_symbols
 
 # Singular, plural, default value:
-names = {'position': ('positions', np.zeros(3)),
-         'number': ('numbers', 0),
-         'tag': ('tags', 0),
-         'momentum': ('momenta', np.zeros(3)),
-         'mass': ('masses', None),
-         'magmom': ('initial_magmoms', 0.0),
-         'charge': ('initial_charges', 0.0)}
+names = {
+    'position': ('positions', np.zeros(3)),
+    'number': ('numbers', 0),
+    'tag': ('tags', 0),
+    'momentum': ('momenta', np.zeros(3)),
+    'mass': ('masses', None),
+    'magmom': ('initial_magmoms', 0.0),
+    'charge': ('initial_charges', 0.0),
+}
 
 
 def atomproperty(name, doc):
@@ -82,12 +82,21 @@ class Atom:
     charge: float
         Atomic charge.
     """
+
     __slots__ = ['data', 'atoms', 'index']
 
-    def __init__(self, symbol='X', position=(0, 0, 0),
-                 tag=None, momentum=None, mass=None,
-                 magmom=None, charge=None,
-                 atoms=None, index=None):
+    def __init__(
+        self,
+        symbol='X',
+        position=(0, 0, 0),
+        tag=None,
+        momentum=None,
+        mass=None,
+        magmom=None,
+        charge=None,
+        atoms=None,
+        index=None,
+    ):
 
         self.data = d = {}
 
@@ -190,8 +199,9 @@ class Atom:
                     array = self.atoms.get_masses()
                 else:
                     default = np.asarray(default)
-                    array = np.zeros((len(self.atoms),) + default.shape,
-                                     default.dtype)
+                    array = np.zeros(
+                        (len(self.atoms),) + default.shape, default.dtype
+                    )
                 array[self.index] = value
                 self.atoms.new_array(plural, array)
 
