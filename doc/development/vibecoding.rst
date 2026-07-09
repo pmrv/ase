@@ -98,4 +98,4 @@ Before submitting your MR, please confirm:
 - [ ] I have added human-written tests for the new logic.
 - [ ] I have properly cited any upstream algorithms or libraries the AI
   utilized.
-- [ ]I have disclosed significant AI tool usage in the MR description.
+- [ ] I have disclosed significant AI tool usage in the MR description.
