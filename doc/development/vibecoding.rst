@@ -73,6 +73,9 @@ demanding.
   through the AI’s output. Remove redundant logic, fix weird naming
   conventions, and ensure the code matches our project’s style guide.
   Ensure the “vibe” translates into readable, maintainable Python.
+- **No AI generated responses:** Code review is done by humans.
+  When communicating with maintainers, do not generate responses
+  using AI.
 
 5. Open Science and Autonomy
 ----------------------------
