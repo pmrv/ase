@@ -1,5 +1,3 @@
-# fmt: off
-
 import atexit
 import functools
 import os
@@ -26,7 +24,7 @@ def paropen(name, mode='r', buffering=-1, encoding=None, comm=None):
 
 
 def parprint(*args, comm=None, **kwargs):
-    """MPI-safe print - prints only from master. """
+    """MPI-safe print - prints only from master."""
     if comm is None:
         comm = world
     if comm.rank == 0:
@@ -49,8 +47,9 @@ class DummyMPI:
 
     def sum(self, a, root=-1):
         if np.isscalar(a):
-            warnings.warn('Please use sum_scalar(...) for scalar arguments',
-                          FutureWarning)
+            warnings.warn(
+                'Please use sum_scalar(...) for scalar arguments', FutureWarning
+            )
         return self._returnval(a)
 
     def sum_scalar(self, a, root=-1):
@@ -117,6 +116,7 @@ class MPI4PY:
     def __init__(self, mpi4py_comm=None):
         if mpi4py_comm is None:
             from mpi4py import MPI
+
             mpi4py_comm = MPI.COMM_WORLD
         self.comm = mpi4py_comm
 
@@ -148,8 +148,9 @@ class MPI4PY:
         else:
             b = self.comm.reduce(a, root)
         if np.isscalar(a):
-            warnings.warn('Please use sum_scalar(...) for scalar arguments',
-                          FutureWarning)
+            warnings.warn(
+                'Please use sum_scalar(...) for scalar arguments', FutureWarning
+            )
         return self._returnval(a, b)
 
     def sum_scalar(self, a, root=-1):
@@ -189,6 +190,7 @@ class AsapCommWrapper:
     """Compatibility hack to save people from trouble with older asap.
 
     We can definitely remove this in 2027."""
+
     def __init__(self, world):
         self.world = world
 
@@ -203,6 +205,7 @@ class AsapCommWrapper:
 
 def _asap_world():
     import _asap
+
     try:
         world = _asap.Communicator()
     except AttributeError:
@@ -222,6 +225,7 @@ def _gpaw_world():
 
     # Return the actual public (possibly wrapper) object
     from gpaw.mpi import world
+
     return world
 
 
@@ -263,8 +267,11 @@ def parallel_function(func):
     @functools.wraps(func)
     def new_func(*args, **kwargs):
         parallel = kwargs.pop('parallel', True)
-        if (world.size == 1 or
-            (args and getattr(args[0], 'serial', False)) or not parallel):
+        if (
+            world.size == 1
+            or (args and getattr(args[0], 'serial', False))
+            or not parallel
+        ):
             # Disable:
             return func(*args, **kwargs)
 
@@ -294,9 +301,11 @@ def parallel_generator(generator):
     @functools.wraps(generator)
     def new_generator(*args, **kwargs):
         parallel = kwargs.pop('parallel', True)
-        if (world.size == 1 or
-            (args and getattr(args[0], 'serial', False)) or
-                not parallel):
+        if (
+            world.size == 1
+            or (args and getattr(args[0], 'serial', False))
+            or not parallel
+        ):
             # Disable:
             for result in generator(*args, **kwargs):
                 yield result
@@ -336,8 +345,13 @@ def register_parallel_cleanup_function():
         error = getattr(sys, 'last_type', None)
         if error:
             sys.stdout.flush()
-            sys.stderr.write(('ASE CLEANUP (node %d): %s occurred.  ' +
-                              'Calling MPI_Abort!\n') % (world.rank, error))
+            sys.stderr.write(
+                (
+                    'ASE CLEANUP (node %d): %s occurred.  '
+                    + 'Calling MPI_Abort!\n'
+                )
+                % (world.rank, error)
+            )
             sys.stderr.flush()
             # Give other nodes a moment to crash by themselves (perhaps
             # producing helpful error messages):
