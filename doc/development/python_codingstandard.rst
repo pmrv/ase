@@ -35,7 +35,8 @@ Conventions`_ PEPs, clarified and extended as follows:
 * No one-liner compound statements (i.e., no ``if x: return``: use two
   lines).
 
-* Maximum line length is 78 characters.
+* Maximum line length is 80 characters (enforced by ``ruff`` and
+  ``flake8``; see ``pyproject.toml`` and ``.flake8``).
 
 * Use "StudlyCaps" for class names.
 
