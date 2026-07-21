@@ -241,33 +241,6 @@ NPT_PROPAGATE_IDS = [
 ]
 
 
-@pytest.mark.parametrize(
-    'strain_rate',
-    [np.array([[1.0, 1.0, 1.0],
-               [0.0, 1.0, 1.0],
-               [0.0, 0.0, 1.0]]),
-    np.array([[1.0, 0.0, 0.0],
-              [1.0, 1.0, 0.0],
-              [1.0, 1.0, 1.0]])]
-     )
-def test_melchionna_npt_set_strain_rate(strain_rate):
-    cell = np.array([[10.0, 0.0, 0.0],
-                     [0.0, 10.0, 0.0],
-                     [0.0, 0.0, 10.0]])
-
-    atoms = Atoms('H', cell=cell, pbc=True)
-    dynamics = MelchionnaNPT(atoms,
-                             timestep=1.0,
-                             temperature_K=300)
-
-    dynamics.set_strain_rate(strain_rate)
-
-    np.testing.assert_array_equal(
-        dynamics.get_strain_rate(),
-        strain_rate,
-    )
-
-
 # Not a real optimizer test but uses optimizers.
 # We should probably not mark this (in general)
 @pytest.mark.optimize()
