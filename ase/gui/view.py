@@ -720,7 +720,8 @@ class View:
             x0 = int(round(x0))
             y0 = int(round(y0))
             self.draw()
-            self.window.canvas.create_rectangle((x, y, x0, y0))
+            self.window.canvas.create_rectangle(
+                (x, y, x0, y0), tags='_ase_transient')
             return
 
         if event.modifier == 'shift':
