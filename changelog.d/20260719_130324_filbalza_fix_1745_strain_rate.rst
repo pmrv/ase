@@ -43,9 +43,8 @@
 ..
 .. - A bullet item for the Other changes category.
 ..
-.. Bugfixes
-.. --------
-..
-.. - Fix :class:`~ase.md.melchionna.MelchionnaNPT` so that
+Bugfixes
+--------
+
+- Fix :class:`~ase.md.melchionna.MelchionnaNPT` so that
   ``set_strain_rate`` works properly (:mr:`4193`).
-..
