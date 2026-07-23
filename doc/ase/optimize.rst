@@ -188,7 +188,7 @@ BFGS. A typical optimization should look like::
 where the trajectory and the restart save the trajectory of the
 optimization and the vectors needed to generate the Hessian Matrix.
 
-QoodOldQuasiNewton
+GoodOldQuasiNewton
 ------------------
 
 While GOQN is an "old" optimizer in the history of ASE,
