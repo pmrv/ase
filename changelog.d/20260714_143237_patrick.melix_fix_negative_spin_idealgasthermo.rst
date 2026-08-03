@@ -1,0 +1,9 @@
+Bugfixes
+--------
+
+- :class:`~ase.thermochemistry.IdealGasThermo` (and other
+  :class:`~ase.thermochemistry.BaseThermoChem` subclasses) now raise a
+  ``ValueError`` when a negative ``spin`` is given. ``spin`` is the total
+  electronic spin magnitude, so a negative value previously produced
+  infinite or NaN electronic entropy via ``kB * log(2 * spin + 1)`` instead
+  of a clear error (:issue:`1939`).

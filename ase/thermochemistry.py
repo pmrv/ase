@@ -313,6 +313,10 @@ class BaseThermoChem(ABC):
                 raise ValueError("Atoms object should not have periodic "
                                  "boundary conditions for BaseThermoChem.")
             self.atoms = atoms
+        if spin is not None and spin < 0:
+            raise ValueError(
+                f"spin must be non-negative (got {spin}); it is the total "
+                "electronic spin magnitude, not a spin z-projection.")
         self.spin = spin
 
     @classmethod
@@ -1232,6 +1236,8 @@ class IdealGasThermo(BaseThermoChem):
         the total electronic spin. (0 for molecules in which all electrons
         are paired, 0.5 for a free radical with a single unpaired electron,
         1.0 for a triplet with two unpaired electrons, such as O_2.)
+        This is a magnitude, not a spin z-projection, so it must be
+        non-negative; a negative value raises a ValueError.
 
     """
 

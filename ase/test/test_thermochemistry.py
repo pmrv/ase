@@ -98,6 +98,24 @@ def test_ideal_gas_thermo_n2(testdir):
     )
 
 
+def test_ideal_gas_thermo_negative_spin():
+    """spin is the total spin magnitude, not a z-projection, so a negative
+    value must raise instead of silently producing infinite/NaN electronic
+    entropy from log(2*spin + 1). See issue #1939."""
+    kwargs = dict(
+        vib_energies=[0.01] * 6,
+        geometry='linear',
+        atoms=molecule('H2'),
+        symmetrynumber=2,
+    )
+    with pytest.raises(ValueError, match='non-negative'):
+        IdealGasThermo(spin=-0.5, **kwargs)
+
+    # spin=0 (closed shell) remains valid.
+    thermo = IdealGasThermo(spin=0.0, **kwargs)
+    assert thermo.spin == 0.0
+
+
 def ideal_gas_thermo_ch3(
     vib_energies,
     geometry='nonlinear',
