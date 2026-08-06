@@ -94,9 +94,11 @@ class Displacement:
             comm = world
         self.comm = comm
 
-        self.cache = MultiFileJSONCache(self.name)
+        self.cache = MultiFileJSONCache(self.name, comm=comm)
 
     def compute_lattice_vectors(self):
+
+    def get_lattice_vectors(self):
         """Return lattice vectors for cells in the supercell."""
         # Lattice vectors -- ordered as illustrated in class docstring
 
@@ -343,9 +345,9 @@ class Phonons(Displacement):
         return fmin, fmax, i_min, i_max
 
     @deprecated(
-        'Current implementation of non-analytical correction is '
-        'likely incorrect, see '
-        'https://gitlab.com/ase/ase/-/work_items/941'
+        'Implementation of non-analytical correction has remained untested '
+        'for many years and was likely incorrect, see '
+        'https://gitlab.com/ase/ase/-/work_items/941   '
     )
     def read_born_charges(self, name='born', neutrality=True):
         r"""Read Born charges and dieletric tensor from JSON file.
@@ -627,7 +629,7 @@ class Phonons(Displacement):
 
         Parameters
         ----------
-        q_c : np.ndarray
+        q_c: np.ndarray
             Phonon wave vector in scaled coordinates.
         D_avNav: np.ndarray
             Force constant matrix scaled by atom masses.
@@ -638,7 +640,7 @@ class Phonons(Displacement):
 
         Returns
         -------
-        D_XX : np.ndarray
+        D_XX: np.ndarray
             Dynamical matrix, a complex-valued array D(q)
             with shape=(3 * natoms, 3 * natoms).
         """
@@ -653,7 +655,7 @@ class Phonons(Displacement):
             - pos_ac[:, np.newaxis, np.newaxis]
         )
 
-        phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
+        phase_aNa = np.exp(2.j * np.pi * np.dot(vectors_aNac, q_c))
         D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
 
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)
@@ -706,11 +708,9 @@ class Phonons(Displacement):
             assert self.eps_vv is not None
             raise RuntimeError(
                 'Inclusion of non-analytic corrections to '
-                'phonon energies currently does not function. '
+                'phonon energies has not worked for a long time. '
                 '(see work item 941)'
             )
-            # cell_cv = 2. * np.pi * self.atoms.cell.reciprocal()
-            # vol = abs(la.det(self.atoms.cell)) / units.Bohr**3
 
         # Multiply by mass prefactor
         m_inv_a = self.atoms.get_masses()[self.indices] ** -0.5
@@ -724,30 +724,6 @@ class Phonons(Displacement):
         u_klav = np.zeros((nk, 3 * nindices, nindices, 3), dtype=complex)
 
         for q_index, q_c in enumerate(path_kc):
-            # Add non-analytic part
-            if born:
-                raise RuntimeError()
-                # # q-vector in cartesian coordinates
-                # q_v = np.dot(q_c, cell_cv)
-                # # Non-analytic contribution to force constants in atomic units
-
-                # # XXX What is this dot product? It looks like it
-                # # will always crash because of a mismatch in dimensions
-                # qdotZ_av = np.dot(q_v, self.Z_avv).ravel()
-                # C_na = (
-                #     4
-                #     * pi
-                #     * np.outer(qdotZ_av, qdotZ_av)
-                #     / np.dot(q_v, np.dot(self.eps_vv, q_v))
-                #     / vol
-                # )
-                # self.C_na = C_na / units.Bohr**2 * units.Hartree
-                # Add mass prefactor and convert to eV / (Ang^2 * amu)
-                # M_inv = np.outer(self.m_inv_x, self.m_inv_x)
-                # D_na = C_na * M_inv / units.Bohr**2 * units.Hartree
-                # self.D_na = D_na
-                # D_N = self.D_N + D_na / np.prod(self.supercell)
-
             # Evaluate Fourier sum
             D_XX = self.compute_dynamical_matrix(q_c, D_avNav)
 
@@ -796,7 +772,6 @@ class Phonons(Displacement):
 
         if modes:
             return omega_kl, u_klav
-
         return omega_kl
 
     def get_dos(
