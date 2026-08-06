@@ -53,9 +53,9 @@ fig.savefig('Al_phonon.png')
 # from ase.io import write
 
 # Write modes for specific q-vector to trajectory files:
-L = path.special_points['L']
+L = np.array(path.special_points['L'])
 ph.write_modes(
-    np.array([l / 2 for l in L]),
+    L / 2.,
     branches=[2],
     repeat=(8, 8, 8),
     kT=3e-4,
