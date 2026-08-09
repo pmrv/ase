@@ -32,6 +32,9 @@ class Namelist(UserDict):
     def __delitem__(self, key):
         super().__delitem__(key.lower())
 
+    def __contains__(self, key):
+        return super().__contains__(key.lower())
+
     @staticmethod
     def search_key(to_find, keys):
         """Search for a key in the namelist, case-insensitive.
