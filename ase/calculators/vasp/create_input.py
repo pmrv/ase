@@ -58,6 +58,23 @@ def check_ichain(ichain, ediffg, iopt):
             raise RuntimeError('Please set EDIFFG < 0')
     return ichain_dct
 
+
+def set_constr(atoms, lnoncollinear, magmom, sorting):
+    mag_dict = {}
+    if not lnoncollinear:
+        return {}
+    
+    magmom = np.array(magmom)
+    assert magmom.shape == (len(atoms), 3), (
+    f"magmoms must have shape ({len(atoms)}, 3), "
+    f"but got {magmom.shape}"
+    )
+
+    magmom = magmom[sorting].flatten()
+    line = compactify_maglst(magmom)
+    mag_dict['m_constr'] = line
+    return mag_dict
+
 def compactify_maglst(magmom):
     lst = [[1, magmom[0]]]
     for n in range(1, len(magmom)):
@@ -1804,9 +1821,14 @@ class GenerateVaspInput:
             spinpol=self.spinpol,
             magmom_input=float_dct.get('magmom', None),
             sorting=self.sort,
+            lnoncollinear=self.bool_params.get("lnoncollinear", False),
         )
         self.spinpol = spinpol
         incar_params.update(magmom_dct)
+
+        # set non-llinear magmoms m_constr.
+        magm_constr_dct = set_constr(atoms=atoms, lnoncollinear=self.bool_params.get("lnoncollinear", False),magmom=float_dct.get("m_constr", None), sorting=self.sort)
+        incar_params.update(magm_constr_dct)
 
         # Custom key-value pairs, which receive no formatting
         # Use the comment "# <Custom ASE key>" to denote such
