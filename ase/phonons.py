@@ -155,6 +155,7 @@ class Displacement:
                 self.nindices = len(atoms)
                 self.indices = np.arange(self.nindices)
             case list():
+                indices: list[int]
                 assert len(select_atoms) == len(set(select_atoms))
                 assert len(select_atoms) <= len(atoms)
                 assert all(
@@ -347,7 +348,7 @@ class Phonons(Displacement):
         )
 
         # Attributes for force constants and dynamical matrix in real space
-        self.C_avNav = None  # in units of eV / Ang**2
+        self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
         # Attributes for born charges and static dielectric tensor
         self.Z_avv = None
@@ -739,7 +740,7 @@ class Phonons(Displacement):
         nindices = self.nindices
 
         # Force constant matrices
-        assert self.C_avNav.size != 0, print(
+        assert self.C_avNav is not None, print(
             'Make sure you have .read() your force constant matrices!'
         )
         C_avNav = self.C_avNav
