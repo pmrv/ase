@@ -59,7 +59,7 @@ def check_ichain(ichain, ediffg, iopt):
     return ichain_dct
 
 
-def set_magmom(ispin, spinpol, atoms, magmom_input, sorting):
+def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
     """Helps to set the magmom tag in the INCAR file with correct formatting"""
     magmom_dct = {}
     if magmom_input is not None:
@@ -71,17 +71,22 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting):
 
             # Check if user remembered to specify ispin
             # note: we do not overwrite ispin if ispin=1
-        if not ispin:
+            # do not change ispin if lnoncollinear has been set by the user. vasp ispin and lnoncollinear do not go together.
+        if not ispin and not lnoncollinear:
             spinpol = True
             # note that ispin is an int key, but for the INCAR it does not
             # matter
             magmom_dct['ispin'] = 2
         magmom = np.array(magmom_input)
         magmom = magmom[sorting]
-    elif (spinpol and atoms.get_initial_magnetic_moments().any()):
-        # We don't want to write magmoms if they are all 0.
+
+        if magmom.ndim > 1:
+            magmom = magmom.flatten()
+
+    elif spinpol: # and atoms.get_initial_magnetic_moments().any()):
+        # We will write the magnetic moments even if they are zero.
         # but we could still be doing a spinpol calculation
-        if not ispin:
+        if not ispin and not lnoncollinear:
             magmom_dct['ispin'] = 2
         # Write out initial magnetic moments
         magmom = atoms.get_initial_magnetic_moments()[sorting]
