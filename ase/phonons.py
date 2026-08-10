@@ -578,7 +578,7 @@ class Phonons(Displacement):
 
         C_avNav *= bools_aNa[:, np.newaxis, :, :, np.newaxis]
 
-    @deprecated('Please use get_force_constants() (with an s) instead')
+    @deprecated('Please use get_force_constants() instead')
     def get_force_constant(self) -> np.ndarray:
         """Deprecated version of get_force_constants,
         can safely be removed by summer 2027"""
