@@ -1,5 +1,6 @@
 """Module for calculating phonons of periodic systems."""
 
+import warnings
 from math import pi, sqrt
 from pathlib import Path
 
@@ -35,6 +36,7 @@ class Displacement:
         atoms: Atoms,
         calc,
         supercell: tuple[int, int, int],
+        select_atoms: list[str] | list[int] | None,
         name: str,
         delta: float,
         center_refcell: bool,
@@ -44,22 +46,25 @@ class Displacement:
 
         Parameters
         ----------
-        atoms: :class:`~ase.Atoms`
+        atoms:
             The atoms to work on.
-        calc: Calculator
+        calc:
             Calculator for the supercell calculation.
-        supercell: tuple[int, int, int]
-            Size of supercell given by the number of repetitions (l, m, n) of
+        supercell:
+            Size of supercell given by the number of repetitions (n1, n2, n3) of
             the small unit cell in each direction.
-        name: str
+        select_atoms:
+            Select which atoms to generate displacements for.
+            By default, displacements are generated for all atoms.
+        name:
             Base name to use for files.
-        delta: float
+        delta:
             Magnitude of displacement in Ang.
-        center_refcell: bool
+        center_refcell:
             Reference cell in which the atoms will be displaced. If False, then
             corner cell in supercell is used. If True, then cell in the center
             of the supercell is used.
-        comm: communicator
+        comm:
             MPI communicator for the phonon calculation.
             Default is to use world.
         """
@@ -69,10 +74,8 @@ class Displacement:
         self.natoms = len(atoms)
         self.calc = calc
 
-        # By default, all atoms in the unit cell are displaced. The set_atoms()
-        # method on this class can be used to specify which atoms to displace.
-        self.indices = np.arange(len(atoms))
-        self.nindices = len(atoms)
+        # Specify indices of which atoms to vibrate
+        self.set_atoms(select_atoms, _warn=False)
 
         self.name = name
         self.delta = delta
@@ -88,7 +91,7 @@ class Displacement:
                 + supercell[1] // 2 * supercell[2]
                 + supercell[2] // 2
             )
-        self.lattice_vectors_array = self.compute_lattice_vectors()
+        self.lattice_vectors_array = self.get_lattice_vectors()
 
         if comm is None:
             comm = world
@@ -96,13 +99,17 @@ class Displacement:
 
         self.cache = MultiFileJSONCache(self.name, comm=comm)
 
+    @deprecated('Please use get_lattice_vectors() instead')
     def compute_lattice_vectors(self):
+        """Deprecated version of get_lattice_vectors,
+        can safely be removed by summer 2027"""
+        return self.get_lattice_vectors().T
 
     def get_lattice_vectors(self):
-        """Return lattice vectors for cells in the supercell."""
-        # Lattice vectors -- ordered as illustrated in class docstring
+        """Return lattice vectors for cells in the supercell,
+        the ordering are as illustrated in Phonons class docstring"""
 
-        # Lattice vectors relevative to the corner unit cell
+        # First, lattice vectors relevative to the corner unit cell
         R_Nc = np.indices(self.supercell).reshape(3, self.ncells).T
 
         N_c = np.array(self.supercell)
@@ -118,34 +125,55 @@ class Displacement:
 
         raise NotImplementedError('Implement in derived classes!.')
 
-    def set_atoms(self, atoms):
-        """Set the atoms to vibrate.
+    def set_atoms(
+        self, select_atoms: list[str] | list[int] | None, _warn: bool = True
+    ):
+        """Specify which atoms to vibrate.
 
         Parameters
         ----------
-        atoms: list
-            Can be either a list of strings, ints or ...
+        select_atoms:
+            List of atomic indices or atomic types.
+            If None, all atoms are set to vibrate.
 
         """
 
-        assert isinstance(atoms, list)
-        assert len(atoms) <= len(self.atoms)
+        if _warn:
+            warnings.warn(
+                'Please specify which atoms to vibrate using the select_atoms '
+                'keyword during initialization instead of using '
+                'Displacements.set_atoms(...)',
+                DeprecationWarning,
+            )
+        # This method can safely be moved inside the __init__ and deleted
+        # roughly by summer 2027.
 
-        if isinstance(atoms[0], str):
-            assert np.all([isinstance(atom, str) for atom in atoms])
-            sym_a = self.atoms.get_chemical_symbols()
-            # List for atomic indices
-            indices = []
-            for type in atoms:
-                indices.extend(
-                    [a for a, atom in enumerate(sym_a) if atom == type]
+        atoms = self.atoms
+
+        match select_atoms:
+            case None:
+                self.nindices = len(atoms)
+                self.indices = np.arange(self.nindices)
+            case list():
+                assert len(select_atoms) == len(set(select_atoms))
+                assert len(select_atoms) <= len(atoms)
+                assert all(
+                    type(atom) is type(select_atoms[0]) for atom in select_atoms
                 )
-        else:
-            assert np.all([isinstance(atom, int) for atom in atoms])
-            indices = atoms
+                if isinstance(select_atoms[0], str):
+                    sym_a = atoms.get_chemical_symbols()
+                    indices = []
+                    for atomtype in select_atoms:
+                        indices.extend(
+                            a
+                            for a, atom in enumerate(sym_a)
+                            if atom == atomtype
+                        )
+                elif isinstance(select_atoms[0], int):
+                    indices = select_atoms
 
-        self.indices = indices
-        self.nindices = len(indices)
+                self.indices = np.array(indices)
+                self.nindices = len(indices)
 
     def _eq_disp(self):
         return self._disp(0, 0, 0)
@@ -299,6 +327,7 @@ class Phonons(Displacement):
         atoms: Atoms,
         calc=None,
         supercell: tuple[int, int, int] = (1, 1, 1),
+        select_atoms: list[int] | list[str] | None = None,
         name: str = 'phonon',
         delta: float = 0.01,
         center_refcell: bool = False,
@@ -310,6 +339,7 @@ class Phonons(Displacement):
             atoms=atoms,
             calc=calc,
             supercell=supercell,
+            select_atoms=select_atoms,
             name=name,
             delta=delta,
             center_refcell=center_refcell,
@@ -317,7 +347,7 @@ class Phonons(Displacement):
         )
 
         # Attributes for force constants and dynamical matrix in real space
-        self.C_avNav = np.empty(0)  # in units of eV / Ang**2
+        self.C_avNav = None  # in units of eV / Ang**2
 
         # Attributes for born charges and static dielectric tensor
         self.Z_avv = None
@@ -547,10 +577,21 @@ class Phonons(Displacement):
 
         C_avNav *= bools_aNa[:, np.newaxis, :, :, np.newaxis]
 
+    @deprecated('Please use get_force_constants() (with an s) instead')
     def get_force_constant(self) -> np.ndarray:
+        """Deprecated version of get_force_constants,
+        can safely be removed by summer 2027"""
+
+        C_avNav = self.get_force_constants()
+        C_Navav = np.moveaxis(C_avNav, (0, 1, 2), (1, 2, 0))
+        return C_Navav.reshape(
+            C_Navav.shape[0] + (3 * self.nindices, 3 * self.nindices)
+        )
+
+    def get_force_constants(self) -> np.ndarray:
         """Return matrix of force constants."""
 
-        assert self.C_avNav.size != 0
+        assert self.C_avNav is not None
         return self.C_avNav
 
     def get_band_structure(
@@ -655,7 +696,7 @@ class Phonons(Displacement):
             - pos_ac[:, np.newaxis, np.newaxis]
         )
 
-        phase_aNa = np.exp(2.j * np.pi * np.dot(vectors_aNac, q_c))
+        phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
         D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
 
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)

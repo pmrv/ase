@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pytest
 
 from ase import Atoms, units
 from ase.build import bulk, molecule
@@ -10,11 +11,12 @@ from ase.io.trajectory import Trajectory
 from ase.phonons import Phonons
 
 
-def check_set_atoms(atoms, set_atoms, expected_atoms):
+def check_set_atoms(atoms, select_atoms, expected_atoms):
     """Perform a test that .set_atoms() only displaces the expected atoms."""
     atoms.calc = EMT()
     phonons = Phonons(atoms, EMT())
-    phonons.set_atoms(set_atoms)
+    with pytest.warns(DeprecationWarning):
+        phonons.set_atoms(select_atoms)
 
     # TODO: For now, because there is no public API to iterate over/inspect
     #       displacements, we run and check the number of files in the cache.
@@ -25,11 +27,11 @@ def check_set_atoms(atoms, set_atoms, expected_atoms):
 
 
 def test_set_atoms_indices(testdir):
-    check_set_atoms(molecule('CO2'), set_atoms=[0, 1], expected_atoms=[0, 1])
+    check_set_atoms(molecule('CO2'), select_atoms=[0, 1], expected_atoms=[0, 1])
 
 
 def test_set_atoms_symbol(testdir):
-    check_set_atoms(molecule('CO2'), set_atoms=['O'], expected_atoms=[1, 2])
+    check_set_atoms(molecule('CO2'), select_atoms=['O'], expected_atoms=[1, 2])
 
 
 def test_check_eq_forces(testdir):
