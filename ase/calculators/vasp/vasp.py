@@ -937,21 +937,6 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         if not lines:
             lines = self.load_file('OUTCAR')
 
-        magnetic_moments = np.zeros(len(self.atoms))
-        magstr = 'magnetization (x)'
-
-        # # Search for the last occurrence
-        # nidx = -1
-        # for n, line in enumerate(lines):
-        #     if magstr in line:
-        #         nidx = n
-
-        # # Read that occurrence
-        # if nidx > -1:
-        #     for m in range(len(self.atoms)):
-        #         magnetic_moments[m] = float(lines[nidx + m + 4].split()[-1])
-
-
         natoms = len(self.atoms)
 
         labels = [
