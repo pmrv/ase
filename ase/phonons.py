@@ -664,7 +664,36 @@ class Phonons(Displacement):
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
 
-    def compute_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
+    @deprecated('Please use calculate_dynamical_matrix() instead')
+    def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
+        """Computation of the dynamical matrix in momentum space D_ab(q).
+            This is a Fourier transform from real-space dynamical matrix D_N
+            for a given momentum vector q.
+
+        Parameters
+        ----------
+        q_scaled : np.ndarray
+            q vector in scaled coordinates.
+        D_N : np.ndarray
+            Dynamical matrix in real-space.
+            It is necessary, at least currently, to provide this matrix
+            explicitly (rather than use self.D_N) because this matrix is
+            modified by the Born charges contributions and these modifications
+            are momentum (q) dependent.
+
+        Returns
+        -------
+        D_q : np.ndarray
+            2D complex-valued array D(q) with shape=(3 * natoms, 3 * natoms).
+
+        """
+        # Evaluate fourier sum
+        R_cN = self.compute_lattice_vectors()
+        phase_N = np.exp(-2.0j * pi * np.dot(q_scaled, R_cN))
+        D_q = np.sum(phase_N[:, np.newaxis, np.newaxis] * D_N, axis=0)
+        return D_q
+
+    def calculate_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_XX(q).
             This is a Fourier transform from real-space force constants
             for a given momentum vector q.
@@ -767,7 +796,7 @@ class Phonons(Displacement):
 
         for q_index, q_c in enumerate(path_kc):
             # Evaluate Fourier sum
-            D_XX = self.compute_dynamical_matrix(q_c, D_avNav)
+            D_XX = self.calculate_dynamical_matrix(q_c, D_avNav)
 
             if modes:
                 omega2_l, u_Xl = la.eigh(D_XX, UPLO='U')
