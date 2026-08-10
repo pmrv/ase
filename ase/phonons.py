@@ -586,7 +586,7 @@ class Phonons(Displacement):
         C_avNav = self.get_force_constants()
         C_Navav = np.moveaxis(C_avNav, (0, 1, 2), (1, 2, 0))
         return C_Navav.reshape(
-            C_Navav.shape[0] + (3 * self.nindices, 3 * self.nindices)
+            (C_Navav.shape[0],) + (3 * self.nindices, 3 * self.nindices)
         )
 
     def get_force_constants(self) -> np.ndarray:
