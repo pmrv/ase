@@ -940,16 +940,58 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         magnetic_moments = np.zeros(len(self.atoms))
         magstr = 'magnetization (x)'
 
-        # Search for the last occurrence
-        nidx = -1
-        for n, line in enumerate(lines):
-            if magstr in line:
-                nidx = n
+        # # Search for the last occurrence
+        # nidx = -1
+        # for n, line in enumerate(lines):
+        #     if magstr in line:
+        #         nidx = n
 
-        # Read that occurrence
-        if nidx > -1:
-            for m in range(len(self.atoms)):
-                magnetic_moments[m] = float(lines[nidx + m + 4].split()[-1])
+        # # Read that occurrence
+        # if nidx > -1:
+        #     for m in range(len(self.atoms)):
+        #         magnetic_moments[m] = float(lines[nidx + m + 4].split()[-1])
+
+
+        natoms = len(self.atoms)
+
+        labels = [
+            'magnetization (x)',
+            'magnetization (y)',
+            'magnetization (z)',
+        ]
+
+        indices = {label: -1 for label in labels}
+
+        # Find last occurrence of each magnetization block
+        for n, line in enumerate(lines):
+            for label in labels:
+                if label in line:
+                    indices[label] = n
+
+        x_idx = indices['magnetization (x)']
+        y_idx = indices['magnetization (y)']
+        z_idx = indices['magnetization (z)']
+
+        # Non-collinear calculation
+        if y_idx >= 0 and z_idx >= 0:
+            magnetic_moments = np.zeros((natoms, 3))
+
+            for component, idx in enumerate((x_idx, y_idx, z_idx)):
+                for atom in range(natoms):
+                    magnetic_moments[atom, component] = float(
+                        lines[idx + atom + 4].split()[-1]
+                    )
+
+        # Collinear calculation
+        else:
+            magnetic_moments = np.zeros(natoms)
+
+            if x_idx >= 0:
+                for atom in range(natoms):
+                    magnetic_moments[atom] = float(
+                        lines[x_idx + atom + 4].split()[-1]
+                    )
+
         return magnetic_moments[self.resort]
 
     def _read_magnetic_moment(self, lines=None):
