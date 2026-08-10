@@ -63,7 +63,7 @@ def set_constr(atoms, lnoncollinear, magmom, sorting):
     mag_dict = {}
     if not lnoncollinear:
         return {}
-    
+
     magmom = np.array(magmom)
     assert magmom.shape == (len(atoms), 3), (
     f"magmoms must have shape ({len(atoms)}, 3), "
@@ -74,6 +74,7 @@ def set_constr(atoms, lnoncollinear, magmom, sorting):
     line = compactify_maglst(magmom)
     mag_dict['m_constr'] = line
     return mag_dict
+
 
 def compactify_maglst(magmom):
     lst = [[1, magmom[0]]]
@@ -99,7 +100,8 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
 
             # Check if user remembered to specify ispin
             # note: we do not overwrite ispin if ispin=1
-            # do not change ispin if lnoncollinear has been set by the user. vasp ispin and lnoncollinear do not go together.
+            # do not change ispin if lnoncollinear has been set by the user.
+            # vasp ispin and lnoncollinear do not go together.
         if not ispin and not lnoncollinear:
             spinpol = True
             # note that ispin is an int key, but for the INCAR it does not
@@ -111,7 +113,7 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
         if magmom.ndim > 1:
             magmom = magmom.flatten()
 
-    elif spinpol: # and atoms.get_initial_magnetic_moments().any()):
+    elif spinpol:  # and atoms.get_initial_magnetic_moments().any()):
         # We will write the magnetic moments even if they are zero.
         # but we could still be doing a spinpol calculation
         if not ispin and not lnoncollinear:
@@ -1827,7 +1829,12 @@ class GenerateVaspInput:
         incar_params.update(magmom_dct)
 
         # set non-llinear magmoms m_constr.
-        magm_constr_dct = set_constr(atoms=atoms, lnoncollinear=self.bool_params.get("lnoncollinear", False),magmom=float_dct.get("m_constr", None), sorting=self.sort)
+        magm_constr_dct = set_constr(
+            atoms=atoms,
+            lnoncollinear=self.bool_params.get("lnoncollinear", False),
+            magmom=float_dct.get("m_constr", None),
+            sorting=self.sort,
+        )
         incar_params.update(magm_constr_dct)
 
         # Custom key-value pairs, which receive no formatting
