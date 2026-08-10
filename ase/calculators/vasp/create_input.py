@@ -58,6 +58,17 @@ def check_ichain(ichain, ediffg, iopt):
             raise RuntimeError('Please set EDIFFG < 0')
     return ichain_dct
 
+def compactify_maglst(magmom):
+    lst = [[1, magmom[0]]]
+    for n in range(1, len(magmom)):
+        if magmom[n] == magmom[n - 1]:
+            lst[-1][0] += 1
+        else:
+            lst.append([1, magmom[n]])
+    line = ' '.join(['{:d}*{:.4f}'.format(mom[0], mom[1])
+                     for mom in lst])
+    return line
+
 
 def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
     """Helps to set the magmom tag in the INCAR file with correct formatting"""
@@ -96,14 +107,7 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
     else:
         return spinpol, {}
     # Compactify the magmom list to symbol order
-    lst = [[1, magmom[0]]]
-    for n in range(1, len(magmom)):
-        if magmom[n] == magmom[n - 1]:
-            lst[-1][0] += 1
-        else:
-            lst.append([1, magmom[n]])
-    line = ' '.join(['{:d}*{:.4f}'.format(mom[0], mom[1])
-                     for mom in lst])
+    line = compactify_maglst(magmom)
     magmom_dct['magmom'] = line
     return spinpol, magmom_dct
 
