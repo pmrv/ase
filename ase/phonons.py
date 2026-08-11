@@ -164,17 +164,9 @@ class Displacement:
                     type(atom) is type(select_atoms[0]) for atom in select_atoms
                 )
                 if isinstance(select_atoms[0], str):
-                    sym_a = atoms.get_chemical_symbols()
-                    indices = []
-                    for atomtype in select_atoms:
-                        indices.extend(
-                            a
-                            for a, atom in enumerate(sym_a)
-                            if atom == atomtype
-                        )
+                    indices = atoms.symbols.search(select_atoms)
                 elif isinstance(select_atoms[0], int):
                     indices = select_atoms
-
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
 

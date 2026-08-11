@@ -34,6 +34,12 @@ def test_set_atoms_symbol(testdir):
     check_set_atoms(molecule('CO2'), select_atoms=['O'], expected_atoms=[1, 2])
 
 
+def test_set_atoms_two_symbols(testdir):
+    check_set_atoms(
+        molecule('CO2'), select_atoms=['O', 'C'], expected_atoms=[0, 1, 2]
+    )
+
+
 def test_check_eq_forces(testdir):
     atoms = bulk('C')
     atoms.calc = EMT()
