@@ -27,7 +27,12 @@ def generate_all_bulk_structures():
     return cases
 
 
-@pytest.fixture(scope='session', params=generate_all_bulk_structures())
+@pytest.fixture(
+    scope='session',
+    params=[
+        pytest.param(obj, id=obj[0]) for obj in generate_all_bulk_structures()
+    ],
+)
 def system(request):
     symbol, atoms = request.param
     atoms = atoms.copy()
@@ -36,12 +41,13 @@ def system(request):
 
 
 def test_symmetry_constrained_relaxation_emt(system):
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     symbol, atoms_ref = system
     atoms_ref = atoms_ref.copy()
     atoms = atoms_ref.copy()
 
     # Symmetry adapted relaxation
-    from ase._4.symopt.relax import Relax
+    from ase._4.optimize._symopt.relax import Relax
     from ase.optimize.bfgs import BFGS
     from ase.parallel import world
 

@@ -38,14 +38,13 @@
 ..
 .. - A bullet item for the Documentation category.
 ..
-Other changes
--------------
+.. Other changes
+.. -------------
+..
+.. - A bullet item for the Other changes category.
+..
+Bugfixes
+--------
 
-- The default command for the CP2K calculator was changed from ``cp2k_shell`` to
-  ``cp2k.psmp -s``.
-..
-.. Bugfixes
-.. --------
-..
-.. - A bullet item for the Bugfixes category.
-..
+- Fix :class:`~ase.md.melchionna.MelchionnaNPT` so that
+  ``set_strain_rate`` works properly (:mr:`4193`).

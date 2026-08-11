@@ -686,7 +686,7 @@ class GUI(View):
              [M(_('_About'), partial(
                  ui.about, 'ASE-GUI',
                  version=__version__,
-                 webpage='https://ase-lib.org/ase/gui/gui.html')),
+                 webpage='https://docs.ase-lib.org/ase/gui/gui.html')),
               M(_('Webpage ...'), webpage)])]
 
     def attach(self, function, *args, **kwargs):
@@ -744,4 +744,4 @@ class GUI(View):
 
 def webpage():
     import webbrowser
-    webbrowser.open('https://ase-lib.org/ase/gui/gui.html')
+    webbrowser.open('https://docs.ase-lib.org/ase/gui/gui.html')

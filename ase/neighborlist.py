@@ -986,8 +986,14 @@ class PrimitiveNeighborList:
 
         N = _calc_expansion(rcell, pbc, rcmax)
 
-        neighbor_indices_a = [[] for _ in range(natoms)]
-        displacements_a = [[] for _ in range(natoms)]
+        # Collect neighbours as flat (first, second, offset) arrays.  The query
+        # returns a Python list per atom; the per-atom distance filtering and
+        # offset bookkeeping are then done with vectorised array operations
+        # rather than a Python loop over atoms, which dominated the build time.
+        arange = np.arange(natoms)
+        first_parts = []
+        second_parts = []
+        offset_parts = []
 
         for n1, n2, n3 in itertools.product(range(N[0] + 1),
                                             range(-N[1], N[1] + 1),
@@ -1002,47 +1008,58 @@ class PrimitiveNeighborList:
                 r=self.cutoffs + rcmax,
             )
 
-            for a in range(natoms):
-                indices = indices_all[a]
+            counts = np.fromiter((len(ind) for ind in indices_all),
+                                 dtype=int, count=natoms)
+            if counts.sum() == 0:
+                continue
 
-                if not indices:
-                    continue
+            first = np.repeat(arange, counts)
+            second = np.concatenate(
+                [np.asarray(ind, dtype=int)
+                 for ind in indices_all if len(ind)])
+            delta = positions[second] + displacement - positions[first]
+            distances = np.sqrt(np.einsum('ij,ij->i', delta, delta))
+            mask = distances < self.cutoffs[second] + self.cutoffs[first]
+            if n1 == 0 and n2 == 0 and n3 == 0:
+                if self.self_interaction:
+                    mask &= second >= first
+                else:
+                    mask &= second > first
+            first = first[mask]
+            second = second[mask]
 
-                indices = np.array(indices)
-                delta = positions[indices] + displacement - positions[a]
-                distances = np.sqrt(np.add.reduce(delta**2, axis=1))
-                cutoffs = self.cutoffs[indices] + self.cutoffs[a]
-                i = indices[distances < cutoffs]
-                if n1 == 0 and n2 == 0 and n3 == 0:
-                    if self.self_interaction:
-                        i = i[i >= a]
-                    else:
-                        i = i[i > a]
+            first_parts.append(first)
+            second_parts.append(second)
+            offset_parts.append(shift0 + offsets[second] - offsets[first])
 
-                neighbor_indices_a[a].append(i)
-
-                disp = shift0 + offsets[i] - offsets[a]
-                displacements_a[a].append(disp)
-
-        self.neighbors = [np.concatenate(i) for i in neighbor_indices_a]
-        self.displacements = [np.concatenate(d) for d in displacements_a]
+        if first_parts:
+            first = np.concatenate(first_parts)
+            second = np.concatenate(second_parts)
+            disp = np.concatenate(offset_parts)
+        else:
+            first = np.zeros(0, dtype=int)
+            second = np.zeros(0, dtype=int)
+            disp = np.zeros((0, 3), dtype=int)
 
         if self.bothways:
-            neighbors2 = [[] for a in range(natoms)]
-            displacements2 = [[] for a in range(natoms)]
-            for a in range(natoms):
-                for b, disp in zip(self.neighbors[a], self.displacements[a]):
-                    # avoid double counting of self interaction
-                    if a == b and (disp == 0).all():
-                        continue
-                    neighbors2[b].append(a)
-                    displacements2[b].append(-disp)
-            for a in range(natoms):
-                nbs = np.concatenate((self.neighbors[a], neighbors2[a]))
-                disp = np.array(list(self.displacements[a]) + displacements2[a])
-                # Force correct type and shape for case of no neighbors:
-                self.neighbors[a] = nbs.astype(int)
-                self.displacements[a] = disp.astype(int).reshape((-1, 3))
+            # Add the reverse of every pair (a -> b becomes b -> a with the
+            # opposite offset), skipping a true self interaction at zero offset.
+            keep = ~((first == second) & (disp == 0).all(axis=1))
+            rev_first, rev_second = second[keep], first[keep]
+            first = np.concatenate((first, rev_first))
+            second = np.concatenate((second, rev_second))
+            disp = np.concatenate((disp, -disp[keep]))
+
+        # Sort by first atom (stable) to group neighbours per atom.
+        order = np.argsort(first, kind='stable')
+        first, second, disp = first[order], second[order], disp[order]
+
+        # Regroup the flat arrays into the per-atom lists the class exposes via
+        # get_neighbors (and that NeighborList relies on).
+        splits = np.cumsum(np.bincount(first, minlength=natoms))[:-1]
+        self.neighbors = [nbs.astype(int) for nbs in np.split(second, splits)]
+        self.displacements = [d.astype(int).reshape((-1, 3))
+                              for d in np.split(disp, splits)]
 
         if self.sorted:
             _sort_neighbors(self.neighbors, self.displacements)

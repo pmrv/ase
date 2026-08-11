@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pytest
 
 from ase import Atoms, units
 from ase.build import bulk, molecule
@@ -10,11 +11,12 @@ from ase.io.trajectory import Trajectory
 from ase.phonons import Phonons
 
 
-def check_set_atoms(atoms, set_atoms, expected_atoms):
+def check_set_atoms(atoms, select_atoms, expected_atoms):
     """Perform a test that .set_atoms() only displaces the expected atoms."""
     atoms.calc = EMT()
     phonons = Phonons(atoms, EMT())
-    phonons.set_atoms(set_atoms)
+    with pytest.warns(FutureWarning):
+        phonons.set_atoms(select_atoms)
 
     # TODO: For now, because there is no public API to iterate over/inspect
     #       displacements, we run and check the number of files in the cache.
@@ -25,11 +27,17 @@ def check_set_atoms(atoms, set_atoms, expected_atoms):
 
 
 def test_set_atoms_indices(testdir):
-    check_set_atoms(molecule('CO2'), set_atoms=[0, 1], expected_atoms=[0, 1])
+    check_set_atoms(molecule('CO2'), select_atoms=[0, 1], expected_atoms=[0, 1])
 
 
 def test_set_atoms_symbol(testdir):
-    check_set_atoms(molecule('CO2'), set_atoms=['O'], expected_atoms=[1, 2])
+    check_set_atoms(molecule('CO2'), select_atoms=['O'], expected_atoms=[1, 2])
+
+
+def test_set_atoms_two_symbols(testdir):
+    check_set_atoms(
+        molecule('CO2'), select_atoms=['O', 'C'], expected_atoms=[0, 1, 2]
+    )
 
 
 def test_check_eq_forces(testdir):
@@ -196,7 +204,7 @@ def test_frequencies_amplitudes(testdir):
     )
 
     for kk, br, hbaromega in checkmodes:
-        print(f'Ckecking k-point {kk} branch {br}')
+        print(f'Checking k-point {kk} branch {br}')
         ph.write_modes(
             kk, branches=(br,), repeat=(repeat, 1, 1), kT=T * units.kB
         )
@@ -273,3 +281,34 @@ def test_partial_dos(testdir):
     dosTotal_array = dos.get_weights()
 
     assert np.allclose(dosTotal_array, dosS_array + dosZn_array)
+
+
+def test_cutoff(testdir):
+    atoms = bulk('Al', 'fcc', a=4.05)
+
+    invmass_X = np.repeat(atoms.get_masses() ** -0.5, 3)
+    invmass_XX = np.outer(invmass_X, invmass_X)
+
+    ph = Phonons(atoms, EMT(), supercell=(3, 3, 3), delta=0.05)
+    ph.run()
+    ph.read(acoustic=True)
+
+    with pytest.warns(FutureWarning):
+        C_NXX = ph.get_force_constant()
+    with pytest.warns(FutureWarning):
+        D_XX = ph.compute_dynamical_matrix([0.2, 0.3, 0.3], C_NXX * invmass_XX)
+
+    assert C_NXX[0, 0, 0] == pytest.approx(3.21090, rel=1e-3)
+    assert C_NXX[8, 0, 2] == pytest.approx(0.01390, rel=1e-3)
+    assert D_XX[0, 0].real == pytest.approx(0.0795, rel=1e-3)
+
+    ph.read(cutoff=3.5, acoustic=True)
+
+    with pytest.warns(FutureWarning):
+        C_NXX = ph.get_force_constant()
+    with pytest.warns(FutureWarning):
+        D_XX = ph.compute_dynamical_matrix([0.2, 0.3, 0.3], C_NXX * invmass_XX)
+
+    assert C_NXX[0, 0, 0] == pytest.approx(3.45943, rel=1e-3)
+    assert C_NXX[8, 0, 2] == pytest.approx(0.0, abs=1e-10)
+    assert D_XX[0, 0].real == pytest.approx(0.0976, rel=1e-3)

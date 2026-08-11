@@ -268,7 +268,7 @@ class MelchionnaNPT(MolecularDynamics):
         (see ``set_mask``), the strain rate along that direction will be
         maintained constantly.
         """
-        if not (rate.shape == (3, 3) and self._triangular(rate)):
+        if not (rate.shape == (3, 3) and self._istriangular(rate)):
             raise ValueError("Strain rate must be a triangular matrix.")
         self.eta = rate
         if self.initialized:

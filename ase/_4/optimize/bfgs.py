@@ -1,7 +1,37 @@
 import numpy as np
 
+from .method import OptimizerMethod
 
-class BFGSMethod:
+
+def fd_hessian(target, eps=1e-5, tol=1e-8):
+    xval_orig = target.get_x()
+
+    ndofs = len(xval_orig)
+    hessian = np.empty((ndofs, ndofs))
+
+    xval = xval_orig.copy()
+
+    for i in range(ndofs):
+        xval[i] = xval_orig[i] + eps
+        target.set_x(xval)
+        gradplus = target.get_gradient().gradient
+        xval[i] = xval_orig[i] - eps
+        target.set_x(xval)
+        gradminus = target.get_gradient().gradient
+        xval[i] = xval_orig[i]
+
+        dgrad_dx = (gradplus - gradminus) / (2 * eps)
+        hessian[i, :] = dgrad_dx
+
+    target.set_x(xval_orig)
+
+    symm_error = abs(hessian.T - hessian).max()
+    assert symm_error < tol, symm_error
+    symm_hessian = 0.5 * (hessian.T + hessian)
+    return symm_hessian
+
+
+class BFGSMethod(OptimizerMethod):
     iotype = 'bfgs'
     methodname = 'BFGS'
 

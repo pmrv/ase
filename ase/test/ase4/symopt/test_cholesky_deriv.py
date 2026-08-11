@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ase._4.symopt.relax import chol_derivative
+from ase._4.optimize._symopt.relax import chol_derivative
 
 pytestmark = pytest.mark.calculator_lite
 
@@ -16,7 +16,8 @@ def numerical_chol_derivative(A, dA, eps=1e-10):
 def test_chol_derivative():
     for i in range(10):
         # Create a random positive definite matrix
-        A = np.random.rand(3, 3)
+        rng = np.random.RandomState(42 + i)
+        A = rng.random((3, 3))
         A = A @ A.T
 
         # Create a random perturbation

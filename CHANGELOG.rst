@@ -3,4 +3,4 @@ Changelog
 
 See what's new in ASE here:
     
-    https://ase-lib.org/releasenotes.html
+    https://docs.ase-lib.org/releasenotes.html

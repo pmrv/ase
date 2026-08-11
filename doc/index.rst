@@ -64,6 +64,16 @@ Supported :mod:`Calculators <ase.calculators>`
 News
 ====
 
+* The website https://ase-lib.org/ now represents the broader ASE community,
+  whereas the ASE documentation has been moved to https://docs.ase-lib.org. (23 Jun 2026)
+
+* :ref:`ASE version 3.29.0 <releasenotes>` released (21 June 2026).
+
+* Workshop on
+  `ASE integration in the wider community
+  <https://www.cecam.org/workshop-details/the-atomic-simulation-environment-integration-into-wider-community-projects-1509>`__
+  held at CECAM, Mainz, Germany June 5-19 (21 Jun 2026).
+
 * :ref:`ASE version 3.28.0 <releasenotes>` released (17 March 2026).
 
 * :ref:`ASE version 3.27.0 <releasenotes>` released (28 December 2025).
@@ -209,11 +219,8 @@ Contents
     tips
     releasenotes
     contact
-    ecosystem
-    committee
     development/development
     faq
-    events/events
 
 .. |ABACUS| image:: static/abacus.png
    :target: https://gitlab.com/1041176461/ase-abacus

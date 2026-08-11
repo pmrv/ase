@@ -5,6 +5,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ase.codes import codes, list_codes
+
 if TYPE_CHECKING:
     from ase._4.plugins.io import IOFormatPlugin
 
@@ -39,8 +41,19 @@ class CLICommand:
             '--calculators',
             nargs='*',
             metavar='NAME',
-            help='List all or specified calculators known to '
-            'ASE and their configuration.',
+            help=(
+                'List specified calculators and their configuration, or all '
+                'configurable calculators known to ASE.'
+            ),
+        )
+        parser.add_argument(
+            '--all-calculators',
+            action='store_true',
+            dest='all_calculators',
+            help=(
+                'List all calculators known to ASE, and their configuration '
+                'if appropriate.'
+            ),
         )
         parser.add_argument(
             '--plugins',
@@ -50,13 +63,22 @@ class CLICommand:
 
     @staticmethod
     def run(args):
-        if args.calculators is not None:
-            from ase.codes import codes, list_codes
+        names = []
 
+        if args.all_calculators:
+            names = [*codes]
+
+        elif args.calculators is not None:
             if args.calculators:
                 names = args.calculators
             else:
-                names = [*codes]
+                names = [
+                    name
+                    for name, metadata in codes.items()
+                    if metadata.configurable
+                ]
+
+        if names:
             list_codes(names)
             return
 

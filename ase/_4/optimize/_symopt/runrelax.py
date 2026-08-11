@@ -2,7 +2,7 @@
 
 from sys import argv
 
-from ase._4.symopt.relax import Relax
+from ase._4.optimize._symopt.relax import Relax
 from ase.parallel import world
 
 
@@ -11,7 +11,7 @@ def main():
     # Wurtzite, distorted structure, nice logging, quick convergence
 
     if world.rank == 0:
-        import requests
+        import requests  # type: ignore[import-untyped]
 
         url = f'https://c2db.fysik.dtu.dk/material/{argv[1]}/download/xyz'
         print(url)

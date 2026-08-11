@@ -13,6 +13,7 @@ Development topics:
 
     contribute
     python_codingstandard
+    vibecoding
     writing_documentation_ase
     addingexamples
     writing_changelog

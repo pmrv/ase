@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ase._4.symopt.relax import Relax
+from ase._4.optimize._symopt.relax import Relax
 from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.optimize.bfgs import BFGS
@@ -22,6 +22,7 @@ def test_generalized_coordinate_units():
     |deps| = |dz(cell)|  (Cell strain)
 
     """
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     atoms = bulk('AuAg', crystalstructure='wurtzite', a=3.24, c=5.20)
     print(atoms.cell.volume, 'SCALE')
     relax = Relax(
@@ -31,6 +32,10 @@ def test_generalized_coordinate_units():
         symprec=0.01,
         comm=world,
     )
+    # XXX remove me:
+    relax.symmetry_adapted_atoms.fmax = 1e-6
+    relax.symmetry_adapted_atoms.smax = 1e-6
+
     optimizable = relax.symmetry_adapted_atoms.__ase_optimizable__()
     for z in range(3):
         vec = np.zeros((3,))
@@ -68,6 +73,7 @@ def test_generalized_coordinate_units():
 
 
 def test_fd_gradients():
+    pytest.importorskip('gpaw')  # XXX use spglib instead
     atoms = bulk('AuAg', crystalstructure='wurtzite', a=3.24, c=5.20)
     relax = Relax(
         atoms=atoms,
@@ -76,6 +82,8 @@ def test_fd_gradients():
         symprec=0.01,
         comm=world,
     )
+    relax.symmetry_adapted_atoms.fmax = 1e-6  # XXX remove me
+    relax.symmetry_adapted_atoms.smax = 1e-6
     optimizable = relax.symmetry_adapted_atoms.__ase_optimizable__()
     for z in range(3):
         vec = np.zeros((3,))

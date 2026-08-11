@@ -313,6 +313,10 @@ class BaseThermoChem(ABC):
                 raise ValueError("Atoms object should not have periodic "
                                  "boundary conditions for BaseThermoChem.")
             self.atoms = atoms
+        if spin is not None and spin < 0:
+            raise ValueError(
+                f"spin must be non-negative (got {spin}); it is the total "
+                "electronic spin magnitude, not a spin z-projection.")
         self.spin = spin
 
     @classmethod
@@ -491,14 +495,12 @@ class BaseThermoChem(ABC):
     def get_vib_entropy_contribution(self,
                                      temperature: float,
                                      return_list: bool = False
-                                     ) -> float | Sequence[float]:
+                                     ) -> float | np.ndarray:
         """Calculates the entropy due to vibrations for a set of vibrations
         given in eV and a temperature given in Kelvin.  Returns the entropy
         in eV/K."""
         kT = units.kB * temperature
-        S_v = 0.
-        energies = np.array(self.vib_energies)
-        energies /= kT  # eV/ eV/K*K
+        energies = np.array(self.vib_energies) / kT  # eV/ eV/K*K
         S_v = energies / (np.exp(energies) - 1.) - \
             np.log(1. - np.exp(-energies))
         S_v *= units.kB
@@ -1234,6 +1236,8 @@ class IdealGasThermo(BaseThermoChem):
         the total electronic spin. (0 for molecules in which all electrons
         are paired, 0.5 for a free radical with a single unpaired electron,
         1.0 for a triplet with two unpaired electrons, such as O_2.)
+        This is a magnitude, not a spin z-projection, so it must be
+        non-negative; a negative value raises a ValueError.
 
     """
 

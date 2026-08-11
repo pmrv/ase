@@ -55,7 +55,7 @@ def test_mineral_spacegroups(datadir, mineral):
 
 
 @pytest.mark.parametrize(
-    'mineral,rngseed', product(list(named_minerals), [13, 42, 93])
+    'mineral,rngseed', list(product(list(named_minerals), [13, 42, 93]))
 )
 def test_mineral_symmetrization(datadir, mineral, rngseed):
     atoms = read(datadir / mineral.datafile)

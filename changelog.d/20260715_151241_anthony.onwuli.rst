@@ -1,0 +1,5 @@
+Bugfixes
+--------
+
+- Fixed extended XYZ reading when Python is run in optimized mode
+  (``python -O``), restoring parity with unoptimized Python execution.

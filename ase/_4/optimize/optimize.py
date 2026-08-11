@@ -1,8 +1,8 @@
 from ase._4.pes import PotentialEnergySurface
-from ase.utils.abc import Optimizable
+from ase.utils.abc import Optimizable as Optimizable3
 
 
-class OptimizablePES(Optimizable):
+class OptimizablePES(Optimizable3):
     """Optimisation of potential energy surface (Atoms + Calculator)."""
 
     def __init__(

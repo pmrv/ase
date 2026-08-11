@@ -112,7 +112,7 @@ calculators-lite:
   script:
     - >
       pytest $COVERAGE_OPTS -n 8 -m calculator_lite
-      ase/test/calculator/ --calculators auto ase/_4/symopt
+      ase/test/calculator/ --calculators auto
   after_script:
     - coverage xml
     - mv .coverage coverage-calculators-lite.dat
@@ -185,6 +185,14 @@ bleeding-edge:
     paths:
       - $PIP_CACHE_DIR
     key: bleeding-edge
+  rules:
+    # If this job fails it is (hopefully) because new libraries came out and
+    # we get some deprecations or otherwise need to update the code.
+    # It is okay for MRs to fail bleeding-edge, we should just make sure
+    # to fix the problem in master.
+    - if: $CI_PIPELINE_SOURCE == "push"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule"
 
 
 doc:
@@ -198,10 +206,10 @@ doc:
     - which sphinx-build
   script:
     - scriv collect --keep || echo Not compiling changelog then  # Avoid error
+    - '! grep -n "^ \* " doc/changelog.rst doc/releasenotes.rst || { echo "Wrong indent in front of star. Use either zero or two spaces" >&2; exit 1; }'
     - python -m ase.utils.sphinx_create_png run # test scripts
     - sphinx-build -W doc doc/build
     - mv doc/build web-html
-    - '! grep -n "^ \* " doc/releasenotes.rst || { echo "Wrong indent in front of star. Use either zero or two spaces" >&2; exit 1; }'
   cache:
     paths:
       - $PIP_CACHE_DIR
