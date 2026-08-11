@@ -393,7 +393,7 @@ class Phonons(Displacement):
 
         .. deprecated:: 3.22.1
             Current implementation of non-analytical correction is likely
-            incorrect, see work item 941
+            incorrect, see :issue:`941`
         """
 
         # Load file with Born charges and dielectric tensor for atoms in the
