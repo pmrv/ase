@@ -15,7 +15,7 @@ def check_set_atoms(atoms, select_atoms, expected_atoms):
     """Perform a test that .set_atoms() only displaces the expected atoms."""
     atoms.calc = EMT()
     phonons = Phonons(atoms, EMT())
-    with pytest.warns(DeprecationWarning):
+    with pytest.warns(FutureWarning):
         phonons.set_atoms(select_atoms)
 
     # TODO: For now, because there is no public API to iterate over/inspect
