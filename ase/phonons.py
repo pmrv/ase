@@ -623,9 +623,7 @@ class Phonons(Displacement):
         >>> phonons = Phonons(...)
         >>> bs, modes = phonons.get_band_structure(path, modes=True)
         """
-        result = self.band_structure(
-            path.kpts, modes=modes, verbose=verbose
-        )
+        result = self.band_structure(path.kpts, modes=modes, verbose=verbose)
         if modes:
             omega_kl, omega_modes = result
         else:
@@ -886,7 +884,8 @@ class Phonons(Displacement):
 
         # Calculate modes
         omega_l, u_l = self.band_structure(
-            q_c[np.newaxis, :], modes=True,
+            q_c[np.newaxis, :],
+            modes=True,
         )
         # Repeat atoms
         atoms = self.atoms * repeat
