@@ -106,8 +106,10 @@ class Displacement:
         return self.get_lattice_vectors().T
 
     def get_lattice_vectors(self):
-        """Return lattice vectors for cells in the supercell,
-        the ordering are as illustrated in Phonons class docstring"""
+        """Return lattice vectors for cells in the supercell.
+
+        These are the integer indices of each cell within the supercell.
+        The ordering is as illustrated in Phonons class docstring"""
 
         # First, lattice vectors relevative to the corner unit cell
         R_Nc = np.indices(self.supercell).reshape(3, self.ncells).T
@@ -143,7 +145,7 @@ class Displacement:
                 'Please specify which atoms to vibrate using the select_atoms '
                 'keyword during initialization instead of using '
                 'Displacements.set_atoms(...)',
-                DeprecationWarning,
+                FutureWarning,
             )
         # This method can safely be moved inside the __init__ and deleted
         # roughly by summer 2027.
