@@ -352,10 +352,6 @@ class Phonons(Displacement):
         # Attributes for force constants and dynamical matrix in real space
         self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
-        # Attributes for born charges and static dielectric tensor
-        self.Z_avv = None
-        self.eps_vv = None
-
     def __call__(self, atoms_N: Atoms):
         """Calculate forces on atoms in supercell."""
         return atoms_N.get_forces()
@@ -426,12 +422,8 @@ class Phonons(Displacement):
         symmetrize: int = 3,
         acoustic: bool = True,
         cutoff: float | None = None,
-        born: bool = False,
-        **kwargs,
     ):
         """Read forces from json files and calculate force constants.
-
-        Extra keyword arguments will be passed to ``read_born_charges``.
 
         Parameters
         ----------
@@ -449,19 +441,12 @@ class Phonons(Displacement):
         cutoff: None or float
             Zero elements in the dynamical matrix between atoms with an
             interatomic distance larger than the cutoff.
-        born: bool
-            Read in Born effective charge tensor and high-frequency static
-            dielectric tensor from file.
         """
 
         method = method.lower()
         assert method in ['standard', 'frederiksen']
         if cutoff is not None:
             cutoff = float(cutoff)
-
-        # Read Born effective charges and optical dielectric tensor
-        if born:
-            self.read_born_charges(**kwargs)
 
         cache = self.cache
         natoms = self.natoms
@@ -601,7 +586,6 @@ class Phonons(Displacement):
         self,
         path,
         modes: bool = False,
-        born: bool = False,
         verbose: bool = True,
     ):
         r"""Calculate and return the phonon band structure.
@@ -621,10 +605,6 @@ class Phonons(Displacement):
             space over which the phonon band structure is calculated.
         modes : bool, optional
             If True, phonon modes will also be calculated and returned.
-            Defaults to False.
-        born : bool, optional
-            If True, includes the effect of Born effective charges in
-            the phonon calculations.
             Defaults to False.
         verbose : bool, optional
             If True, enables verbose output during the calculation.
@@ -652,7 +632,7 @@ class Phonons(Displacement):
         >>> bs, modes = phonons.get_band_structure(path, modes=True)
         """
         result = self.band_structure(
-            path.kpts, modes=modes, born=born, verbose=verbose
+            path.kpts, modes=modes, verbose=verbose
         )
         if modes:
             omega_kl, omega_modes = result
@@ -678,10 +658,6 @@ class Phonons(Displacement):
             q vector in scaled coordinates.
         D_N : np.ndarray
             Dynamical matrix in real-space.
-            It is necessary, at least currently, to provide this matrix
-            explicitly (rather than use self.D_N) because this matrix is
-            modified by the Born charges contributions and these modifications
-            are momentum (q) dependent.
 
         Returns
         -------
@@ -706,10 +682,6 @@ class Phonons(Displacement):
             Phonon wave vector in scaled coordinates.
         D_avNav: np.ndarray
             Force constant matrix scaled by atom masses.
-            It is necessary, at least currently, to provide this matrix
-            explicitly (rather than use self.C_avNav) because this matrix is
-            modified by the Born charges contributions and these modifications
-            are momentum (q) dependent.
 
         Returns
         -------
@@ -733,7 +705,7 @@ class Phonons(Displacement):
 
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)
 
-    def band_structure(self, path_kc, modes=False, born=False, verbose=True):
+    def band_structure(self, path_kc, modes=False, verbose=True):
         """Calculate phonon dispersion along a path in the Brillouin zone.
 
         The dynamical matrix at arbitrary q-vectors is obtained by Fourier
@@ -752,11 +724,6 @@ class Phonons(Displacement):
             dynamical matrix will be calculated.
         modes: bool
             Returns both frequencies and modes when True.
-        born: bool
-            Include non-analytic part given by the Born effective charges and
-            the static part of the high-frequency dielectric tensor. This
-            contribution to the force constant accounts for the splitting
-            between the LO and TO branches for q -> 0.
         verbose: bool
             Print warnings when imaginary frequncies are detected.
 
@@ -775,15 +742,6 @@ class Phonons(Displacement):
             'Make sure you have .read() your force constant matrices!'
         )
         C_avNav = self.C_avNav
-
-        if born:
-            assert self.Z_avv is not None
-            assert self.eps_vv is not None
-            raise RuntimeError(
-                'Inclusion of non-analytic corrections to '
-                'phonon energies has not worked for a long time. '
-                '(see work item 941)'
-            )
 
         # Multiply by mass prefactor
         m_inv_a = self.atoms.get_masses()[self.indices] ** -0.5
@@ -901,7 +859,6 @@ class Phonons(Displacement):
         q_c,
         branches=0,
         kT: float = units.kB * 300,
-        born: bool = False,
         repeat: tuple[int, int, int] = (1, 1, 1),
         nimages: int = 30,
         center: bool = False,
@@ -917,8 +874,6 @@ class Phonons(Displacement):
         kT: float
             Temperature in units of eV. Determines the amplitude of the atomic
             displacements in the modes.
-        born: bool
-            Include non-analytic contribution to the force constants at q -> 0.
         repeat: tuple
             Repeat atoms (l, m, n) times in the directions of the lattice
             vectors. Displacements of atoms in repeated cells carry a Bloch
@@ -939,7 +894,7 @@ class Phonons(Displacement):
 
         # Calculate modes
         omega_l, u_l = self.band_structure(
-            q_c[np.newaxis, :], modes=True, born=born
+            q_c[np.newaxis, :], modes=True,
         )
         # Repeat atoms
         atoms = self.atoms * repeat
