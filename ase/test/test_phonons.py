@@ -275,3 +275,25 @@ def test_partial_dos(testdir):
     dosTotal_array = dos.get_weights()
 
     assert np.allclose(dosTotal_array, dosS_array + dosZn_array)
+
+
+def test_cutoff(testdir):
+    ph = Phonons(
+        bulk('Al', 'fcc', a=4.05), EMT(), supercell=(3, 3, 3), delta=0.05
+    )
+    ph.run()
+    ph.read(acoustic=True)
+
+    C_NXX = ph.get_force_constant()
+
+    assert C_NXX[0, 0, 0] == pytest.approx(3.21090, rel=1e-3)
+    assert C_NXX[8, 0, 2] == pytest.approx(0.01390, rel=1e-3)
+
+    ph.read(cutoff=3.5, acoustic=True)
+
+    C_NXX = ph.get_force_constant()
+
+    assert C_NXX[0, 0, 0] == pytest.approx(3.45943, rel=1e-3)
+    assert C_NXX[8, 0, 2] == pytest.approx(0.0, abs=1e-10)
+
+    ph.clean()
