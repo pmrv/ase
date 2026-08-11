@@ -284,24 +284,31 @@ def test_partial_dos(testdir):
 
 
 def test_cutoff(testdir):
-    ph = Phonons(
-        bulk('Al', 'fcc', a=4.05), EMT(), supercell=(3, 3, 3), delta=0.05
-    )
+    atoms = bulk('Al', 'fcc', a=4.05)
+
+    invmass_X = np.repeat(atoms.get_masses() ** -0.5, 3)
+    invmass_XX = np.outer(invmass_X, invmass_X)
+
+    ph = Phonons(atoms, EMT(), supercell=(3, 3, 3), delta=0.05)
     ph.run()
     ph.read(acoustic=True)
 
     with pytest.warns(FutureWarning):
         C_NXX = ph.get_force_constant()
+    with pytest.warns(FutureWarning):
+        D_XX = ph.compute_dynamical_matrix([0.2, 0.3, 0.3], C_NXX * invmass_XX)
 
     assert C_NXX[0, 0, 0] == pytest.approx(3.21090, rel=1e-3)
     assert C_NXX[8, 0, 2] == pytest.approx(0.01390, rel=1e-3)
+    assert D_XX[0, 0].real == pytest.approx(0.0795, rel=1e-3)
 
     ph.read(cutoff=3.5, acoustic=True)
 
     with pytest.warns(FutureWarning):
         C_NXX = ph.get_force_constant()
+    with pytest.warns(FutureWarning):
+        D_XX = ph.compute_dynamical_matrix([0.2, 0.3, 0.3], C_NXX * invmass_XX)
 
     assert C_NXX[0, 0, 0] == pytest.approx(3.45943, rel=1e-3)
     assert C_NXX[8, 0, 2] == pytest.approx(0.0, abs=1e-10)
-
-    ph.clean()
+    assert D_XX[0, 0].real == pytest.approx(0.0976, rel=1e-3)
