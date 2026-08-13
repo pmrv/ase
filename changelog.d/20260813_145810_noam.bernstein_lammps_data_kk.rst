@@ -42,9 +42,9 @@
 .. -------------
 ..
 .. - A bullet item for the Other changes category.
-..
-.. Bugfixes
-.. --------
+
+ Bugfixes
+ --------
 
  - Allow lammps-data to support atomic styles with '/kk' suffix from kokkos runs
 
