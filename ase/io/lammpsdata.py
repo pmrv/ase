@@ -351,6 +351,9 @@ def _read_atoms_section(fileobj, natoms: int, style: str | None = None):
         fields = line.split()
         if style is None:
             style = _guess_atom_style(fields)
+        style_orig = style
+        if style.endswith('/kk'):
+            style = style[:len(style) - 3]
         data.ids[i] = int(fields[0])
         if style == 'full' and len(fields) in (7, 10):
             # id mol-id type q x y z [tx ty tz]
@@ -382,7 +385,7 @@ def _read_atoms_section(fileobj, natoms: int, style: str | None = None):
                 data.cell_ids[i] = tuple(int(fields[_]) for _ in (6, 7, 8))
         else:
             raise RuntimeError(
-                f'Style "{style}" not supported or invalid. '
+                f'Style "{style_orig}" not supported or invalid. '
                 f'Number of fields: {len(fields)}'
             )
     if all(_.isdigit() for _ in data.labels):
