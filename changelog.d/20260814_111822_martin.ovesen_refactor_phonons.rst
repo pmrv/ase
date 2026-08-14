@@ -1,5 +1,5 @@
-Development
------------
+Other changes
+-------------
 
 - Many internals of the :class:`~ase.phonons.Displacement` class and
   :class:`~ase.phonons.Phonons` class have been changed:
