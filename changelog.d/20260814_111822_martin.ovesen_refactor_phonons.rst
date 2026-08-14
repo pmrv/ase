@@ -1,0 +1,32 @@
+Development
+-----------
+
+- Many internals of the :class:`~ase.phonons.Displacement` class and
+  :class:`~ase.phonons.Phonons` class have been changed:
+    * Calculation of the dynamical matrix has been changed such that an
+      "atom-to-atom" phase factor is used instead of a
+      "cell-to-cell" phase factor. Consequently, the
+      ``compute_dynamical_matrix`` has been deprecated and replaced by the
+      ``calculate_dynamical_matrix`` method which uses the new phase factors.
+    * Matrices of force constants have been reshaped from using three indices
+      (n_cells, 3 * n_atoms, 3 * n_atoms) to five indices (n_atoms, 3) and
+      (n_cells, n_atoms, 3) to make the indexing less abstract. Consequently,
+      the ``get_force_constant`` method has been deprecated and replaced by the
+      ``get_force_constants`` which returns the reshaped force constant matrix.
+    * The ``set_atoms`` method has been deprecated.Instead, when specifying
+      which atoms to generate displacements for, please use the new
+      ``select_atoms`` keyword during class initialization.
+    * The ``compute_lattice_vectors`` method has been deprecated; replaced by
+      ``get_lattice_vectors`` which simply returns the transpose ``R_Nc`` to
+      consistently keep the crystal index as the last index.
+    * New tests for the deprecated functions and their replacements
+      have been added.
+
+Bugfixes
+--------
+
+- Fixed two small bugs when calculating force constants in
+  :class:`~ase.phonons.Phonons` while enforcing momentum conservating
+  (``frederiksen=True``) with ``center_refcell=True``. Fixing these bugs did
+  not significantly alter any numbers in the testing suite.
+ 
