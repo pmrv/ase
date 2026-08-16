@@ -459,7 +459,7 @@ class PhaseDiagram:
         for i, Y in enumerate(X):
             try:
                 x = np.linalg.solve((Y[1:] - Y[:1]).T, -Y[0])
-            except np.linalg.linalg.LinAlgError:
+            except np.linalg.LinAlgError:
                 continue
             if (x > -eps).all() and x.sum() < 1 + eps:
                 indices = self.simplices[i]
