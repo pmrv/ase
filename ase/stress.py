@@ -22,11 +22,13 @@ def get_elasticity_tensor(atoms, h=0.001, verbose=False):
             strain = np.eye(3)
             strain[k, l] += h
             atoms.set_cell(cell0 @ strain, scale_atoms=True)
-            stressp_ij = f(atoms.get_stress())
+            stress_plus_ij = f(atoms.get_stress())
             strain[k, l] -= 2 * h
             atoms.set_cell(cell0 @ strain, scale_atoms=True)
-            stressm_ij = f(atoms.get_stress())
-            C_ijkl[k, l] = (stressp_ij - stressm_ij) / (2 * h)
+            stress_minus_ij = f(atoms.get_stress())
+            atoms.set_cell(cell0, scale_atoms=True)
+
+            C_ijkl[k, l] = (stress_plus_ij - stress_minus_ij) / (2 * h)
 
     if verbose:
         for i in range(3):
