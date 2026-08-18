@@ -93,7 +93,6 @@ def test_elasticity_tensor_displacement():
     from ase.stress import voigt_6_to_full_3x3_stress
 
     atoms = emt_aluminium_supercell((2, 3, 4))
-    cell0 = atoms.cell.copy()
     e0 = atoms.get_potential_energy()
 
     eps = 1e-5
