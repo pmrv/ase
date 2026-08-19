@@ -40,7 +40,6 @@ class Displacement:
         name: str,
         delta: float,
         center_refcell: bool,
-        use_minimum_image_vectors: bool,
         comm,
     ):
         """Init with an instance of :class:`~ase.Atoms` and a calculator.
@@ -65,8 +64,6 @@ class Displacement:
             Reference cell in which the atoms will be displaced. If False, then
             corner cell in supercell is used. If True, then cell in the center
             of the supercell is used.
-        use_minimum_image_vectors:
-            ...
         comm:
             MPI communicator for the phonon calculation.
             Default is to use world.
@@ -96,8 +93,6 @@ class Displacement:
             )
 
         self.lattice_vectors_array = self.get_lattice_vectors()
-        if use_minimum_image_phase:
-            self.minimum_image_vectors = self.compute_minimum_image_vectors()
 
         if comm is None:
             comm = world
@@ -162,17 +157,17 @@ class Displacement:
             case None:
                 self.nindices = len(atoms)
                 self.indices = np.arange(self.nindices)
-            case list():
+            case [*atomlist]:
                 indices: list[int]
-                assert len(select_atoms) == len(set(select_atoms))
-                assert len(select_atoms) <= len(atoms)
+                assert len(atomlist) == len(set(atomlist))
+                assert len(atomlist) <= len(atoms)
                 assert all(
-                    type(atom) is type(select_atoms[0]) for atom in select_atoms
+                    type(atom) is type(atomlist[0]) for atom in atomlist
                 )
-                if isinstance(select_atoms[0], str):
-                    indices = atoms.symbols.search(select_atoms)
-                elif isinstance(select_atoms[0], int):
-                    indices = select_atoms
+                if isinstance(atomlist[0], str):
+                    indices = atoms.symbols.search(atomlist)
+                elif isinstance(atomlist[0], int):
+                    indices = atomlist
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
 
@@ -332,7 +327,7 @@ class Phonons(Displacement):
         name: str = 'phonon',
         delta: float = 0.01,
         center_refcell: bool = False,
-        use_minimum_image_phase: bool = True,
+        use_mean_minimum_images: bool = False,
         comm=None,
     ):
         """Initialize with base class args and kwargs."""
@@ -345,9 +340,10 @@ class Phonons(Displacement):
             name=name,
             delta=delta,
             center_refcell=center_refcell,
-            use_minimum_image_phase=use_minimum_image_phase,
             comm=comm,
         )
+        self.use_mean_minimum_images = use_mean_minimum_images
+        self.atom2atom_vectors = self.get_atom2atom_vectors()
 
         self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
@@ -371,6 +367,41 @@ class Phonons(Displacement):
         i_max = np.where(feq_av == fmax)
 
         return fmin, fmax, i_min, i_max
+
+    def get_atom2atom_vectors(self):
+
+        R_Nc = self.lattice_vectors_array
+        relpos_ac = self.atoms.get_scaled_positions(wrap=True)[self.indices]
+
+        vectors_aNac = (
+            relpos_ac[np.newaxis, np.newaxis]
+            + R_Nc[np.newaxis, :, np.newaxis]
+            - relpos_ac[:, np.newaxis, np.newaxis]
+        )
+
+        if not self.use_mean_minimum_images:
+            return vectors_aNac
+
+        supercellshifts_Sc = (
+            np.indices((3, 3, 3)).reshape(3, -1).T - 1
+        ) * self.supercell
+        bools_L = np.logical_or(
+            supercellshifts_Sc == 0, self.atoms.pbc).all(axis=1)
+        supercellshifts_Sc = supercellshifts_Sc[bools_L]
+        cell_cv = self.atoms.cell.array
+
+        vectors_aNaSc = np.empty(vectors_aNac.shape[0:3], dtype=object)
+
+        for a1, vectors_Nac in enumerate(vectors_aNac):
+            for N, vectors_ac in enumerate(vectors_Nac):
+                for a2, vector_c in enumerate(vectors_ac):
+                    images_Sc = vector_c + supercellshifts_Sc
+                    lengths_S = np.linalg.norm(images_Sc @ cell_cv, axis=1)
+                    bools_S = np.isclose(
+                        lengths_S, lengths_S.min(), rtol=0.0, atol=1e-6)
+                    vectors_aNaSc[a1, N, a2] = images_Sc[bools_S]
+
+        return vectors_aNaSc
 
     @deprecated(
         'Implementation of non-analytical correction has remained untested '
@@ -564,40 +595,6 @@ class Phonons(Displacement):
 
         C_avNav *= bools_aNa[:, np.newaxis, :, :, np.newaxis]
 
-    def compute_minimum_image_vectors(self):
-        relpos_ac = self.atoms.get_scaled_positions(wrap=True)
-
-        supercellshifts_Lc = (
-            np.indices((3, 3, 3)).reshape(3, -1).T - 1
-        ) * self.supercell
-        bools_L = np.logical_or(supercellshifts_Lc == 0, self.atoms.pbc).all(
-            axis=1
-        )
-        supercellshifts_Lc = supercellshifts_Lc[bools_L]
-
-        vectors = []
-        for R_c in self._lattice_vectors_array.T:
-            atom_pair_vectors = []
-            for a in self.indices:
-                atom_vectors = []
-                for b in self.indices:
-                    vector_c = R_c + relpos_ac[b] - relpos_ac[a]
-                    images = vector_c + supercellshifts_Lc
-                    image_v = images @ self.atoms.cell.array
-                    lengths2 = np.einsum('ij,ij->i', image_v, image_v)
-                    minimum = lengths2.min()
-                    shortest = images[
-                        np.isclose(lengths2, minimum, rtol=0.0, atol=1e-8)
-                    ]
-                    atom_vectors.append(shortest)
-                atom_pair_vectors.append(atom_vectors)
-            vectors.append(atom_pair_vectors)
-
-        print(vectors)
-        print(len(vectors))
-        cc
-        return vectors
-
     @deprecated('Please use get_force_constants() instead')
     def get_force_constant(self) -> np.ndarray:
         """Deprecated version of get_force_constants,
@@ -730,8 +727,8 @@ class Phonons(Displacement):
 
     def calculate_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_XX(q).
-            This is a Fourier transform from real-space force constants
-            for a given momentum vector q.
+        This is a Fourier transform from real-space force constants
+        for a given momentum vector q.
 
         Parameters
         ----------
@@ -747,17 +744,18 @@ class Phonons(Displacement):
             with shape=(3 * natoms, 3 * natoms).
         """
 
-        # Evaluate fourier sum
-        R_Nc = self.lattice_vectors_array
-        pos_ac = self.atoms.get_scaled_positions()[self.indices]
+        if not self.use_mean_minimum_images:
+            atom2atom_aNac = self.atom2atom_vectors
+            phase_aNa = np.exp(2.0j * np.pi * np.dot(atom2atom_aNac, q_c))
+        else:
+            atom2atom_aNaSc = self.atom2atom_vectors
+            # In this case, atom2atom is an ndarray with 3 indexes of ndarrays
+            # with 2 indexes so some code might look unintuitive
+            phase_aNa = np.zeros(atom2atom_aNaSc.shape, dtype=complex)
+            for (a1, N, a2), atom2atom_Sc in np.ndenumerate(atom2atom_aNaSc):
+                phase_aNa[a1, N, a2] = np.exp(
+                    2.0j * np.pi * np.dot(atom2atom_Sc, q_c)).mean()
 
-        vectors_aNac = (
-            pos_ac[np.newaxis, np.newaxis]
-            + R_Nc[np.newaxis, :, np.newaxis]
-            - pos_ac[:, np.newaxis, np.newaxis]
-        )
-
-        phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
         D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
 
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)

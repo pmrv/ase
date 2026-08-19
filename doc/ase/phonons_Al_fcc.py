@@ -10,9 +10,9 @@ atoms = bulk('Al', 'fcc', a=4.05)
 
 # Phonon calculator
 N = 7
-ph = Phonons(atoms, EMT(), supercell=(N, N, N), delta=0.05)
+ph = Phonons(atoms, EMT(), supercell=(N, N, N), delta=0.05,
+             use_mean_minimum_images=True)
 ph.run()
-
 # Read forces and assemble the dynamical matrix
 ph.read(acoustic=True)
 ph.clean()
