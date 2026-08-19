@@ -161,9 +161,7 @@ class Displacement:
                 indices: list[int]
                 assert len(atomlist) == len(set(atomlist))
                 assert len(atomlist) <= len(atoms)
-                assert all(
-                    type(atom) is type(atomlist[0]) for atom in atomlist
-                )
+                assert all(type(atom) is type(atomlist[0]) for atom in atomlist)
                 if isinstance(atomlist[0], str):
                     indices = atoms.symbols.search(atomlist)
                 elif isinstance(atomlist[0], int):
@@ -385,8 +383,9 @@ class Phonons(Displacement):
         supercellshifts_Sc = (
             np.indices((3, 3, 3)).reshape(3, -1).T - 1
         ) * self.supercell
-        bools_L = np.logical_or(
-            supercellshifts_Sc == 0, self.atoms.pbc).all(axis=1)
+        bools_L = np.logical_or(supercellshifts_Sc == 0, self.atoms.pbc).all(
+            axis=1
+        )
         supercellshifts_Sc = supercellshifts_Sc[bools_L]
         cell_cv = self.atoms.cell.array
 
@@ -398,7 +397,8 @@ class Phonons(Displacement):
                     images_Sc = vector_c + supercellshifts_Sc
                     lengths_S = np.linalg.norm(images_Sc @ cell_cv, axis=1)
                     bools_S = np.isclose(
-                        lengths_S, lengths_S.min(), rtol=0.0, atol=1e-6)
+                        lengths_S, lengths_S.min(), rtol=0.0, atol=1e-6
+                    )
                     vectors_aNaSc[a1, N, a2] = images_Sc[bools_S]
 
         return vectors_aNaSc
@@ -728,7 +728,8 @@ class Phonons(Displacement):
             phase_aNa = np.zeros(atom2atom_aNaSc.shape, dtype=complex)
             for (a1, N, a2), atom2atom_Sc in np.ndenumerate(atom2atom_aNaSc):
                 phase_aNa[a1, N, a2] = np.exp(
-                    2.0j * np.pi * np.dot(atom2atom_Sc, q_c)).mean()
+                    2.0j * np.pi * np.dot(atom2atom_Sc, q_c)
+                ).mean()
 
         D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
 
