@@ -674,28 +674,6 @@ class Phonons(Displacement):
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
 
-    def _compute_dynamical_matrix_mean_minimum_image_phase(
-        self,
-        q_scaled: np.ndarray,
-        D_N: np.ndarray,
-    ):
-        natoms = len(self.indices)
-        R_cN = self._lattice_vectors_array
-        D_Navav = D_N.reshape((len(D_N), natoms, 3, natoms, 3))
-        D_qavav = np.zeros((natoms, 3, natoms, 3), dtype=complex)
-        minimum_image_vectors = self.minimum_image_vectors
-
-        for n in range(len(R_cN.T)):
-            for i, a in enumerate(self.indices):
-                for j, b in enumerate(self.indices):
-                    vectors = minimum_image_vectors[n][i][j]
-                    phase = np.exp(-2.0j * pi * (vectors @ q_scaled)).mean()
-                    D_qavav[i, :, j, :] += phase * D_Navav[n, i, :, j, :]
-
-        D_q = D_qavav.reshape((3 * natoms, 3 * natoms))
-        return (D_q + D_q.conj().T) / 2.0
-
-    @deprecated('Please use calculate_dynamical_matrix() instead')
     def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_ab(q).
             This is a Fourier transform from real-space dynamical matrix D_N
@@ -714,10 +692,6 @@ class Phonons(Displacement):
             2D complex-valued array D(q) with shape=(3 * natoms, 3 * natoms).
 
         """
-        if self.mean_minimum_image_phase:
-            return self._compute_dynamical_matrix_mean_minimum_image_phase(
-                q_scaled, D_N
-            )
 
         # Evaluate fourier sum
         R_cN = self.compute_lattice_vectors()
