@@ -300,8 +300,12 @@ class SymmetryAdaptedCellCoordinates:
         return self.M_cc + np.einsum('z,zcd->cd', cell_z, self.dM_zcc)
 
     @classmethod
-    def build(cls, cell, pbc_c, rotation_scc: np.ndarray, *, log):
-        return cls(*cls.unit_cell_symmetry(cell, rotation_scc, pbc_c, log=log))
+    def build(cls, cell, pbc_c, rotation_scc: np.ndarray, *, log, **kwargs):
+        return cls(
+            *cls.unit_cell_symmetry(
+                cell, rotation_scc, pbc_c, log=log, **kwargs
+            )
+        )
 
     @classmethod
     def symmetrize_cell(cls, C_cv, rotation_scc):
@@ -343,7 +347,9 @@ class SymmetryAdaptedCellCoordinates:
         return osymC_cv, symC_cv, M_cc, rot_vv
 
     @classmethod
-    def unit_cell_symmetry(cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log):
+    def unit_cell_symmetry(
+        cls, C_cv, rotation_scc, pbc_c, units='Å^2', *, log, fixcell=False
+    ):
         pretty(
             C_cv @ C_cv.T, "Cell metric (M_cc' = C_cv C_c'v)", units, log=log
         )
@@ -396,34 +402,39 @@ class SymmetryAdaptedCellCoordinates:
         tol = 1e-6
         null_mask = S < tol
         nullspace = Vh[null_mask]
-        dM_zcc = []
-        dM_zvv = []
-        for B in nullspace:
-            B = B @ eps_ijk.reshape((9, 6)).T
-            dM_vv = B.reshape((3, 3))
-            dof = osymC_cv @ dM_vv @ osymC_cv.T
-            dM_zcc.append(dof)
-            dM_zvv.append(rot_vv @ dM_vv @ rot_vv.T)
-        dM_zcc = np.array(dM_zcc).reshape((-1, 3, 3))
-        dM_zvv = np.array(dM_zvv).reshape((-1, 3, 3))
 
-        # Do a QR decomposition, try to get more zeros to coordinates
-        basis = np.array(dM_zcc).reshape((-1, 9))
-        Q, R = np.linalg.qr(basis)
-        dM_zcc = (Q.T @ basis).reshape((-1, 3, 3))
+        if fixcell:
+            dM_zcc = np.zeros((0, 3, 3))
+            dM_zvv = np.zeros((0, 3, 3))
+        else:
+            dM_zcc = []
+            dM_zvv = []
+            for B in nullspace:
+                B = B @ eps_ijk.reshape((9, 6)).T
+                dM_vv = B.reshape((3, 3))
+                dof = osymC_cv @ dM_vv @ osymC_cv.T
+                dM_zcc.append(dof)
+                dM_zvv.append(rot_vv @ dM_vv @ rot_vv.T)
+            dM_zcc = np.array(dM_zcc).reshape((-1, 3, 3))
+            dM_zvv = np.array(dM_zvv).reshape((-1, 3, 3))
 
-        # Normalize tangent space vectors
-        Cinv = np.linalg.inv(C_cv)
-        for z in range(len(dM_zcc)):
-            dC = chol_derivative(M_cc, dM_zcc[z]) @ rot_vv.T
-            eps = 0.5 * (Cinv @ dC + dC.T @ Cinv.T)
+            # Do a QR decomposition, try to get more zeros to coordinates
+            basis = np.array(dM_zcc).reshape((-1, 9))
+            Q, R = np.linalg.qr(basis)
+            dM_zcc = (Q.T @ basis).reshape((-1, 3, 3))
 
-            dM_zcc[z] /= np.sum(np.abs(eps)) * np.linalg.det(C_cv)
-            dM_zcc[z] *= CELL_COORDINATE_SCALING_FACTOR
-            # Define the direction of the tangent vector such that
-            # it increases the volume. Sign cannot be used because of shear
-            if np.trace(np.linalg.inv(C_cv) @ dC) < 0:
-                dM_zcc[z] *= -1
+            # Normalize tangent space vectors
+            Cinv = np.linalg.inv(C_cv)
+            for z in range(len(dM_zcc)):
+                dC = chol_derivative(M_cc, dM_zcc[z]) @ rot_vv.T
+                eps = 0.5 * (Cinv @ dC + dC.T @ Cinv.T)
+
+                dM_zcc[z] /= np.sum(np.abs(eps)) * np.linalg.det(C_cv)
+                dM_zcc[z] *= CELL_COORDINATE_SCALING_FACTOR
+                # Define the direction of the tangent vector such that
+                # it increases the volume. Sign cannot be used because of shear
+                if np.trace(np.linalg.inv(C_cv) @ dC) < 0:
+                    dM_zcc[z] *= -1
 
         pretty_dofs(dM_zcc, M_cc, rot_vv, osymC_cv, log=log)
 
@@ -520,6 +531,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         cell_coordinates: SymmetryAdaptedCellCoordinates | None = None,
         atom_coordinates=None,
         value_z=None,
+        fixcell: bool = False,
     ):
         self.actual_atoms = actual_atoms
         self.symmetries = symmetries
@@ -535,6 +547,7 @@ class SymmetryAdaptedAtoms(Optimizable):
                 self.actual_atoms.pbc,
                 self.symmetries.rotation_scc,
                 log=log,
+                fixcell=fixcell,
             )
 
         self.cell_coordinates = cell_coordinates
@@ -611,12 +624,12 @@ class SymmetryAdaptedAtoms(Optimizable):
         return cls(**dct, log=lambda *args, **kwargs: None)
 
     @classmethod
-    def from_atoms_spglib(cls, atoms, log=print, *, symprec):
+    def from_atoms_spglib(cls, atoms, log=print, *, symprec, **kwargs):
         symmetries = AtomsSymmetries.from_spglib_auto(atoms, symprec=symprec)
-        return cls(atoms, symmetries, log=log)
+        return cls(atoms, symmetries, log=log, **kwargs)
 
     @classmethod
-    def from_spglib_dataset(cls, atoms, dataset, log=print):
+    def from_spglib_dataset(cls, atoms, dataset, log=print, **kwargs):
         # XXX This will fail in atommaps if atoms are not exactly symmetrized.
         # Better to not fail now, but rather wait until after the
         # symmetrization and then check the atommaps against the
@@ -624,7 +637,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         #
         # Here we can only promise ~symprec tolerance.
         symmetries = AtomsSymmetries.from_spglib(atoms, dataset)
-        return cls(atoms, symmetries, log=log)
+        return cls(atoms, symmetries, log=log, **kwargs)
 
     @classmethod
     def from_atoms(cls, atoms, log=print, *, symprec, symmorphic):
@@ -663,8 +676,10 @@ class SymmetryAdaptedAtoms(Optimizable):
 
     def set_x(self, x):
         self.value_z[:] = x
-        self.actual_atoms.set_cell(self.cell_coordinates.get_cell(self.cell_z))
-
+        if self._ndofs_cell > 0:
+            self.actual_atoms.set_cell(
+                self.cell_coordinates.get_cell(self.cell_z)
+            )
         self.actual_atoms.set_scaled_positions(
             self.atom_coordinates.get_scaled_coordinates(self.atoms_z)
         )
@@ -699,7 +714,10 @@ class SymmetryAdaptedAtoms(Optimizable):
 
     def _get_gradient(self, fmax, smax):
         grad_z = np.zeros(self._ndofs_cell)
-        S_vv = self.actual_atoms.get_stress(voigt=False)
+        if self._ndofs_cell:
+            S_vv = self.actual_atoms.get_stress(voigt=False)
+        else:
+            S_vv = np.zeros((3, 3))
         C_cv = self.cell_coordinates.get_cell(self.cell_z)
         V = np.linalg.det(C_cv)
         Cinv = np.linalg.inv(C_cv)
