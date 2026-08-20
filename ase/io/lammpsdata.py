@@ -353,7 +353,7 @@ def _read_atoms_section(fileobj, natoms: int, style: str | None = None):
             style = _guess_atom_style(fields)
         style_orig = style
         if style.endswith('/kk'):
-            style = style[: len(style) - 3]
+            style = style[:-3]  # remove Kokkos suffix
         data.ids[i] = int(fields[0])
         if style == 'full' and len(fields) in (7, 10):
             # id mol-id type q x y z [tx ty tz]
