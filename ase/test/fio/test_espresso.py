@@ -576,6 +576,16 @@ def test_pw_output():
     assert len(pw_output_traj) == 2
     assert pw_output_traj[1].get_volume() > pw_output_traj[0].get_volume()
 
+    assert len(pw_output_traj[1].constraints) == 1
+    constraint = pw_output_traj[1].constraints[0]
+    assert isinstance(constraint, FixAtoms)
+    assert (constraint.get_indices() == [0]).all()
+
+    # Shortcoming of pw output format: constraints are only available in the
+    # ATOMIC_POSITIONS blocks printed after each relaxation step, not in the
+    # header lines from which the first image is extracted
+    assert len(pw_output_traj[0].constraints) == 0
+
 
 def test_pw_output_cell():
     """Read pw output file with cell optimization."""

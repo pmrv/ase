@@ -217,8 +217,10 @@ def read_espresso_out(fileobj, index=slice(None), results_required=True):
             symbols = [label_to_symbol(position[0]) for position in
                        positions_card]
             positions = [position[1] for position in positions_card]
+            constraint_flags = [position[2] for position in positions_card]
             structure = Atoms(symbols=symbols, positions=positions, cell=cell,
                               pbc=True)
+            structure.set_constraint(convert_constraint_flags(constraint_flags))
 
         def find_thing(get_thing, indices, **kwargs):
             for index in indices:
