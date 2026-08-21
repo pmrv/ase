@@ -9,10 +9,10 @@ from ase.phonons import Phonons
 atoms = bulk('Al', 'fcc', a=4.05)
 
 # Phonon calculator
-N = 7
-ph = Phonons(atoms, EMT(), supercell=(N, N, N), delta=0.05,
-             use_mean_minimum_images=True)
+N = 5
+ph = Phonons(atoms, EMT(), supercell=(N, N, N), use_mean_minimum_images=True)
 ph.run()
+
 # Read forces and assemble the dynamical matrix
 ph.read(acoustic=True)
 ph.clean()
@@ -21,6 +21,8 @@ path = atoms.cell.bandpath('GXULGK', npoints=100)
 bs = ph.get_band_structure(path)
 
 dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
+# Note the very small width in DOS which is used because phonon energies are
+# typically on the order of 10 meV
 
 # Plot the band structure and DOS:
 import matplotlib.pyplot as plt  # noqa
@@ -47,7 +49,6 @@ dosax.set_xticks([])
 dosax.set_xlabel('DOS', fontsize=18)
 
 fig.savefig('Al_phonon.png')
-
 # --- literalinclude division line ---
 # from ase.io.trajectory import Trajectory
 # from ase.io import write
@@ -61,7 +62,6 @@ ph.write_modes(
     kT=3e-4,
     center=True,
 )
-
 
 # Generate gif animation:
 # XXX Temporarily disabled due to matplotlib writer compatibility issue.
