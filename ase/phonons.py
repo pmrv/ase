@@ -366,12 +366,12 @@ class Phonons(Displacement):
 
         return fmin, fmax, i_min, i_max
 
-    def get_atom2atom_vectors(self):
+    def get_atom2atom_vectors(self) -> np.ndarray:
         """Calculate all atom-to-atom vectors, i.e. all vectors that go from
         atom a1 in the reference unit cell to atom a2 in cell N in the
         supercell.
 
-        If the phonons class was initialized with use_mean_minimum_images=True
+        If the phonons class was initialized with use_mean_minimum_images=True,
         all the shortest atom-to-atom vectors are calculated by also checking
         the periodic images of atom2 in cell N.
         """
@@ -464,18 +464,18 @@ class Phonons(Displacement):
 
         Parameters
         ----------
-        method: str
+        method:
             Specify method for evaluating the atomic forces,
             method='Frederiksen' imposes momentum conservation.
-        symmetrize: int
+        symmetrize:
             Symmetrize force constants (see doc string at top) when
             ``symmetrize != 0`` (default: 3). Since restoring the acoustic sum
             rule breaks the symmetry, the symmetrization must be repeated a few
             times until the changes a insignificant. The integer gives the
             number of iterations that will be carried out.
-        acoustic: bool
+        acoustic:
             Restore the acoustic sum rule on the force constants.
-        cutoff: None or float
+        cutoff:
             Zero elements in the dynamical matrix between atoms with an
             interatomic distance larger than the cutoff.
         """
@@ -682,7 +682,9 @@ class Phonons(Displacement):
         return (bs, omega_modes) if modes else bs
 
     @deprecated('Please use calculate_dynamical_matrix() instead')
-    def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
+    def compute_dynamical_matrix(
+        self, q_scaled: np.ndarray, D_N: np.ndarray
+    ) -> np.ndarray:
         """Computation of the dynamical matrix in momentum space D_ab(q).
         This is a Fourier transform from real-space dynamical matrix D_N
         for a given momentum vector q.
@@ -707,21 +709,23 @@ class Phonons(Displacement):
         D_q = np.sum(phase_N[:, np.newaxis, np.newaxis] * D_N, axis=0)
         return D_q
 
-    def calculate_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
+    def calculate_dynamical_matrix(
+        self, q_c: np.ndarray, D_avNav: np.ndarray
+    ) -> np.ndarray:
         """Computation of the dynamical matrix in momentum space D_XX(q).
         This is a Fourier transform from real-space force constants
         for a given momentum vector q.
 
         If the phonons class was initialized with use_mean_minimum_images=True,
-        the q-dependent phase factor for a given set of atoms a1, (N, a2), is
-        averaged over all the shortest atom-to-atom vectors in the periodic
-        images of the supercell.
+        the q-dependent phase factor for a given set of atoms a1 and (N, a2) is
+        averaged over all the shortest atom-to-atom vectors from atom1 to a
+        periodic image of atom (N, a2).
 
         Parameters
         ----------
-        q_c: np.ndarray
+        q_c:
             Phonon wave vector in scaled coordinates.
-        D_avNav: np.ndarray
+        D_avNav:
             Force constant matrix scaled by atom masses.
 
         Returns
