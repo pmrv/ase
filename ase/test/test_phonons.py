@@ -44,7 +44,12 @@ def test_check_eq_forces(testdir):
     atoms = bulk('C')
     atoms.calc = EMT()
 
-    phonons = Phonons(atoms, EMT(), supercell=(1, 2, 1))
+    phonons = Phonons(
+        atoms,
+        EMT(),
+        supercell=(1, 2, 1),
+        use_mean_minimum_images=True,
+    )
     phonons.run()
     fmin, fmax, _i_min, _i_max = phonons.check_eq_forces()
     assert fmin < fmax
@@ -76,9 +81,9 @@ def test_get_band_structure_with_modes(testdir):
     npoints = 100  # k-points in band path
     natoms = len(atoms)
 
-    ph = Phonons(atoms, EMT(), supercell=(N, N, N), delta=0.05)
+    ph = Phonons(atoms, EMT(), supercell=(N, N, N))
     ph.run()
-    ph.read(acoustic=True)
+    ph.read()
     ph.clean()
 
     path = atoms.cell.bandpath('GXULGK', npoints=npoints)
@@ -134,14 +139,19 @@ def test_frequencies_amplitudes(testdir):
     calc = LennardJones(sigma=LJ_sigma, epsilon=LJ_epsilon, rc=1.5 * d0)
 
     print('Calculating phonons')
-    N = 7
+    N = 5
     ph = Phonons(
-        atoms, calc, supercell=(N, 1, 1), delta=0.005, name='phonon_CuO'
+        atoms,
+        calc,
+        supercell=(N, 1, 1),
+        delta=0.005,
+        name='phonon_CuO',
+        use_mean_minimum_images=True,
     )
     ph.run()
     assert ph.check_eq_forces()[1] < 1e-9, 'System is not at equilibrium'
     # Read forces and assemble the dynamical matrix
-    ph.read(acoustic=True)
+    ph.read()
     ph.clean()
 
     path = atoms.cell.bandpath(npoints=50, pbc=[1, 0, 0])
@@ -266,7 +276,7 @@ def test_partial_dos(testdir):
     ph.run()
     assert ph.check_eq_forces()[1] < 1e-9, 'System is not at equilibrium'
     # Read forces and assemble the dynamical matrix
-    ph.read(acoustic=True)
+    ph.read()
     ph.clean()
 
     # Analyzing phonons
@@ -291,7 +301,7 @@ def test_cutoff(testdir):
 
     ph = Phonons(atoms, EMT(), supercell=(3, 3, 3), delta=0.05)
     ph.run()
-    ph.read(acoustic=True)
+    ph.read()
 
     with pytest.warns(FutureWarning):
         C_NXX = ph.get_force_constant()
@@ -302,7 +312,7 @@ def test_cutoff(testdir):
     assert C_NXX[8, 0, 2] == pytest.approx(0.01390, rel=1e-3)
     assert D_XX[0, 0].real == pytest.approx(0.0795, rel=1e-3)
 
-    ph.read(cutoff=3.5, acoustic=True)
+    ph.read(cutoff=3.5)
 
     with pytest.warns(FutureWarning):
         C_NXX = ph.get_force_constant()
