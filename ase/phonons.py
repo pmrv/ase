@@ -367,10 +367,17 @@ class Phonons(Displacement):
         return fmin, fmax, i_min, i_max
 
     def get_atom2atom_vectors(self):
+        """Calculate all atom-to-atom vectors, i.e. all vectors that go from
+        atom a1 in the reference unit cell to atom a2 in cell N in the
+        supercell.
+
+        If the phonons class was initialized with use_mean_minimum_images=True
+        all the shortest atom-to-atom vectors are calculated by also checking
+        the periodic images of atom2 in cell N.
+        """
 
         R_Nc = self.lattice_vectors_array
         relpos_ac = self.atoms.get_scaled_positions(wrap=True)[self.indices]
-
         vectors_aNac = (
             relpos_ac[np.newaxis, np.newaxis]
             + R_Nc[np.newaxis, :, np.newaxis]
@@ -674,10 +681,11 @@ class Phonons(Displacement):
         # Return based on the modes flag
         return (bs, omega_modes) if modes else bs
 
+    @deprecated('Please use calculate_dynamical_matrix() instead')
     def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
         """Computation of the dynamical matrix in momentum space D_ab(q).
-            This is a Fourier transform from real-space dynamical matrix D_N
-            for a given momentum vector q.
+        This is a Fourier transform from real-space dynamical matrix D_N
+        for a given momentum vector q.
 
         Parameters
         ----------
@@ -703,6 +711,11 @@ class Phonons(Displacement):
         """Computation of the dynamical matrix in momentum space D_XX(q).
         This is a Fourier transform from real-space force constants
         for a given momentum vector q.
+
+        If the phonons class was initialized with use_mean_minimum_images=True,
+        the q-dependent phase factor for a given set of atoms a1, (N, a2), is
+        averaged over all the shortest atom-to-atom vectors in the periodic
+        images of the supercell.
 
         Parameters
         ----------
