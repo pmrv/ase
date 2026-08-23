@@ -374,7 +374,9 @@ class Phonons(Displacement):
 
         If the phonons class was initialized with use_mean_minimum_images=True,
         all the shortest atom-to-atom vectors are calculated by also checking
-        the periodic images of atom2 in cell N.
+        the periodic images of atom2 in cell N. Furthermore, the keyword
+        mmi_atol can be supplied to the Phonons class which controls the
+        tolerance when detecting minimum image vectors.
         """
 
         R_Nc = self.lattice_vectors_array
