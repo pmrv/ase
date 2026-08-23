@@ -10,11 +10,17 @@ atoms = bulk('Al', 'fcc', a=4.05)
 
 # Phonon calculator
 N = 5
-ph = Phonons(atoms, EMT(), supercell=(N, N, N), use_mean_minimum_images=True)
+ph = Phonons(
+    atoms,
+    EMT(),
+    supercell=(N, N, N),
+    use_mean_minimum_images=True,
+    mmi_atol=1e-6,
+)
 ph.run()
 
 # Read forces and assemble the dynamical matrix
-ph.read(acoustic=True)
+ph.read()
 ph.clean()
 
 path = atoms.cell.bandpath('GXULGK', npoints=100)

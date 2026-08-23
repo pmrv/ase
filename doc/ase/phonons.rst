@@ -25,7 +25,8 @@ phases see equation (48) and surrounding text in [Togo]_. In the ASE
 :class:`~ase.phonons.Phonons` class, the usage of mean minimum image phases can
 be enabled by setting ``use_mean_minimum_images=True`` at class initialization.
 This is highly recommended and tends to have much better converged phonon
-energies for smaller supercells.
+energies for smaller supercells. The tolerance for detecting mean minimum
+images can also be adjusted with the ``mmi_atol`` keyword.
 
 For polar materials the dynamical matrix at the zone center acquires a
 non-analytical contribution that accounts for the LO-TO splitting. This

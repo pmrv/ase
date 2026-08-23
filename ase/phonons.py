@@ -326,6 +326,7 @@ class Phonons(Displacement):
         delta: float = 0.01,
         center_refcell: bool = False,
         use_mean_minimum_images: bool = False,
+        mmi_atol: float = 1e-8,
         comm=None,
     ):
         """Initialize with base class args and kwargs."""
@@ -341,7 +342,7 @@ class Phonons(Displacement):
             comm=comm,
         )
         self.use_mean_minimum_images = use_mean_minimum_images
-        self.atom2atom_vectors = self.get_atom2atom_vectors()
+        self.atom2atom_vectors = self.get_atom2atom_vectors(mmi_atol)
 
         self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
@@ -366,7 +367,7 @@ class Phonons(Displacement):
 
         return fmin, fmax, i_min, i_max
 
-    def get_atom2atom_vectors(self) -> np.ndarray:
+    def get_atom2atom_vectors(self, mmi_atol: float = 1e-8) -> np.ndarray:
         """Calculate all atom-to-atom vectors, i.e. all vectors that go from
         atom a1 in the reference unit cell to atom a2 in cell N in the
         supercell.
@@ -404,7 +405,10 @@ class Phonons(Displacement):
                     images_Sc = vector_c + supercellshifts_Sc
                     lengths_S = np.linalg.norm(images_Sc @ cell_cv, axis=1)
                     bools_S = np.isclose(
-                        lengths_S, lengths_S.min(), rtol=0.0, atol=1e-6
+                        lengths_S,
+                        lengths_S.min(),
+                        rtol=0.0,
+                        atol=mmi_atol,
                     )
                     vectors_aNaSc[a1, N, a2] = images_Sc[bools_S]
 
