@@ -21,8 +21,6 @@ path = atoms.cell.bandpath('GXULGK', npoints=100)
 bs = ph.get_band_structure(path)
 
 dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
-# Note the very small width in DOS which is used because phonon energies are
-# typically on the order of 10 meV
 
 # Plot the band structure and DOS:
 import matplotlib.pyplot as plt  # noqa
