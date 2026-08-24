@@ -61,8 +61,6 @@ ase = [
     'test/pytest.ini',
     'test/testdata/**',
 ]
-[tool.setuptools.packages.find]
-include = ['ase*']
 
 [tool.setuptools.dynamic]
 version = {attr = 'ase.__version__'}
