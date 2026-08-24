@@ -482,8 +482,7 @@ def calculate_eos(atoms, npoints=5, eps=0.04, trajectory=None, callback=None):
 class CLICommand:
     """Calculate EOS from one or more trajectory files.
 
-    See https://docs.ase-lib.org/examples_generated/03-tutorials/eos_01.html for
-    more information.
+    See :ref:`eos_example` for more information.
     """
 
     @staticmethod
