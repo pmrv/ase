@@ -1,0 +1,17 @@
+Documentation
+-------------
+
+- The phonons documentation page has been updated to show users how they can
+  enable the calculation of phonon energies using using mean minimum images,
+  and how they can control the tolerance for detecting mean minimum vectors.
+  The documentation also urges users to enable this setting as it typically
+  yields more converged energies for smaller supercells.
+
+Other changes
+-------------
+
+- Phonon energies can now be calculated using mean minimum image phase factors
+  which tend to yield more converged energies for smaller supercells. This
+  can be enabled by initializing :class:`~ase.phonons.Displacement` with
+  ``use_mean_minimum_images=True``. The tolerance for detecting mean minimum
+  vectors can also be adjusted with the ``mmi_atol`` keyword.
