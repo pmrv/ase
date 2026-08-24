@@ -197,9 +197,11 @@ class Symbols(collections.abc.Sequence):
         >>> atoms.symbols.species_indices()
         [0, 0, 1, 2, 1, 3, 4, 0, 5]
 
-         ^  ^  ^  ^  ^  ^  ^  ^  ^
-         C  H  H  H  C  H  H  O  H
+	The indices correspond to the atoms as follows::
 
+             [0, 0, 1, 2, 1, 3, 4, 0, 5]
+              ^  ^  ^  ^  ^  ^  ^  ^  ^
+              C  H  H  H  C  H  H  O  H
         """
 
         counts: dict[str, int] = {}
