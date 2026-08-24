@@ -394,7 +394,9 @@ class BandPath:
         return np.dot(coords, self.icell)
 
     def __repr__(self):
-        return '{}(path={}, cell=[3x3], special_points={{{}}}, kpts=[{}x3])'.format(
+        return (
+            '{}(path={}, cell=[3x3], special_points={{{}}}, kpts=[{}x3])'
+        ).format(
             self.__class__.__name__,
             repr(self.path),
             ''.join(sorted(self.special_points)),
