@@ -195,6 +195,12 @@ bleeding-edge:
     - if: $CI_PIPELINE_SOURCE == "schedule"
 
 
+doc-minimal:
+  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
+  script:
+    - cd doc/
+    - make
+
 doc:
   image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
