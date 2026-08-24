@@ -48,8 +48,8 @@ def get_cell_coordinates(cell, shifted=False):
         B2[:, :, n1:n2] = B1[:, :, n1:n2]
         B2[:, :, n1:n2, c] += h
         n1 = n2
-    B1.shape = (-1, 3)
-    B2.shape = (-1, 3)
+    B1 = B1.reshape((-1, 3))
+    B2 = B2.reshape((-1, 3))
     if shifted:
         B1 -= 0.5
         B2 -= 0.5

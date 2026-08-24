@@ -8,6 +8,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/pip-cache"
   PYTEST_ADDOPTS: "--color=yes --durations=20 -r s"
   COVERAGE_OPTS: "--cov=ase --cov-config=pyproject.toml --junit-xml=report.xml"
+  DOCKERSUFFIX: ""  # set this to "-staging" to run on the staging dockers
 
 stages:
   - test
@@ -33,7 +34,7 @@ workflow:
 # Check oldest supported Python with oldest supported libraries.
 # Does not install any optional libraries except matplotlib.
 oldlibs:
-  image: registry.gitlab.com/ase/ase:ase-oldlibs
+  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
   before_script:
     - pwd
     - whoami
@@ -42,6 +43,7 @@ oldlibs:
       numpy==1.21.6 scipy==1.8.1 matplotlib==3.5.2
       pytest==7.4.0 attrs==20.3.0 pluggy==1.0.0 py==1.11.0 six==1.16.0
       pytest-xdist==3.2.0 execnet==1.8.1 pytest-forked==1.4.0
+      typing_extensions==4.13.1  # for Self type and Concatenate[ ...] in Python 3.10
     - pip install --no-deps --editable .
   script:
     - pytest -n 8 -Wignore::DeprecationWarning
@@ -69,7 +71,7 @@ pipinstall:
 # the coverage script to correctly resolve the OMIT paths (a bit hacky).
 # It would be better to install it for real, and for things to just work.
 main:
-  image: registry.gitlab.com/ase/ase:ase-main
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
   before_script:
     - python --version
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
@@ -101,7 +103,7 @@ main:
 # Encompasses those tests marked as @pytest.mark.calculator_lite.
 # Please make sure these tests are cheap.
 calculators-lite:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
     - pip install --no-deps --editable .
@@ -110,7 +112,7 @@ calculators-lite:
   script:
     - >
       pytest $COVERAGE_OPTS -n 8 -m calculator_lite
-      ase/test/calculator/ --calculators auto ase/_4/symopt
+      ase/test/calculator/ --calculators auto
   after_script:
     - coverage xml
     - mv .coverage coverage-calculators-lite.dat
@@ -135,7 +137,7 @@ calculators-lite:
 #
 # It would be great if someone could enable more calculators with this.
 calculators:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install --no-deps --editable .
     - pip install --upgrade pytest-cov>=7.0.0 coverage>=7.10.6
@@ -183,10 +185,18 @@ bleeding-edge:
     paths:
       - $PIP_CACHE_DIR
     key: bleeding-edge
+  rules:
+    # If this job fails it is (hopefully) because new libraries came out and
+    # we get some deprecations or otherwise need to update the code.
+    # It is okay for MRs to fail bleeding-edge, we should just make sure
+    # to fix the problem in master.
+    - if: $CI_PIPELINE_SOURCE == "push"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "schedule"
 
 
 doc:
-  image: registry.gitlab.com/ase/ase:ase-full-monty
+  image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
     - pip install scriv sphinx_book_theme sphinx-gallery sphinxcontrib-video
     - pip install --no-deps .[docs]
@@ -196,10 +206,10 @@ doc:
     - which sphinx-build
   script:
     - scriv collect --keep || echo Not compiling changelog then  # Avoid error
+    - '! grep -n "^ \* " doc/changelog.rst doc/releasenotes.rst || { echo "Wrong indent in front of star. Use either zero or two spaces" >&2; exit 1; }'
     - python -m ase.utils.sphinx_create_png run # test scripts
     - sphinx-build -W doc doc/build
     - mv doc/build web-html
-    - '! grep -n "^ \* " doc/releasenotes.rst || { echo "Wrong indent in front of star. Use either zero or two spaces" >&2; exit 1; }'
   cache:
     paths:
       - $PIP_CACHE_DIR
@@ -210,7 +220,7 @@ doc:
     expire_in: 1 week
 
 distribution-package:
-  image: registry.gitlab.com/ase/ase:ase-main
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
   before_script:
     - mkdir dist
     - pip install setuptools build

@@ -118,14 +118,14 @@ class MolecularDynamics(BaseDynamics):
         # That way we won't need to test multiple cases.  Currently,
         # we do not test /any/ kind of MD with any kind of Filter in ASE.
         self.atoms = atoms
-        self.masses = self.atoms.get_masses()
+        masses = self.atoms.get_masses()
 
-        if 0 in self.masses:
+        if 0 in masses:
             warnings.warn('Zero mass encountered in atoms; this will '
                           'likely lead to errors if the massless atoms '
                           'are unconstrained.')
 
-        self.masses.shape = (-1, 1)
+        self.masses = masses.reshape((-1, 1))
 
         if not self.atoms.has('momenta'):
             self.atoms.set_momenta(np.zeros([len(self.atoms), 3]))
@@ -160,7 +160,7 @@ class MolecularDynamics(BaseDynamics):
         if self.nsteps == 0:
             # For historical reasons we do a magical incantation
             # here with forces, log, observers.
-            self.atoms.get_forces()
+            self._refresh_properties()
             self.log()
             self.call_observers()
 
@@ -170,10 +170,16 @@ class MolecularDynamics(BaseDynamics):
         while self.nsteps < self.max_steps:
             self.step()
             self.nsteps += 1
-            self.atoms.get_forces()
+            self._refresh_properties()
             self.log()
             self.call_observers()
             yield self.nsteps == self.max_steps
+
+    def _refresh_properties(self):
+        """Ensure up-to-date forces/energies are cached
+        for downstream readers (logger, observers).
+        """
+        self.atoms.get_forces()
 
     def log(self):
         # Subclasses can override this.

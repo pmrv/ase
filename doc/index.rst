@@ -2,29 +2,6 @@
 Atomic Simulation Environment
 =============================
 
-.. admonition:: ASE User Experience Poll
-   :class: tip
-
-   In preparation of the
-   CECAM Flagship workshop *The Atomic Simulation Environment: Integration into Wider Community Projects*
-   taking place June 15-19, 2026 in Mainz, Germany (registration closed),
-   we are conducting a user survey: 
-
-   **Please take part by filling out the** `ASE User Experience Poll`_ **by 1st of June 2026.**
-
-   It targets all ASE users and people interested in ASE
-   and aims to give us an overview on how ASE user experience and performance can be improved in the future,
-   as well as what features are desirable. Results will be discussed at the `ASE CECAM workshop 2026`_.
-
-.. _ASE User Experience Poll: https://docs.google.com/
- forms/d/e/1FAIpQLSedlkU2n1sS9pNPsZqWTNDhrgLojQt2UpJCMO505FAI_wfOAQ/viewform
-
-.. _ASE CECAM workshop 2026: https://www.cecam.org/
- workshop-details/the-atomic-simulation-environment-
- integration-into-wider-community-projects-1509
-
-
-
 The Atomic Simulation Environment (ASE) is a set of tools and Python_
 modules for setting up, manipulating, running, visualizing and analyzing
 atomistic simulations.  The code is freely available under the :ref:`GNU LGPL
@@ -86,6 +63,16 @@ Supported :mod:`Calculators <ase.calculators>`
 
 News
 ====
+
+* The website https://ase-lib.org/ now represents the broader ASE community,
+  whereas the ASE documentation has been moved to https://docs.ase-lib.org. (23 Jun 2026)
+
+* :ref:`ASE version 3.29.0 <releasenotes>` released (21 June 2026).
+
+* Workshop on
+  `ASE integration in the wider community
+  <https://www.cecam.org/workshop-details/the-atomic-simulation-environment-integration-into-wider-community-projects-1509>`__
+  held at CECAM, Mainz, Germany June 5-19 (21 Jun 2026).
 
 * :ref:`ASE version 3.28.0 <releasenotes>` released (17 March 2026).
 
@@ -233,11 +220,8 @@ Contents
     tips
     releasenotes
     contact
-    ecosystem
-    committee
     development/development
     faq
-    events/events
 
 .. |ABACUS| image:: static/abacus.png
    :target: https://gitlab.com/1041176461/ase-abacus

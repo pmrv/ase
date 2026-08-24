@@ -610,13 +610,7 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
     def _set_old_keywords(self):
         """Store keywords for backwards compatibility wd VASP calculator"""
         self.spinpol = self.get_spin_polarized()
-        self.energy_free = self.get_potential_energy(force_consistent=True)
-        self.energy_zero = self.get_potential_energy(force_consistent=False)
-        self.forces = self.get_forces()
         self.fermi = self.get_fermi_level()
-        self.dipole = self.get_dipole_moment()
-        # Prevent calculation from going into a loop
-        self.stress = self.get_property('stress', allow_calculation=False)
         self.nbands = self.get_number_of_bands()
 
     # Below defines some functions for faster access to certain common keywords
@@ -695,18 +689,11 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         self.version = self.get_version()
 
         # XXX: Do we want to read all of this again?
-        self.energy_free, self.energy_zero = self.read_energy(lines=lines)
-        self.forces = self.read_forces(lines=lines)
         self.fermi = self.read_fermi(lines=lines)
 
-        self.dipole = self.read_dipole(lines=lines)
-
-        self.stress = self.read_stress(lines=lines)
         self.nbands = self.read_nbands(lines=lines)
 
         self.read_ldau()
-        self.magnetic_moment, self.magnetic_moments = self.read_mag(
-            lines=lines)
 
     def _read_xml(self) -> SinglePointDFTCalculator:
         """Read vasprun.xml, and return the last calculator object.
@@ -847,23 +834,6 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
                     niter = list(map(int, re.findall(r'\d+', line)))[0]
         return niter
 
-    def read_stress(self, lines=None):
-        """Read stress from OUTCAR.
-
-        Depreciated: Use get_stress() instead.
-        """
-        # We don't really need this, as we read this from vasprun.xml
-        # keeping it around "just in case" for now
-        if not lines:
-            lines = self.load_file('OUTCAR')
-
-        stress = None
-        for line in lines:
-            if ' in kB  ' in line:
-                stress = -np.array([float(a) for a in line.split()[2:]])
-                stress = stress[[0, 1, 2, 4, 5, 3]] * 1e-1 * ase.units.GPa
-        return stress
-
     def read_ldau(self, lines=None):
         """Read the LDA+U values from OUTCAR"""
         if not lines:
@@ -919,59 +889,6 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         raise ValueError('No xc or pp found.')
 
     # Methods for reading information from OUTCAR files:
-    def read_energy(self, all=None, lines=None):
-        """Method to read energy from OUTCAR file.
-        Depreciated: use get_potential_energy() instead"""
-        if not lines:
-            lines = self.load_file('OUTCAR')
-
-        [energy_free, energy_zero] = [0, 0]
-        if all:
-            energy_free = []
-            energy_zero = []
-        for line in lines:
-            # Free energy
-            if line.lower().startswith('  free  energy   toten'):
-                if all:
-                    energy_free.append(float(line.split()[-2]))
-                else:
-                    energy_free = float(line.split()[-2])
-            # Extrapolated zero point energy
-            if line.startswith('  energy  without entropy'):
-                if all:
-                    energy_zero.append(float(line.split()[-1]))
-                else:
-                    energy_zero = float(line.split()[-1])
-        return [energy_free, energy_zero]
-
-    def read_forces(self, all=False, lines=None):
-        """Method that reads forces from OUTCAR file.
-
-        If 'all' is switched on, the forces for all ionic steps
-        in the OUTCAR file be returned, in other case only the
-        forces for the last ionic configuration is returned."""
-
-        if not lines:
-            lines = self.load_file('OUTCAR')
-
-        if all:
-            all_forces = []
-
-        for n, line in enumerate(lines):
-            if 'TOTAL-FORCE' in line:
-                forces = []
-                for i in range(len(self.atoms)):
-                    forces.append(
-                        np.array(
-                            [float(f) for f in lines[n + 2 + i].split()[3:6]]))
-
-                if all:
-                    all_forces.append(np.array(forces)[self.resort])
-
-        if all:
-            return np.array(all_forces)
-        return np.array(forces)[self.resort]
-
     def read_fermi(self, lines=None):
         """Method that reads Fermi energy from OUTCAR file"""
         if not lines:

@@ -141,7 +141,8 @@ class STM:
         for i, a in enumerate(ldos):
             heights[i] = find_height(a, current, h, z0)
 
-        s0 = heights.shape = self.ldos.shape[:2]
+        s0 = self.ldos.shape[:2]
+        heights = heights.reshape(s0)
         heights = np.tile(heights, repeat)
         s = heights.shape
 
@@ -176,7 +177,8 @@ class STM:
         for i, a in enumerate(ldos):
             current[i] = self.find_current(a, zp)
 
-        s0 = current.shape = self.ldos.shape[:2]
+        s0 = self.ldos.shape[:2]
+        current = current.reshape(s0)
         current = np.tile(current, repeat)
         s = current.shape
 

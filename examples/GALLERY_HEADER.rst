@@ -23,7 +23,8 @@ yet.  Tutorials still in legacy format can be found under
 
 .. note::
 
-   You can also take a look at tutorials from previous :ref:`events`.
+   You can also take a look at tutorials from previous
+   `events <https://community.ase-lib.org/events/>`__.
 
 .. note::
 

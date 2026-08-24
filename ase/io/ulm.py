@@ -655,7 +655,7 @@ class NDArrayReader:
             # Not as fast, but works for reading from tar-files:
             a = np.frombuffer(self.fd.read(int(count * self.itemsize)),
                               self.dtype)
-        a.shape = (stop - start,) + self.shape[1:]
+        a = a.reshape((stop - start,) + self.shape[1:])
         if step != 1:
             a = a[::step].copy()
         if self.little_endian != np.little_endian:

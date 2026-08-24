@@ -108,6 +108,9 @@ def all_tested_formats():
 
 
 @pytest.mark.parametrize('format', all_tested_formats())
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_ioformat(format, atoms, catch_warnings):
     if format in ['proteindatabank', 'netcdftrajectory', 'castep-cell']:
         warnings.simplefilter('ignore', UserWarning)

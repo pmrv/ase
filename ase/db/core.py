@@ -789,8 +789,7 @@ def b2o(obj: Any, b: bytes) -> Any:
         shape, name, offset = x
         dtype = np.dtype(name)
         size = dtype.itemsize * np.prod(shape).astype(int)
-        a = np.frombuffer(b[offset : offset + size], dtype)
-        a.shape = shape
+        a = np.frombuffer(b[offset : offset + size], dtype).reshape(shape)
         if not np.little_endian:
             a = a.byteswap()
         return a

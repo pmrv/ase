@@ -262,10 +262,9 @@ class POVRAY:
         self.positions = positions - self.offset
 
         if cell_vertices is not None:
-            self.cell_vertices = cell_vertices - self.offset
-            self.cell_vertices.shape = (2, 2, 2, 3)
-        else:
-            self.cell_vertices = None
+            cell_vertices = (cell_vertices - self.offset).reshape((2, 2, 2, 3))
+
+        self.cell_vertices = cell_vertices
 
         ratio = float(self.image_width) / self.image_height
         if canvas_width is None:

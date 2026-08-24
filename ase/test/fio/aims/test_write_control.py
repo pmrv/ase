@@ -208,6 +208,9 @@ def aims_species_dir_light(tmp_path):
         pytest.param('1', [None, None], marks=pytest.mark.xfail),
     ],
 )
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_manipulate_tiers(tier, expected_basis_functions):
     """Test manipulating the basis functions using manipulate_tiers."""
     output_basis_functions = ase.io.aims.manipulate_tiers(
@@ -217,6 +220,9 @@ def test_manipulate_tiers(tier, expected_basis_functions):
         assert contains(basis_function_line, output_basis_functions)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_parse_species_path(aims_species_dir_light):
     """Test parsing the species file for all species."""
     species_array = ['Cl', 'Au']
@@ -234,6 +240,9 @@ def test_parse_species_path(aims_species_dir_light):
     assert '#     ionic 6 s auto' in basis_function_dict['Au']
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_write_species(aims_species_dir_light):
     """Test writing species file."""
     parameters = {}
@@ -257,6 +266,9 @@ def test_write_species(aims_species_dir_light):
             'ionic 6 p auto\n     hydro 4 f 7.4.*^#     ionic 3 d auto',
         ),
     ],
+)
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_control_tier(
     aims_species_dir_light,
@@ -295,6 +307,9 @@ def test_control_tier(
     assert contains(expected_basis_set_re, control_file_as_string)
 
 
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
+)
 def test_control(bulk_au, parameters_dict, aims_species_dir_light):
     """Tests that control.in for a Gold bulk system works.
 
@@ -340,6 +355,9 @@ def test_control(bulk_au, parameters_dict, aims_species_dir_light):
         ('LDA', r'xc\s+pw-lda'),
         pytest.param('PBE_06_Fake', None, marks=pytest.mark.xfail),
     ],
+)
+@pytest.mark.filterwarnings(
+    'ignore:FHI-aims io is moving to the ase-io-aims plugin.*:FutureWarning'
 )
 def test_control_functional(
     aims_species_dir_light,

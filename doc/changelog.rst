@@ -30,6 +30,119 @@ Git master branch
 
 .. scriv-auto-changelog-start
 
+Version 3.29.0
+==============
+
+I/O
+---
+
+- Add support for reading and writing RuNNer's `input.data` files.
+
+- Changed :func:`~ase.io.vasp.write_vasp_xdatcar` so that it writes unwrapped
+  scaled positions (:mr:`4040`)
+
+Calculators
+-----------
+
+- :class:`~ase.calculators.plumed.Plumed` computes stress and can be used in
+  constant pressure molecular dynamics simulations (:mr:`4027`).
+
+- Removed `Vasp2` deprecated as of ASE 3.21.0 (:mr:`4030`)
+
+- :class:`~ase.calculators.socketio.SocketIOCalculator`:
+  The :class:`~ase.calculators.socketio.SocketClient` now goes into
+  the “ready” state after computing forces whereas previously it would
+  request a reinitialization.
+  This change ensures future compatibility with the driver as
+  implemented in `i-pi <https://ipi-code.org/>`__
+  and may be significantly faster in larger, fast-running
+  computations (e.g. with MLIPs). (:mr:`4069`)
+
+- In the CP2K calculator, on calculator startup, when waiting for a ready
+  message from the CP2K shell, skip lines until the message is encountered.
+  This fixes a bug where the calculator fails on builds that print extra
+  startup messages.
+
+Optimizers
+----------
+
+- Add :class:`ase.optimizers.rfo.RFO` class for minimizing geometries with
+  RFO (Rational Function Optimizer) combined with BFGS-based Hessian updates.
+
+Molecular dynamics
+------------------
+
+- Add :func:`~ase.md.thermalize_momenta` to supersede
+  :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`.
+  The new function takes temperature only in K (ASE standard),
+  both as positional and keyword arguments.
+  (:mr:`4016`)
+
+- Deprecate :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`
+  in favor of :func:`~ase.md.thermalize_momenta`.
+  (:mr:`4016`)
+
+- Remove the deprecated parameter ``temp`` (temperature in eV) from
+  :func:`~ase.md.velocitydistribution.MaxwellBoltzmannDistribution`.
+  (:mr:`4016`)
+
+GUI
+---
+
+- Atoms, lines, and text on the canvas once again take the colour set via
+  gui_foreground_color in ~/.ase/gui.py
+
+Other changes
+-------------
+
+- Change :func:`ase.geometry.rdf.get_rdf` to accept multiple images to compute
+  the average RDF over them (:mr:`3994`)
+
+- The default command for the CP2K calculator was changed from ``cp2k_shell`` to
+  ``cp2k.psmp -s``.
+
+Bugfixes
+--------
+
+- :meth:`.VibrationsData.todict` no longer throws an error when
+  the length of :attr:`.VibrationsData._indices` is not 1 but
+  differs from the length of :attr:`.VibrationsData._atoms`
+
+- Fix :func:`~ase.io.vasp.read_vasp_configuration` so that it can parse the VASP-POSCAR
+  format with POTCAR hashes in place of element symbols like ``Na_pv/6a2f546d``
+  (:mr:`3968`)
+
+- Fixed :class:`~ase.mep.neb.NEB` so that it stores unconstrained forces
+  as raw forces correctly (:mr:`4026`)
+
+- Added divergence check for infinite direction norm in :meth:`ase.mep.dimer.MinModeTranslate.step` (:mr:`4041`)
+- Prevent step in `ase.mep.dimer.MinModeTranslate.step` from becoming NaN (:mr:`4041`)
+
+- Fixed :class:`~ase.eos.EquationOfState` to provide the correct energy at the
+  equilibrium volume for the Anton-Schmidt EOS (:mr:`4062`)
+
+- Snap near-integer coordinates in `build()` to absorb floating-point noise,
+  preventing boundary atoms from erroneously splitting into an extra layer.
+- Intercept `vacuum=0.0` in `surface()`, which unphysically shrinks the Z-axis
+  to the atomic bounding box and causes layers to overlap. Now warns and falls
+  back to `vacuum=None`.
+
+- Fixed the VASP calculator to treat the ``drotmax`` (DRotMax) parameter as an
+  integer key instead of a float key, so it is written correctly to the INCAR
+  file (:mr:`4116`).
+
+- Fix :meth:`ase.calculators.eam.EAM.write_potential` to write the potential
+  consistent with the given one (:mr:`4122`)
+
+- Fix :meth:`ase.optimize.lbfgs.LBFGS.replay_trajectory` broken since ASE 3.27.0
+  (:mr:`4125`)
+
+- Fix :func:`~ase.io.vasp.read_vasp` to ignore the leading whitespace before
+  the keywords like `Selective`, `Cartesian` (or `K`), `Direct` to be consistent
+  with VASP (:mr:`4141`)
+
+- Fix vasp parser read constraints error when contcar is empty.
+
 Version 3.28.0
 ==============
 
