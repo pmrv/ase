@@ -197,7 +197,7 @@ class Symbols(collections.abc.Sequence):
         >>> atoms.symbols.species_indices()
         [0, 0, 1, 2, 1, 3, 4, 0, 5]
 
-	The indices correspond to the atoms as follows::
+        The indices correspond to the atoms as follows::
 
              [0, 0, 1, 2, 1, 3, 4, 0, 5]
               ^  ^  ^  ^  ^  ^  ^  ^  ^
