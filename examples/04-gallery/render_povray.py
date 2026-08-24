@@ -1,4 +1,9 @@
-# creates:  nice.png
+"""
+
+Rendering structure with povray
+===============================
+
+"""
 
 import numpy as np
 
