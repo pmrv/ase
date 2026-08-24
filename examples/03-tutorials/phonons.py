@@ -41,7 +41,7 @@ fig = plt.figure(figsize=(7, 4))
 ax = fig.add_axes([0.12, 0.07, 0.67, 0.85])
 
 
-# Plot phonon band-strucuture and dos
+# Plot phonon band-structure and dos
 emax = 0.035
 bs.plot(ax=ax, emin=0.0, emax=emax)
 
