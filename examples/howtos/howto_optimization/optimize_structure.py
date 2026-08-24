@@ -2,8 +2,9 @@
 
 Simple structure relaxation
 ===========================
-This is a very simple example of a structure relaxation.
 """
+#%%
+#This is a very simple example of a structure relaxation.
 
 from ase.build import molecule
 from ase.calculators.emt import EMT
