@@ -197,9 +197,14 @@ bleeding-edge:
 
 doc-minimal:
   image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
+  before_script:
+    - pip install --editable .[docs]
   script:
-    - cd doc/
-    - make
+    - sphinx-build -W doc doc/build
+  cache:
+    key: doc-minimal
+    paths:
+     - $PIP_CACHE_DIR
 
 doc:
   image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
