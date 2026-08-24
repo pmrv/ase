@@ -1,5 +1,7 @@
 """
 
+.. gallery_render_povray:
+
 Rendering structure with povray
 ===============================
 

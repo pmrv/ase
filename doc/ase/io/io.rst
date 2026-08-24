@@ -153,7 +153,7 @@ can be found here: :download:`save_pov.py`
 .. image:: NaCl_C6H6.png
 
 An other example showing how to change colors and textures in pov can
-be found here: :download:`../../tutorials/saving_graphics.py`.
+be found :ref:`here <gallery_render_povray>`.
 
 Adding a new file-format to ASE
 ===============================
