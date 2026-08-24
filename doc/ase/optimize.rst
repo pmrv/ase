@@ -105,9 +105,9 @@ Use the command ``ase gui H2O.traj`` to see what is going on (more here:
 :mod:`ase.gui`).  The trajectory file can also be accessed using the
 module :mod:`ase.io.trajectory`.
 
-The ``attach`` method takes an optional argument ``interval=n`` that can
-be used to tell the structure optimizer object to write the
-configuration to the trajectory file only every ``n`` steps.
+The ``attach`` method in :class:`BaseDynamics`  takes an optional argument
+ ``interval=n`` that can be used to tell the structure optimizer object to 
+write the configuration to the trajectory file only every ``n`` steps.
 
 During a structure optimization, the BFGS and LBFGS optimizers use two
 quantities to decide where to move the atoms on each step:
@@ -418,7 +418,8 @@ is computed using a standalone force field calculator::
     from ase.build import molecule
     from ase.utils.ff import Morse, Angle, Dihedral, VdW
     from ase.calculators.ff import ForceField
-    from ase.optimize.precon import get_neighbours, FF, PreconLBFGS
+    from ase.optimize.precon.neighbors import get_neighbours
+    from ase.optimize.precon FF, PreconLBFGS
 
     from ase.calculators.loggingcalc import LoggingCalculator
     import matplotlib as mpl
