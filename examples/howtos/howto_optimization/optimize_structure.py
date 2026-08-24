@@ -9,7 +9,7 @@ from ase.build import molecule
 from ase.calculators.emt import EMT
 from ase.optimize import BFGS
 
-h2o = molecule('H2O')
-h2o.calc = EMT()
-optim = BFGS(h2o, trajectory='H2O.traj')
-optim.run(fmax=0.05)
+atoms = molecule('H2O')
+atoms.calc = EMT()
+opt = BFGS(atoms, trajectory='H2O.traj')
+opt.run(fmax=0.05)
