@@ -9,8 +9,9 @@ using a 7x7x7 supercell within effective medium theory:
 """
 
 # %%
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.phonons import Phonons
@@ -61,11 +62,11 @@ dosax.set_xticks([])
 dosax.set_xlabel('DOS', fontsize=18)
 plt.show()
 
-#fig.savefig('Al_phonon.png')
+# fig.savefig('Al_phonon.png')
 
 # %%
-from ase.io.trajectory import Trajectory
-from ase.io import write
+from ase.io.trajectory import Trajectory  # noqa
+from ase.io import write  # noqa
 
 # Write modes for specific q-vector to trajectory files:
 L = np.array(path.special_points['L'])
