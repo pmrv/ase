@@ -2,7 +2,8 @@ import numpy as np
 
 from ase.build import bulk
 from ase.calculators.lj import LennardJones
-from ase.constraints import FixSymmetry, UnitCellFilter
+from ase.constraints import FixSymmetry
+from ase.filters import UnitCellFilter
 from ase.optimize import BFGS
 from ase.spacegroup.symmetrize import check_symmetry
 
