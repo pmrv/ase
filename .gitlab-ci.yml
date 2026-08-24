@@ -202,7 +202,7 @@ doc-minimal:
   # If we don't have a minimal test job, then optional dependencies can
   # become accidentally mandatory, and then this job will fail, thus
   # preventing that problem.
-  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
   before_script:
     - pip install --editable .[docs]
   script:
