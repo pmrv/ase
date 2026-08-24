@@ -211,6 +211,8 @@ class EquationOfState:
     --------
     >>> from ase.build import bulk
     >>> from ase.calculators.emt import EMT
+    >>> import numpy as np
+    >>> from ase.eos import EquationOfState
     >>> atoms = bulk('Al')
     >>> atoms.calc = EMT()
     >>> cell = atoms.cell.copy()
