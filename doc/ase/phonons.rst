@@ -21,7 +21,7 @@ images of :math:`(N, a_2)` and choosing the shortest vector. Furthermore, there
 may be multiple images of :math:`(N, a_2)` that yield the shortest vector. In
 such cases, it will be beneficial to use the averaged phase factor of all the
 shortest atom-to-atom image vectors. For further details on mean minimum image
-phases see equation (48) and surrounding text in [Togo]_. In the ASE
+phases see equations (47) and (48) and surrounding text in [Togo]_. In the ASE
 :class:`~ase.phonons.Phonons` class, the usage of mean minimum image phases can
 be enabled by setting ``use_mean_minimum_images=True`` at class initialization.
 This is highly recommended and tends to have much better converged phonon
