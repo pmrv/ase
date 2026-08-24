@@ -45,7 +45,7 @@ class Symbols(collections.abc.Sequence):
     >>> atoms.symbols[:3]
     Symbols('C2O')
     >>> atoms.symbols == 'H'
-    array([False, False, False,  True,  True,  True,  True,  True,  True])
+    array([False, False, False,  True,  True,  True,  True,  True,  True], ...)
     >>> atoms.symbols[-3:] = 'Pu'
     >>> atoms.symbols
     Symbols('C2OH3Pu3')
