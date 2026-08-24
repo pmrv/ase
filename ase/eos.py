@@ -211,6 +211,8 @@ class EquationOfState:
     --------
     >>> from ase.build import bulk
     >>> from ase.calculators.emt import EMT
+    >>> import numpy as np
+    >>> from ase.eos import EquationOfState
     >>> atoms = bulk('Al')
     >>> atoms.calc = EMT()
     >>> cell = atoms.cell.copy()
@@ -480,8 +482,7 @@ def calculate_eos(atoms, npoints=5, eps=0.04, trajectory=None, callback=None):
 class CLICommand:
     """Calculate EOS from one or more trajectory files.
 
-    See https://docs.ase-lib.org/tutorials/eos/eos.html for
-    more information.
+    See :ref:`eos_example` for more information.
     """
 
     @staticmethod
