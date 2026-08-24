@@ -196,6 +196,12 @@ bleeding-edge:
 
 
 doc-minimal:
+  # This job exists because we'd like people to be able to build the docs
+  # locally when working on the documentation.
+  #
+  # If we don't have a minimal test job, then optional dependencies can
+  # become accidentally mandatory, and then this job will fail, thus
+  # preventing that problem.
   image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
   before_script:
     - pip install --editable .[docs]
