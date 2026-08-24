@@ -44,7 +44,7 @@ sphinx_gallery_conf = {
     'filename_pattern': r'/*\.py',
     'ignore_pattern': r'/*prerequisites\.py',
     # "copyfile_regex": r".*\.(xyz|dat)",
-    'examples_dirs': ['../examples', 'howtos'],
+    'examples_dirs': ['../examples/tutorials', '../examples/howtos'],
     'gallery_dirs': ['examples_generated', 'howtos_generated'],
     'min_reported_time': 60,
     'reference_url': {'ase': None},
