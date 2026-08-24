@@ -225,6 +225,7 @@ Contents
     about
     install
     examples_generated/index
+    howtos_generated/index
     gettingstarted/gettingstarted
     cmdline
     ase/gui/gui
