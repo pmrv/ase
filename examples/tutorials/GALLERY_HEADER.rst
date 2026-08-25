@@ -3,7 +3,8 @@
 Tutorials
 =========
 
-This directory contains examples of how to use ASE.
+This directory contains tutorials of how to use ASE. Shorter examples
+can also be found in :ref:`howtos`.
 
 For running the examples install ase.
 
