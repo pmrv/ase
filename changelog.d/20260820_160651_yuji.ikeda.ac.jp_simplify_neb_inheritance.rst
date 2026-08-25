@@ -1,0 +1,6 @@
+Optimizers
+----------
+
+- Remove deprecated DyNEB-related options from the base :class:`~ase.mep.neb.NEB``.
+  Use :class:`~ase.mep.neb.DyNEB`` directly.
+  (:mr:`4206`)
