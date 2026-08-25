@@ -304,16 +304,16 @@ class Phonons(Displacement):
     --------
     >>> from ase.build import bulk
     >>> from ase.phonons import Phonons
-    >>> from gpaw import GPAW, FermiDirac
+    >>> from ase.calculators.emt import EMT
 
-    >>> atoms = bulk('Si', 'diamond', a=5.4)
-    >>> calc = GPAW(mode='fd',
-    ...             kpts=(5, 5, 5),
-    ...             h=0.2,
-    ...             occupations=FermiDirac(0.))
-    >>> ph = Phonons(atoms, calc, supercell=(5, 5, 5))
+    >>> atoms = bulk('Al', 'fcc', a=4.05)
+    >>> calc = EMT()
+    >>> ph = Phonons(atoms, calc, supercell=(7, 7, 7), delta=0.05)
     >>> ph.run()
-    >>> ph.read(method='frederiksen', acoustic=True)
+    >>> ph.read(acoustic=True)
+    >>> path = atoms.cell.bandpath('GXULGK', npoints=100)
+    >>> bs = ph.get_band_structure(path, verbose=False)
+    >>> dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
 
     """
 
@@ -381,6 +381,10 @@ class Phonons(Displacement):
                    /__  ij
                     a
 
+        .. deprecated:: 3.22.1
+            Current implementation of non-analytical correction is likely
+            incorrect, see :issue:`941`
+
         Parameters
         ----------
 
@@ -390,10 +394,6 @@ class Phonons(Displacement):
         name: str
             Key used to identify the file with Born charges for the unit cell
             in the JSON cache.
-
-        .. deprecated:: 3.22.1
-            Current implementation of non-analytical correction is likely
-            incorrect, see :issue:`941`
         """
 
         # Load file with Born charges and dielectric tensor for atoms in the
@@ -560,7 +560,12 @@ class Phonons(Displacement):
     @deprecated('Please use get_force_constants() instead')
     def get_force_constant(self) -> np.ndarray:
         """Deprecated version of get_force_constants,
-        can safely be removed by summer 2027"""
+        can safely be removed by summer 2027
+        
+        .. note::
+           Please use get_force_constants().
+
+        """
 
         C_avNav = self.get_force_constants()
         C_Navav = np.moveaxis(C_avNav, (0, 1, 2), (1, 2, 0))
@@ -616,12 +621,6 @@ class Phonons(Displacement):
             is `1 / m_{eff}`, where `m_{eff}` is the effective mass of the
             mode.
 
-        Examples
-        --------
-        >>> from ase.dft.kpoints import BandPath
-        >>> path = BandPath(...)  # Define the band path
-        >>> phonons = Phonons(...)
-        >>> bs, modes = phonons.get_band_structure(path, modes=True)
         """
         result = self.band_structure(path.kpts, modes=modes, verbose=verbose)
         if modes:
@@ -641,6 +640,9 @@ class Phonons(Displacement):
         """Computation of the dynamical matrix in momentum space D_ab(q).
             This is a Fourier transform from real-space dynamical matrix D_N
             for a given momentum vector q.
+
+        .. note::
+           Deprecated. Please use calculate_dynamical_matrix().
 
         Parameters
         ----------
@@ -854,6 +856,10 @@ class Phonons(Displacement):
         center: bool = False,
     ) -> None:
         """Write modes to trajectory file.
+        
+        .. note::
+           To exaggerate the amplitudes for better visualization, multiply
+           kT by the square of the desired factor.
 
         Parameters
         ----------
@@ -872,9 +878,6 @@ class Phonons(Displacement):
             Number of images in an oscillation.
         center: bool
             Center atoms in unit cell if True (default: False).
-
-        To exaggerate the amplitudes for better visualization, multiply
-        kT by the square of the desired factor.
         """
 
         if isinstance(branches, int):
