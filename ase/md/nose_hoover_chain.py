@@ -765,11 +765,14 @@ class MaskedMTKNPT(MTKNPT):
         self._p_c = np.zeros(3)  # Cell momenta for axis
 
     @property
-    def mask(self) -> tuple[bool, bool, bool]:
+    def mask(self) -> np.ndarray:
         return self._mask
 
     @mask.setter
     def mask(self, mask: tuple[bool, bool, bool]) -> None:
+        mask = np.asarray(mask, dtype=bool)
+        if mask.shape != (3,):
+            raise ValueError('mask must contain exactly three booleans')
         self._mask = mask
 
     @property
