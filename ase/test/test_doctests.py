@@ -19,6 +19,7 @@ ase.geometry.geometry
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols

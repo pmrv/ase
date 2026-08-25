@@ -16,32 +16,18 @@ in the present implementation. Its implementation in conjunction with the small
 displacement method is described in [Wang]_.
 
 
-Example
-=======
+List of all Methods
+===================
 
-Simple example showing how to calculate the phonon dispersion for bulk aluminum
-using a 7x7x7 supercell within effective medium theory:
+.. autoclass:: Phonons
+   :members:
 
-.. literalinclude:: phonons_Al_fcc.py
-   :start-after: creates:
-   :end-before: literalinclude division line
 
-.. image:: Al_phonon.png
-
-Mode inspection:
-
-.. literalinclude:: phonons_Al_fcc.py
-   :start-after: literalinclude division line
+References
+===========
 
 .. [Alfe] D. Alfe, PHON: A program to calculate phonons using the small
           displacement method, Comput. Phys. Commun. 180, 2622 (2009)
 .. [Wang] Y. Wang *et al.*, A mixed-space approach to first-principles
           calculations of phonon frequencies for polar materials, J. Phys.:
           Cond. Matter 22, 202201 (2010)
-
-
-List of all Methods
-===================
-
-.. autoclass:: Phonons
-   :members:
