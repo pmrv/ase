@@ -66,10 +66,8 @@ plt.show()
 
 # %%
 # You can visualize the modes with the following script:
-from ase.io.trajectory import Trajectory  # noqa
-from ase.io import write  # noqa
 
-# Write modes for specific q-vector to trajectory files:
+# Write modes for specific q-vector to trajectory file
 L = np.array(path.special_points['L'])
 ph.write_modes(
     L / 2.0,
@@ -79,8 +77,12 @@ ph.write_modes(
     center=True,
 )
 
-# Generate gif animation:
-# XXX Temporarily disabled due to matplotlib writer compatibility issue.
+# Optionally, generate gif animation
+
+# from ase.io.trajectory import Trajectory
+# from ase.io import write
+
+# Temporarily disabled due to matplotlib writer compatibility issue.
 # with Trajectory('phonon.mode.2.traj', 'r') as traj:
-#     write('Al_mode.gif', traj, interval=50,
+#    write('Al_mode.gif', traj, interval=50,
 #           rotation='-36x,26.5y,-25z')
