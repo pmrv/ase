@@ -13,6 +13,8 @@ MANIFEST
 doc/ase/dft/bztable.rst
 doc/tutorials/deltacodesdft/fit.json
 doc/ase/io/formatoptions.rst
+doc/howtos_generated/
+examples/**/*.db
 
 # Editor backup files
 *~
