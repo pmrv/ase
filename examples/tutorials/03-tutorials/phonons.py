@@ -65,6 +65,7 @@ plt.show()
 # fig.savefig('Al_phonon.png')
 
 # %%
+# You can visualize the modes with the following script:
 from ase.io.trajectory import Trajectory  # noqa
 from ase.io import write  # noqa
 
