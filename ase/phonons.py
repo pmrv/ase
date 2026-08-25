@@ -561,7 +561,7 @@ class Phonons(Displacement):
     def get_force_constant(self) -> np.ndarray:
         """Deprecated version of get_force_constants,
         can safely be removed by summer 2027
-        
+
         .. note::
            Please use get_force_constants().
 
@@ -856,7 +856,7 @@ class Phonons(Displacement):
         center: bool = False,
     ) -> None:
         """Write modes to trajectory file.
-        
+
         .. note::
            To exaggerate the amplitudes for better visualization, multiply
            kT by the square of the desired factor.
