@@ -229,7 +229,26 @@ def _gpaw_world():
     return world
 
 
-world = MPI()
+# Note to implementors:
+#   Whoever sets this variable MUST check that it was not already set!
+#   If it is set in two places, there are two competing parallel
+#   mechanisms and that must be avoided.
+mpiworld_importpath = os.environ.get('ASE_PARALLEL_WORLD_HOOK')
+
+if mpiworld_importpath is None:
+    # In the future this will be always serial!
+    # We should detect if we would set a real communicator here
+    # and issue a FutureWarning there.
+    mpiworld_module = None
+    world = MPI()
+
+    # Once we remove these MPI behaviours, all other MPI initialization
+    # code in ASE can be removed.
+else:
+    import importlib
+
+    mpiworld_module = importlib.import_module(mpiworld_importpath)
+    world = mpiworld_module.ASE_PARALLEL_WORLD_HOOK()
 
 
 def barrier():
