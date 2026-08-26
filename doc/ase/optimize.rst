@@ -76,12 +76,12 @@ with the experimental geometry::
    import numpy as np
    d = 0.9575
    t = np.pi / 180 * 104.51
-   water = Atoms('H2O',
+   system = Atoms('H2O',
                  positions=[(d, 0, 0),
                             (d * np.cos(t), d * np.sin(t), 0),
                             (0, 0, 0)],
                  calculator=EMT())
-   dyn = BFGS(water)
+   dyn = BFGS(system)
    dyn.run(fmax=0.05)
 
 which produces the following output. The columns are the solver name, step
@@ -98,19 +98,27 @@ When doing structure optimization, it is useful to write the
 trajectory to a file, so that the progress of the optimization run can
 be followed during or after the run::
 
-  dyn = BFGS(water, trajectory='H2O.traj')
+  dyn = BFGS(system, trajectory='H2O.traj')
   dyn.run(fmax = 0.05)
 
 Use the command ``ase gui H2O.traj`` to see what is going on (more here:
 :mod:`ase.gui`).  The trajectory file can also be accessed using the
 module :mod:`ase.io.trajectory`.
 
-The ``attach`` method in :class:`BaseDynamics`  takes an optional argument
- ``interval=n`` that can be used to tell the structure optimizer object to 
-write the configuration to the trajectory file only every ``n`` steps.
+The ``attach`` method takes an optional argument ``interval = n`` that can be
+used to tell the structure optimizer object to write the configuration to
+the trajectory file only every ``n`` steps::
+
+  from ase.optimize import BFGS
+  from ase.io import Trajectory
+  [...]
+  dyn = BFGS(system, trajectory='H2O.traj')
+  traj = Trajectory('H2O.traj', 'w', system)
+  dyn.attach(traj.write, interval = 2)
+  dyn.run(fmax = 0.05)
 
 During a structure optimization, the BFGS and LBFGS optimizers use two
-quantities to decide where to move the atoms on each step:
+quantities to decide where to move the atoms on each step, e.g.:
 
 * the forces on each atom, as returned by the associated
   :class:`~ase.calculators.calculator.Calculator` object
@@ -132,10 +140,10 @@ Aside from the geometry, the Hessian of the previous run can and
 should be retained for the second run.  Use the ``restart`` keyword to
 specify a file in which to save the Hessian::
 
-  dyn = BFGS(atoms=system, trajectory='qn.traj', restart='qn.json')
+  dyn = BFGS(atoms=system, trajectory = 'H2O.traj', restart = 'H2O.json')
 
 This will create an optimizer which saves the Hessian to
-:file:`qn.json` (using the Python :mod:`json` module) on each
+:file:`'H2O.json` (using the Python :mod:`json` module) on each
 step.  If the file already exists, the Hessian will also be
 *initialized* from that file.
 
@@ -144,19 +152,19 @@ optimization, since it contains the history of all forces and
 positions, and thus whichever information about the Hessian was
 assembled so far::
 
-  dyn = BFGS(atoms=system, trajectory='qn.traj')
+  dyn = BFGS(atoms = system, trajectory = 'H2O.traj')
   dyn.replay_trajectory('history.traj')
   dyn.run(fmax = 0.05)
 
-``replay_trajectory`` will read through each iteration stored in 
-:file:`history.traj`, performing adjustments to the Hessian as appropriate.  
-Setting ``dyn.run(...)`` then continues the trajectory calculation from the
-stored iterations. 
-Note that the stored steps will not be written to :file:`qn.traj`, i.e.,
-:file:`qn.traj` will only contain the steps from the continued trajectory
-calculation. Do not use the same filename for :file:`qn.traj` and 
-:file:`history.traj` to avoid overwriting the pervious iterations.
-If restarting with more than one previous trajectory file, use 
+``replay_trajectory`` will read through each iteration stored in
+:file:`history.traj`, performing adjustments to the Hessian as appropriate.
+Setting ``dyn.run(fmax = 0.05)`` then continues the trajectory calculation from
+the stored iterations.
+Note that the stored steps will not be written to :file:`H2O.traj`, i.e.,
+:file:`H2O.traj` will only contain the steps from the continued trajectory
+calculation. Do not use the same filename for :file:`H2O.traj` and
+:file:`history.traj` to avoid overwriting the previous iterations.
+If restarting with more than one previous trajectory file, use
 :ref:`ase-gui` to concatenate them into a single trajectory file first::
 
   $ ase gui part1.traj part2.traj -o history.traj
