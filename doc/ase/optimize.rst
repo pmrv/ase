@@ -210,18 +210,42 @@ optimization and the vectors needed to generate the Hessian Matrix.
 
 GoodOldQuasiNewton
 ------------------
+.. class:: GoodOldQuasiNewton
 
 While GOQN is an "old" optimizer in the history of ASE,
 it can be very effective and often converges in fewer steps than newer optimizers.
+The GOQN is used like this::
 
-.. class:: GoodOldQuasiNewton           
+  dyn = GoodOldQuasiNewton(atoms=system, trajectory = 'goqn.traj')
+
+
+
 
 CellAwareBFGS
 -------------
+.. class:: CellAwareBFGS
 
 CellAwareBFGS requires a :class:`UnitCellFilter` (usually the :class:`FrechetCellFilter` is the best choice) and can use additional information about the system (bulk modulus, Posson ratio) to inform the optimization process.
+The CellAwareBFGS can be used as follows::
+  from ase.build import bulk
+  from ase.calculators.emt import EMT
+  from ase.filters import FrechetCellFilter
+  from ase.optimize.cellawarebfgs import CellAwareBFGS
+  from ase.units import GPa
 
-.. class:: CellAwareBFGS
+  atoms = bulk('Au')
+
+  atoms.calc = EMT()
+  dyn = CellAwareBFGS(
+          FrechetCellFilter(atoms, exp_cell_factor=1.0),
+          alpha=70, # suppress-ratio for elastic tensor calculation
+          bulk_modulus = 100 * GPa,
+          poisson_ratio = 0.37,
+          long_output=True,
+      )
+  dyn.run(fmax=0.005)
+
+
 
 RFO
 ---
