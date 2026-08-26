@@ -47,7 +47,7 @@ array([[ 0.      ,  0.      ,  0.      ],
 Building an Atoms object from Atom objects
 ------------------------------------------
 
-It is also possible to create an :class:`~ase.Atoms` object from an :class:`Atom` object:
+It is also possible to create an :class:`~ase.Atoms` object from :class:`Atom` objects:
 
 >>> from ase.atoms import Atoms
 >>> a1 = Atom('H', (0, 0, 0), mass=2)
