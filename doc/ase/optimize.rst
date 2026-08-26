@@ -210,6 +210,7 @@ optimization and the vectors needed to generate the Hessian Matrix.
 
 GoodOldQuasiNewton
 ------------------
+
 .. class:: GoodOldQuasiNewton
 
 While GOQN is an "old" optimizer in the history of ASE,
@@ -223,10 +224,15 @@ The GOQN is used like this::
 
 CellAwareBFGS
 -------------
+
 .. class:: CellAwareBFGS
 
-CellAwareBFGS requires a :class:`UnitCellFilter` (usually the :class:`FrechetCellFilter` is the best choice) and can use additional information about the system (bulk modulus, Posson ratio) to inform the optimization process.
+CellAwareBFGS requires a :class:`UnitCellFilter` (usually the
+:class:`FrechetCellFilter` is the best choice) and can use additional
+information about the system (bulk modulus, Posson ratio) to inform the
+optimization process.
 The CellAwareBFGS can be used as follows::
+
   from ase.build import bulk
   from ase.calculators.emt import EMT
   from ase.filters import FrechetCellFilter
@@ -252,6 +258,10 @@ RFO
 
 .. autoclass:: RFO
 
+Example::
+  
+  dyn = RFO(atoms=system, trajectory = 'rfo.traj', restart='rfo.json')
+
 GPMin
 -----
 
@@ -276,6 +286,10 @@ Read more about this algorithm here:
              run GPMin with more than 100 atoms in the unit cell.
 
 
+Basic example::
+
+  dyn = GPMin(atoms=system, trajectory = 'gpmin.traj', restart='gpmin.json')
+
 FIRE
 ----
 
@@ -287,8 +301,19 @@ Read about this algorithm here:
   | :doi:`Structural Relaxation Made Simple <10.1103/PhysRevLett.97.170201>`
   | Physical Review Letters, Vol. **97**, 170201 (2006)
 
+Basic example::
+
+  dyn = FIRE(system,
+           trajectory = 'fire.traj',
+           restart ='fire.json',
+           dtmax = 1.0,
+           dt = 1.0)
+
+
 FIRE2.0 / ABC-FIRE
 ------------------
+
+.. class:: FIRE2
 
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
@@ -300,7 +325,23 @@ FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled 
   | :doi:`ABC-FIRE: Accelerated Bias-Corrected Fast Inertial Relaxation Engine <https://doi.org/10.1016/j.commatsci.2022.111978>`
   | Comput. Mater. Sci. 218 (2023) 111978.
 
-.. class:: FIRE2
+Basic example::
+
+  fire_parameters = {
+        'dt': 0.1,
+        'maxstep': 0.2,
+        'dtmax': 1.0,
+        'Nmin': 20,
+        'finc': 1.1,
+        'fdec': 0.5,
+        'astart': 0.25,
+        'fa': 0.99,
+    }
+  dyn = FIRE2(
+        system,
+        use_abc=True,
+        **fire_parameters
+        )
 
 
 MDMin
@@ -330,16 +371,23 @@ quadratic it becomes advantageous to switch to a minimization method
 with quadratic convergence, such as *Conjugate Gradient* or *Quasi
 Newton*.
 
+Basic example::
+
+  dyn = MDMin(atoms=system, trajectory = 'mdmin.traj', restart='mdmin.json')
+
 
 SciPy optimizers
 ----------------
 
 SciPy provides a number of optimizers. An interface module for a couple of
 these have been written for ASE. Most notable are the optimizers SciPyFminBFGS
-and SciPyFminCG. These are called with the regular syntax and can be imported
-as::
+and SciPyFminCG. These can be imported as::
 
   from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
+
+and are called with the regular syntax, e.g.::
+
+  dyn = SciPyFminBFGS(atoms=system, trajectory = 'part1.traj')
 
 .. autoclass:: ase.optimize.sciopt.SciPyFminBFGS
 .. autoclass:: ase.optimize.sciopt.SciPyFminCG
@@ -536,8 +584,9 @@ Basin hopping
 The global optimization algorithm can be used quite similar as a
 local optimization algorithm::
 
-  from ase import *
   from ase.optimize.basin import BasinHopping
+  from ase.units import kB
+  [...]
 
   bh = BasinHopping(atoms=system,         # the system to optimize
                     temperature=100 * kB, # 'temperature' to overcome barriers
