@@ -52,7 +52,7 @@ It is also possible to create an :class:`~ase.Atoms` object from :class:`Atom` o
 >>> from ase.atoms import Atoms
 >>> a1 = Atom('H', (0, 0, 0), mass=2)
 >>> a2 = Atom('H', (0.74, 0, 0), mass=2)
->>> h2=Atoms([a1,a2])
+>>> h2=Atoms([a1, a2])
 >>> h2.get_center_of_mass()
 array([0.37, 0.  , 0.  ])
 
