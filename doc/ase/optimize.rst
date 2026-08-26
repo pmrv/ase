@@ -162,7 +162,7 @@ Setting ``dyn.run(fmax = 0.05)`` then continues the trajectory calculation from
 the stored iterations.
 Note that the stored steps will not be written to :file:`H2O.traj`, i.e.,
 :file:`H2O.traj` will only contain the steps from the continued trajectory
-calculation. Do not use the same filename for :file:`H2O.traj` and
+calculation. Be careful not to use the same filename for :file:`H2O.traj` and
 :file:`history.traj` to avoid overwriting the previous iterations.
 If restarting with more than one previous trajectory file, use
 :ref:`ase-gui` to concatenate them into a single trajectory file first::
@@ -433,7 +433,7 @@ is computed using a standalone force field calculator::
     from ase.utils.ff import Morse, Angle, Dihedral, VdW
     from ase.calculators.ff import ForceField
     from ase.optimize.precon.neighbors import get_neighbours
-    from ase.optimize.precon FF, PreconLBFGS
+    from ase.optimize.precon import FF, PreconLBFGS
 
     from ase.calculators.loggingcalc import LoggingCalculator
     import matplotlib as mpl
