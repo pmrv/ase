@@ -3,7 +3,7 @@ from numpy import linalg
 from scipy.integrate import trapezoid
 
 from ase.transport.greenfunction import GreenFunction
-from ase.transport.selfenergy import BoxProbe, LeadSelfEnergy
+from ase.transport.selfenergy import LeadSelfEnergy
 from ase.transport.tools import (
     cutcoupling,
     dagger,
@@ -72,8 +72,6 @@ class TransportCalculator:
             projected density of states for.
         dos : {False, bool}, optional
             The total density of states of the central region.
-        box: XXX
-            YYY
 
         If hc1/hc2 are None, they are assumed to be identical to
         the coupling matrix elements between nearest neighbor
@@ -104,7 +102,6 @@ class TransportCalculator:
             'hc2': None,
             'sc1': None,
             'sc2': None,
-            'box': None,
             'align_bf': None,
             'eta1': 1e-5,
             'eta2': 1e-5,
@@ -136,7 +133,6 @@ class TransportCalculator:
                 'eta1',
                 'eta2',
                 'align_bf',
-                'box',
             ]:
                 self.initialized = False
                 self.uptodate = False
@@ -254,19 +250,6 @@ class TransportCalculator:
                 (h2_ii, s2_ii), (h2_ij, s2_ij), (h2_im, s2_im), p['eta2']
             ),
         ]
-        box = p['box']
-        if box is not None:
-            print('Using box probe!')
-            self.selfenergies.append(
-                BoxProbe(
-                    eta=box[0],
-                    a=box[1],
-                    b=box[2],
-                    energies=box[3],
-                    S=s_mm,
-                    T=0.3,
-                )
-            )
 
         # setup scattering green function
         self.greenfunction = GreenFunction(
