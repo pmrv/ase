@@ -64,7 +64,7 @@ should be less than *fmax*:
 BFGS
 ----
 
-.. class:: BFGS
+.. autoclass:: BFGS
 
 The ``BFGS`` object is one of the minimizers in the ASE package. The below
 script uses ``BFGS`` to optimize the structure of a water molecule, starting
@@ -183,7 +183,6 @@ When switching between different types of optimizers, e.g. between
 ``restart`` keyword are not compatible, but the Hessian can still be
 retained by replaying the trajectory as above.
 
-
 LBFGS
 -----
 
@@ -208,10 +207,13 @@ BFGS. A typical optimization should look like::
 where the trajectory and the restart save the trajectory of the
 optimization and the vectors needed to generate the Hessian Matrix.
 
+.. autoclass:: LBFGS
+.. autoclass:: LBFGSLineSearch
+
 GoodOldQuasiNewton
 ------------------
 
-.. class:: GoodOldQuasiNewton
+.. autoclass:: GoodOldQuasiNewton
 
 While GOQN is an "old" optimizer in the history of ASE,
 it can be very effective and often converges in fewer steps than newer optimizers.
@@ -220,12 +222,10 @@ The GOQN is used like this::
   dyn = GoodOldQuasiNewton(atoms=system, trajectory = 'goqn.traj')
 
 
-
-
 CellAwareBFGS
 -------------
 
-.. class:: CellAwareBFGS
+.. autoclass:: CellAwareBFGS
 
 CellAwareBFGS requires a :class:`UnitCellFilter` (usually the
 :class:`FrechetCellFilter` is the best choice) and can use additional
@@ -251,8 +251,6 @@ The CellAwareBFGS can be used as follows::
       )
   dyn.run(fmax=0.005)
 
-
-
 RFO
 ---
 
@@ -262,10 +260,11 @@ Example::
   
   dyn = RFO(atoms=system, trajectory = 'rfo.traj', restart='rfo.json')
 
+
 GPMin
 -----
 
-.. class:: GPMin
+.. autoclass:: GPMin
 
 The GPMin (Gaussian Process minimizer) produces a model for the Potential
 Energy Surface using the information about the potential energies and
@@ -293,7 +292,7 @@ Basic example::
 FIRE
 ----
 
-.. class:: FIRE
+.. autoclass:: FIRE
 
 Read about this algorithm here:
 
@@ -313,7 +312,7 @@ Basic example::
 FIRE2.0 / ABC-FIRE
 ------------------
 
-.. class:: FIRE2
+.. autoclass:: FIRE2
 
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
@@ -347,7 +346,7 @@ Basic example::
 MDMin
 -----
 
-.. class:: MDMin
+.. autoclass:: MDMin
 
 The MDmin algorithm is a modification of the usual velocity-Verlet
 molecular dynamics algorithm.  Newtons second law is solved
@@ -396,8 +395,8 @@ and are called with the regular syntax, e.g.::
 BFGSLineSearch
 --------------
 
-.. class:: BFGSLineSearch
-.. class:: QuasiNewton
+.. autoclass:: BFGSLineSearch
+.. autoclass:: QuasiNewton
 
 BFGSLineSearch is the BFGS algorithm with a line search mechanism
 that enforces the step taken fulfills the Wolfe conditions, so that
