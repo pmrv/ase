@@ -85,7 +85,7 @@ with the experimental geometry::
    dyn.run(fmax=0.05)
 
 which produces the following output. The columns are the solver name, step
-number, clock time, potential energy (eV), and maximum force.::
+number, clock time, potential energy (eV), and maximum force::
 
    BFGS:   0  19:45:25        2.769633       8.6091
    BFGS:   1  19:45:25        2.154560       4.4644
@@ -152,22 +152,28 @@ optimization, since it contains the history of all forces and
 positions, and thus whichever information about the Hessian was
 assembled so far::
 
-  dyn = BFGS(atoms = system, trajectory = 'H2O.traj')
-  dyn.replay_trajectory('history.traj')
-  dyn.run(fmax = 0.05)
+  from ase.io import read
+  from ase.calculators.emt import EMT
+  from ase.optimize import BFGS
+
+  system = read('H2O.traj')
+  system.calc = EMT()
+  dyn2 = BFGS(system, trajectory='part2.traj')
+  dyn2.replay_trajectory('H2O.traj')
+  dyn2.run(fmax = 0.01)
 
 ``replay_trajectory`` will read through each iteration stored in
-:file:`history.traj`, performing adjustments to the Hessian as appropriate.
-Setting ``dyn.run(fmax = 0.05)`` then continues the trajectory calculation from
+:file:`H2O.traj`, performing adjustments to the Hessian as appropriate.
+Setting ``dyn.run(fmax = 0.01)`` then continues the trajectory calculation from
 the stored iterations.
 Note that the stored steps will not be written to :file:`H2O.traj`, i.e.,
 :file:`H2O.traj` will only contain the steps from the continued trajectory
 calculation. Be careful not to use the same filename for :file:`H2O.traj` and
-:file:`history.traj` to avoid overwriting the previous iterations.
+:file:`part2.traj` to avoid overwriting the previous iterations.
 If restarting with more than one previous trajectory file, use
 :ref:`ase-gui` to concatenate them into a single trajectory file first::
 
-  $ ase gui part1.traj part2.traj -o history.traj
+  $ ase gui H2O.traj part2.traj -o history.traj
 
 The file :file:`history.traj` will then contain all necessary
 information.
