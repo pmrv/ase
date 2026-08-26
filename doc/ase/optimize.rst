@@ -99,7 +99,7 @@ trajectory to a file, so that the progress of the optimization run can
 be followed during or after the run::
 
   dyn = BFGS(water, trajectory='H2O.traj')
-  dyn.run(fmax=0.05)
+  dyn.run(fmax = 0.05)
 
 Use the command ``ase gui H2O.traj`` to see what is going on (more here:
 :mod:`ase.gui`).  The trajectory file can also be accessed using the
@@ -146,12 +146,18 @@ assembled so far::
 
   dyn = BFGS(atoms=system, trajectory='qn.traj')
   dyn.replay_trajectory('history.traj')
+  dyn.run(fmax = 0.05)
 
-This will read through each iteration stored in :file:`history.traj`,
-performing adjustments to the Hessian as appropriate.  Note that these
-steps will not be written to :file:`qn.traj`.  If restarting with more than
-one previous trajectory file, use :ref:`ase-gui` to concatenate them
-into a single trajectory file first::
+``replay_trajectory`` will read through each iteration stored in 
+:file:`history.traj`, performing adjustments to the Hessian as appropriate.  
+Setting ``dyn.run(...)`` then continues the trajectory calculation from the
+stored iterations. 
+Note that the stored steps will not be written to :file:`qn.traj`, i.e.,
+:file:`qn.traj` will only contain the steps from the continued trajectory
+calculation. Do not use the same filename for :file:`qn.traj` and 
+:file:`history.traj` to avoid overwriting the pervious iterations.
+If restarting with more than one previous trajectory file, use 
+:ref:`ase-gui` to concatenate them into a single trajectory file first::
 
   $ ase gui part1.traj part2.traj -o history.traj
 
