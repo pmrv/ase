@@ -10,6 +10,7 @@ ase.build.tools
 ase.cell
 ase.calculators.vasp.vasp
 ase.collections.collection
+ase.constraints
 ase.dft.kpoints
 ase.eos
 ase.formula
@@ -18,6 +19,7 @@ ase.geometry.geometry
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols

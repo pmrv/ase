@@ -1,14 +1,27 @@
-# creates: Al_phonon.png
+""".. _phonons:
+
+===================================================
+Phonon calculations with small displacement method
+===================================================
+
+Simple example showing how to calculate the phonon dispersion for bulk aluminum
+using a 5x5x5 supercell within effective medium theory:
+"""
+
+# %%
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ase.build import bulk
 from ase.calculators.emt import EMT
 from ase.phonons import Phonons
 
-# Setup crystal and EMT calculator
+# %%
+# Setup Al crystal
 atoms = bulk('Al', 'fcc', a=4.05)
 
-# Phonon calculator
+# %%
+# Setup phonon calculation with EMT calculator
 N = 5
 ph = Phonons(
     atoms,
@@ -19,21 +32,22 @@ ph = Phonons(
 )
 ph.run()
 
+# %%
 # Read forces and assemble the dynamical matrix
 ph.read()
 ph.clean()
 
+# %%
+# Set and plot phonon band-structure along specific path
 path = atoms.cell.bandpath('GXULGK', npoints=100)
 bs = ph.get_band_structure(path)
 
+# Get phonon DoS
 dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
-
-# Plot the band structure and DOS:
-import matplotlib.pyplot as plt  # noqa
-
 fig = plt.figure(figsize=(7, 4))
 ax = fig.add_axes([0.12, 0.07, 0.67, 0.85])
 
+# Plot phonon band structure and DoS
 emax = 0.035
 bs.plot(ax=ax, emin=0.0, emax=emax)
 
@@ -50,14 +64,15 @@ dosax.fill_between(
 dosax.set_ylim(0, emax)
 dosax.set_yticks([])
 dosax.set_xticks([])
-dosax.set_xlabel('DOS', fontsize=18)
+dosax.set_xlabel('DoS', fontsize=18)
+plt.show()
 
-fig.savefig('Al_phonon.png')
-# --- literalinclude division line ---
-# from ase.io.trajectory import Trajectory
-# from ase.io import write
+# fig.savefig('Al_phonon.png')
 
-# Write modes for specific q-vector to trajectory files:
+# %%
+# You can visualize the modes with the following script:
+
+# Write modes for specific q-vector to trajectory file
 L = np.array(path.special_points['L'])
 ph.write_modes(
     L / 2.0,
@@ -67,8 +82,12 @@ ph.write_modes(
     center=True,
 )
 
-# Generate gif animation:
-# XXX Temporarily disabled due to matplotlib writer compatibility issue.
+# Optionally, generate gif animation
+
+# from ase.io.trajectory import Trajectory
+# from ase.io import write
+
+# Temporarily disabled due to matplotlib writer compatibility issue.
 # with Trajectory('phonon.mode.2.traj', 'r') as traj:
-#     write('Al_mode.gif', traj, interval=50,
+#    write('Al_mode.gif', traj, interval=50,
 #           rotation='-36x,26.5y,-25z')
