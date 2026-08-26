@@ -44,7 +44,7 @@ array([[ 0.      ,  0.      ,  0.      ],
        [-0.629118,  0.629118, -0.629118]])
 
 
-Builing and Atoms object from Atom objects
+Building an Atoms object from Atom objects
 ------------------------------------------
 
 It is also possible to create an :class:`~ase.Atoms` object from an :class:`Atom` object:
