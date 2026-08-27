@@ -6,7 +6,6 @@ import numpy as np
 
 from ase import Atoms
 from ase._4.optimize.lbfgs import LBFGSMethod
-from ase._4.optimize.optimizable import initial_inverse_position_hessian
 from ase.optimize.optimize import Optimizer
 from ase.utils.linesearch import LineSearch
 
@@ -78,6 +77,8 @@ class LBFGS(Optimizer):
         """
         # Initial approximation of inverse Hessian 1./70. is to emulate the
         # behaviour of BFGS. Note that this is never changed!
+        from ase._4.optimize.optimizable import initial_inverse_position_hessian
+
         H0 = initial_inverse_position_hessian(0, alpha)
         self.state = LBFGSMethod(memory=memory, initial_inverse_hessian=H0)
 
