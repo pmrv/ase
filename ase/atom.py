@@ -99,7 +99,7 @@ class Atom:
     -2 [ 0.  0.  0.]
     >>> c.x = 0.0
     >>> c.position
-    array([0., 2., 3.])
+    array([ 0.,  2.,  3.])
     >>> b.symbol
     'O'
     >>> c.tag = 42
