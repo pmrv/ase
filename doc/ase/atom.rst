@@ -31,7 +31,7 @@ array([[ 0.      ,  0.      ,  0.      ],
        [-0.629118,  0.629118, -0.629118]])
 >>> a = atoms[2]
 >>> a
-Atom('H', [np.float64(-0.629118), np.float64(-0.629118), np.float64(0.629118)], index=2)
+Atom('H', [-0.629118, -0.629118, 0.629118], index=2)
 
 Modifying an :class:`Atom` object will also change the :class:`~ase.atoms` object:
 
