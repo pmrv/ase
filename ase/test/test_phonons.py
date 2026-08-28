@@ -14,7 +14,7 @@ from ase.phonons import Phonons
 def check_set_atoms(atoms, select_atoms, expected_atoms):
     """Perform a test that .set_atoms() only displaces the expected atoms."""
     atoms.calc = EMT()
-    phonons = Phonons(atoms, EMT())
+    phonons = Phonons(atoms, EMT(), use_mean_minimum_images=False)
     with pytest.warns(FutureWarning):
         phonons.set_atoms(select_atoms)
 
@@ -61,7 +61,8 @@ def test_check_consistent_format(testdir):
     atoms = molecule('H2')
     atoms.calc = EMT()
 
-    phonons = Phonons(atoms, EMT())
+    with pytest.warns(FutureWarning, match='use_mean_minimum_images'):
+        phonons = Phonons(atoms, EMT())
     phonons.run()
 
     # Check that the data stored for `eq` is shaped like the data stored for
@@ -81,7 +82,9 @@ def test_get_band_structure_with_modes(testdir):
     npoints = 100  # k-points in band path
     natoms = len(atoms)
 
-    ph = Phonons(atoms, EMT(), supercell=(N, N, N))
+    ph = Phonons(
+        atoms, EMT(), supercell=(N, N, N), use_mean_minimum_images=False
+    )
     ph.run()
     ph.read()
     ph.clean()
@@ -271,7 +274,12 @@ def test_partial_dos(testdir):
     # Calculating phonons
     N = 3
     ph = Phonons(
-        atoms, calc, supercell=(N, N, N), delta=0.005, name='phonon_ZnS'
+        atoms,
+        calc,
+        supercell=(N, N, N),
+        delta=0.005,
+        name='phonon_ZnS',
+        use_mean_minimum_images=False,
     )
     ph.run()
     assert ph.check_eq_forces()[1] < 1e-9, 'System is not at equilibrium'
@@ -299,7 +307,13 @@ def test_cutoff(testdir):
     invmass_X = np.repeat(atoms.get_masses() ** -0.5, 3)
     invmass_XX = np.outer(invmass_X, invmass_X)
 
-    ph = Phonons(atoms, EMT(), supercell=(3, 3, 3), delta=0.05)
+    ph = Phonons(
+        atoms,
+        EMT(),
+        supercell=(3, 3, 3),
+        delta=0.05,
+        use_mean_minimum_images=False,
+    )
     ph.run()
     ph.read()
 
@@ -341,9 +355,13 @@ def test_mean_minimum_images_improvement(testdir):
     ph.read()
     ph.clean()
 
-    w_old_ql = ph.band_structure(
-        q_qc, verbose=False,
-    ) * 1000  # meV
+    w_old_ql = (
+        ph.band_structure(
+            q_qc,
+            verbose=False,
+        )
+        * 1000
+    )  # meV
 
     ph = Phonons(
         atoms,
@@ -356,9 +374,13 @@ def test_mean_minimum_images_improvement(testdir):
     ph.read()
     ph.clean()
 
-    w_new_ql = ph.band_structure(
-        q_qc, verbose=False,
-    ) * 1000  # meV
+    w_new_ql = (
+        ph.band_structure(
+            q_qc,
+            verbose=False,
+        )
+        * 1000
+    )  # meV
 
     # Old behavior: Negative energy near Gamma and some value at K.
     assert w_old_ql[:, 0] == pytest.approx([-2.238175, 6.1449], abs=1e-4)
