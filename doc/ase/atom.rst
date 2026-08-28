@@ -14,79 +14,12 @@ script, atoms can be created like this:
 
 .. autoclass:: Atom
 
-The first argument to the constructor of an :class:`Atom` object is
-the chemical symbol, and the second argument is the position in Å
-units (see :mod:`ase.units`).  The position can be any numerical sequence
-of length three.  The properties of an atom can also be set using
-keywords like it is done in the *a2* and *a3* examples above.
-
-More examples:
-
->>> a = Atom('O', charge=-2)
->>> b = Atom(8, charge=-2)
->>> c = Atom('H', (1, 2, 3), magmom=1)
->>> print(a.charge, a.position)
--2 [ 0.  0.  0.]
->>> c.x = 0.0
->>> c.position
-array([ 0.,  2.,  3.])
->>> b.symbol
-'O'
->>> c.tag = 42
->>> c.number
-1
->>> c.symbol = 'Li'
->>> c.number
-3
-
-If the atom object belongs to an Atoms object, then assigning
-values to the atom attributes will change the corresponding
-arrays of the atoms object:
-
->>> from ase import Atoms
->>> OH = Atoms('OH')
->>> OH[0].charge = -1
->>> OH.get_initial_charges()
-array([-1.,  0.])
-
-Another example:
-
->>> for atom in bulk:
-...     if atom.symbol == 'Ni':
-...         atom.magmom = 0.7  # set initial magnetic moment
-
-
-The different properties of an atom can be obtained and changed via
-attributes (``position``, ``number``, ``tag``, ``momentum``, ``mass``,
-``magmom``, ``charge``, ``x``, ``y``, ``z``):
-
->>> a1.position = [1, 0, 0]
->>> a1.position
-[1, 0, 0]
->>> a1.z = 2.5
->>> a1.position
-[1, 0, 2.5]
->>> a2.magmom = 1.0
-
-That last line will set the initial magnetic moment that some
-calculators use (similar to the
-:meth:`~ase.Atoms.set_initial_magnetic_moments` method).
-
-
-.. note::
-
-   The ``position`` and ``momentum`` attributes refer to mutable
-   objects, so in some cases, you may want to use
-   ``a1.position.copy()`` in order to avoid changing the position of
-   ``a1`` by accident.
-
 
 Getting an Atom from an Atoms object
 ------------------------------------
 
 Indexing an :class:`~ase.Atoms` object returns an :class:`Atom` object
 still remembering that it belongs to the collective :class:`~ase.Atoms`:
-Modifying it will also change the atoms object:
 
 >>> from ase.build import molecule
 >>> atoms = molecule('CH4')
@@ -98,7 +31,10 @@ array([[ 0.      ,  0.      ,  0.      ],
        [-0.629118,  0.629118, -0.629118]])
 >>> a = atoms[2]
 >>> a
-Atom('H', [-0.62911799999999996, -0.62911799999999996, 0.62911799999999996], index=2)
+Atom('H', [-0.629118, -0.629118, 0.629118], index=2)
+
+Modifying an :class:`Atom` object will also change the :class:`~ase.atoms` object:
+
 >>> a.x = 0
 >>> atoms.get_positions()
 array([[ 0.      ,  0.      ,  0.      ],
@@ -108,6 +44,18 @@ array([[ 0.      ,  0.      ,  0.      ],
        [-0.629118,  0.629118, -0.629118]])
 
 
+Building an Atoms object from Atom objects
+------------------------------------------
+
+It is also possible to create an :class:`~ase.Atoms` object from :class:`Atom` objects:
+
+>>> from ase.atoms import Atoms
+>>> a1 = Atom('H', (0, 0, 0), mass=2)
+>>> a2 = Atom('H', (0.74, 0, 0), mass=2)
+>>> h2=Atoms([a1, a2])
+>>> h2.get_center_of_mass()
+array([0.37, 0.  , 0.  ])
+
 .. seealso::
 
    :mod:`ase`:
@@ -115,3 +63,7 @@ array([[ 0.      ,  0.      ,  0.      ],
 
    :mod:`ase.calculators`:
      Information about how to calculate forces and energies of atoms.
+
+   :ref:`tips` :
+     General tips for using ase.
+

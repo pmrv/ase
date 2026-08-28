@@ -338,7 +338,19 @@ class Cell:
         return result, op
 
     def permute_axes(self, permutation):
-        """Permute axes of cell."""
+        """Permute axes of cell.
+
+        Examples
+        --------
+
+        >>> from ase.cell import Cell
+
+        >>> cell = Cell.fromcellpar([2.0, 3.0, 4.0])
+        >>> cell
+        Cell([2.0, 3.0, 4.0])
+        >>> cell.permute_axes([0, 2, 1])
+        Cell([2.0, 4.0, 3.0])
+        """
         assert (np.sort(permutation) == np.arange(3)).all()
         permuted = Cell(self[permutation][:, permutation])
         return permuted
