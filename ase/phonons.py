@@ -325,7 +325,7 @@ class Phonons(Displacement):
         name: str = 'phonon',
         delta: float = 0.01,
         center_refcell: bool = False,
-        use_mean_minimum_images: bool = False,
+        use_mean_minimum_images: bool | None = None,
         mmi_atol: float = 1e-8,
         comm=None,
     ):
@@ -341,6 +341,19 @@ class Phonons(Displacement):
             center_refcell=center_refcell,
             comm=comm,
         )
+
+        if use_mean_minimum_images is None:
+            warnings.warn(
+                'The "use_mean_minimum_images" parameter is new to the '
+                'Phonons class and in the future it will be True by default. '
+                'For now, it will be set to False to ensure consistency with '
+                'previous behaviour. Please explicitly set the '
+                '"use_mean_minimum_images" keyword to True / False '
+                'to ensure consistent behaviour with future versions.',
+                FutureWarning,
+            )
+            use_mean_minimum_images = False
+
         self.use_mean_minimum_images = use_mean_minimum_images
         self.atom2atom_vectors = self.get_atom2atom_vectors(mmi_atol)
 
