@@ -338,24 +338,37 @@ def test_cutoff(testdir):
     assert D_XX[0, 0].real == pytest.approx(0.0976, rel=1e-3)
 
 
-def test_mean_minimum_images_improvement(testdir):
+@pytest.mark.parametrize(
+    'use_mean_minimum_images, reference',
+    [
+        # Old behavior: Negative energy near Gamma and some value at K.
+        (False, [-2.238175, 6.1449]),
+        # New behavior: Energy near Gamma is now positive,
+        # and the value at K is significantly different.
+        (True, [0.75196, 8.42653]),
+    ],
+)
+def test_mean_minimum_images_improvement(
+    testdir, use_mean_minimum_images, reference
+):
     atoms = bulk('Au', 'fcc', a=4.08)
 
     # q-points, 1 near Gamma and 1 at the high symmetry point K.
     q_qc = np.array([[0.028125, 0.028125, 0.05625], [0.375, 0.375, 0.75]])
 
     N = 2
+
     ph = Phonons(
         atoms,
         EMT(),
         supercell=(N, N, N),
-        use_mean_minimum_images=False,
+        use_mean_minimum_images=use_mean_minimum_images,
     )
     ph.run()
     ph.read()
     ph.clean()
 
-    w_old_ql = (
+    w_ql = (
         ph.band_structure(
             q_qc,
             verbose=False,
@@ -363,28 +376,4 @@ def test_mean_minimum_images_improvement(testdir):
         * 1000
     )  # meV
 
-    ph = Phonons(
-        atoms,
-        EMT(),
-        supercell=(N, N, N),
-        use_mean_minimum_images=True,
-        mmi_atol=1e-6,
-    )
-    ph.run()
-    ph.read()
-    ph.clean()
-
-    w_new_ql = (
-        ph.band_structure(
-            q_qc,
-            verbose=False,
-        )
-        * 1000
-    )  # meV
-
-    # Old behavior: Negative energy near Gamma and some value at K.
-    assert w_old_ql[:, 0] == pytest.approx([-2.238175, 6.1449], abs=1e-4)
-
-    # New behavior: Energy near Gamma is now positive,
-    # and the value at K is significantly different.
-    assert w_new_ql[:, 0] == pytest.approx([0.75196, 8.42653], abs=1e-4)
+    assert w_ql[:, 0] == pytest.approx(reference, abs=1e-4)
