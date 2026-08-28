@@ -624,7 +624,9 @@ class SymmetryAdaptedAtoms(Optimizable):
         return cls(**dct, log=lambda *args, **kwargs: None)
 
     @classmethod
-    def from_atoms_spglib(cls, atoms, log=print, *, symprec, **kwargs):
+    def from_atoms_spglib(cls, atoms, log=print, *, symprec=1e-4, **kwargs):
+        # We set default symprec=1e-4 because structures from POSCARS
+        # often have 5 digits.
         symmetries = AtomsSymmetries.from_spglib_auto(atoms, symprec=symprec)
         return cls(atoms, symmetries, log=log, **kwargs)
 
@@ -640,7 +642,12 @@ class SymmetryAdaptedAtoms(Optimizable):
         return cls(atoms, symmetries, log=log, **kwargs)
 
     @classmethod
-    def from_atoms(cls, atoms, log=print, *, symprec, symmorphic):
+    def from_atoms(cls, atoms, **kwargs):
+        return cls.from_atoms_spglib(atoms, **kwargs)
+
+    @classmethod
+    def from_atoms_GPAW(cls, atoms, log=print, *, symprec, symmorphic):
+        # XXX Move this to GPAW.
         symmetries = AtomsSymmetries.from_GPAW(
             atoms,
             tolerance=symprec,
