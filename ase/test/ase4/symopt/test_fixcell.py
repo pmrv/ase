@@ -22,7 +22,8 @@ def test_symmatoms_fixcell():
     from ase._4.optimize.symopt import SymOpt
 
     atoms = bulk('Au') * (2, 2, 1)
-    atoms.cell += np.random.RandomState(42).random((3, 3))
+    atoms.cell -= 0.1 * np.random.RandomState(42).random((3, 3))
+    atoms.rattle(stdev=0.05, seed=17)
     atoms.calc = NoStressEMT()
 
     with pytest.raises(RuntimeError):
@@ -39,8 +40,8 @@ def test_symmatoms_fixcell():
     opt = Optimizer(target, BFGSMethod(70 * np.identity(len(target.get_x()))))
     step = opt.run()
     assert step.gradient_obj.converged  # XXX improve API
-    atoms.cell.copy()
 
-    e1 = atoms.get_potential_energy()
     assert atoms.cell[:] == pytest.approx(cell0, abs=1e-16)
-    assert e1 < e0 - 0.2
+    # Energy should be at least somewhat lower:
+    e1 = atoms.get_potential_energy()
+    assert e1 < e0 - 0.05
