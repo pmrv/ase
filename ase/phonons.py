@@ -308,12 +308,12 @@ class Phonons(Displacement):
     >>> atoms = bulk('Al', 'fcc', a=4.05)
     >>> calc = EMT()
     >>> ph = Phonons(
-    >>>     atoms,
-    >>>     calc,
-    >>>     supercell=(7, 7, 7),
-    >>>     delta=0.05,
-    >>>     use_mean_minimum_images=True
-    >>> )
+    ...     atoms,
+    ...     calc,
+    ...     supercell=(7, 7, 7),
+    ...     delta=0.05,
+    ...     use_mean_minimum_images=True
+    ... )
     >>> ph.run()
     >>> ph.read()
     >>> path = atoms.cell.bandpath('GXULGK', npoints=100)
