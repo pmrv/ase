@@ -14,19 +14,21 @@ displacements is the construction of the :math:`\mathbf{q}`-dependent dynamical
 matrix from harmonic force constants and phase factors. These phase factors
 are determined by the input :math:`\mathbf{q}`-vector and the atom-to-atom
 vectors which go from an atom :math:`a_1` in the reference unit cell to an
-atom :math:`a_2` in cell :math:`N` in the supercell; however, the due to the
+atom :math:`a_2` in cell :math:`N` in the supercell; however, due to the
 periodicity of the supercell, the shortest vector from :math:`a_1` to atom
-:math:`(N, a_2)` is found by checking all the nearest-neighbour periodic
-images of :math:`(N, a_2)` and choosing the shortest vector. Furthermore, there
-may be multiple images of :math:`(N, a_2)` that yield the shortest vector. In
-such cases, it will be beneficial to use the averaged phase factor of all the
-shortest atom-to-atom image vectors. For further details on mean minimum image
-phases see equations (47) and (48) and surrounding text in [Togo]_. In the ASE
-:class:`~ase.phonons.Phonons` class, the usage of mean minimum image phases can
-be enabled by setting ``use_mean_minimum_images=True`` at class initialization.
-This is highly recommended and tends to have much better converged phonon
-energies for smaller supercells. The tolerance for detecting mean minimum
-images can also be adjusted with the ``mmi_atol`` keyword.
+:math:`(N, a_2)` is not necessarily the obvious displacement vector between
+atoms in the supercell. Instead, the shortest vector can be found by checking
+all the nearest-neighbour periodic images of :math:`(N, a_2)` and choosing the
+shortest vector. Furthermore, there may be multiple images of :math:`(N, a_2)`
+that yield the shortest vector, and in such cases, it will be beneficial to use
+the averaged phase factor of all the shortest atom-to-atom image vectors. For
+further details on mean minimum image phases see equations (47) and (48) and
+surrounding text in [Togo]_. In the ASE :class:`~ase.phonons.Phonons` class,
+the usage of mean minimum image phases can be enabled by setting
+``use_mean_minimum_images=True`` at class initialization. This is highly
+recommended and tends to have much better converged phonon energies for
+smaller supercells. The tolerance for detecting mean minimum images can be
+adjusted with the ``mmi_atol`` keyword.
 
 For polar materials the dynamical matrix at the zone center acquires a
 non-analytical contribution that accounts for the LO-TO splitting. This
