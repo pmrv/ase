@@ -42,33 +42,6 @@ class Displacement:
         center_refcell: bool,
         comm,
     ):
-        """Init with an instance of :class:`~ase.Atoms` and a calculator.
-
-        Parameters
-        ----------
-        atoms:
-            The atoms to work on.
-        calc:
-            Calculator for the supercell calculation.
-        supercell:
-            Size of supercell given by the number of repetitions (n1, n2, n3) of
-            the small unit cell in each direction.
-        select_atoms:
-            Select which atoms to generate displacements for.
-            By default, displacements are generated for all atoms.
-        name:
-            Base name to use for files.
-        delta:
-            Magnitude of displacement in Ang.
-        center_refcell:
-            Reference cell in which the atoms will be displaced. If False, then
-            corner cell in supercell is used. If True, then cell in the center
-            of the supercell is used.
-        comm:
-            MPI communicator for the phonon calculation.
-            Default is to use world.
-        """
-
         # Store atoms and calculator
         self.atoms = atoms
         self.natoms = len(atoms)
@@ -332,10 +305,43 @@ class Phonons(Displacement):
         delta: float = 0.01,
         center_refcell: bool = False,
         use_mean_minimum_images: bool | None = None,
-        mmi_atol: float = 1e-8,
+        minimum_image_tol: float = 1e-5,
         comm=None,
     ):
-        """Initialize with base class args and kwargs."""
+        """Init with an instance of :class:`~ase.Atoms` and a calculator.
+
+        Parameters
+        ----------
+        atoms:
+            The atoms to work on.
+        calc:
+            Calculator for the supercell calculation.
+        supercell:
+            Size of supercell given by the number of repetitions (n1, n2, n3) of
+            the small unit cell in each direction.
+        select_atoms:
+            Select which atoms to generate displacements for.
+            By default, displacements are generated for all atoms.
+        name:
+            Base name to use for files.
+        delta:
+            Magnitude of displacement in Ang.
+        center_refcell:
+            Reference cell in which the atoms will be displaced. If False, then
+            corner cell in supercell is used. If True, then cell in the center
+            of the supercell is used.
+        use_mean_minimum_images:
+            Use averaged phase factor of all the shortest atom-to-atom image
+            vectors.  This will be the default in the future and is strongly
+            recommended as it requires smaller supercells to converge
+            the phonon energies.
+        minimum_image_tol:
+            Tolerance (in Å) for finding equivalent atoms when using
+            mean minimum image phase factors.
+        comm:
+            MPI communicator for the phonon calculation.
+            Default is to use world.
+        """
 
         super().__init__(
             atoms=atoms,
@@ -361,7 +367,7 @@ class Phonons(Displacement):
             use_mean_minimum_images = False
 
         self.use_mean_minimum_images = use_mean_minimum_images
-        self.atom2atom_vectors = self.get_atom2atom_vectors(mmi_atol)
+        self.atom2atom_vectors = self._get_atom2atom_vectors(minimum_image_tol)
 
         self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
@@ -386,7 +392,7 @@ class Phonons(Displacement):
 
         return fmin, fmax, i_min, i_max
 
-    def get_atom2atom_vectors(self, mmi_atol: float = 1e-8) -> np.ndarray:
+    def _get_atom2atom_vectors(self, minimum_image_tol: float) -> np.ndarray:
         """Calculate all atom-to-atom vectors, i.e. all vectors that go from
         atom a1 in the reference unit cell to atom a2 in cell N in the
         supercell.
@@ -394,8 +400,8 @@ class Phonons(Displacement):
         If the phonons class was initialized with use_mean_minimum_images=True,
         all the shortest atom-to-atom vectors are calculated by also checking
         the periodic images of atom2 in cell N. Furthermore, the keyword
-        mmi_atol can be supplied to the Phonons class which controls the
-        tolerance when detecting minimum image vectors.
+        minimum_image_tol can be supplied to the Phonons class which controls
+        the tolerance when detecting minimum image vectors.
         """
 
         R_Nc = self.lattice_vectors_array
@@ -429,7 +435,7 @@ class Phonons(Displacement):
                         lengths_S,
                         lengths_S.min(),
                         rtol=0.0,
-                        atol=mmi_atol,
+                        atol=minimum_image_tol,
                     )
                     vectors_aNaSc[a1, N, a2] = images_Sc[bools_S]
 
