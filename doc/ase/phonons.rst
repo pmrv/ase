@@ -28,7 +28,7 @@ the usage of mean minimum image phases can be enabled by setting
 ``use_mean_minimum_images=True`` at class initialization. This is highly
 recommended and tends to have much better converged phonon energies for
 smaller supercells. The tolerance for detecting mean minimum images can be
-adjusted with the ``mmi_atol`` keyword.
+adjusted with the ``minimum_image_tol`` keyword.
 
 For polar materials the dynamical matrix at the zone center acquires a
 non-analytical contribution that accounts for the LO-TO splitting. This

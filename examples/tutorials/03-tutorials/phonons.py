@@ -28,7 +28,7 @@ ph = Phonons(
     EMT(),
     supercell=(N, N, N),
     use_mean_minimum_images=True,
-    mmi_atol=1e-6,
+    minimum_image_tol=1e-6,
 )
 ph.run()
 

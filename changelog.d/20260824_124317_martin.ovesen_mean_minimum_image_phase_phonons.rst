@@ -14,4 +14,4 @@ Other changes
   which tend to yield more converged energies for smaller supercells. This
   can be enabled by initializing :class:`~ase.phonons.Displacement` with
   ``use_mean_minimum_images=True``. The tolerance for detecting mean minimum
-  vectors can also be adjusted with the ``mmi_atol`` keyword.
+  vectors can also be adjusted with the ``minimum_image_tol`` keyword.
