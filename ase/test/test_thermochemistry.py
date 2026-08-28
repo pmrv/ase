@@ -495,7 +495,13 @@ def test_crystal_thermo(asap3, testdir):
 
     # Phonon calculator
     N = 7
-    ph = Phonons(atoms, calc, supercell=(N, N, N), delta=0.05)
+    ph = Phonons(
+        atoms,
+        calc,
+        supercell=(N, N, N),
+        delta=0.05,
+        use_mean_minimum_images=False,
+    )
     ph.run()
 
     ph.read(acoustic=True)
