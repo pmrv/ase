@@ -5,7 +5,7 @@ Phonon calculations with small displacement method
 ===================================================
 
 Simple example showing how to calculate the phonon dispersion for bulk aluminum
-using a 7x7x7 supercell within effective medium theory:
+using a 5x5x5 supercell within effective medium theory:
 """
 
 # %%
@@ -22,13 +22,19 @@ atoms = bulk('Al', 'fcc', a=4.05)
 
 # %%
 # Setup phonon calculation with EMT calculator
-N = 7
-ph = Phonons(atoms, EMT(), supercell=(N, N, N), delta=0.05)
+N = 5
+ph = Phonons(
+    atoms,
+    EMT(),
+    supercell=(N, N, N),
+    use_mean_minimum_images=True,
+    minimum_image_tol=1e-6,
+)
 ph.run()
 
 # %%
 # Read forces and assemble the dynamical matrix
-ph.read(acoustic=True)
+ph.read()
 ph.clean()
 
 # %%
@@ -36,13 +42,12 @@ ph.clean()
 path = atoms.cell.bandpath('GXULGK', npoints=100)
 bs = ph.get_band_structure(path)
 
-# Get phonon dos
+# Get phonon DoS
 dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
 fig = plt.figure(figsize=(7, 4))
 ax = fig.add_axes([0.12, 0.07, 0.67, 0.85])
 
-
-# Plot phonon band-structure and dos
+# Plot phonon band structure and DoS
 emax = 0.035
 bs.plot(ax=ax, emin=0.0, emax=emax)
 
@@ -59,7 +64,7 @@ dosax.fill_between(
 dosax.set_ylim(0, emax)
 dosax.set_yticks([])
 dosax.set_xticks([])
-dosax.set_xlabel('DOS', fontsize=18)
+dosax.set_xlabel('DoS', fontsize=18)
 plt.show()
 
 # fig.savefig('Al_phonon.png')
