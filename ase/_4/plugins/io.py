@@ -8,12 +8,12 @@ from typing import (
     Any,
     BinaryIO,
     Callable,
+    Concatenate,
     Iterator,
     Literal,
+    Self,
     TextIO,
 )
-
-from typing_extensions import Concatenate, Self
 
 from ase.atoms import Atoms
 from ase.io.formats import IOFormat

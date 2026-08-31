@@ -81,7 +81,7 @@ latex_documents = [
 
 intersphinx_mapping = {
     'gpaw': ('https://gpaw.readthedocs.io', None),
-    'python': ('https://docs.python.org/3.10', None),
+    'python': ('https://docs.python.org/3.11', None),
 }
 
 # Avoid GUI windows during doctest:
