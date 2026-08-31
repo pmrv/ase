@@ -12,6 +12,16 @@ from ase.transport.tools import (
     subdiagonalize,
 )
 from ase.units import kB
+from ase.utils import deprecated
+
+
+def asetransport_deprecated(func):
+    return deprecated(
+        'The ase.transport package is deprecated in ase-3.30.0 '
+        'and will be removed in a future version.  If you use any '
+        'features in ase.transport, and believe that they are worth '
+        'conserving, please open an issue on the ASE issue tracker.'
+    )
 
 
 class TransportCalculator:
@@ -19,6 +29,7 @@ class TransportCalculator:
     two semi-infinite leads using a Green function method.
     """
 
+    @asetransport_deprecated
     def __init__(self, **kwargs):
         """Create the transport calculator.
 
