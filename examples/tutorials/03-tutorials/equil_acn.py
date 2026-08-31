@@ -69,7 +69,6 @@ plot_atoms(
     show_unit_cell=0,
     radii=0.75,
 )
-ax.set_axis_off()
 plt.tight_layout()
 plt.show()
 
@@ -95,7 +94,6 @@ plot_atoms(
     show_unit_cell=2,
     radii=0.75,
 )
-ax.set_axis_off()
 plt.tight_layout()
 plt.show()
 

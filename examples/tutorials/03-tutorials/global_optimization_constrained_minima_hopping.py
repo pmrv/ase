@@ -82,7 +82,6 @@ slab.set_constraint(fix)
 
 fig, ax = plt.subplots()
 plot_atoms(slab, ax, rotation=('270x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # We can also attach a calculator.
@@ -112,7 +111,6 @@ atoms.calc = EMT()
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation=('270x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # Hookean constraints
@@ -179,7 +177,6 @@ atoms = read('minima.traj')
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation=('270x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # We can also analyze this with
