@@ -151,7 +151,6 @@ atoms.center(vacuum=4.0)
 # visualization
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax=ax)
-ax.set_axis_off()
 
 # Make QM atoms selection of first water molecule:
 qm_idx = range(3)
@@ -325,7 +324,6 @@ qm_idx = list(qm_idx) + na_idx
 # visualization
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax=ax)
-ax.set_axis_off()
 
 # %%
 # To use the implementation, you need to 'Combine'
