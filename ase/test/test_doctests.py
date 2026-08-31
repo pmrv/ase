@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 module_names = """\
+ase.atom
 ase.atoms
 ase.build.tools
 ase.cell
@@ -19,9 +20,12 @@ ase.geometry.geometry
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.utils
+ase.spectrum
 """.split()
 
 
