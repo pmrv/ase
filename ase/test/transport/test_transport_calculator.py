@@ -1,5 +1,5 @@
-# flake8: noqa
 import numpy as np
+import pytest
 
 from ase.transport.calculators import TransportCalculator
 
@@ -13,6 +13,11 @@ def write(fname, xs, ys):
 
 
 def test_transport_calculator(testdir):
+    with pytest.warns(FutureWarning):
+        _runtest(testdir)
+
+
+def _runtest(testdir):
     H_lead = np.zeros([4, 4])
 
     # On-site energies are zero

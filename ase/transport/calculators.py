@@ -2,7 +2,7 @@ import numpy as np
 from numpy import linalg
 from scipy.integrate import trapezoid
 
-from ase.transport.greenfunction import GreenFunction
+from ase.transport.greenfunction import GreenFunction, asetransport_deprecated
 from ase.transport.selfenergy import LeadSelfEnergy
 from ase.transport.tools import (
     cutcoupling,
@@ -12,16 +12,6 @@ from ase.transport.tools import (
     subdiagonalize,
 )
 from ase.units import kB
-from ase.utils import deprecated
-
-
-def asetransport_deprecated(func):
-    return deprecated(
-        'The ase.transport package is deprecated in ase-3.30.0 '
-        'and will be removed in a future version.  If you use any '
-        'features in ase.transport, and believe that they are worth '
-        'conserving, please open an issue on the ASE issue tracker.'
-    )
 
 
 class TransportCalculator:

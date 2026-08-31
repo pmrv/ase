@@ -44,7 +44,7 @@ from ase.lattice import (
     TET,
     TRI,
 )
-from ase.transport.tools import dagger, normalize
+from ase.dft.wannier import dagger, normalize
 
 calc = pytest.mark.calculator
 Nk = 2
