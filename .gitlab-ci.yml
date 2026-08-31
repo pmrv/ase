@@ -34,8 +34,7 @@ workflow:
 # Check oldest supported Python with oldest supported libraries.
 # Does not install any optional libraries except matplotlib.
 oldlibs:
-#  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
-  image: registry.gitlab.com/ase/ase:ase-oldlibs-staging
+  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
   before_script:
     - pwd
     - whoami
@@ -43,8 +42,6 @@ oldlibs:
       pip install
       numpy==1.24.4 scipy==1.10 matplotlib==3.7.1
       pytest==7.4.0 pluggy==1.2.0 pytest-xdist==3.2.0
-      # attrs==20.3.0 pluggy==1.0.0 py==1.11.0 six==1.16.0
-      # execnet==1.8.1 pytest-forked==1.4.0
     - pip install --no-deps --editable .
   script:
     - pytest -n 8 -Wignore::DeprecationWarning
@@ -331,7 +328,7 @@ windows_test:
     # https://stackoverflow.com/questions/61791108/gitlab-ci-shared-windows-runner-for-python
     # https://gitlab.com/gitlab-org/ci-cd/shared-runners/images/gcp/windows-containers/-/issues/13
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - choco install python --version=3.10 -y -f
+    - choco install python --version=3.11 -y -f
     - refreshenv
     - python --version
     - python -m pip install --upgrade pip
