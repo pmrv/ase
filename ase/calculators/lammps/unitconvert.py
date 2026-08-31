@@ -148,13 +148,22 @@ UNITSETS["nano"] = dict(
 def convert(value, quantity, fromunits, tounits):
     """Convert units between LAMMPS and ASE.
 
-    :param value: converted value
-    :param quantity: mass, distance, time, energy, velocity, force, torque,
-    temperature, pressure, dynamic_viscosity, charge, dipole,
-    electric_field or density
-    :param fromunits: ASE, metal, real or other (see lammps docs).
-    :param tounits: ASE, metal, real or other
-    :returns: converted value
-    :rtype:
+    Parameters
+    ----------
+    value : float
+        Value to be converted.
+    quantity : str
+        mass, distance, time, energy, velocity, force, torque, temperature,
+        pressure, dynamic_viscosity, charge, dipole, electric_field or density
+    fromunits : str
+        ASE, metal, real or other (see LAMMPS docs).
+    tounits : str
+        ASE, metal, real or other.
+
+    Returns
+    -------
+    float
+        Converted value.
+
     """
     return UNITSETS[fromunits][quantity] / UNITSETS[tounits][quantity] * value
