@@ -141,6 +141,11 @@ class Displacement:
                     indices = atomlist
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
+            case _:
+                raise ValueError(
+                    'Bad input type for keyword "select_atoms"; '
+                    'should be either list[str] or list[int]!'
+                )
 
     def _eq_disp(self):
         return self._disp(0, 0, 0)
