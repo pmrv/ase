@@ -91,14 +91,3 @@ adhere to the principles of open science.
   “clever” code. Prioritize clarity and scientific understanding. The
   goal is maintainable open science, not just code that happens to
   compile.
-
-Pull Request Checklist
-----------------------
-
-Before submitting your MR, please confirm:
-
-- [ ] I have reviewed and understand all AI-generated code in this MR.
-- [ ] I have added human-written tests for the new logic.
-- [ ] I have properly cited any upstream algorithms or libraries the AI
-  utilized.
-- [ ] I have disclosed significant AI tool usage in the MR description.

@@ -25,6 +25,7 @@ ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
 ase.utils
+ase.spectrum
 """.split()
 
 
