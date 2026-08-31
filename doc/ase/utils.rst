@@ -38,4 +38,4 @@ https://atztogo.github.io/spglib/python-spglib.html
 Phonons
 =======
 
-http://phonopy.sourceforge.net/
+https://phonopy.github.io/phonopy/
