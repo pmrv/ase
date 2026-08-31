@@ -61,7 +61,7 @@ def _runtest(testdir):
     pdos = tcalc.get_pdos()
 
     tcalc.set(dos=True)
-    dos = tcalc.get_dos()
+    tcalc.get_dos()
 
     write('T.dat', tcalc.energies, T)
     write('pdos0.dat', tcalc.energies, pdos[0])
@@ -70,7 +70,7 @@ def _runtest(testdir):
     # subdiagonalize
     h_rot, s_rot, eps, u = tcalc.subdiagonalize_bfs([2, 3], apply=True)
     T_rot = tcalc.get_transmission()
-    dos_rot = tcalc.get_dos()
+    tcalc.get_dos()
     pdos_rot = tcalc.get_pdos()
 
     write('T_rot.dat', tcalc.energies, T_rot)
@@ -85,7 +85,7 @@ def _runtest(testdir):
     # remove coupling
     h_cut, s_cut = tcalc.cutcoupling_bfs([2], apply=True)
     T_cut = tcalc.get_transmission()
-    dos_cut = tcalc.get_dos()
+    tcalc.get_dos()
     pdos_cut = tcalc.get_pdos()
 
     write('T_cut.dat', tcalc.energies, T_cut)

@@ -2,6 +2,7 @@ import numpy as np
 
 from ase.transport.greenfunction import asetransport_deprecated
 
+
 class LeadSelfEnergy:
     conv = 1e-8  # Convergence criteria for surface Green function
 

@@ -41,7 +41,7 @@
 Other changes
 -------------
 
- - Deprecated the :module:`ase.transport` package.
+ - Deprecated the :mod:`ase.transport` package.
    The package has not been worked on in many years, and is
    therefore probably unused.
    If you use the package and would like to keep it, please

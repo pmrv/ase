@@ -30,6 +30,7 @@ def normalize(matrix, S=None):
 
     """
     from ase.dft.wannier import normalize as wannier_normalize
+
     return wannier_normalize(matrix, S)
 
 

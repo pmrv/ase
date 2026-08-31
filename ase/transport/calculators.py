@@ -23,6 +23,11 @@ class TransportCalculator:
     def __init__(self, **kwargs):
         """Create the transport calculator.
 
+        .. deprecated:: ase-3.30.0
+            The :mod:`ase.transport` package will be removed in a future
+            release unless users express interest in keeping it e.g.
+            on the issue tracker.
+
         Parameters
         ----------
 
