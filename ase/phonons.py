@@ -142,7 +142,7 @@ class Displacement:
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
             case _:
-                raise ValueError(
+                raise TypeError(
                     'Bad input type for keyword "select_atoms"; '
                     'should be either list[str] or list[int]!'
                 )
