@@ -66,11 +66,10 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
 
     >>> traj = Trajectory('example.traj')
     >>> for atoms in traj:
-    ...    # Analyze atoms
+    >>>     ...    # Analyze atoms
 
     Writing every 10th time step in a molecular dynamics simulation::
 
-    # dyn is the dynamics (e.g. VelocityVerlet, Langevin or similar)
     >>> from ase.md.velocityverlet import VelocityVerlet
     >>> dyn = VelocityVerlet(atoms, timestep=1.0)
     >>> traj = Trajectory('example.traj', 'w', atoms)
