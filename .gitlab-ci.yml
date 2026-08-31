@@ -34,7 +34,8 @@ workflow:
 # Check oldest supported Python with oldest supported libraries.
 # Does not install any optional libraries except matplotlib.
 oldlibs:
-  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
+#  image: registry.gitlab.com/ase/ase:ase-oldlibs${DOCKERSUFFIX}
+  image: registry.gitlab.com/ase/ase:ase-oldlibs-staging
   before_script:
     - pwd
     - whoami
