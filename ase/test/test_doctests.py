@@ -24,6 +24,7 @@ ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.io
 """.split()
 
 
