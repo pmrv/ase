@@ -15,6 +15,7 @@ ase.constraints
 ase.dft.kpoints
 ase.eos
 ase.formula
+ase.geometry
 ase.geometry.cell
 ase.geometry.geometry
 ase.io.ulm
