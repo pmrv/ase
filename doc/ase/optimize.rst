@@ -183,6 +183,7 @@ When switching between different types of optimizers, e.g. between
 ``restart`` keyword are not compatible, but the Hessian can still be
 retained by replaying the trajectory as above.
 
+
 LBFGS
 -----
 
@@ -223,6 +224,8 @@ The GOQN is used like this::
   dyn = GoodOldQuasiNewton(atoms=system, trajectory = 'goqn.traj')
 
 
+
+
 CellAwareBFGS
 -------------
 
@@ -252,17 +255,17 @@ The CellAwareBFGS can be used as follows::
       )
   dyn.run(fmax=0.005)
 
+
+
 RFO
 ---
 
 .. autoclass:: RFO
 
 Example::
-  
   from ase.optimize import RFO
   [...]
   dyn = RFO(atoms=system, trajectory = 'rfo.traj', restart='rfo.json')
-
 
 GPMin
 -----
@@ -331,6 +334,7 @@ FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled 
   | :doi:`ABC-FIRE: Accelerated Bias-Corrected Fast Inertial Relaxation Engine <https://doi.org/10.1016/j.commatsci.2022.111978>`
   | Comput. Mater. Sci. 218 (2023) 111978.
 
+.. class:: FIRE2
 Basic example::
 
   from ase.optimize import FIRE2
@@ -399,7 +403,7 @@ and are called with the regular syntax, e.g.::
 
   dyn = SciPyFminBFGS(atoms=system, trajectory = 'part1.traj')
 
-.. class:: ase.optimize.sciopt.SciPyFminBFGS
+.. autoclass:: ase.optimize.sciopt.SciPyFminBFGS
 .. autoclass:: ase.optimize.sciopt.SciPyFminCG
 
 
@@ -606,7 +610,6 @@ optimizers described above as a local optimization algorithm::
                     fmax=0.1,             # maximal force for the optimizer
                     )
 
-
 Read more about this algorithm here:
 
   | David J. Wales and Jonathan P. K. Doye
@@ -647,8 +650,8 @@ rejected and :math:`E_\mathrm{diff}` is increased. The method is used as::
    opt(totalsteps=10)
 
 This example will run the algorithm until 10 steps are taken (once ``system``
-is defined). If ``totalsteps`` is not specified the algorithm will run 
-indefinitely (or until stopped by a batch system). A number of optional 
+is defined). If ``totalsteps`` is not specified the algorithm will run
+indefinitely (or until stopped by a batch system). A number of optional
 arguments can be fed when initializing the algorithm as keyword pairs. The
 keywords and default values are:
 
