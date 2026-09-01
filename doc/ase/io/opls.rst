@@ -1,6 +1,6 @@
-==========================================
-Setting up an OPLS force field calculation
-==========================================
+============================
+OPLS force field calculation
+============================
 
 .. module:: ase.io.opls
    :synopsis: OPLS force field
