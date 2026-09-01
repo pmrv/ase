@@ -59,19 +59,19 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
     >>> from ase import Atoms
     >>> atoms = Atoms('H2', positions=[(0, 0, 0), (0, 0, 0.74)])
 
-    Writing a configuration::
+    Writing a configuration:
 
     >>> from ase.io.trajectory import Trajectory
     >>> with Trajectory('example.traj', 'w') as traj:
     ...     traj.write(atoms)
 
-    Reading all configurations::
+    Reading all configurations:
 
     >>> with Trajectory('example.traj') as traj:
     ...     for atoms in traj:
     ...         pass
 
-    Writing every 10th time step in a molecular dynamics simulation::
+    Writing every 10th time step in a molecular dynamics simulation:
 
     >>> from ase.md.verlet import VelocityVerlet
     >>> from ase.calculators.emt import EMT
@@ -170,7 +170,7 @@ class TrajectoryWriter:
         If the atoms argument is not given, the atoms object specified
         when creating the trajectory object is used.
 
-        Use keyword arguments to add extra properties::
+        Use keyword arguments to add extra properties:
 
             writer.write(atoms, energy=117, dipole=[0, 0, 1.0])
         """

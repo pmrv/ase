@@ -9,7 +9,7 @@ Suppose, we define the ethanal molecule as extended xyz file
 """
 
 # %%
-# .. literalinclude:: 172_ext.xyz
+# .. literalinclude:: .../examples/howtos/howto_io/172_ext.xyz
 #
 # Then we can read and view the structure using:
 
