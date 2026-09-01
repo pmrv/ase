@@ -4,7 +4,7 @@ Setting up an OPLS force field calculation
 ==========================================
 
 
-Suppose, we define the ethanal molecule as extended xyz file 
+Suppose, we define the ethanal molecule as extended xyz file
 (``172_ext.xyz``):
 """
 
@@ -26,7 +26,7 @@ view(s.colored(elements))  # view with fake elements
 # Defining the force field
 # ------------------------
 #
-# The definitions of the force field can be stored in an Amber like style 
+# The definitions of the force field can be stored in an Amber like style
 # (``172_defs.par``):
 #
 # .. literalinclude:: 172_defs.par
@@ -44,4 +44,3 @@ opls.write_lammps(s, prefix='lmp')
 # which writes the LAMMPS input files ``lmp_atoms`` defining atoms,  bonds,
 # etc., and ``lmp_opls`` defining the corresponding OPLS force field. A
 # rudimentary ``lmp_in`` is also written.
-
