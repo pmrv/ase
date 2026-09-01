@@ -334,7 +334,7 @@ FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled 
   | :doi:`ABC-FIRE: Accelerated Bias-Corrected Fast Inertial Relaxation Engine <https://doi.org/10.1016/j.commatsci.2022.111978>`
   | Comput. Mater. Sci. 218 (2023) 111978.
 
-.. class:: FIRE2
+
 Basic example::
 
   from ase.optimize import FIRE2
