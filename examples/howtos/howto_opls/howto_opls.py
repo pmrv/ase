@@ -1,4 +1,4 @@
-""".. _howto_opls:
+""".. _howto_opls_setup:
 
 Setting up an OPLS force field calculation
 ==========================================
