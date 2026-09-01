@@ -71,7 +71,7 @@ class DihedralsData:
 
 class OPLSff:
     """OPLS helper class.
-    Read OPLS structure and force field parameters and write LAMMPS input
+    Read OPLS structure and force field parameters and write LAMMPS input.
     """
 
     def __init__(self, fileobj=None, warnings=0):
