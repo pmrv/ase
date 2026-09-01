@@ -543,6 +543,17 @@ class Pourbaix:
         """Evaluate the reaction energy for decomposing
         the target material into each of the available products
         at a given pH and applied potential.
+
+        Example:
+        --------
+        >>> from ase.phasediagram import solvated
+        >>> from ase.pourbaix import Pourbaix
+        >>> refs = solvated('CoO') + [
+        ...     ('Co', 0.0),
+        ...     ('CoO', -2.509),
+        ...     ('Co3O4', -9.402)]
+        >>> pb = Pourbaix('CoO',dict(refs))
+        >>> energy = pb._decompose(U=1.5, pH=0)
         """
         return self._const + np.dot(self._var, [U, pH])
 

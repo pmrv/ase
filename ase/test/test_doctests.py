@@ -24,6 +24,8 @@ ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.phasediagram
+ase.pourbaix
 ase.utils
 ase.spectrum
 """.split()
