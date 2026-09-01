@@ -267,7 +267,7 @@ Example::
 GPMin
 -----
 
-.. autoclass:: GPMin
+.. class:: GPMin
 
 The GPMin (Gaussian Process minimizer) produces a model for the Potential
 Energy Surface using the information about the potential energies and
@@ -297,7 +297,7 @@ Basic example::
 FIRE
 ----
 
-.. autoclass:: FIRE
+.. class:: FIRE
 
 Read about this algorithm here:
 
@@ -319,7 +319,7 @@ Basic example::
 FIRE2.0 / ABC-FIRE
 ------------------
 
-.. autoclass:: FIRE2
+.. class:: FIRE2
 
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
@@ -355,7 +355,7 @@ Basic example::
 MDMin
 -----
 
-.. autoclass:: MDMin
+.. class:: MDMin
 
 The MDmin algorithm is a modification of the usual velocity-Verlet
 molecular dynamics algorithm.  Newtons second law is solved
@@ -406,8 +406,8 @@ and are called with the regular syntax, e.g.::
 BFGSLineSearch
 --------------
 
-.. autoclass:: BFGSLineSearch
-.. autoclass:: QuasiNewton
+.. class:: BFGSLineSearch
+.. class:: QuasiNewton
 
 BFGSLineSearch is the BFGS algorithm with a line search mechanism
 that enforces the step taken fulfills the Wolfe conditions, so that
