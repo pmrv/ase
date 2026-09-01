@@ -27,6 +27,7 @@ ase.geometry.minkowski_reduction
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.parallel
 ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
