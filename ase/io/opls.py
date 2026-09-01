@@ -70,7 +70,7 @@ class DihedralsData:
 
 
 class OPLSff:
-    """Class OPLSff
+    """OPLS helper class.
     Read OPLS structure and force field parameters and write LAMMPS input
     """
 
@@ -521,7 +521,7 @@ minimize        1.0e-14 1.0e-5 100000 100000
 
 
 class OPLSStructure(Atoms):
-    """Class for representing OPLSSStructure
+    """Class for representing OPLSSStructure.
 
     Parameters
     ----------
