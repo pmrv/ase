@@ -74,14 +74,13 @@ class OPLSff:
 
     Example
     -------
-    
-    Read OPLS structure and force field parameters and write LAMMPS input 
+ 
+    Read OPLS structure and force field parameters and write LAMMPS input
     >>> from ase.io.opls import OPLSff, OPLSStructure
     >>> s = OPLSStructure('filename.xyz')
     >>> with open('amber.par') as fd:
     >>>      opls = OPLSff(fd)
-    >>> opls.write_lammps(s, prefix='lmp')
-    
+    >>> opls.write_lammps(s, prefix='lmp') 
     """
 
     def __init__(self, fileobj=None, warnings=0):
