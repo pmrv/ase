@@ -22,8 +22,10 @@ use :func:`~ase.io.Trajectory`:
 >>> from ase.io import Trajectory
 >>> from ase.parallel import world
 >>> atoms = Atoms('N2', positions=[[0., 0., 0.], [0., 0., 1.]])
->>> Trajectory(f'myfile_{world.rank}.traj', mode='w', atoms=atoms).write()
->>> atoms = Trajectory(f'myfile_{world.rank}.traj', mode='r')[-1]
+>>> with Trajectory(f'myfile_{world.rank}.traj', mode='w', atoms=atoms) as traj:
+>>>     traj.write()
+>>> with Trajectory(f'myfile_{world.rank}.traj', mode='r') as traj:
+>>>     atoms = traj[-1]
 
 .. autofunction:: paropen
 .. autofunction:: parprint
