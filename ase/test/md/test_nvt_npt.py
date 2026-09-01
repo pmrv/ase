@@ -174,50 +174,18 @@ def propagate(
 
 
 NVT_PROPAGATE_TESTS = [
-    (NVTBerendsen, 'nvt', None),
-    (NVTBerendsen, 'nvt', FixAtoms(0)),
-    (NVTBerendsen, 'nvt', FixBondLengths([[0, 1]])),
-    (Langevin, 'langevin', None),
-    (Langevin, 'langevin', FixAtoms(0)),
-    (Langevin, 'langevin', FixBondLengths([[0, 1]])),
-    (Bussi, 'nvt', None),
-    (Bussi, 'nvt', FixAtoms(0)),
-    (Bussi, 'nvt', FixBondLengths([[0, 1]])),
-    (NoseHooverChainNVT, 'nosehoover', None),
-    pytest.param(
-        NoseHooverChainNVT,
-        'nosehoover',
-        FixAtoms(0),
-        marks=pytest.mark.xfail(
-            reason='NoseHooverChainNVT does not yet support constraints',
-            strict=True,
-        ),
-    ),
-    pytest.param(
-        NoseHooverChainNVT,
-        'nosehoover',
-        FixBondLengths([[0, 1]]),
-        marks=pytest.mark.xfail(
-            reason='NoseHooverChainNVT does not yet support constraints',
-            strict=True,
-        ),
-    ),
+    (NVTBerendsen, 'nvt'),
+    (Langevin, 'langevin'),
+    (Bussi, 'nvt'),
+    (NoseHooverChainNVT, 'nosehoover'),
 ]
 
 
 NVT_PROPAGATE_IDS = [
     'nvtberendsen',
-    'nvtberendsen-fixatoms',
-    'nvtberendsen-fixbondlengths',
     'langevin',
-    'langevin-fixatoms',
-    'langevin-fixbondlengths',
     'bussi',
-    'bussi-fixatoms',
-    'bussi-fixbondlengths',
     'nosehoovernvt',
-    'nosehoovernvt-fixatoms',
-    'nosehoovernvt-fixbondlengths',
 ]
 
 
@@ -246,7 +214,12 @@ NPT_PROPAGATE_IDS = [
 @pytest.mark.optimize()
 @pytest.mark.slow()
 @pytest.mark.parametrize(
-    ('algorithm', 'params_key', 'constraints'),
+    'constraints',
+    [None, FixAtoms(0), FixBondLengths([[0, 1]])],
+    ids=lambda val: type(val),
+)
+@pytest.mark.parametrize(
+    ('algorithm', 'params_key'),
     NVT_PROPAGATE_TESTS,
     ids=NVT_PROPAGATE_IDS,
 )

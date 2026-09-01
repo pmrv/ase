@@ -34,7 +34,7 @@ def calculate_isotropic_elasticity_tensor(bulk_modulus, poisson_ratio,
     """
 
     # https://scienceworld.wolfram.com/physics/LameConstants.html
-    _lambda = 3 * bulk_modulus * poisson_ratio / (1 + 1 * poisson_ratio)
+    _lambda = 3 * bulk_modulus * poisson_ratio / (1 + poisson_ratio)
     _mu = _lambda * (1 - 2 * poisson_ratio) / (2 * poisson_ratio)
 
     # https://en.wikipedia.org/wiki/Elasticity_tensor

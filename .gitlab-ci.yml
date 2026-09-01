@@ -40,10 +40,8 @@ oldlibs:
     - whoami
     - >
       pip install
-      numpy==1.21.6 scipy==1.8.1 matplotlib==3.5.2
-      pytest==7.4.0 attrs==20.3.0 pluggy==1.0.0 py==1.11.0 six==1.16.0
-      pytest-xdist==3.2.0 execnet==1.8.1 pytest-forked==1.4.0
-      typing_extensions==4.13.1  # for Self type and Concatenate[ ...] in Python 3.10
+      numpy==1.24.4 scipy==1.10 matplotlib==3.7.1
+      pytest==7.4.0 pluggy==1.2.0 pytest-xdist==3.2.0
     - pip install --no-deps --editable .
   script:
     - pytest -n 8 -Wignore::DeprecationWarning
@@ -195,6 +193,23 @@ bleeding-edge:
     - if: $CI_PIPELINE_SOURCE == "schedule"
 
 
+doc-minimal:
+  # This job exists because we'd like people to be able to build the docs
+  # locally when working on the documentation.
+  #
+  # If we don't have a minimal test job, then optional dependencies can
+  # become accidentally mandatory, and then this job will fail, thus
+  # preventing that problem.
+  image: registry.gitlab.com/ase/ase:ase-main${DOCKERSUFFIX}
+  before_script:
+    - pip install --editable .[docs]
+  script:
+    - sphinx-build -W doc doc/build
+  cache:
+    key: doc-minimal
+    paths:
+     - $PIP_CACHE_DIR
+
 doc:
   image: registry.gitlab.com/ase/ase:ase-full-monty${DOCKERSUFFIX}
   before_script:
@@ -313,7 +328,7 @@ windows_test:
     # https://stackoverflow.com/questions/61791108/gitlab-ci-shared-windows-runner-for-python
     # https://gitlab.com/gitlab-org/ci-cd/shared-runners/images/gcp/windows-containers/-/issues/13
     - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - choco install python --version=3.10 -y -f
+    - choco install python --version=3.11 -y -f
     - refreshenv
     - python --version
     - python -m pip install --upgrade pip
