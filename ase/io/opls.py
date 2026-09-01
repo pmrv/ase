@@ -71,16 +71,7 @@ class DihedralsData:
 
 class OPLSff:
     """Class OPLSff
-
-    Example
-    -------
-
     Read OPLS structure and force field parameters and write LAMMPS input
-    >>> from ase.io.opls import OPLSff, OPLSStructure
-    >>> s = OPLSStructure('filename.xyz')
-    >>> with open('amber.par') as fd:
-    >>>      opls = OPLSff(fd)
-    >>> opls.write_lammps(s, prefix='lmp')
     """
 
     def __init__(self, fileobj=None, warnings=0):
@@ -537,15 +528,6 @@ class OPLSStructure(Atoms):
 
     filename: str
       Extended xyz filename
-
-    Examples
-    --------
-
-    >>> from ase.io.opls import OPLSStructure
-    >>> from ase.visualize import view
-    >>> s = OPLSStructure('filename.xyz')
-    >>> elements = {'CT': 'Si', 'HC': 'H', 'H1': 'He'}
-    >>> s.colored(elements) # with elements colored for viewing
 
     """
 

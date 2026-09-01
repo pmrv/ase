@@ -58,28 +58,30 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
 
     >>> from ase import Atoms
     >>> atoms = Atoms('H2', positions=[(0, 0, 0), (0, 0, 0.74)])
-    
-    Reading a configuration::
+
+    Writing a configuration::
 
     >>> from ase.io.trajectory import Trajectory
-    >>> traj = Trajectory('example.traj')
-    >>> atoms = traj[-1]
+    >>> with Trajectory('example.traj', 'w') as traj:
+    ...     traj.write(atoms)
 
     Reading all configurations::
 
-    >>> traj = Trajectory('example.traj')
-    >>> for atoms in traj:
-    >>>    # Analyze atoms
-    >>>     ...
+    >>> with Trajectory('example.traj') as traj:
+    ...     for atoms in traj:
+    ...         pass
 
     Writing every 10th time step in a molecular dynamics simulation::
 
-    >>> from ase.md.velocityverlet import VelocityVerlet
+    >>> from ase.md.verlet import VelocityVerlet
+    >>> from ase.calculators.emt import EMT
+    >>> atoms.calc = EMT()
     >>> dyn = VelocityVerlet(atoms, timestep=1.0)
-    >>> traj = Trajectory('example.traj', 'w', atoms)
-    >>> dyn.attach(traj.write, interval=100)
-    >>> dyn.run(10000)
-    >>> traj.close()
+    >>> with Trajectory('md.traj', 'w', atoms) as traj:
+    ...     dyn.attach(traj.write, interval=10)
+    ...     converged = dyn.run(20)
+    >>> converged
+    True
 
     """
     if mode == 'r':
