@@ -66,7 +66,8 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
 
     >>> traj = Trajectory('example.traj')
     >>> for atoms in traj:
-    >>>     ...    # Analyze atoms
+    >>>    # Analyze atoms
+    >>>     ...
 
     Writing every 10th time step in a molecular dynamics simulation::
 
@@ -74,7 +75,7 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
     >>> dyn = VelocityVerlet(atoms, timestep=1.0)
     >>> traj = Trajectory('example.traj', 'w', atoms)
     >>> dyn.attach(traj.write, interval=100)
-    >>> dyn.run(10)
+    >>> dyn.run(10000)
     >>> traj.close()
 
     """
