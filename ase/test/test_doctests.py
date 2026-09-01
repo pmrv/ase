@@ -25,6 +25,9 @@ ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
 ase.io
+ase.utils
+ase.spectrum
+>>>>>>> origin/master
 """.split()
 
 

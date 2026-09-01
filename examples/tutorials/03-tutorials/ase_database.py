@@ -83,7 +83,6 @@ ax3.set_position([new_x0, pos3.y0, pos3.width, pos3.height])
 for name, ax in zip(structures, [ax1, ax2, ax3]):
     plot_atoms(bulk(name) * 3, ax, rotation='0x,30y,0z', show_unit_cell=0)
     ax.set_title(name)
-    ax.set_axis_off()
 
 # %%
 # Inspecting a database on the command line

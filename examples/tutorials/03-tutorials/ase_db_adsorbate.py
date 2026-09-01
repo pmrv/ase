@@ -82,7 +82,6 @@ with connect(path_to_bulk_db) as bulk_db:
 # using Python, which we do here for gold:
 fig, ax = plt.subplots(figsize=(3, 3))
 plot_atoms(atoms, ax)
-ax.set_axis_off()
 # %%
 #
 # .. highlight:: bash

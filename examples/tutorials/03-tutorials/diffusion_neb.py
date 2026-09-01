@@ -34,7 +34,6 @@ slab.center(axis=2, vacuum=4.0)
 # %%
 fig, ax = plt.subplots()
 plot_atoms(slab, ax)
-ax.set_axis_off()
 
 # %%
 # Fix second and third layers:
@@ -94,7 +93,6 @@ qn.run(fmax=0.05)
 # Visualize the results with::
 fig, ax = plt.subplots()
 plot_atoms(final, ax)
-ax.set_axis_off()
 
 # %%
 # or from the command line:

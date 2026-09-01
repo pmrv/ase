@@ -28,7 +28,6 @@ atoms.center(vacuum=3.0)
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation='10x,60y,0z')
-ax.set_axis_off()
 
 # %%
 # .. admonition:: Exercise
@@ -111,7 +110,6 @@ from ase.build import molecule
 atoms = molecule('H2O', vacuum=3.0)
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation='10x,60y,0z')
-ax.set_axis_off()
 
 # %%
 # This function returns a molecule from the G2 test set, which is nice
