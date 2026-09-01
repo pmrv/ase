@@ -56,6 +56,9 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
     Examples
     --------
 
+    >>> from ase import Atoms
+    >>> atoms = Atoms('H2', positions=[(0, 0, 0), (0, 0, 0.74)])
+    
     Reading a configuration::
 
     >>> from ase.io.trajectory import Trajectory
