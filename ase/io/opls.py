@@ -517,6 +517,25 @@ minimize        1.0e-14 1.0e-5 100000 100000
 
 
 class OPLSStructure(Atoms):
+    """Class for representing OPLSSStructure
+
+    Parameters
+    ----------
+
+    filename: str
+      Extended xyz filename
+
+    Examples
+    --------
+
+    >>> from ase.io.opls import OPLSStructure
+    >>> from ase.visualize import view
+    >>> s = OPLSStructure('filename.xyz')
+    >>> elements = {'CT': 'Si', 'HC': 'H', 'H1': 'He'}
+    >>> s.colored(elements) # with elements colored for viewing
+
+    """
+
     default_map = {
         'BR': 'Br',
         'Be': 'Be',
