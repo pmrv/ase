@@ -16,8 +16,14 @@ ase.dft.kpoints
 ase.eos
 ase.formula
 ase.geometry
+ase.geometry.analysis
+ase.geometry.bravais_type_engine
+ase.geometry.dimensionality
 ase.geometry.cell
 ase.geometry.geometry
+ase.geometry.distance
+ase.geometry.rdf
+ase.geometry.minkowski_reduction
 ase.io.ulm
 ase.lattice
 ase.neighborlist
