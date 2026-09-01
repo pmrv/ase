@@ -9,7 +9,7 @@ Suppose, we define the ethanal molecule as extended xyz file
 """
 
 # %%
-# .. literalinclude:: .../examples/howtos/howto_io/172_ext.xyz
+# .. literalinclude:: ../../../examples/howtos/howto_io/172_ext.xyz
 #
 # Then we can read and view the structure using:
 
@@ -29,7 +29,7 @@ view(s.colored(elements))  # view with fake elements
 # The definitions of the force field can be stored in an Amber like style
 # (``172_defs.par``):
 #
-# .. literalinclude:: 172_defs.par
+# .. literalinclude:: ../../../examples/howtos/howto_io/172_defs.par
 #
 # We can write LAMMPS input using the information above:
 
