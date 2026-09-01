@@ -31,6 +31,9 @@ ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.io
+ase.io.trajectory
+ase.io.opls
 ase.phasediagram
 ase.pourbaix
 ase.utils
