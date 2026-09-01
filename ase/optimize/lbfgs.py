@@ -1,5 +1,3 @@
-# fmt: off
-
 from typing import IO
 
 import numpy as np
@@ -93,9 +91,10 @@ class LBFGS(Optimizer):
             self.maxstep = self.defaults['maxstep']
 
         if self.maxstep > 1.0:
-            raise ValueError('You are using a much too large value for ' +
-                             'the maximum step size: %.1f Angstrom' %
-                             self.maxstep)
+            raise ValueError(
+                'You are using a much too large value for '
+                + 'the maximum step size: %.1f Angstrom' % self.maxstep
+            )
 
         self.damping = damping
         self.use_line_search = use_line_search
@@ -199,12 +198,21 @@ class LBFGS(Optimizer):
     def line_search(self, r, g, e):
         p_size = np.sqrt((self.p**2).sum())
         if p_size <= np.sqrt(self.optimizable.ndofs() / 3 * 1e-10):
-            self.p /= (p_size / np.sqrt(self.optimizable.ndofs() / 3 * 1e-10))
+            self.p /= p_size / np.sqrt(self.optimizable.ndofs() / 3 * 1e-10)
         ls = LineSearch(get_gradient_norm=self.optimizable.gradient_norm)
-        self.alpha_k, e, self.e0, self.no_update = \
-            ls._line_search(self.func, self.fprime, r, self.p, g, e, self.e0,
-                            maxstep=self.maxstep, c1=.23,
-                            c2=.46, stpmax=50.)
+        self.alpha_k, e, self.e0, self.no_update = ls._line_search(
+            self.func,
+            self.fprime,
+            r,
+            self.p,
+            g,
+            e,
+            self.e0,
+            maxstep=self.maxstep,
+            c1=0.23,
+            c2=0.46,
+            stpmax=50.0,
+        )
         if self.alpha_k is None:
             raise RuntimeError('LineSearch failed!')
 
