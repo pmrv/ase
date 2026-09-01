@@ -61,7 +61,7 @@ def check_ichain(ichain, ediffg, iopt):
 
 def set_constr(atoms, lnoncollinear, magmom, sorting):
     mag_dict = {}
-    if not lnoncollinear:
+    if not lnoncollinear or magmom is None:
         return {}
 
     magmom = np.array(magmom)
