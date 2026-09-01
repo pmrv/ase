@@ -27,7 +27,6 @@ ase.symbols
 ase.io
 ase.utils
 ase.spectrum
->>>>>>> origin/master
 """.split()
 
 
