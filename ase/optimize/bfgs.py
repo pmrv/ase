@@ -1,5 +1,3 @@
-# fmt: off
-
 import warnings
 from pathlib import Path
 from typing import IO
@@ -66,8 +64,10 @@ class BFGS(Optimizer):
             self.maxstep = maxstep
 
         if self.maxstep > 1.0:
-            warnings.warn('You are using a *very* large value for '
-                          'the maximum step size: %.1f Å' % self.maxstep)
+            warnings.warn(
+                'You are using a *very* large value for '
+                'the maximum step size: %.1f Å' % self.maxstep
+            )
 
         self.alpha = alpha
         if self.alpha is None:
@@ -76,10 +76,13 @@ class BFGS(Optimizer):
         self.state = None
 
         super().__init__(
-            atoms=atoms, restart=restart,
-            logfile=logfile, trajectory=trajectory,
+            atoms=atoms,
+            restart=restart,
+            logfile=logfile,
+            trajectory=trajectory,
             append_trajectory=append_trajectory,
-            **kwargs)
+            **kwargs,
+        )
 
     def initialize(self):
         # initial hessian
@@ -111,11 +114,19 @@ class BFGS(Optimizer):
         dpos = self.determine_step(dpos, steplengths)
         optimizable.set_x(pos + dpos)
         if isinstance(self.atoms, UnitCellFilter):
-            self.dump((self.state.hessian, self.pos0, self.forces0,
-                       self.maxstep, self.atoms.orig_cell))
+            self.dump(
+                (
+                    self.state.hessian,
+                    self.pos0,
+                    self.forces0,
+                    self.maxstep,
+                    self.atoms.orig_cell,
+                )
+            )
         else:
-            self.dump((self.state.hessian, self.pos0, self.forces0,
-                       self.maxstep))
+            self.dump(
+                (self.state.hessian, self.pos0, self.forces0, self.maxstep)
+            )
 
     def prepare_step(self, pos, gradient):
         pos = pos.ravel()
