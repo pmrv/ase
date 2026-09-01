@@ -82,16 +82,6 @@ class ExcitingGroundStateTemplate(CalculatorTemplate):
     _label = 'exciting'
 
     def __init__(self):
-        """Initialise with constant class attributes.
-
-        Parameters
-        ----------
-        program_name : str
-            The DFT program, should always be exciting.
-        implemented_properties : list[str]
-            What properties should exciting calculate/read from output.
-
-        """
         super().__init__('exciting', self.implemented_properties)
         self.errorname = f'{self._label}.err'
 
