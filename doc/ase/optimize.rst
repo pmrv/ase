@@ -76,16 +76,16 @@ with the experimental geometry::
    import numpy as np
    d = 0.9575
    t = np.pi / 180 * 104.51
-   water = Atoms('H2O',
+   system = Atoms('H2O',
                  positions=[(d, 0, 0),
                             (d * np.cos(t), d * np.sin(t), 0),
                             (0, 0, 0)],
                  calculator=EMT())
-   dyn = BFGS(water)
+   dyn = BFGS(system)
    dyn.run(fmax=0.05)
 
 which produces the following output. The columns are the solver name, step
-number, clock time, potential energy (eV), and maximum force.::
+number, clock time, potential energy (eV), and maximum force::
 
    BFGS:   0  19:45:25        2.769633       8.6091
    BFGS:   1  19:45:25        2.154560       4.4644
@@ -98,19 +98,27 @@ When doing structure optimization, it is useful to write the
 trajectory to a file, so that the progress of the optimization run can
 be followed during or after the run::
 
-  dyn = BFGS(water, trajectory='H2O.traj')
-  dyn.run(fmax=0.05)
+  dyn = BFGS(system, trajectory='H2O.traj')
+  dyn.run(fmax = 0.05)
 
 Use the command ``ase gui H2O.traj`` to see what is going on (more here:
 :mod:`ase.gui`).  The trajectory file can also be accessed using the
 module :mod:`ase.io.trajectory`.
 
-The ``attach`` method takes an optional argument ``interval=n`` that can
-be used to tell the structure optimizer object to write the
-configuration to the trajectory file only every ``n`` steps.
+The ``attach`` method takes an optional argument ``interval = n`` that can be
+used to tell the structure optimizer object to write the configuration to
+the trajectory file only every ``n`` steps::
+
+  from ase.optimize import BFGS
+  from ase.io import Trajectory
+  [...]
+  dyn = BFGS(system, trajectory='H2O.traj')
+  traj = Trajectory('H2O.traj', 'w', system)
+  dyn.attach(traj.write, interval = 2)
+  dyn.run(fmax = 0.05)
 
 During a structure optimization, the BFGS and LBFGS optimizers use two
-quantities to decide where to move the atoms on each step:
+quantities to decide where to move the atoms on each step, e.g.:
 
 * the forces on each atom, as returned by the associated
   :class:`~ase.calculators.calculator.Calculator` object
@@ -132,10 +140,10 @@ Aside from the geometry, the Hessian of the previous run can and
 should be retained for the second run.  Use the ``restart`` keyword to
 specify a file in which to save the Hessian::
 
-  dyn = BFGS(atoms=system, trajectory='qn.traj', restart='qn.json')
+  dyn = BFGS(atoms=system, trajectory = 'H2O.traj', restart = 'H2O.json')
 
 This will create an optimizer which saves the Hessian to
-:file:`qn.json` (using the Python :mod:`json` module) on each
+:file:`'H2O.json` (using the Python :mod:`json` module) on each
 step.  If the file already exists, the Hessian will also be
 *initialized* from that file.
 
@@ -144,16 +152,28 @@ optimization, since it contains the history of all forces and
 positions, and thus whichever information about the Hessian was
 assembled so far::
 
-  dyn = BFGS(atoms=system, trajectory='qn.traj')
-  dyn.replay_trajectory('history.traj')
+  from ase.io import read
+  from ase.calculators.emt import EMT
+  from ase.optimize import BFGS
 
-This will read through each iteration stored in :file:`history.traj`,
-performing adjustments to the Hessian as appropriate.  Note that these
-steps will not be written to :file:`qn.traj`.  If restarting with more than
-one previous trajectory file, use :ref:`ase-gui` to concatenate them
-into a single trajectory file first::
+  system = read('H2O.traj')
+  system.calc = EMT()
+  dyn2 = BFGS(system, trajectory='part2.traj')
+  dyn2.replay_trajectory('H2O.traj')
+  dyn2.run(fmax = 0.01)
 
-  $ ase gui part1.traj part2.traj -o history.traj
+``replay_trajectory`` will read through each iteration stored in
+:file:`H2O.traj`, performing adjustments to the Hessian as appropriate.
+Setting ``dyn.run(fmax = 0.01)`` then continues the trajectory calculation from
+the stored iterations.
+Note that the stored steps will not be written to :file:`H2O.traj`, i.e.,
+:file:`H2O.traj` will only contain the steps from the continued trajectory
+calculation. Be careful not to use the same filename for :file:`H2O.traj` and
+:file:`part2.traj` to avoid overwriting the previous iterations.
+If restarting with more than one previous trajectory file, use
+:ref:`ase-gui` to concatenate them into a single trajectory file first::
+
+  $ ase gui H2O.traj part2.traj -o history.traj
 
 The file :file:`history.traj` will then contain all necessary
 information.
@@ -183,6 +203,8 @@ step lengths are determined by the forces.
 To start a structure optimization with LBFGS algorithm is similar to
 BFGS. A typical optimization should look like::
 
+  from ase.optimize import LBFGS
+  [...]
   dyn = LBFGS(atoms=system, trajectory='lbfgs.traj', restart='lbfgs.pckl')
 
 where the trajectory and the restart save the trajectory of the
@@ -191,22 +213,59 @@ optimization and the vectors needed to generate the Hessian Matrix.
 GoodOldQuasiNewton
 ------------------
 
+.. class:: GoodOldQuasiNewton
+
 While GOQN is an "old" optimizer in the history of ASE,
 it can be very effective and often converges in fewer steps than newer optimizers.
+The GOQN is used like this::
 
-.. class:: GoodOldQuasiNewton           
+  from ase.optimize import GoodOldQuasiNewton
+  [...]
+  dyn = GoodOldQuasiNewton(atoms=system, trajectory = 'goqn.traj')
+
+
+
 
 CellAwareBFGS
 -------------
 
-CellAwareBFGS requires a :class:`UnitCellFilter` (usually the :class:`FrechetCellFilter` is the best choice) and can use additional information about the system (bulk modulus, Posson ratio) to inform the optimization process.
-
 .. class:: CellAwareBFGS
+
+CellAwareBFGS requires a :class:`UnitCellFilter` (usually the
+:class:`FrechetCellFilter` is the best choice) and can use additional
+information about the system (bulk modulus, Posson ratio) to inform the
+optimization process.
+The CellAwareBFGS can be used as follows::
+
+  from ase.build import bulk
+  from ase.calculators.emt import EMT
+  from ase.filters import FrechetCellFilter
+  from ase.optimize.cellawarebfgs import CellAwareBFGS
+  from ase.units import GPa
+
+  atoms = bulk('Au')
+
+  atoms.calc = EMT()
+  dyn = CellAwareBFGS(
+          FrechetCellFilter(atoms, exp_cell_factor=1.0),
+          alpha=70, # suppress-ratio for elastic tensor calculation
+          bulk_modulus = 100 * GPa,
+          poisson_ratio = 0.37,
+          long_output=True,
+      )
+  dyn.run(fmax=0.005)
+
+
 
 RFO
 ---
 
 .. autoclass:: RFO
+
+Example::
+  from ase.optimize import RFO
+  [...]
+  dyn = RFO(atoms=system, trajectory = 'rfo.traj', restart='rfo.json')
 
 GPMin
 -----
@@ -232,6 +291,12 @@ Read more about this algorithm here:
              run GPMin with more than 100 atoms in the unit cell.
 
 
+Basic example::
+
+  from ase.optimize import GPMin
+  [...]
+  dyn = GPMin(atoms=system, trajectory = 'gpmin.traj', restart='gpmin.json')
+
 FIRE
 ----
 
@@ -243,8 +308,21 @@ Read about this algorithm here:
   | :doi:`Structural Relaxation Made Simple <10.1103/PhysRevLett.97.170201>`
   | Physical Review Letters, Vol. **97**, 170201 (2006)
 
+Basic example::
+
+  from ase.optimize import FIRE
+  [...]
+  dyn = FIRE(system,
+           trajectory = 'fire.traj',
+           restart ='fire.json',
+           dtmax = 1.0,
+           dt = 1.0)
+
+
 FIRE2.0 / ABC-FIRE
 ------------------
+
+.. class:: FIRE2
 
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
@@ -256,7 +334,26 @@ FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled 
   | :doi:`ABC-FIRE: Accelerated Bias-Corrected Fast Inertial Relaxation Engine <https://doi.org/10.1016/j.commatsci.2022.111978>`
   | Comput. Mater. Sci. 218 (2023) 111978.
 
-.. class:: FIRE2
+
+Basic example::
+
+  from ase.optimize import FIRE2
+  [...]
+  fire_parameters = {
+        'dt': 0.1,
+        'maxstep': 0.2,
+        'dtmax': 1.0,
+        'Nmin': 20,
+        'finc': 1.1,
+        'fdec': 0.5,
+        'astart': 0.25,
+        'fa': 0.99,
+    }
+  dyn = FIRE2(
+        system,
+        use_abc=True,
+        **fire_parameters
+        )
 
 
 MDMin
@@ -286,16 +383,25 @@ quadratic it becomes advantageous to switch to a minimization method
 with quadratic convergence, such as *Conjugate Gradient* or *Quasi
 Newton*.
 
+Basic example::
+
+  from ase.optimize import MDMin
+  [...]
+  dyn = MDMin(atoms=system, trajectory = 'mdmin.traj', restart='mdmin.json')
+
 
 SciPy optimizers
 ----------------
 
 SciPy provides a number of optimizers. An interface module for a couple of
 these have been written for ASE. Most notable are the optimizers SciPyFminBFGS
-and SciPyFminCG. These are called with the regular syntax and can be imported
-as::
+and SciPyFminCG. These can be imported as::
 
   from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
+
+and are called with the regular syntax, e.g.::
+
+  dyn = SciPyFminBFGS(atoms=system, trajectory = 'part1.traj')
 
 .. autoclass:: ase.optimize.sciopt.SciPyFminBFGS
 .. autoclass:: ase.optimize.sciopt.SciPyFminCG
@@ -316,7 +422,7 @@ The usage of BFGSLineSearch algorithm is similar to other BFGS type
 algorithms. A typical optimization should look like::
 
   from ase.optimize.bfgslinesearch import BFGSLineSearch
-
+  [...]
   dyn = BFGSLineSearch(atoms=system, trajectory='bfgs_ls.traj', restart='bfgs_ls.pckl')
 
 where the trajectory and the restart save the trajectory of the
@@ -418,7 +524,8 @@ is computed using a standalone force field calculator::
     from ase.build import molecule
     from ase.utils.ff import Morse, Angle, Dihedral, VdW
     from ase.calculators.ff import ForceField
-    from ase.optimize.precon import get_neighbours, FF, PreconLBFGS
+    from ase.optimize.precon.neighbors import get_neighbours
+    from ase.optimize.precon import FF, PreconLBFGS
 
     from ase.calculators.loggingcalc import LoggingCalculator
     import matplotlib as mpl
@@ -488,11 +595,13 @@ Basin hopping
 
 .. module:: ase.optimize.basin
 
-The global optimization algorithm can be used quite similar as a
-local optimization algorithm::
+The global optimization algorithm can be used similarly to the other
+optimizers described above as a local optimization algorithm::
 
-  from ase import *
+  from ase.optimize import LBFGS
   from ase.optimize.basin import BasinHopping
+  from ase.units import kB
+  [...]
 
   bh = BasinHopping(atoms=system,         # the system to optimize
                     temperature=100 * kB, # 'temperature' to overcome barriers
@@ -523,13 +632,28 @@ The minima hopping algorithm was developed and described by Goedecker:
   | :doi:`Minima hopping: An efficient search method for the global minimum of the potential energy surface of complex molecular systems <10.1063/1.1724816>`
   | J. Chem. Phys., Vol. **120**, 9911 (2004)
 
-This algorithm utilizes a series of alternating steps of NVE molecular dynamics and local optimizations, and has two parameters that the code dynamically adjusts in response to the progress of the search. The first parameter is the initial temperature of the NVE simulation. Whenever a step finds a new minimum this temperature is decreased; if the step finds a previously found minimum the temperature is increased. The second dynamically adjusted parameter is :math:`E_\mathrm{diff}`, which is an energy threshold for accepting a newly found minimum. If the new minimum is no more than :math:`E_\mathrm{diff}` eV higher than the previous minimum, it is acccepted and :math:`E_\mathrm{diff}` is decreased; if it is more than :math:`E_\mathrm{diff}` eV higher it is rejected and :math:`E_\mathrm{diff}` is increased. The method is used as::
+This algorithm utilizes a series of alternating steps of NVE molecular dynamics
+and local optimizations, and has two parameters that the code dynamically
+adjusts in response to the progress of the search. The first parameter is the
+initial temperature of the NVE simulation. Whenever a step finds a new minimum
+this temperature is decreased; if the step finds a previously found minimum the
+temperature is increased. The second dynamically adjusted parameter is
+:math:`E_\mathrm{diff}`, which is an energy threshold for accepting a newly
+found minimum. If the new minimum is no more than :math:`E_\mathrm{diff}` eV
+higher than the previous minimum, it is acccepted and :math:`E_\mathrm{diff}`
+is decreased; if it is more than :math:`E_\mathrm{diff}` eV higher it is
+rejected and :math:`E_\mathrm{diff}` is increased. The method is used as::
 
    from ase.optimize.minimahopping import MinimaHopping
+   [...]
    opt = MinimaHopping(atoms=system)
    opt(totalsteps=10)
 
-This will run the algorithm until 10 steps are taken; alternatively, if totalsteps is not specified the algorithm will run indefinitely (or until stopped by a batch system). A number of optional arguments can be fed when initializing the algorithm as keyword pairs. The keywords and default values are:
+This example will run the algorithm until 10 steps are taken (once ``system``
+is defined). If ``totalsteps`` is not specified the algorithm will run
+indefinitely (or until stopped by a batch system). A number of optional
+arguments can be fed when initializing the algorithm as keyword pairs. The
+keywords and default values are:
 
 
  | ``T0``: 1000.,  # K, initial MD 'temperature'
@@ -547,13 +671,32 @@ This will run the algorithm until 10 steps are taken; alternatively, if totalste
  | ``minima_traj`` : 'minima.traj',  # storage file for minima list
  | ``fmax`` : 0.05,  # eV/A, max force for optimizations
 
-Specific definitions of the ``alpha``, ``beta``, and ``mdmin`` parameters can be found in the publication by Goedecker. ``minima_threshold`` is used to determine if two atomic configurations are identical; if any atom has moved by more than this amount it is considered a new configuration. Note that the code tries to do this in an intelligent manner: atoms are considered to be indistinguishable, and translations are allowed in the directions of the periodic boundary conditions. Therefore, if a CO is adsorbed in an ontop site on a (211) surface it will be considered identical no matter which ontop site it occupies.
+Specific definitions of the ``alpha``, ``beta``, and ``mdmin`` parameters can
+be found in the publication by Goedecker. ``minima_threshold`` is used to
+determine if two atomic configurations are identical; if any atom has moved by
+more than this amount it is considered a new configuration. Note that the code
+tries to do this in an intelligent manner: atoms are considered to be
+indistinguishable, and translations are allowed in the directions of the
+periodic boundary conditions. Therefore, if a CO is adsorbed in an ontop site
+on a (211) surface it will be considered identical no matter which ontop site
+it occupies.
 
-The trajectory file ``minima_traj`` will be populated with the accepted minima as they are found. A log of the progress is kept in ``logfile``.
+The trajectory file ``minima_traj`` will be populated with the accepted minima
+as they are found. A log of the progress is kept in ``logfile``.
 
-The code is written such that a stopped simulation (e.g., killed by the batching system when the maximum wall time was exceeded) can usually be restarted without too much effort by the user. In most cases, the script can be resubmitted without any modification -- if the ``logfile`` and ``minima_traj`` are found, the script will attempt to use these to resume. (Note that you may need to clean up files left in the directory by the calculator, however.)
+The code is written such that a stopped simulation (e.g., killed by the
+batching system when the maximum wall time was exceeded) can usually be
+restarted without too much effort by the user. In most cases, the script can be
+resubmitted without any modification -- if the ``logfile`` and ``minima_traj``
+are found, the script will attempt to use these to resume. *Note that you may
+need to clean up files* left in the directory by the calculator, however.
 
-Note that these searches can be quite slow, so it can pay to have multiple searches running at a time. Multiple searches can run in parallel and share one list of minima. (Run each script from a separate directory but specify the location to the same absolute location for ``minima_traj``). Each search will use the global information of the list of minima, but will keep its own local information of the initial temperature and :math:`E_\mathrm{diff}`.
+Note that these searches can be quite slow, so it can pay to have multiple
+searches running at a time. Multiple searches can run in parallel and share one
+list of minima. (Run each script from a separate directory but specify the
+location to the same absolute location for ``minima_traj``). Each search will
+use the global information of the list of minima, but will keep its own local
+information of the initial temperature and :math:`E_\mathrm{diff}`.
 
 For an example of use, see the :ref:`minima_hopping` tutorial.
 
