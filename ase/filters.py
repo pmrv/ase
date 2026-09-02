@@ -342,9 +342,9 @@ class UnitCellFilter(Filter):
         - 0.0003 eV/A^3 = 0.048 GPa
         - 0.0001 eV/A^3 = 0.02 GPa
 
-        Additional optional arguments:
-
-        cell_factor: float (default float(len(atoms)))
+        Parameters
+        ----------
+        cell_factor: float, default: float(len(atoms))
             Factor by which deformation gradient is multiplied to put
             it on the same scale as the positions when assembling
             the combined position/cell vector. The stress contribution to
@@ -352,23 +352,23 @@ class UnitCellFilter(Filter):
             of as a very simple preconditioners. Default is number of atoms
             which gives approximately the correct scaling.
 
-        hydrostatic_strain: bool (default False)
+        hydrostatic_strain: bool, default: False
             Constrain the cell by only allowing hydrostatic deformation.
-            The virial tensor is replaced by np.diag([np.trace(virial)]*3).
+            The virial tensor is replaced by `np.diag([np.trace(virial)] * 3)`.
 
             .. versionadded:: 3.17.0
 
-        constant_volume: bool (default False)
+        constant_volume: bool, default: False
             Project out the diagonal elements of the virial tensor to allow
             relaxations at constant volume, e.g. for mapping out an
             energy-volume curve. Note: this only approximately conserves
             the volume and breaks energy/force consistency so can only be
             used with optimizers that do require do a line minimisation
-            (e.g. FIRE).
+            (e.g. :class:`~ase.optimize.FIRE`).
 
             .. versionadded:: 3.17.0
 
-        scalar_pressure: float (default 0.0)
+        scalar_pressure: float, default: 0.0
             Applied pressure to use for enthalpy pV term. As above, this
             breaks energy/force consistency.
 
@@ -515,9 +515,8 @@ class FrechetCellFilter(UnitCellFilter):
         atoms,
         mask=None,
         exp_cell_factor=None,
-        hydrostatic_strain=False,
-        constant_volume=False,
-        scalar_pressure=0.0,
+        *args,
+        **kwargs,
     ):
         r"""Create a filter that returns the atomic forces and unit cell
         stresses together, so they can simultaneously be minimized.
@@ -563,29 +562,19 @@ class FrechetCellFilter(UnitCellFilter):
         - 0.0003 eV/A^3 = 0.048 GPa
         - 0.0001 eV/A^3 = 0.02 GPa
 
-        Additional optional arguments:
-
-        exp_cell_factor: float (default float(len(atoms)))
+        Parameters
+        ----------
+        exp_cell_factor : float, default: float(len(atoms))
             Scaling factor for cell variables. The cell gradients in
-            FrechetCellFilter.get_forces() is divided by exp_cell_factor.
+            :meth:`~ase.filters.FrechetCellFilter.get_forces()` is divided by
+            ``exp_cell_factor``.
             By default, set the number of atoms. We recommend to set
             an extensive value for this parameter.
+        *args, **kwargs
+            Additional arguments passed to :class:`~ase.filters.UnitCellFilter`.
 
-        hydrostatic_strain: bool (default False)
-            Constrain the cell by only allowing hydrostatic deformation.
-            The virial tensor is replaced by np.diag([np.trace(virial)]*3).
-
-        constant_volume: bool (default False)
-            Project out the diagonal elements of the virial tensor to allow
-            relaxations at constant volume, e.g. for mapping out an
-            energy-volume curve.
-
-        scalar_pressure: float (default 0.0)
-            Applied pressure to use for enthalpy pV term. As above, this
-            breaks energy/force consistency.
-
-        Implementation note:
-
+        Notes
+        -----
         The implementation is based on that of Christoph Ortner in JuLIP.jl:
         https://github.com/JuliaMolSim/JuLIP.jl/blob/master/src/expcell.jl
 
@@ -603,9 +592,8 @@ class FrechetCellFilter(UnitCellFilter):
             self,
             atoms=atoms,
             mask=mask,
-            hydrostatic_strain=hydrostatic_strain,
-            constant_volume=constant_volume,
-            scalar_pressure=scalar_pressure,
+            *args,
+            **kwargs,
         )
 
         # We defer the scipy import to avoid high immediate import overhead
@@ -666,9 +654,8 @@ class ExpCellFilter(UnitCellFilter):
         atoms,
         mask=None,
         cell_factor=None,
-        hydrostatic_strain=False,
-        constant_volume=False,
-        scalar_pressure=0.0,
+        *args,
+        **kwargs,
     ):
         r"""Create a filter that returns the atomic forces and unit cell
             stresses together, so they can simultaneously be minimized.
@@ -716,28 +703,18 @@ class ExpCellFilter(UnitCellFilter):
             - 0.0003 eV/A^3 = 0.048 GPa
             - 0.0001 eV/A^3 = 0.02 GPa
 
-            Additional optional arguments:
+        Parameters
+        ----------
+        cell_factor : float(DEPRECATED)
+            Retained for backwards compatibility, but no longer used.
 
-            cell_factor: (DEPRECATED)
-                Retained for backwards compatibility, but no longer used.
+            .. deprecated:: 3.23.0
 
-                .. deprecated:: 3.23.0
+        *args, **kwargs
+            Additional arguments passed to :class:`~ase.filters.UnitCellFilter`.
 
-            hydrostatic_strain: bool (default False)
-                Constrain the cell by only allowing hydrostatic deformation.
-                The virial tensor is replaced by np.diag([np.trace(virial)]*3).
-
-            constant_volume: bool (default False)
-                Project out the diagonal elements of the virial tensor to allow
-                relaxations at constant volume, e.g. for mapping out an
-                energy-volume curve.
-
-            scalar_pressure: float (default 0.0)
-                Applied pressure to use for enthalpy pV term. As above, this
-                breaks energy/force consistency.
-
-        Implementation details:
-
+        Notes
+        -----
         The implementation is based on that of Christoph Ortner in JuLIP.jl:
         https://github.com/libAtoms/JuLIP.jl/blob/expcell/src/Constraints.jl#L244
 
@@ -795,9 +772,8 @@ class ExpCellFilter(UnitCellFilter):
             atoms=atoms,
             mask=mask,
             cell_factor=cell_factor,
-            hydrostatic_strain=hydrostatic_strain,
-            constant_volume=constant_volume,
-            scalar_pressure=scalar_pressure,
+            *args,
+            **kwargs,
         )
         if cell_factor is not None:
             # cell_factor used in UnitCellFilter does not affect on gradients of
