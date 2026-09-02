@@ -371,13 +371,14 @@ class UnitCellFilter(Filter):
         kept fixed, the atoms follow the cell deformation affinely,
         :math:`\mathbf{r}_i = \mathbf{F}\mathbf{q}_i`.  This separates
         homogeneous cell deformation from internal atomic displacements.
-
         The cell forces are the negative derivatives of the energy with
         respect to :math:`\mathbf{F}`.
+        For full details, see [1]_.
 
-        For full details see:
+        .. [1]
             E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
-            Phys. Rev. B 59, 235 (1999)
+            Phys. Rev. B 59, 235 (1999).
+            :doi:`10.1103/PhysRevB.59.235`
 
         Parameters
         ----------
