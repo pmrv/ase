@@ -284,8 +284,6 @@ class StrainFilter(Filter):
 
 
 class UnitCellFilter(Filter):
-    """Modify the supercell and the atom positions."""
-
     def __init__(
         self,
         atoms,
@@ -296,15 +294,10 @@ class UnitCellFilter(Filter):
         orig_cell=None,
         scalar_pressure=0.0,
     ):
-        """Create a filter that returns the atomic forces and unit cell
-        stresses together, so they can simultaneously be minimized.
+        """Filter returning the atomic forces and the cell stresses together.
 
-        The first argument, atoms, is the atoms object. The optional second
-        argument, mask, is a list of booleans, indicating which of the six
-        independent components of the strain are relaxed.
-
-        - True = relax to zero
-        - False = fixed, ignore this component
+        This class is used together with an ASE optimizer in order to minimize
+        both the atomic forces and the cell stresses simultaneously.
 
         Degrees of freedom are the positions in the original undeformed cell,
         plus the deformation tensor (extra 3 "atoms"). This gives forces
@@ -317,6 +310,15 @@ class UnitCellFilter(Filter):
 
         Parameters
         ----------
+        atoms : :class:`~ase.Atoms`
+            ASE :class:`~ase.Atoms` object.
+        mask : list[bool] | None, default: None
+            Mask indicating which of the six independent components of the
+            strain are relaxed.
+
+            - :obj:`True`: relax to zero
+            - :obj:`False`: fixed, ignore this component
+
         cell_factor: float, default: float(len(atoms))
             Factor by which deformation gradient is multiplied to put
             it on the same scale as the positions when assembling
@@ -510,8 +512,6 @@ class UnitCellFilter(Filter):
 
 
 class FrechetCellFilter(UnitCellFilter):
-    """Modify the supercell and the atom positions."""
-
     def __init__(
         self,
         atoms,
@@ -520,17 +520,12 @@ class FrechetCellFilter(UnitCellFilter):
         *args,
         **kwargs,
     ):
-        r"""Create a filter that returns the atomic forces and unit cell
-        stresses together, so they can simultaneously be minimized.
+        r"""Filter returning the atomic forces and the cell stresses together.
+
+        This class is used together with an ASE optimizer in order to minimize
+        both the atomic forces and the cell stresses simultaneously.
 
         .. versionadded:: 3.23.0
-
-        The first argument, atoms, is the atoms object. The optional second
-        argument, mask, is a list of booleans, indicating which of the six
-        independent components of the strain are relaxed.
-
-        - True = relax to zero
-        - False = fixed, ignore this component
 
         Degrees of freedom are the positions in the original undeformed cell,
         plus the log of the deformation tensor (extra 3 "atoms"). This gives
@@ -632,20 +627,15 @@ class ExpCellFilter(UnitCellFilter):
         *args,
         **kwargs,
     ):
-        r"""Create a filter that returns the atomic forces and unit cell
-            stresses together, so they can simultaneously be minimized.
+        r"""Filter returning the atomic forces and the cell stresses together.
 
-            The first argument, atoms, is the atoms object. The optional second
-            argument, mask, is a list of booleans, indicating which of the six
-            independent components of the strain are relaxed.
+        This class is used together with an ASE optimizer in order to minimize
+        both the atomic forces and the cell stresses simultaneously.
 
-            - True = relax to zero
-            - False = fixed, ignore this component
-
-            Degrees of freedom are the positions in the original undeformed
-            cell, plus the log of the deformation tensor (extra 3 "atoms"). This
-            gives forces consistent with numerical derivatives of the potential
-            energy with respect to the cell degrees of freedom.
+        Degrees of freedom are the positions in the original undeformed cell,
+        plus the log of the deformation tensor (extra 3 "atoms"). This gives
+        forces consistent with numerical derivatives of the potential
+        energy with respect to the cell degrees of freedom.
 
             For full details see:
                 E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
