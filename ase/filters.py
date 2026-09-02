@@ -215,32 +215,38 @@ class Filter:
 
 
 class StrainFilter(Filter):
-    """Modify the supercell while keeping the scaled positions fixed.
-
-    Presents the strain of the supercell as the generalized positions,
-    and the global stress tensor (times the volume) as the generalized
-    force.
-
-    This filter can be used to relax the unit cell until the stress is
-    zero.  If MDMin is used for this, the timestep (dt) to be used
-    depends on the system size. 0.01/x where x is a typical dimension
-    seems like a good choice.
-
-    The stress and strain are presented as 6-vectors, the order of the
-    components follow the standard engingeering practice: xx, yy, zz,
-    yz, xz, xy.
-
-    """
-
     def __init__(self, atoms, mask=None, include_ideal_gas=False):
-        """Create a filter applying a homogeneous strain to a list of atoms.
+        """Filter applying a homogeneous strain to a list of atoms.
 
-        The first argument, atoms, is the atoms object.
+        This class is used together with an ASE optimizer in order to optimize
+        the cell shape with minimizing the stress while keeping the scaled
+        positions fixed.
 
-        The optional second argument, mask, is a list of six booleans,
-        indicating which of the six independent components of the
-        strain that are allowed to become non-zero.  It defaults to
-        [1,1,1,1,1,1].
+        This class regards the strain of the cell as the generalized positions
+        and the global stress tensor (times the volume) as the generalized
+        force.
+
+        The stress and strain are presented as 6-vectors, the order of the
+        components follow the standard engineering practice:
+        ``xx``, ``yy``, ``zz``, ``yz``, ``xz``, ``xy``.
+
+        Parameters
+        ----------
+        atoms : :class:`~ase.Atoms`
+            ASE :class:`~ase.Atoms` object.
+        mask : list[bool] | None, default: None
+            List of six booleans, indicating which of the six independent
+            components of the strain that are allowed to become non-zero.
+            The default (:obj:`None`) relaxes all the six components, i.e.,
+            ``[True, True, True, True, True, True]``.
+        include_ideal_gas : bool, default: False
+            If True, the kinetic contribution of the stress is also considered.
+
+        Notes
+        -----
+        If this filter is used together with :class:`~ase.optimize.MDMin`,
+        the timestep (``dt``) to be used depends on the system size.
+        0.01/x where x is a typical dimension seems like a good choice.
 
         """
 
