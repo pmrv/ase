@@ -58,25 +58,51 @@ class OptimizableFilter(Optimizable):
 
 
 class Filter:
-    """Subset filter class."""
-
     def __init__(self, atoms, indices=None, mask=None):
-        """Filter atoms.
+        """Filter "hiding" specified atoms.
 
-        This filter can be used to hide degrees of freedom in an Atoms
-        object.
+        This filter "hides" some atoms in the ASE :class:`~ase.Atoms` object.
 
         Parameters
         ----------
-        indices : list of int
-           Indices for those atoms that should remain visible.
-        mask : list of bool
+        atoms : :class:`~ase.Atoms`
+            ASE :class:`~ase.Atoms` object.
+        indices : list[int] | None, default: None
+           Indices for of the atoms that should remain visible.
+        mask : list[bool] | None, default: None
            One boolean per atom indicating if the atom should remain
            visible or not.
 
-        If a Trajectory tries to save this object, it will instead
-        save the underlying Atoms object.  To prevent this, override
-        the iterimages method.
+        Notes
+        -----
+        You must supply either ``indices`` or ``mask``.
+
+        If :class:`~ase.io.Trajectory` tries to save this object,
+        it will instead save the underlying :class:`~ase.Atoms` object.
+        To prevent this, override the :meth:`~Filter.iterimages` method.
+
+        Examples
+        --------
+        >>> from ase.build import molecule
+        >>> from ase.filters import Filter
+        >>> atoms=molecule('H2O')
+        >>> list(atoms.symbols)
+        ['O', 'H', 'H']
+        >>> atoms.get_positions()
+        array([[ 0.      ,  0.      ,  0.119262],
+               [ 0.      ,  0.763239, -0.477047],
+               [ 0.      , -0.763239, -0.477047]])
+        >>> f1 = Filter(atoms, indices=[1, 2])
+        >>> f2 = Filter(atoms, mask=[0, 1, 1])
+        >>> f3 = Filter(atoms, mask=[a.z == 1 for a in atoms])
+        >>> f1.get_positions()
+        array([[ 0.      ,  0.763239, -0.477047],
+               [ 0.      , -0.763239, -0.477047]])
+
+        In all three filters, only the hydrogen atoms are made visible.
+        When asking for the positions, only the positions of the hydrogen atoms
+        are returned.
+
         """
 
         self.atoms = atoms
