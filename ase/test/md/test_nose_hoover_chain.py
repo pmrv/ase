@@ -383,32 +383,5 @@ def test_masked_npt(
     assert np.allclose(np.sum(atoms.get_momenta(), axis=0), 0.0)
     assert np.isclose(conserved_energy1, conserved_energy2, atol=1e-3)
     assert not np.allclose(atoms.get_positions(), positions1, atol=1e-6)
-
-
-@pytest.mark.parametrize(
-    'mask',
-    [
-        pytest.param((True, False, False), id='uniaxial-a'),
-        pytest.param((False, False, True), id='uniaxial-c'),
-        pytest.param((True, True, False), id='biaxial-a-b'),
-        pytest.param((True, False, True), id='biaxial-a-c'),
-        pytest.param((True, True, True), id='triaxial'),
-    ],
-)
-def test_masked_npt_mask_updates_cell_momenta(
-    hcp_Cu: Atoms, mask: tuple[bool, bool, bool]
-):
-    hcp_Cu.calc = EMT()
-    md = MaskedMTKNPT(
-        hcp_Cu,
-        timestep=ase.units.fs,
-        temperature_K=300,
-        pressure_au=1.0,
-        mask=mask,
-        tdamp=100 * ase.units.fs,
-        pdamp=1000 * ase.units.fs,
-    )
-
-    md.run(1)
     assert np.allclose(md._p_c[~np.asarray(mask)], 0.0)
     assert not np.allclose(md._p_c[np.asarray(mask)], 0.0)
