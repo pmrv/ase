@@ -679,13 +679,7 @@ class ExpCellFilter(UnitCellFilter):
         both the atomic forces and the cell stresses simultaneously.
 
         Degrees of freedom are the positions in the original undeformed cell,
-        plus the log of the deformation tensor (extra 3 "atoms"). This gives
-        forces consistent with numerical derivatives of the potential
-        energy with respect to the cell degrees of freedom.
-
-            For full details see:
-                E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
-                Phys. Rev. B 59, 235 (1999)
+        plus the log of the deformation tensor (extra 3 "atoms").
 
         Parameters
         ----------
@@ -702,47 +696,104 @@ class ExpCellFilter(UnitCellFilter):
         The implementation is based on that of Christoph Ortner in JuLIP.jl:
         https://github.com/libAtoms/JuLIP.jl/blob/expcell/src/Constraints.jl#L244
 
-        We decompose the deformation gradient as
+        In :class:`ExpCellFilter`, we express the deformation gradient
+        :math:`\mathbf{F} \in \mathbb{R}^{3 \times 3}` as
 
-            F = exp(U) F0
-            x =  F * F0^{-1} z  = exp(U) z
+        .. math::
+            \mathbf{F} = \exp(\mathbf{U}),
 
-        If we write the energy as a function of U we can transform the
-        stress associated with a perturbation V into a derivative using a
-        linear map V -> L(U, V).
+        where :math:`\mathbf{U} = \log(\mathbf{F})` is used as the cell
+        optimization variable.
 
-        \phi( exp(U+tV) (z+tv) ) ~ \phi'(x) . (exp(U) v) + \phi'(x) .
-                                                    ( L(U, V) exp(-U) exp(U) z )
+        For a perturbation
+        :math:`\mathbf{V} \in \mathbb{R}^{3 \times 3}` of
+        :math:`\mathbf{U}`, the corresponding first-order change of
+        :math:`\mathbf{F}` is given by the Fréchet derivative of the
+        matrix exponential,
 
-        where
+        .. math::
+            L_{\exp}(\mathbf{U}, \mathbf{V})
+            \equiv
+            \left.
+            \frac{\mathrm{d}}{\mathrm{d}t}
+            \exp(\mathbf{U} + t\mathbf{V})
+            \right|_{t=0}.
 
-                \nabla E(U) : V  =  [S exp(-U)'] : L(U,V)
-                                =  L'(U, S exp(-U)') : V
-                                =  L(U', S exp(-U)') : V
-                                =  L(U, S exp(-U)) : V     (provided U = U')
+        Let :math:`\mathbf{S}` denote the virial tensor, defined here as
+        :math:`\mathbf{S} = -\Omega \boldsymbol\sigma`, where :math:`\Omega` is
+        the current cell volume and :math:`\boldsymbol\sigma` is the Cauchy
+        stress tensor. Since the energy gradient with respect to
+        :math:`\mathbf{F}` is :math:`-\mathbf{S}\mathbf{F}^{-\top}`,
+        the directional derivative of the energy with respect to
+        :math:`\mathbf{U}` is
 
-        where the : operator represents double contraction,
-        i.e. A:B = trace(A'B), and
+        .. math::
+            \left.
+            \frac{\mathrm{d}}{\mathrm{d}t}
+            E(\mathbf{U} + t\mathbf{V})
+            \right|_{t=0}
+            =
+            [-\mathbf{S}\exp(-\mathbf{U}^{\top})]
+            :
+            L_{\exp}(\mathbf{U},\mathbf{V}).
 
-            F = deformation tensor - 3x3 matrix
-            F0 = reference deformation tensor - 3x3 matrix, np.eye(3) here
-            U = cell degrees of freedom used here - 3x3 matrix
-            V = perturbation to cell DoFs - 3x3 matrix
-            v = perturbation to position DoFs
-            x = atomic positions in deformed cell
-            z = atomic positions in original cell
-            \phi = potential energy
-            S = stress tensor [3x3 matrix]
-            L(U, V) = directional derivative of exp at U in direction V, i.e
-            d/dt exp(U + t V)|_{t=0} = L(U, V)
+        Here :math:`:` denotes the Frobenius inner product,
+        :math:`\mathbf{A}:\mathbf{B}
+        = \operatorname{tr}(\mathbf{A}^{\!\top}\mathbf{B})`.
 
-        This means we can write
+        Using the integral representation of the Fréchet derivative
+        and the cyclic property of the trace, this can be rewritten as
 
-            d/dt E(U + t V)|_{t=0} = L(U, S exp (-U)) : V
+        .. math::
+            [-\mathbf{S}\exp(-\mathbf{U}^{\top})]
+            :
+            L_{\exp}(\mathbf{U},\mathbf{V})
+            =
+            L_{\exp}\left(
+                \mathbf{U}^{\top},
+                -\mathbf{S}\exp(-\mathbf{U}^{\top})
+            \right)
+            :
+            \mathbf{V}.
 
-        and therefore the contribution to the gradient of the energy is
+        Therefore,
 
-            \nabla E(U) / \nabla U_ij =  [L(U, S exp(-U))]_ij
+        .. math::
+            \left.
+            \frac{\mathrm{d}}{\mathrm{d}t}
+            E(\mathbf{U} + t\mathbf{V})
+            \right|_{t=0}
+            =
+            L_{\exp}\left(
+                \mathbf{U}^{\top},
+                -\mathbf{S}\exp(-\mathbf{U}^{\top})
+            \right)
+            :
+            \mathbf{V}.
+
+        If :math:`\mathbf{U}` is symmetric, an assumption that does not hold
+        in general, this reduces to
+
+        .. math::
+            \left.
+            \frac{\mathrm{d}}{\mathrm{d}t}
+            E(\mathbf{U} + t\mathbf{V})
+            \right|_{t=0}
+            =
+            L_{\exp}\left(
+                \mathbf{U},
+                -\mathbf{S}\exp(-\mathbf{U})
+            \right)
+            :
+            \mathbf{V}.
+
+        Thus, under this assumption, the generalized cell force with respect to
+        :math:`\mathbf{U}`, i.e. the negative energy gradient, is
+
+        .. math::
+
+            -\frac{\partial E}{\partial \mathbf{U}}
+            = -L_{\exp}\left(\mathbf{U}, -\mathbf{S}\exp(-\mathbf{U})\right).
 
         """
         Filter.__init__(self, atoms=atoms, indices=range(len(atoms)))
