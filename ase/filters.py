@@ -330,15 +330,26 @@ class UnitCellFilter(Filter):
         orig_cell=None,
         scalar_pressure=0.0,
     ):
-        """Filter returning the atomic forces and the cell stresses together.
+        r"""Filter returning the atomic forces and the cell stresses together.
 
         This class is used together with an ASE optimizer in order to minimize
         both the atomic forces and the cell stresses simultaneously.
 
         Degrees of freedom are the positions in the original undeformed cell,
-        plus the deformation tensor (extra 3 "atoms"). This gives forces
-        consistent with numerical derivatives of the potential energy
-        with respect to the cell degreees of freedom.
+        plus the deformation gradient :math:`\mathbf{F}` (extra 3 "atoms").
+        If :math:`\mathbf{r}_i` denotes a Cartesian atomic position, the
+        corresponding atomic degree of freedom is
+
+        .. math::
+            \mathbf{q}_i = \mathbf{F}^{-1}\mathbf{r}_i.
+
+        Thus, when :math:`\mathbf{F}` changes while :math:`\mathbf{q}_i` is
+        kept fixed, the atoms follow the cell deformation affinely,
+        :math:`\mathbf{r}_i = \mathbf{F}\mathbf{q}_i`.  This separates
+        homogeneous cell deformation from internal atomic displacements.
+
+        The cell forces are the negative derivatives of the energy with
+        respect to :math:`\mathbf{F}`.
 
         For full details see:
             E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
@@ -568,9 +579,10 @@ class FrechetCellFilter(UnitCellFilter):
         .. versionadded:: 3.23.0
 
         Degrees of freedom are the positions in the original undeformed cell,
-        plus the log of the deformation tensor (extra 3 "atoms"). This gives
-        forces consistent with numerical derivatives of the potential energy
-        with respect to the cell degrees of freedom.
+        plus the matrix logarithm :math:`\mathbf{U} = \log(\mathbf{F})` of the
+        deformation gradient (extra 3 "atoms"). The cell forces are computed
+        using the Fréchet derivative of the matrix exponential, giving the
+        negative derivatives of the energy with respect to :math:`\mathbf{U}`.
 
         Parameters
         ----------
@@ -585,12 +597,13 @@ class FrechetCellFilter(UnitCellFilter):
 
         Notes
         -----
-        The implementation is based on that of Christoph Ortner in JuLIP.jl:
-        https://github.com/JuliaMolSim/JuLIP.jl/blob/master/src/expcell.jl
-
-        The initial implementation of ExpCellFilter gave inconsistent gradients
-        for cell variables (matrix log of the deformation tensor). If you would
-        like to keep the previous behavior, please use ExpCellFilter.
+        The original :class:`ExpCellFilter` implementation also uses the
+        matrix logarithm of the deformation gradient as the cell variable,
+        but its cell forces are not in general consistent with numerical
+        energy derivatives. :class:`FrechetCellFilter` instead evaluates the
+        required Fréchet derivatives explicitly.
+        If you would like to keep the previous behavior, please use
+        :class:`ExpCellFilter`.
 
         The derivation of gradients of energy w.r.t positions and the log of the
         deformation tensor is given in
