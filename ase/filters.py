@@ -356,6 +356,8 @@ class UnitCellFilter(Filter):
             Constrain the cell by only allowing hydrostatic deformation.
             The virial tensor is replaced by np.diag([np.trace(virial)]*3).
 
+            .. versionadded:: 3.17.0
+
         constant_volume: bool (default False)
             Project out the diagonal elements of the virial tensor to allow
             relaxations at constant volume, e.g. for mapping out an
@@ -364,9 +366,14 @@ class UnitCellFilter(Filter):
             used with optimizers that do require do a line minimisation
             (e.g. FIRE).
 
+            .. versionadded:: 3.17.0
+
         scalar_pressure: float (default 0.0)
             Applied pressure to use for enthalpy pV term. As above, this
             breaks energy/force consistency.
+
+            .. versionadded:: 3.17.0
+
         """
 
         from ase._4.optimize.cellutil import CellUtility
@@ -514,6 +521,8 @@ class FrechetCellFilter(UnitCellFilter):
     ):
         r"""Create a filter that returns the atomic forces and unit cell
         stresses together, so they can simultaneously be minimized.
+
+        .. versionadded:: 3.23.0
 
         The first argument, atoms, is the atoms object. The optional second
         argument, mask, is a list of booleans, indicating which of the six
@@ -712,6 +721,8 @@ class ExpCellFilter(UnitCellFilter):
             cell_factor: (DEPRECATED)
                 Retained for backwards compatibility, but no longer used.
 
+                .. deprecated:: 3.23.0
+
             hydrostatic_strain: bool (default False)
                 Constrain the cell by only allowing hydrostatic deformation.
                 The virial tensor is replaced by np.diag([np.trace(virial)]*3).
@@ -771,6 +782,8 @@ class ExpCellFilter(UnitCellFilter):
         and therefore the contribution to the gradient of the energy is
 
             \nabla E(U) / \nabla U_ij =  [L(U, S exp(-U))]_ij
+
+        .. versionadded:: 3.17.0
 
         .. deprecated:: 3.23.0
             Use :class:`~ase.filters.FrechetCellFilter` for better convergence
