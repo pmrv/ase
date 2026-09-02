@@ -334,14 +334,6 @@ class UnitCellFilter(Filter):
         >>> qn.attach(traj)
         >>> qn.run(fmax=0.05)
 
-        Helpful conversion table:
-
-        - 0.05 eV/A^3   = 8 GPA
-        - 0.003 eV/A^3  = 0.48 GPa
-        - 0.0006 eV/A^3 = 0.096 GPa
-        - 0.0003 eV/A^3 = 0.048 GPa
-        - 0.0001 eV/A^3 = 0.02 GPa
-
         Parameters
         ----------
         cell_factor: float, default: float(len(atoms))
@@ -369,8 +361,10 @@ class UnitCellFilter(Filter):
             .. versionadded:: 3.17.0
 
         scalar_pressure: float, default: 0.0
-            Applied pressure to use for enthalpy pV term. As above, this
-            breaks energy/force consistency.
+            Applied pressure in eV/Å3 to use for enthalpy pV term.
+            (Note: 1 eV/Å3 ≈ 160.2 GPa).
+            For example, set ``1.0 * ase.units.GPa`` to provide 1 GPa.
+            As above, this breaks energy/force consistency.
 
             .. versionadded:: 3.17.0
 
@@ -554,14 +548,6 @@ class FrechetCellFilter(UnitCellFilter):
         >>> qn.attach(traj)
         >>> qn.run(fmax=0.05)
 
-        Helpful conversion table:
-
-        - 0.05 eV/A^3   = 8 GPA
-        - 0.003 eV/A^3  = 0.48 GPa
-        - 0.0006 eV/A^3 = 0.096 GPa
-        - 0.0003 eV/A^3 = 0.048 GPa
-        - 0.0001 eV/A^3 = 0.02 GPa
-
         Parameters
         ----------
         exp_cell_factor : float, default: float(len(atoms))
@@ -694,14 +680,6 @@ class ExpCellFilter(UnitCellFilter):
             >>> traj = Trajectory('TiO2.traj', 'w', atoms)
             >>> qn.attach(traj)
             >>> qn.run(fmax=0.05)
-
-            Helpful conversion table:
-
-            - 0.05 eV/A^3   = 8 GPA
-            - 0.003 eV/A^3  = 0.48 GPa
-            - 0.0006 eV/A^3 = 0.096 GPa
-            - 0.0003 eV/A^3 = 0.048 GPa
-            - 0.0001 eV/A^3 = 0.02 GPa
 
         Parameters
         ----------
