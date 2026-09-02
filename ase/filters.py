@@ -1,14 +1,25 @@
 """Filters"""
 
+from __future__ import annotations
+
 from functools import cached_property
+from typing import TYPE_CHECKING, Never
 from warnings import warn
 
 import numpy as np
+import numpy.typing as npt
 
 from ase.calculators.calculator import PropertyNotImplementedError
 from ase.stress import full_3x3_to_voigt_6_stress, voigt_6_to_full_3x3_stress
 from ase.utils import deprecated
 from ase.utils.abc import Optimizable
+
+if TYPE_CHECKING:
+    from ase import Atom, Atoms
+    from ase.calculators.calculator import BaseCalculator
+    from ase.cell import Cell
+    from ase.constraints.constraint import FixConstraint
+
 
 __all__ = [
     'Filter',
@@ -20,20 +31,20 @@ __all__ = [
 
 
 class OptimizableFilter(Optimizable):
-    def __init__(self, filterobj):
+    def __init__(self, filterobj: Filter) -> None:
         self.filterobj = filterobj
 
-    def get_x(self):
+    def get_x(self) -> npt.NDArray[np.floating]:
         return self.filterobj.get_positions().ravel()
 
-    def set_x(self, x):
+    def set_x(self, x: npt.NDArray[np.floating]) -> None:
         self.filterobj.set_positions(x.reshape(-1, 3))
 
-    def get_gradient(self):
+    def get_gradient(self) -> np.ndarray:
         return -self.filterobj.get_forces().ravel()
 
     @cached_property
-    def _use_force_consistent_energy(self):
+    def _use_force_consistent_energy(self) -> bool:
         # This boolean is in principle invalidated if the
         # calculator changes.  This can lead to weird things
         # in multi-step optimizations.
@@ -44,21 +55,26 @@ class OptimizableFilter(Optimizable):
         else:
             return True
 
-    def get_value(self):
+    def get_value(self) -> float:
         force_consistent = self._use_force_consistent_energy
         return self.filterobj.get_potential_energy(
             force_consistent=force_consistent
         )
 
-    def ndofs(self):
+    def ndofs(self) -> int:
         return 3 * len(self.filterobj)
 
-    def iterimages(self):
+    def iterimages(self) -> Atoms:
         return self.filterobj.iterimages()
 
 
 class Filter:
-    def __init__(self, atoms, indices=None, mask=None):
+    def __init__(
+        self,
+        atoms: Atoms,
+        indices=None,
+        mask: np.ndarray | None = None,
+    ):
         """Filter "hiding" specified atoms.
 
         This filter "hides" some atoms in the ASE :class:`~ase.Atoms` object
@@ -73,7 +89,7 @@ class Filter:
             ASE :class:`~ase.Atoms` object.
         indices : list[int] | None, default: None
            Indices for of the atoms that should remain visible.
-        mask : list[bool] | None, default: None
+        mask : np.ndarray | None, default: None
            One boolean per atom indicating if the atom should remain
            visible or not.
 
@@ -110,7 +126,7 @@ class Filter:
         """
 
         self.atoms = atoms
-        self.constraints = []
+        self.constraints: list[FixConstraint] = []
         # Make self.info a reference to the underlying atoms' info dictionary.
         self.info = self.atoms.info
 
@@ -126,18 +142,18 @@ class Filter:
             self.index = np.asarray(indices, int)
             self.n = len(self.index)
 
-    def iterimages(self):
+    def iterimages(self) -> Atoms:
         # Present the real atoms object to Trajectory and friends
         return self.atoms.iterimages()
 
-    def get_cell(self):
+    def get_cell(self) -> Cell:
         """Returns the computational cell.
 
         The computational cell is the same as for the original system.
         """
         return self.atoms.get_cell()
 
-    def get_pbc(self):
+    def get_pbc(self) -> npt.NDArray[np.bool_]:
         """Returns the periodic boundary conditions.
 
         The boundary conditions are the same as for the original system.
@@ -158,31 +174,34 @@ class Filter:
         get_positions, set_positions, doc='Positions of the atoms'
     )
 
-    def get_momenta(self):
+    def get_momenta(self) -> npt.NDArray[np.floating]:
         "Return the momenta of the visible atoms."
         return self.atoms.get_momenta()[self.index]
 
-    def set_momenta(self, momenta, **kwargs):
+    def set_momenta(self, momenta: npt.NDArray[np.floating], **kwargs) -> None:
         "Set the momenta of the visible atoms."
         mom = self.atoms.get_momenta()
         mom[self.index] = momenta
         self.atoms.set_momenta(mom, **kwargs)
 
-    def get_atomic_numbers(self):
+    def get_atomic_numbers(self) -> npt.NDArray[np.integer]:
         "Return the atomic numbers of the visible atoms."
         return self.atoms.get_atomic_numbers()[self.index]
 
-    def set_atomic_numbers(self, atomic_numbers):
+    def set_atomic_numbers(
+        self,
+        atomic_numbers: npt.NDArray[np.integer],
+    ) -> None:
         "Set the atomic numbers of the visible atoms."
         z = self.atoms.get_atomic_numbers()
         z[self.index] = atomic_numbers
         self.atoms.set_atomic_numbers(z)
 
-    def get_tags(self):
+    def get_tags(self) -> npt.NDArray[np.integer]:
         "Return the tags of the visible atoms."
         return self.atoms.get_tags()[self.index]
 
-    def set_tags(self, tags):
+    def set_tags(self, tags: npt.NDArray[np.integer]) -> None:
         "Set the tags of the visible atoms."
         tg = self.atoms.get_tags()
         tg[self.index] = tags
@@ -191,13 +210,13 @@ class Filter:
     def get_forces(self, *args, **kwargs):
         return self.atoms.get_forces(*args, **kwargs)[self.index]
 
-    def get_stress(self, *args, **kwargs):
+    def get_stress(self, *args, **kwargs) -> npt.NDArray[np.floating]:
         return self.atoms.get_stress(*args, **kwargs)
 
-    def get_stresses(self, *args, **kwargs):
+    def get_stresses(self, *args, **kwargs) -> npt.NDArray[np.floating]:
         return self.atoms.get_stresses(*args, **kwargs)[self.index]
 
-    def get_masses(self):
+    def get_masses(self) -> npt.NDArray[np.floating]:
         return self.atoms.get_masses()[self.index]
 
     def get_potential_energy(self, **kwargs):
@@ -207,13 +226,13 @@ class Filter:
         """
         return self.atoms.get_potential_energy(**kwargs)
 
-    def get_chemical_symbols(self):
+    def get_chemical_symbols(self) -> list[str]:
         return self.atoms.get_chemical_symbols()
 
-    def get_initial_magnetic_moments(self):
+    def get_initial_magnetic_moments(self) -> npt.NDArray[np.floating]:
         return self.atoms.get_initial_magnetic_moments()
 
-    def get_calculator(self):
+    def get_calculator(self) -> BaseCalculator:
         """Returns the calculator.
 
         WARNING: The calculator is unaware of this filter, and sees a
@@ -222,30 +241,35 @@ class Filter:
         return self.atoms.calc
 
     @property
-    def calc(self):
+    def calc(self) -> BaseCalculator:
         return self.atoms.calc
 
-    def get_celldisp(self):
+    def get_celldisp(self) -> npt.NDArray[np.floating]:
         return self.atoms.get_celldisp()
 
-    def has(self, name):
+    def has(self, name: str) -> bool:
         "Check for existence of array."
         return self.atoms.has(name)
 
-    def __len__(self):
+    def __len__(self) -> int:
         "Return the number of movable atoms."
         return self.n
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: int) -> Atom:
         "Return an atom."
         return self.atoms[self.index[i]]
 
-    def __ase_optimizable__(self):
+    def __ase_optimizable__(self) -> OptimizableFilter:
         return OptimizableFilter(self)
 
 
 class StrainFilter(Filter):
-    def __init__(self, atoms, mask=None, include_ideal_gas=False):
+    def __init__(
+        self,
+        atoms: Atoms,
+        mask: np.ndarray | None = None,
+        include_ideal_gas: bool = False,
+    ) -> None:
         """Filter applying a homogeneous strain to a list of atoms.
 
         This class is used together with an ASE optimizer in order to optimize
@@ -264,8 +288,8 @@ class StrainFilter(Filter):
         ----------
         atoms : :class:`~ase.Atoms`
             ASE :class:`~ase.Atoms` object.
-        mask : list[bool] | None, default: None
-            List of six booleans, indicating which of the six independent
+        mask : np.ndarray | None, default: None
+            Array of six booleans, indicating which of the six independent
             components of the strain that are allowed to become non-zero.
             The default (:obj:`None`) relaxes all the six components, i.e.,
             ``[True, True, True, True, True, True]``.
@@ -312,24 +336,24 @@ class StrainFilter(Filter):
         stress = self.atoms.get_stress(include_ideal_gas=self.include_ideal_gas)
         return -self.atoms.get_volume() * (stress * self.mask).reshape((2, 3))
 
-    def has(self, x):
+    def has(self, x: str) -> bool:
         return self.atoms.has(x)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return 2
 
 
 class UnitCellFilter(Filter):
     def __init__(
         self,
-        atoms,
-        mask=None,
-        cell_factor=None,
-        hydrostatic_strain=False,
-        constant_volume=False,
-        orig_cell=None,
-        scalar_pressure=0.0,
-    ):
+        atoms: Atoms,
+        mask: np.ndarray | None = None,
+        cell_factor: float | None = None,
+        hydrostatic_strain: bool = False,
+        constant_volume: bool = False,
+        orig_cell: np.ndarray | None = None,
+        scalar_pressure: float = 0.0,
+    ) -> None:
         r"""Filter returning the atomic forces and the cell stresses together.
 
         This class is used together with an ASE optimizer in order to minimize
@@ -359,7 +383,7 @@ class UnitCellFilter(Filter):
         ----------
         atoms : :class:`~ase.Atoms`
             ASE :class:`~ase.Atoms` object.
-        mask : list[bool] | None, default: None
+        mask : np.ndarray | None, default: None
             Mask indicating which of the six independent components of the
             strain are relaxed.
 
@@ -458,44 +482,44 @@ class UnitCellFilter(Filter):
         self.arrays = self.atoms.arrays
 
     @property
-    def hydrostatic_strain(self):
+    def hydrostatic_strain(self) -> bool:
         return self._utility.hydrostatic_strain
 
     @hydrostatic_strain.setter
-    def hydrostatic_strain(self, value):
+    def hydrostatic_strain(self, value: bool) -> None:
         # Probably we do not need these setters but at least one precon
         # test unwisely does hasattr() magic with these.
         self._utility.hydrostatic_strain = value
 
     @property
-    def constant_volume(self):
+    def constant_volume(self) -> bool:
         return self._utility.constant_volume
 
     @constant_volume.setter
-    def constant_volume(self, value):
+    def constant_volume(self, value: bool) -> None:
         self._utility.constant_volume = value
 
     @property
-    def scalar_pressure(self):
+    def scalar_pressure(self) -> float:
         return self._utility.scalar_pressure
 
     @scalar_pressure.setter
-    def scalar_pressure(self, value):
+    def scalar_pressure(self, value: float) -> None:
         self._utility.scalar_pressure = value
 
     @property
-    def mask(self):
+    def mask(self) -> np.ndarray:
         return self._utility.mask3x3
 
     @property
-    def orig_cell(self):
+    def orig_cell(self) -> npt.NDArray[np.floating]:
         return self._utility.orig_cell
 
     @orig_cell.setter
-    def orig_cell(self, value):
+    def orig_cell(self, value: npt.NDArray[np.floating]) -> None:
         self._utility.orig_cell[:] = value
 
-    def deform_grad(self):
+    def deform_grad(self) -> npt.NDArray[np.floating]:
         return self._utility.deform_grad(self.atoms.cell)
 
     def get_positions(self):
@@ -552,13 +576,13 @@ class UnitCellFilter(Filter):
         self.stress = modified_stress  # XXX what's this doing here?
         return forces
 
-    def get_stress(self):
+    def get_stress(self) -> Never:
         raise PropertyNotImplementedError
 
-    def has(self, x):
+    def has(self, x: str) -> bool:
         return self.atoms.has(x)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.atoms) + 3
 
 
