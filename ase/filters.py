@@ -61,7 +61,11 @@ class Filter:
     def __init__(self, atoms, indices=None, mask=None):
         """Filter "hiding" specified atoms.
 
-        This filter "hides" some atoms in the ASE :class:`~ase.Atoms` object.
+        This filter "hides" some atoms in the ASE :class:`~ase.Atoms` object
+        and thus fixes their positions during structure optimization.
+
+        This can be used as an alternative to the
+        :class:`~ase.constraints.FixAtoms` constraint.
 
         Parameters
         ----------
@@ -383,6 +387,10 @@ class UnitCellFilter(Filter):
 
             .. versionadded:: 3.17.0
 
+        Notes
+        -----
+        :class:`FrechetCellFilter` will probably perform better.
+
         Examples
         --------
         You can still use constraints on the atoms, e.g.
@@ -661,6 +669,12 @@ class ExpCellFilter(UnitCellFilter):
     ):
         r"""Filter returning the atomic forces and the cell stresses together.
 
+        .. versionadded:: 3.17.0
+
+        .. deprecated:: 3.23.0
+            Use :class:`~ase.filters.FrechetCellFilter` for better convergence
+            w.r.t. cell variables.
+
         This class is used together with an ASE optimizer in order to minimize
         both the atomic forces and the cell stresses simultaneously.
 
@@ -730,11 +744,6 @@ class ExpCellFilter(UnitCellFilter):
 
             \nabla E(U) / \nabla U_ij =  [L(U, S exp(-U))]_ij
 
-        .. versionadded:: 3.17.0
-
-        .. deprecated:: 3.23.0
-            Use :class:`~ase.filters.FrechetCellFilter` for better convergence
-            w.r.t. cell variables.
         """
         Filter.__init__(self, atoms=atoms, indices=range(len(atoms)))
         UnitCellFilter.__init__(
