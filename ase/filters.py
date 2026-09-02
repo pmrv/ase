@@ -315,25 +315,6 @@ class UnitCellFilter(Filter):
             E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
             Phys. Rev. B 59, 235 (1999)
 
-        You can still use constraints on the atoms, e.g. FixAtoms, to control
-        the relaxation of the atoms.
-
-        >>> # this should be equivalent to the StrainFilter
-        >>> atoms = Atoms(...)
-        >>> atoms.set_constraint(FixAtoms(mask=[True for atom in atoms]))
-        >>> ucf = UnitCellFilter(atoms)
-
-        You should not attach this UnitCellFilter object to a
-        trajectory. Instead, create a trajectory for the atoms, and
-        attach it to an optimizer like this:
-
-        >>> atoms = Atoms(...)
-        >>> ucf = UnitCellFilter(atoms)
-        >>> qn = QuasiNewton(ucf)
-        >>> traj = Trajectory('TiO2.traj', 'w', atoms)
-        >>> qn.attach(traj)
-        >>> qn.run(fmax=0.05)
-
         Parameters
         ----------
         cell_factor: float, default: float(len(atoms))
@@ -367,6 +348,33 @@ class UnitCellFilter(Filter):
             As above, this breaks energy/force consistency.
 
             .. versionadded:: 3.17.0
+
+        Examples
+        --------
+        You can still use constraints on the atoms, e.g.
+        :class:`~ase.constraints.FixAtoms`, to control
+        the relaxation of the atoms.
+
+        >>> from ase.build import bulk
+        >>> from ase.constraints import FixAtoms
+        >>> atoms = bulk('BN', 'wurtzite', a=2.55, c=4.23)
+        >>> # this should be equivalent to the StrainFilter
+        >>> atoms.set_constraint(FixAtoms(mask=[True for atom in atoms]))
+        >>> ucf = UnitCellFilter(atoms)
+
+        You should not attach :class:`~ase.filters.UnitCellFilter` to a
+        trajectory. Instead, create a trajectory for the atoms, and
+        attach it to an optimizer like this:
+
+        >>> from ase.io import Trajectory
+        >>> from ase.optimize import BFGS
+        >>> atoms = bulk('BN', 'wurtzite', a=2.55, c=4.23)
+        >>> # atoms.calc = ...
+        >>> ucf = UnitCellFilter(atoms)
+        >>> opt = BFGS(ucf)
+        >>> traj = Trajectory('BN.traj', 'w', atoms)
+        >>> opt.attach(traj)
+        >>> # opt.run(fmax=0.05)
 
         """
 
@@ -529,25 +537,6 @@ class FrechetCellFilter(UnitCellFilter):
         forces consistent with numerical derivatives of the potential energy
         with respect to the cell degrees of freedom.
 
-        You can still use constraints on the atoms, e.g. FixAtoms, to control
-        the relaxation of the atoms.
-
-        >>> # this should be equivalent to the StrainFilter
-        >>> atoms = Atoms(...)
-        >>> atoms.set_constraint(FixAtoms(mask=[True for atom in atoms]))
-        >>> ecf = FrechetCellFilter(atoms)
-
-        You should not attach this FrechetCellFilter object to a
-        trajectory. Instead, create a trajectory for the atoms, and
-        attach it to an optimizer like this:
-
-        >>> atoms = Atoms(...)
-        >>> ecf = FrechetCellFilter(atoms)
-        >>> qn = QuasiNewton(ecf)
-        >>> traj = Trajectory('TiO2.traj', 'w', atoms)
-        >>> qn.attach(traj)
-        >>> qn.run(fmax=0.05)
-
         Parameters
         ----------
         exp_cell_factor : float, default: float(len(atoms))
@@ -661,25 +650,6 @@ class ExpCellFilter(UnitCellFilter):
             For full details see:
                 E. B. Tadmor, G. S. Smith, N. Bernstein, and E. Kaxiras,
                 Phys. Rev. B 59, 235 (1999)
-
-            You can still use constraints on the atoms, e.g. FixAtoms, to
-            control the relaxation of the atoms.
-
-            >>> # this should be equivalent to the StrainFilter
-            >>> atoms = Atoms(...)
-            >>> atoms.set_constraint(FixAtoms(mask=[True for atom in atoms]))
-            >>> ecf = ExpCellFilter(atoms)
-
-            You should not attach this ExpCellFilter object to a
-            trajectory. Instead, create a trajectory for the atoms, and
-            attach it to an optimizer like this:
-
-            >>> atoms = Atoms(...)
-            >>> ecf = ExpCellFilter(atoms)
-            >>> qn = QuasiNewton(ecf)
-            >>> traj = Trajectory('TiO2.traj', 'w', atoms)
-            >>> qn.attach(traj)
-            >>> qn.run(fmax=0.05)
 
         Parameters
         ----------

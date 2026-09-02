@@ -14,6 +14,7 @@ ase.collections.collection
 ase.constraints
 ase.dft.kpoints
 ase.eos
+ase.filters
 ase.formula
 ase.geometry
 ase.geometry.analysis
