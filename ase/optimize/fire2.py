@@ -116,6 +116,39 @@ class FIRE2(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import FIRE2
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> fire_parameters = {
+        ... 'dt': 0.5,
+        ... 'maxstep': 0.2,
+        ... 'dtmax': 1.0,
+        ... 'Nmin': 20,
+        ... 'finc': 1.1,
+        ... 'fdec': 0.5,
+        ... 'astart': 0.25,
+        ... 'fa': 0.99,
+        ... }
+        >>> dyn = FIRE2(system, use_abc=True, **fire_parameters)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+               Step     Time          Energy          fmax
+        FIRE2:    0 ...        0.440344        3.251800
+        FIRE2:    1 ...        2.859671       21.028202
+        FIRE2:    2 ...        0.875141        5.281651
+        FIRE2:    3 ...        2.859671       21.028202
+        FIRE2:    4 ...        0.668117        4.546505
+        FIRE2:    5 ...        0.311649        1.823901
+        FIRE2:    6 ...        0.262793        0.035743
+        ...
        """
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)
 

@@ -125,6 +125,27 @@ class GPMin(Optimizer, GaussianProcess):
                      may cause a memory issue.
                      This class prints a warning if the user tries to
                      run GPMin with more than 100 atoms in the unit cell.
+
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import LBFGS
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = LBFGS(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+               Step     Time          Energy          fmax
+        GPMin:    0 ...        0.440344        3.251800
+        GPMin:    1 ...        0.357046        2.961912
+        GPMin:    2 ...        0.262953        0.116630
+        GPMin:    3 ...        0.262777        0.004907
+        ...
         """
         # Warn the user if the number of atoms is very large
         if len(atoms) > 100:

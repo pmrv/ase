@@ -60,6 +60,29 @@ class SciPyOptimizer(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+        Examples
+        --------
+        SciPy provides a number of optimizers. An interface module for a couple
+        of these have been written for ASE. Most notable are the optimizers
+        SciPyFminBFGS and SciPyFminCG. These can be imported as:
+
+        >>> from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
+        >>> from ase.calculators.emt import EMT
+        >>> from ase import Atoms
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> # The optimizers are called with the regular syntax, e.g.:
+        >>> dyn = SciPyFminBFGS(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+                       Step     Time          Energy          fmax
+        SciPyFminBFGS:    0 ...        0.440344        3.251800
+        SciPyFminBFGS:    1 ...        0.264361        0.347497
+        SciPyFminBFGS:    2 ...        0.262860        0.080535
+        SciPyFminBFGS:    3 ...        0.262777        0.001453
+        ...
         """
         restart = None
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)

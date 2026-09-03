@@ -225,8 +225,6 @@ RFO
 GPMin
 -----
 
-.. class:: GPMin
-
 The GPMin (Gaussian Process minimizer) produces a model for the Potential
 Energy Surface using the information about the potential energies and
 the forces of the configurations it has already visited and uses it
@@ -245,40 +243,22 @@ Read more about this algorithm here:
              This class prints a warning if the user tries to
              run GPMin with more than 100 atoms in the unit cell.
 
+.. autoclass:: GPMin
 
-Basic example::
-
-  from ase.optimize import GPMin
-  [...]
-  dyn = GPMin(atoms=system, trajectory = 'gpmin.traj', restart='gpmin.json')
 
 FIRE
 ----
-
-.. class:: FIRE
-
 Read about this algorithm here:
 
   | Erik Bitzek, Pekka Koskinen, Franz Gähler, Michael Moseler, and Peter Gumbsch
   | :doi:`Structural Relaxation Made Simple <10.1103/PhysRevLett.97.170201>`
   | Physical Review Letters, Vol. **97**, 170201 (2006)
 
-Basic example::
-
-  from ase.optimize import FIRE
-  [...]
-  dyn = FIRE(system,
-           trajectory = 'fire.traj',
-           restart ='fire.json',
-           dtmax = 1.0,
-           dt = 1.0)
+.. autoclass:: FIRE
 
 
 FIRE2.0 / ABC-FIRE
 ------------------
-
-.. class:: FIRE2
-
 FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled by the ``use_abc`` parameter.
 
   | J. Guénolé, W.G. Nöhring, A. Vaid, F. Houllé, Z. Xie, A. Prakash, E. Bitzek,
@@ -289,32 +269,11 @@ FIRE2.0 and ABC-FIRE are implemented by the same class, with the latter enabled 
   | :doi:`ABC-FIRE: Accelerated Bias-Corrected Fast Inertial Relaxation Engine <https://doi.org/10.1016/j.commatsci.2022.111978>`
   | Comput. Mater. Sci. 218 (2023) 111978.
 
-
-Basic example::
-
-  from ase.optimize import FIRE2
-  [...]
-  fire_parameters = {
-        'dt': 0.1,
-        'maxstep': 0.2,
-        'dtmax': 1.0,
-        'Nmin': 20,
-        'finc': 1.1,
-        'fdec': 0.5,
-        'astart': 0.25,
-        'fa': 0.99,
-    }
-  dyn = FIRE2(
-        system,
-        use_abc=True,
-        **fire_parameters
-        )
+.. autoclass:: FIRE2
 
 
 MDMin
 -----
-
-.. class:: MDMin
 
 The MDmin algorithm is a modification of the usual velocity-Verlet
 molecular dynamics algorithm.  Newtons second law is solved
@@ -338,28 +297,17 @@ quadratic it becomes advantageous to switch to a minimization method
 with quadratic convergence, such as *Conjugate Gradient* or *Quasi
 Newton*.
 
-Basic example::
-
-  from ase.optimize import MDMin
-  [...]
-  dyn = MDMin(atoms=system, trajectory = 'mdmin.traj', restart='mdmin.json')
-
+.. autoclass:: MDMin
 
 SciPy optimizers
 ----------------
 
 SciPy provides a number of optimizers. An interface module for a couple of
 these have been written for ASE. Most notable are the optimizers SciPyFminBFGS
-and SciPyFminCG. These can be imported as::
+and SciPyFminCG. 
 
-  from ase.optimize.sciopt import SciPyFminBFGS, SciPyFminCG
-
-and are called with the regular syntax, e.g.::
-
-  dyn = SciPyFminBFGS(atoms=system, trajectory = 'part1.traj')
-
+.. class:: ase.optimize.sciopt.SciPyFminCG
 .. autoclass:: ase.optimize.sciopt.SciPyFminBFGS
-.. autoclass:: ase.optimize.sciopt.SciPyFminCG
 
 
 BFGSLineSearch
