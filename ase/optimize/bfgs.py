@@ -67,7 +67,7 @@ class BFGS(Optimizer):
         >>> from ase.calculators.emt import EMT
 
         >>> system = Atoms(
-        ... 'N2', 
+        ... 'N2',
         ... positions = [(0, 0, 0), (0, 0, 1.05)],
         ... calculator=EMT()
         ... )
