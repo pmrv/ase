@@ -65,7 +65,7 @@ class BFGS(Optimizer):
         >>> from ase import Atoms
         >>> from ase.optimize import BFGS
         >>> from ase.calculators.emt import EMT
-
+        ...
         >>> system = Atoms(
         ... 'N2',
         ... positions = [(0, 0, 0), (0, 0, 1.05)],
@@ -77,7 +77,6 @@ class BFGS(Optimizer):
         BFGS:    0 ...        0.312013        1.830198
         BFGS:    1 ...        0.262779        0.012531
         ...
-        
         """
         if maxstep is None:
             self.maxstep = self.defaults['maxstep']
