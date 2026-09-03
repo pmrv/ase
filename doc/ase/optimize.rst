@@ -83,7 +83,7 @@ the trajectory file only every ``n`` steps::
 
   from ase.optimize import BFGS
   from ase.io import Trajectory
-  [...]
+  ...
   dyn = BFGS(system, trajectory='H2O.traj')
   traj = Trajectory('H2O.traj', 'w', system)
   dyn.attach(traj.write, interval = 2)
@@ -177,16 +177,11 @@ follow the format of the ``BFGS``.
 
 GoodOldQuasiNewton
 ------------------
+While GOQN is an "old" optimizer in the history of ASE, it can be very
+effective and often converges in fewer steps than newer optimizers.
+The GOQN is used with a similar syntax as the BFGS.
 
-.. class:: GoodOldQuasiNewton
-
-While GOQN is an "old" optimizer in the history of ASE,
-it can be very effective and often converges in fewer steps than newer optimizers.
-The GOQN is used like this::
-
-  from ase.optimize import GoodOldQuasiNewton
-  [...]
-  dyn = GoodOldQuasiNewton(atoms=system, trajectory = 'goqn.traj')
+.. autoclass:: GoodOldQuasiNewton
 
 
 
@@ -226,11 +221,6 @@ RFO
 ---
 
 .. autoclass:: RFO
-
-Example::
-  from ase.optimize import RFO
-  [...]
-  dyn = RFO(atoms=system, trajectory = 'rfo.traj', restart='rfo.json')
 
 GPMin
 -----

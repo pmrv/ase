@@ -84,6 +84,31 @@ class CellAwareBFGS(BFGS):
         if hasattr(atoms, 'exp_cell_factor'):
             assert atoms.exp_cell_factor == 1.0
 
+    """
+    Examples
+    --------
+    >>> from ase.build import bulk
+    >>> from ase.calculators.emt import EMT
+    >>> from ase.filters import FrechetCellFilter
+    >>> from ase.optimize.cellawarebfgs import CellAwareBFGS
+    >>> from ase.units import GPa
+    >>> atoms = bulk('Au')
+    >>> atoms.calc = EMT()
+    >>> dyn = CellAwareBFGS(
+    ... FrechetCellFilter(atoms, exp_cell_factor=1.0),
+    ... # suppress-ratio for elastic tensor calculation
+    ... alpha=70,
+    ... bulk_modulus = 100 * GPa,
+    ... poisson_ratio = 0.37,
+    ... long_output=False,
+    ... )
+    ... dyn.run(fmax=0.005) # doctest:+ELLIPSIS
+                   Step     Time          Energy             fmax            smax          volume
+    CellAwareBFGS:    0 ...        0.002606         0.000000        0.018190       16.979328
+    CellAwareBFGS:    1 ...        0.001092         0.000000        0.012946       16.491622
+    CellAwareBFGS:    2 ...       -0.000134         0.000000        0.000374       16.689245
+    """
+
     def initialize(self):
         super().initialize()
         C_ijkl = calculate_isotropic_elasticity_tensor(
