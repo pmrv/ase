@@ -59,6 +59,25 @@ class BFGS(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import BFGS
+        >>> from ase.calculators.emt import EMT
+
+        >>> system = Atoms(
+        ... 'N2', 
+        ... positions = [(0, 0, 0), (0, 0, 1.05)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = BFGS(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+              Step     Time          Energy          fmax
+        BFGS:    0 ...        0.312013        1.830198
+        BFGS:    1 ...        0.262779        0.012531
+        ...
+        
         """
         if maxstep is None:
             self.maxstep = self.defaults['maxstep']

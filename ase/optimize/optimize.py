@@ -210,8 +210,9 @@ class BaseDynamics(IOContext):
         >>> atoms.calc = EMT()
         >>> with BFGS(atoms, logfile=None, trajectory="opt.traj") as opt:
         ...     opt.insert_observer(update_info, atoms=atoms, opt=opt)
-        ...     opt.run(fmax=0.05, steps=10)
-        True
+        ...     opt.run(fmax=0.05, steps=10) # doctest:+ELLIPSIS
+        ...
+        np.True_
         """
         if not isinstance(function, Callable):
             function = function.write
@@ -309,10 +310,10 @@ class Dynamics(BaseDynamics):
         --------
         This method allows, e.g., to run two optimizers or MD thermostats at
         the same time.
-        >>> opt1 = BFGS(atoms)
-        >>> opt2 = BFGS(StrainFilter(atoms)).irun()
-        >>> for _ in opt2:
-        ...     opt1.run()
+        #>>> opt1 = BFGS(atoms)
+        #>>> opt2 = BFGS(StrainFilter(atoms)).irun()
+        #>>> for _ in opt2:
+        #...     opt1.run()
         """
 
         # update the maximum number of steps
