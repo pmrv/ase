@@ -49,7 +49,7 @@ class RFO(BFGS):
 
         **kwargs
             Keyword arguments passed to :class:`~ase.optimize.BFGS`.
-        
+
         Examples
         --------
 
