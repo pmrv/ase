@@ -51,8 +51,9 @@ def _parse_tss_block(value, scaled=False):
 
 
 class CastepOption:
-    """ "A CASTEP option. It handles basic conversions from string to its value
-    type."""
+    """CASTEP option.
+
+    Handles basic conversions from string to its value type."""
 
     default_convert_types = {
         'boolean (logical)': 'bool',

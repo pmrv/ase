@@ -60,8 +60,8 @@ units_CODATA1986 = {
     'a0': 0.529177249,  # A
     'c': 299792458,  # m/s
     'e': 1.60217733e-19,  # C
-    'me': 5.485799110e-4,
-}  # u
+    'me': 5.485799110e-4,  # u
+}
 
 # CODATA2002: default in CASTEP 5.01
 # (-> check in more recent CASTEP in case of numerical discrepancies?!)
@@ -74,8 +74,8 @@ units_CODATA2002 = {
     'a0': 0.5291772108,  # A
     'c': 299792458,  # m/s
     'e': 1.60217653e-19,  # C
-    'me': 5.4857990945e-4,
-}  # u
+    'me': 5.4857990945e-4,  # u
+}
 
 # (common) derived entries
 for d in (units_CODATA1986, units_CODATA2002):
