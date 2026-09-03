@@ -14,7 +14,8 @@ import ase.gui.ui as ui
 from ase import Atoms, __version__
 from ase.gui.defaults import read_defaults
 from ase.gui.i18n import _
-from ase.gui.icons import Icons
+
+# from ase.gui.icons import Icons
 from ase.gui.images import Images
 from ase.gui.nanoparticle import SetupNanoparticle
 from ase.gui.nanotube import SetupNanotube
@@ -68,7 +69,21 @@ class GUI(View):
         if show_bonds:
             self.config['show_bonds'] = True
 
-        self.icons = Icons()
+        """Actual picture icons are implemented and ready to go but there is a
+        problem in testing them: they tend to somehow disappear from memory
+        while the test suite is being run. For this reason, this is currently
+        commented out."""
+        # self.icons = Icons()
+        self.icons = {
+            'graph': 'Graph',
+            'movie': 'Movie',
+            'first': '⇤',
+            'back': '←',
+            'play': '▷',
+            'pause': '||',
+            'forward': '→',
+            'last': '⇥'
+        }
 
         menu = self.get_menu_data()
 

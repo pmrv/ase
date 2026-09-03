@@ -1,3 +1,10 @@
+"""This module is waiting for the day that we fix a problem with the testing:
+
+Actual picture icons in the GUI are ready to go but there is a problem in
+testing them: they tend to somehow disappear from memory while the test suite
+is being run.
+"""
+
 import tkinter as tk
 from pathlib import Path
 
@@ -22,8 +29,8 @@ class Icons:
     def create_photoimages(self):
         """Creates PhotoImage objects that Tkinter can use. This must be done
         after the main window is created."""
-        # Pillow is super convenient here, but we perhaps can't assume
-        # people have it installed
+        # Pillow is super convenient here, but it then needs to be added as
+        # a dependency
         try:
             from PIL import Image, ImageTk
         except ModuleNotFoundError:

@@ -580,6 +580,11 @@ def runcallbacks(win):
     win.close()
 
 
+def test_callbacks(display):
+    win = window()
+    win.win.after_idle(runcallbacks)
+
+
 def test_atoms_editor_set_values(gui, atoms):
     editor = gui.atoms_editor()
 
@@ -699,8 +704,3 @@ def test_custom_radii(gui, radii):
     radii = gui.images.get_radii(gui.atoms)
     assert radii[0] / radius_scale == pytest.approx(5.0)
     assert radii[1] / radius_scale == pytest.approx(3.0)
-
-
-def test_callbacks(display):
-    win = window()
-    win.win.after_idle(runcallbacks)
