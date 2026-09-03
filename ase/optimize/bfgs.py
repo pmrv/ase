@@ -61,22 +61,33 @@ class BFGS(Optimizer):
 
         Examples
         --------
+        The BFGS object is one of the minimizers in the ASE package. The below
+        script uses BFGS to optimize the structure of a water molecule,
+        starting with the experimental geometry:
 
         >>> from ase import Atoms
         >>> from ase.optimize import BFGS
         >>> from ase.calculators.emt import EMT
-        ...
-        >>> system = Atoms(
-        ... 'N2',
-        ... positions = [(0, 0, 0), (0, 0, 1.05)],
-        ... calculator=EMT()
-        ... )
+        >>> import numpy as np
+        >>> d = 0.9575
+        >>> t = np.pi / 180 * 104.51
+        >>> system = Atoms('H2O',
+        ... positions=[(d, 0, 0),
+        ... (d * np.cos(t), d * np.sin(t), 0),
+        ... (0, 0, 0)],
+        ... calculator=EMT())
         >>> dyn = BFGS(system)
         >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
-              Step     Time          Energy          fmax
-        BFGS:    0 ...        0.312013        1.830198
-        BFGS:    1 ...        0.262779        0.012531
         ...
+              Step     Time          Energy          fmax
+        BFGS:    0 ...        2.769632        8.609090
+        BFGS:    1 ...        1.930507        1.641499
+        BFGS:    2 ...        1.884227        0.535354
+        BFGS:    3 ...        1.879314        0.049628
+        np.True_
+
+        The columns are the solver name, step number, clock time, potential
+        energy (eV), and maximum force (eV/Å).
         """
         if maxstep is None:
             self.maxstep = self.defaults['maxstep']

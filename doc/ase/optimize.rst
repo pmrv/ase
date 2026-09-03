@@ -64,35 +64,7 @@ should be less than *fmax*:
 BFGS
 ----
 
-.. class:: BFGS
-
-The ``BFGS`` object is one of the minimizers in the ASE package. The below
-script uses ``BFGS`` to optimize the structure of a water molecule, starting
-with the experimental geometry::
-
-   from ase import Atoms
-   from ase.optimize import BFGS
-   from ase.calculators.emt import EMT
-   import numpy as np
-   d = 0.9575
-   t = np.pi / 180 * 104.51
-   system = Atoms('H2O',
-                 positions=[(d, 0, 0),
-                            (d * np.cos(t), d * np.sin(t), 0),
-                            (0, 0, 0)],
-                 calculator=EMT())
-   dyn = BFGS(system)
-   dyn.run(fmax=0.05)
-
-which produces the following output. The columns are the solver name, step
-number, clock time, potential energy (eV), and maximum force::
-
-   BFGS:   0  19:45:25        2.769633       8.6091
-   BFGS:   1  19:45:25        2.154560       4.4644
-   BFGS:   2  19:45:25        1.906812       1.3097
-   BFGS:   3  19:45:25        1.880255       0.2056
-   BFGS:   4  19:45:25        1.879488       0.0205
-
+.. autoclass:: BFGS
 
 When doing structure optimization, it is useful to write the
 trajectory to a file, so that the progress of the optimization run can
