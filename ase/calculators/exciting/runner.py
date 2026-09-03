@@ -32,14 +32,21 @@ class SimpleBinaryRunner:
                  args=None) -> None:
         """Initialise class.
 
-        :param binary: Binary name prepended by full path, or just binary name
+        Parameters
+        ----------
+        binary : str
+            Binary name prepended by full path, or just binary name
             (if present in $PATH).
-        :param run_argv: Run commands sequentially as a list of str.
+        run_argv : list[str]
+            Run commands sequentially as a list of str.
             For example:
             * For serial: ['./'] or ['']
             * For MPI:   ['mpirun', '-np', '2']
-        :param omp_num_threads: Number of OMP threads.
-        :param args: Optional arguments for the binary.
+        omp_num_threads : int
+            Number of OMP threads.
+        args : None
+            Optional arguments for the binary.
+
         """
         if args is None:
             args = []
