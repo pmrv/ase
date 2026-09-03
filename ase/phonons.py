@@ -42,33 +42,6 @@ class Displacement:
         center_refcell: bool,
         comm,
     ):
-        """Init with an instance of :class:`~ase.Atoms` and a calculator.
-
-        Parameters
-        ----------
-        atoms:
-            The atoms to work on.
-        calc:
-            Calculator for the supercell calculation.
-        supercell:
-            Size of supercell given by the number of repetitions (n1, n2, n3) of
-            the small unit cell in each direction.
-        select_atoms:
-            Select which atoms to generate displacements for.
-            By default, displacements are generated for all atoms.
-        name:
-            Base name to use for files.
-        delta:
-            Magnitude of displacement in Ang.
-        center_refcell:
-            Reference cell in which the atoms will be displaced. If False, then
-            corner cell in supercell is used. If True, then cell in the center
-            of the supercell is used.
-        comm:
-            MPI communicator for the phonon calculation.
-            Default is to use world.
-        """
-
         # Store atoms and calculator
         self.atoms = atoms
         self.natoms = len(atoms)
@@ -91,6 +64,7 @@ class Displacement:
                 + supercell[1] // 2 * supercell[2]
                 + supercell[2] // 2
             )
+
         self.lattice_vectors_array = self.get_lattice_vectors()
 
         if comm is None:
@@ -156,19 +130,22 @@ class Displacement:
             case None:
                 self.nindices = len(atoms)
                 self.indices = np.arange(self.nindices)
-            case list():
+            case [*atomlist]:
                 indices: list[int]
-                assert len(select_atoms) == len(set(select_atoms))
-                assert len(select_atoms) <= len(atoms)
-                assert all(
-                    type(atom) is type(select_atoms[0]) for atom in select_atoms
-                )
-                if isinstance(select_atoms[0], str):
-                    indices = atoms.symbols.search(select_atoms)
-                elif isinstance(select_atoms[0], int):
-                    indices = select_atoms
+                assert len(atomlist) == len(set(atomlist))
+                assert len(atomlist) <= len(atoms)
+                assert all(type(atom) is type(atomlist[0]) for atom in atomlist)
+                if isinstance(atomlist[0], str):
+                    indices = atoms.symbols.search(atomlist)
+                elif isinstance(atomlist[0], int):
+                    indices = atomlist
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
+            case _:
+                raise TypeError(
+                    'Bad input type for keyword "select_atoms"; '
+                    'should be either list[str] or list[int]!'
+                )
 
     def _eq_disp(self):
         return self._disp(0, 0, 0)
@@ -308,9 +285,15 @@ class Phonons(Displacement):
 
     >>> atoms = bulk('Al', 'fcc', a=4.05)
     >>> calc = EMT()
-    >>> ph = Phonons(atoms, calc, supercell=(7, 7, 7), delta=0.05)
+    >>> ph = Phonons(
+    ...     atoms,
+    ...     calc,
+    ...     supercell=(7, 7, 7),
+    ...     delta=0.05,
+    ...     use_mean_minimum_images=True
+    ... )
     >>> ph.run()
-    >>> ph.read(acoustic=True)
+    >>> ph.read()
     >>> path = atoms.cell.bandpath('GXULGK', npoints=100)
     >>> bs = ph.get_band_structure(path, verbose=False)
     >>> dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
@@ -326,9 +309,44 @@ class Phonons(Displacement):
         name: str = 'phonon',
         delta: float = 0.01,
         center_refcell: bool = False,
+        use_mean_minimum_images: bool | None = None,
+        minimum_image_tol: float = 1e-5,
         comm=None,
     ):
-        """Initialize with base class args and kwargs."""
+        """Init with an instance of :class:`~ase.Atoms` and a calculator.
+
+        Parameters
+        ----------
+        atoms:
+            The atoms to work on.
+        calc:
+            Calculator for the supercell calculation.
+        supercell:
+            Size of supercell given by the number of repetitions (n1, n2, n3) of
+            the small unit cell in each direction.
+        select_atoms:
+            Select which atoms to generate displacements for.
+            By default, displacements are generated for all atoms.
+        name:
+            Base name to use for files.
+        delta:
+            Magnitude of displacement in Ang.
+        center_refcell:
+            Reference cell in which the atoms will be displaced. If False, then
+            corner cell in supercell is used. If True, then cell in the center
+            of the supercell is used.
+        use_mean_minimum_images:
+            Use averaged phase factor of all the shortest atom-to-atom image
+            vectors.  This will be the default in the future and is strongly
+            recommended as it requires smaller supercells to converge
+            the phonon energies.
+        minimum_image_tol:
+            Tolerance (in Å) for finding equivalent atoms when using
+            mean minimum image phase factors.
+        comm:
+            MPI communicator for the phonon calculation.
+            Default is to use world.
+        """
 
         super().__init__(
             atoms=atoms,
@@ -341,7 +359,21 @@ class Phonons(Displacement):
             comm=comm,
         )
 
-        # Attributes for force constants and dynamical matrix in real space
+        if use_mean_minimum_images is None:
+            warnings.warn(
+                'The "use_mean_minimum_images" parameter is new to the '
+                'Phonons class and in the future it will be True by default. '
+                'For now, it will be set to False to ensure consistency with '
+                'previous behaviour. Please explicitly set the '
+                '"use_mean_minimum_images" keyword to True / False '
+                'to ensure consistent behaviour with future versions.',
+                FutureWarning,
+            )
+            use_mean_minimum_images = False
+
+        self.use_mean_minimum_images = use_mean_minimum_images
+        self.atom2atom_vectors = self._get_atom2atom_vectors(minimum_image_tol)
+
         self.C_avNav: np.ndarray | None = None  # in units of eV / Ang**2
 
     def __call__(self, atoms_N: Atoms):
@@ -364,6 +396,55 @@ class Phonons(Displacement):
         i_max = np.where(feq_av == fmax)
 
         return fmin, fmax, i_min, i_max
+
+    def _get_atom2atom_vectors(self, minimum_image_tol: float) -> np.ndarray:
+        """Calculate all atom-to-atom vectors, i.e. all vectors that go from
+        atom a1 in the reference unit cell to atom a2 in cell N in the
+        supercell.
+
+        If the phonons class was initialized with use_mean_minimum_images=True,
+        all the shortest atom-to-atom vectors are calculated by also checking
+        the periodic images of atom2 in cell N. Furthermore, the keyword
+        minimum_image_tol can be supplied to the Phonons class which controls
+        the tolerance when detecting minimum image vectors.
+        """
+
+        R_Nc = self.lattice_vectors_array
+        relpos_ac = self.atoms.get_scaled_positions(wrap=True)[self.indices]
+        vectors_aNac = (
+            relpos_ac[np.newaxis, np.newaxis]
+            + R_Nc[np.newaxis, :, np.newaxis]
+            - relpos_ac[:, np.newaxis, np.newaxis]
+        )
+
+        if not self.use_mean_minimum_images:
+            return vectors_aNac
+
+        supercellshifts_Sc = (
+            np.indices((3, 3, 3)).reshape(3, -1).T - 1
+        ) * self.supercell
+        bools_L = np.logical_or(supercellshifts_Sc == 0, self.atoms.pbc).all(
+            axis=1
+        )
+        supercellshifts_Sc = supercellshifts_Sc[bools_L]
+        cell_cv = self.atoms.cell.array
+
+        vectors_aNaSc = np.empty(vectors_aNac.shape[0:3], dtype=object)
+
+        for a1, vectors_Nac in enumerate(vectors_aNac):
+            for N, vectors_ac in enumerate(vectors_Nac):
+                for a2, vector_c in enumerate(vectors_ac):
+                    images_Sc = vector_c + supercellshifts_Sc
+                    lengths_S = np.linalg.norm(images_Sc @ cell_cv, axis=1)
+                    bools_S = np.isclose(
+                        lengths_S,
+                        lengths_S.min(),
+                        rtol=0.0,
+                        atol=minimum_image_tol,
+                    )
+                    vectors_aNaSc[a1, N, a2] = images_Sc[bools_S]
+
+        return vectors_aNaSc
 
     @deprecated(
         'Implementation of non-analytical correction has remained untested '
@@ -419,18 +500,18 @@ class Phonons(Displacement):
 
         Parameters
         ----------
-        method: str
+        method:
             Specify method for evaluating the atomic forces,
             method='Frederiksen' imposes momentum conservation.
-        symmetrize: int
+        symmetrize:
             Symmetrize force constants (see doc string at top) when
             ``symmetrize != 0`` (default: 3). Since restoring the acoustic sum
             rule breaks the symmetry, the symmetrization must be repeated a few
             times until the changes a insignificant. The integer gives the
             number of iterations that will be carried out.
-        acoustic: bool
+        acoustic:
             Restore the acoustic sum rule on the force constants.
-        cutoff: None or float
+        cutoff:
             Zero elements in the dynamical matrix between atoms with an
             interatomic distance larger than the cutoff.
         """
@@ -636,10 +717,12 @@ class Phonons(Displacement):
         return (bs, omega_modes) if modes else bs
 
     @deprecated('Please use calculate_dynamical_matrix() instead')
-    def compute_dynamical_matrix(self, q_scaled: np.ndarray, D_N: np.ndarray):
+    def compute_dynamical_matrix(
+        self, q_scaled: np.ndarray, D_N: np.ndarray
+    ) -> np.ndarray:
         """Computation of the dynamical matrix in momentum space D_ab(q).
-            This is a Fourier transform from real-space dynamical matrix D_N
-            for a given momentum vector q.
+        This is a Fourier transform from real-space dynamical matrix D_N
+        for a given momentum vector q.
 
         .. note::
            Deprecated. Please use calculate_dynamical_matrix().
@@ -657,22 +740,30 @@ class Phonons(Displacement):
             2D complex-valued array D(q) with shape=(3 * natoms, 3 * natoms).
 
         """
+
         # Evaluate fourier sum
         R_cN = self.compute_lattice_vectors()
         phase_N = np.exp(-2.0j * pi * np.dot(q_scaled, R_cN))
         D_q = np.sum(phase_N[:, np.newaxis, np.newaxis] * D_N, axis=0)
         return D_q
 
-    def calculate_dynamical_matrix(self, q_c: np.ndarray, D_avNav: np.ndarray):
+    def calculate_dynamical_matrix(
+        self, q_c: np.ndarray, D_avNav: np.ndarray
+    ) -> np.ndarray:
         """Computation of the dynamical matrix in momentum space D_XX(q).
-            This is a Fourier transform from real-space force constants
-            for a given momentum vector q.
+        This is a Fourier transform from real-space force constants
+        for a given momentum vector q.
+
+        If the phonons class was initialized with use_mean_minimum_images=True,
+        the q-dependent phase factor for a given set of atoms a1 and (N, a2) is
+        averaged over all the shortest atom-to-atom vectors from atom1 to a
+        periodic image of atom (N, a2).
 
         Parameters
         ----------
-        q_c: np.ndarray
+        q_c:
             Phonon wave vector in scaled coordinates.
-        D_avNav: np.ndarray
+        D_avNav:
             Force constant matrix scaled by atom masses.
 
         Returns
@@ -682,17 +773,19 @@ class Phonons(Displacement):
             with shape=(3 * natoms, 3 * natoms).
         """
 
-        # Evaluate fourier sum
-        R_Nc = self.lattice_vectors_array
-        pos_ac = self.atoms.get_scaled_positions()[self.indices]
+        if not self.use_mean_minimum_images:
+            atom2atom_aNac = self.atom2atom_vectors
+            phase_aNa = np.exp(2.0j * np.pi * np.dot(atom2atom_aNac, q_c))
+        else:
+            atom2atom_aNaSc = self.atom2atom_vectors
+            # In this case, atom2atom is an ndarray with 3 indexes of ndarrays
+            # with 2 indexes so some code might look unintuitive
+            phase_aNa = np.zeros(atom2atom_aNaSc.shape, dtype=complex)
+            for (a1, N, a2), atom2atom_Sc in np.ndenumerate(atom2atom_aNaSc):
+                phase_aNa[a1, N, a2] = np.exp(
+                    2.0j * np.pi * np.dot(atom2atom_Sc, q_c)
+                ).mean()
 
-        vectors_aNac = (
-            pos_ac[np.newaxis, np.newaxis]
-            + R_Nc[np.newaxis, :, np.newaxis]
-            - pos_ac[:, np.newaxis, np.newaxis]
-        )
-
-        phase_aNa = np.exp(2.0j * np.pi * np.dot(vectors_aNac, q_c))
         D_avav = np.einsum('avNbw,aNb->avbw', D_avNav, phase_aNa)
 
         return D_avav.reshape(3 * self.nindices, 3 * self.nindices)

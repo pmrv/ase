@@ -30,7 +30,13 @@ def test_phonon_md_init(asap3, testdir):
         opt.run(fmax=0.001)
     positions0 = atoms.positions.copy()
 
-    phonons = Phonons(atoms, EMT(), supercell=(1, 1, 1), delta=0.05)
+    phonons = Phonons(
+        atoms,
+        EMT(),
+        supercell=(1, 1, 1),
+        delta=0.05,
+        use_mean_minimum_images=False,
+    )
 
     try:
         phonons.run()

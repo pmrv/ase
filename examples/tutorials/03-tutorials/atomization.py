@@ -39,7 +39,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(molecule, ax, rotation=('90x,0y,90z'))
-ax.set_axis_off()
 
 # %%
 # The EMT calculator is then attached to the molecule

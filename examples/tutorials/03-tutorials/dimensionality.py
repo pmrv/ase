@@ -39,7 +39,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation=('-20x,0y, 0z'))
-ax.set_axis_off()
 
 # %%
 # Coloring the atoms by their tags shows the distinct bonded clusters, which in

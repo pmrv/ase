@@ -8,9 +8,11 @@ from ase.parallel import world
 from ase.transport.greenfunction import GreenFunction
 from ase.transport.selfenergy import LeadSelfEnergy
 from ase.transport.tools import dagger
+from ase.transport import asetransport_deprecated
 
 
 class STM:
+    @asetransport_deprecated
     def __init__(
         self,
         h1,
