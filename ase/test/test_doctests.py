@@ -20,6 +20,7 @@ ase.geometry.geometry
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.optimize.bfgs
 ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
