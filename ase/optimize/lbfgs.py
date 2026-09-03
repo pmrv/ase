@@ -13,7 +13,7 @@ from ase.utils.linesearch import LineSearch
 class LBFGS(Optimizer):
     """Limited memory BFGS optimizer.
 
-    A limited memory version of the bfgs algorithm. Unlike the bfgs algorithm
+    A limited memory version of the BFGS algorithm. Unlike the BFGS algorithm
     used in bfgs.py, the inverse of Hessian matrix is updated.  The inverse
     Hessian is represented only as a diagonal matrix to save memory
 
@@ -74,6 +74,27 @@ class LBFGS(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import LBFGS
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = LBFGS(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+               Step     Time          Energy          fmax
+        LBFGS:    0 ...        0.440344        3.251800
+        LBFGS:    1 ...        0.264361        0.347497
+        LBFGS:    2 ...        0.262860        0.080535
+        LBFGS:    3 ...        0.262777        0.001453
+        ...
         """
         # Initial approximation of inverse Hessian 1./70. is to emulate the
         # behaviour of BFGS. Note that this is never changed!

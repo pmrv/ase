@@ -159,9 +159,6 @@ retained by replaying the trajectory as above.
 LBFGS
 -----
 
-.. class:: LBFGS
-.. class:: LBFGSLineSearch
-
 LBFGS is the limited memory version of the BFGS algorithm, where
 the inverse of Hessian matrix is updated instead of the Hessian
 itself. Two ways exist for determining the atomic
@@ -172,15 +169,11 @@ latter one, the approximated Hessian matrix is only used to find
 out the directions of the line searches and atomic steps, the
 step lengths are determined by the forces.
 
-To start a structure optimization with LBFGS algorithm is similar to
-BFGS. A typical optimization should look like::
+The syntax for a structure optimisation with ``LBFGS`` and ``LBGGSLineSearch``
+follow the format of the ``BFGS``.
 
-  from ase.optimize import LBFGS
-  [...]
-  dyn = LBFGS(atoms=system, trajectory='lbfgs.traj', restart='lbfgs.pckl')
-
-where the trajectory and the restart save the trajectory of the
-optimization and the vectors needed to generate the Hessian Matrix.
+.. autoclass:: LBFGS
+.. class:: LBFGSLineSearch
 
 GoodOldQuasiNewton
 ------------------
