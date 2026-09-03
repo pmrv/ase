@@ -76,7 +76,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(initial, ax, rotation=('90x,0y,90z'))
-ax.set_axis_off()
 
 # %%
 # Now we can create the final state.
@@ -226,7 +225,6 @@ relax.run(fmax=0.05)
 
 fig, ax = plt.subplots()
 plot_atoms(initial, ax, rotation=('0x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # We can now create and optimise the final state by
@@ -242,7 +240,6 @@ relax.run(fmax=0.05)
 
 fig, ax = plt.subplots()
 plot_atoms(final, ax, rotation=('0x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # 2.2 Image Dependent Pair Potential

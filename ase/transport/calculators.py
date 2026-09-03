@@ -2,7 +2,7 @@ import numpy as np
 from numpy import linalg
 from scipy.integrate import trapezoid
 
-from ase.transport.greenfunction import GreenFunction
+from ase.transport.greenfunction import GreenFunction, asetransport_deprecated
 from ase.transport.selfenergy import LeadSelfEnergy
 from ase.transport.tools import (
     cutcoupling,
@@ -19,8 +19,14 @@ class TransportCalculator:
     two semi-infinite leads using a Green function method.
     """
 
+    @asetransport_deprecated
     def __init__(self, **kwargs):
         """Create the transport calculator.
+
+        .. deprecated:: ase-3.30.0
+            The :mod:`ase.transport` package will be removed in a future
+            release unless users express interest in keeping it e.g.
+            on the issue tracker.
 
         Parameters
         ----------

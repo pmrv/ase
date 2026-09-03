@@ -70,6 +70,10 @@ class DihedralsData:
 
 
 class OPLSff:
+    """OPLS helper class.
+    Read OPLS structure and force field parameters and write LAMMPS input.
+    """
+
     def __init__(self, fileobj=None, warnings=0):
         self.warnings = warnings
         self.data = {}
@@ -517,6 +521,16 @@ minimize        1.0e-14 1.0e-5 100000 100000
 
 
 class OPLSStructure(Atoms):
+    """Class for representing OPLSSStructure.
+
+    Parameters
+    ----------
+
+    filename: str
+      Extended xyz filename
+
+    """
+
     default_map = {
         'BR': 'Br',
         'Be': 'Be',

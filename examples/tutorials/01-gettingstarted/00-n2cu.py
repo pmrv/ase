@@ -228,7 +228,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(slab_from_file, ax)
-ax.set_axis_off()
 
 # %%
 #
