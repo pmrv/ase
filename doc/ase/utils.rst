@@ -32,10 +32,9 @@ This module compares two atomic structures to see if they are symmetrically equi
 Symmetry analysis
 =================
 
-https://atztogo.github.io/spglib/python-spglib.html
-
+https://spglib.readthedocs.io/en/stable/index.html
 
 Phonons
 =======
 
-http://phonopy.sourceforge.net/
+https://phonopy.github.io/phonopy/

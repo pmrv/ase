@@ -25,7 +25,6 @@ import os
 import shlex
 import shutil
 import subprocess
-import warnings
 from contextlib import ExitStack
 from re import IGNORECASE
 from re import compile as re_compile
@@ -307,22 +306,18 @@ class LAMMPS(Calculator):
             self._run(set_atoms, exitstack)
 
     def _run(self, set_atoms, exitstack):
-        pbc = self.atoms.get_pbc()
-        if all(pbc):
-            cell = self.atoms.get_cell()
-        elif not any(pbc):
-            # large enough cell for non-periodic calculation -
+        cell = self.atoms.get_cell()
+        if np.all(cell == 0.0):  # without cell
+            # large enough cell if it does not exist -
             # LAMMPS shrink-wraps automatically via input command
             #       "periodic s s s"
             # below
             cell = 2 * np.max(np.abs(self.atoms.get_positions())) * np.eye(3)
-        else:
-            warnings.warn(
-                "semi-periodic ASE cell detected - translation "
-                + "to proper LAMMPS input cell might fail"
-            )
-            cell = self.atoms.get_cell()
-        self.prism = Prism(cell)
+        self.prism = Prism(
+            cell,
+            pbc=self.atoms.get_pbc(),
+            reduce_cell=self.parameters['reduce_cell'],
+        )
 
         self.set_missing_parameters()
         self.calls += 1

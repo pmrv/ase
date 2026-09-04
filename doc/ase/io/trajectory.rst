@@ -40,8 +40,6 @@ Trajectory
 The Trajectory function returns a Trajectory reading or writing
 object, depending on the mode.
 
-.. autofunction:: ase.io.Trajectory
-
 The function returns a TrajectoryReader or a TrajectoryWriter object.
 
 Reading a trajectory file is done by indexing the TrajectoryReader
@@ -52,31 +50,8 @@ Writing a trajectory file is done by calling the ``write`` method.  If no
 atoms object was given when creating the object, it must be given as
 an argument to the ``write`` method.
 
+.. autofunction:: ase.io.Trajectory
 
-Examples
---------
-
-Reading a configuration::
-
-    from ase.io.trajectory import Trajectory
-    traj = Trajectory('example.traj')
-    atoms = traj[-1]
-
-Reading all configurations::
-
-    traj = Trajectory('example.traj')
-    for atoms in traj:
-        # Analyze atoms
-
-Writing every 100th time step in a molecular dynamics simulation::
-
-    # dyn is the dynamics (e.g. VelocityVerlet, Langevin or similar)
-    traj = Trajectory('example.traj', 'w', atoms)
-    dyn.attach(traj.write, interval=100)
-    dyn.run(10000)
-    traj.close()
-
-    
 .. _new trajectory:
     
 The TrajectoryReader and TrajectoryWriter objects

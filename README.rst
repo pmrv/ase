@@ -23,7 +23,7 @@ Webpage: https://ase-lib.org/
 Requirements
 ------------
 
-* Python_ 3.10 or later
+* Python_ 3.11 or later
 * NumPy_ (base N-dimensional array package)
 * SciPy_ (library for scientific computing)
 * Matplotlib_ (2D Plotting)

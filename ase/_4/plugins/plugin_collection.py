@@ -5,9 +5,7 @@ from collections.abc import Collection, Iterator
 from functools import cached_property
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Any, Callable, TypeVar, cast
-
-from typing_extensions import Self
+from typing import Any, Callable, Self, TypeVar, cast
 
 from .io import IOFormatPlugin
 from .plugin import CalculatorPlugin, Plugin

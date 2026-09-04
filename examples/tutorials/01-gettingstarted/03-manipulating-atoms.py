@@ -65,7 +65,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation=('-80x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # Note that we added the ``rotation`` argument,
@@ -91,7 +90,6 @@ atoms_repeated = atoms.repeat((3, 3, 2))
 
 fig, ax = plt.subplots()
 plot_atoms(atoms_repeated, ax, rotation=('-80x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # Adding atoms
@@ -113,7 +111,6 @@ atoms.positions[-1] = absolute
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax, rotation=('-80x,0y,0z'))
-ax.set_axis_off()
 
 # %%
 # Interface building
@@ -164,7 +161,6 @@ water = read('water.traj')
 
 fig, ax = plt.subplots()
 plot_atoms(water, ax)
-ax.set_axis_off()
 
 # %%
 # and let's look at the unit cell.
@@ -183,7 +179,6 @@ slab = fcc111('Ni', size=[2, 4, 3], a=3.55, orthogonal=True)
 
 fig, ax = plt.subplots()
 plot_atoms(slab, ax)
-ax.set_axis_off()
 
 print(slab.cell)
 
@@ -198,7 +193,6 @@ water.cell = [water.cell[1, 1], water.cell[0, 0], 0.0]
 
 fig, ax = plt.subplots()
 plot_atoms(water, ax)
-ax.set_axis_off()
 
 # %%
 # Let's also :meth:`~ase.Atoms.rotate` the molecules:
@@ -207,7 +201,6 @@ water.rotate(90, 'z', center=(0, 0, 0))
 
 fig, ax = plt.subplots()
 plot_atoms(water, ax)
-ax.set_axis_off()
 
 # %%
 # Now we can wrap the atoms into the cell
@@ -215,7 +208,6 @@ ax.set_axis_off()
 water.wrap()
 fig, ax = plt.subplots()
 plot_atoms(water, ax)
-ax.set_axis_off()
 
 # %%
 # The :meth:`~ase.Atoms.wrap` method only works if periodic boundary
@@ -242,7 +234,6 @@ interface.write('NiH2O.traj')
 
 fig, ax = plt.subplots()
 plot_atoms(interface, ax)
-ax.set_axis_off()
 
 # %%
 # Adding two atoms objects will take the positions from both and the cell and

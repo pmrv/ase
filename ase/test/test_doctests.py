@@ -15,16 +15,30 @@ ase.constraints
 ase.dft.kpoints
 ase.eos
 ase.formula
+ase.geometry
+ase.geometry.analysis
+ase.geometry.bravais_type_engine
+ase.geometry.dimensionality
 ase.geometry.cell
 ase.geometry.geometry
+ase.geometry.distance
+ase.geometry.rdf
+ase.geometry.minkowski_reduction
 ase.io.ulm
 ase.lattice
 ase.neighborlist
+ase.parallel
 ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
-ase.visualize
+ase.io
+ase.io.trajectory
+ase.io.opls
+ase.phasediagram
+ase.pourbaix
+ase.utils
+ase.spectrum
 """.split()
 
 

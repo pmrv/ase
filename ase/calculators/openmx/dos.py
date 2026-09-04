@@ -45,20 +45,24 @@ class DOS:
         """
         function for reading DOS from the following OpenMX file extensions:
          ~.[DOS|PDOS].[Tetrahedron|Gaussian]<.atom(int).(orbital)
-        :param method: the method which has been used to calculate the density
-                       of states ('Tetrahedron' or 'Gaussian')
-        :param pdos: True if the pseudo-density of states have been calculated,
-                     False if only the total density of states has been
-                     calculated
-        :param atom_index: positive integer, n. For the nth atom in the unit
-                           cell as specified in the OpenMX input file
-        :param orbital: '' or 's1' or 'p1', 'p2', 'p3' or 'd1', 'd2', 'd3',
-                        'd4', 'd5' etc. If pdos is True then this specifies the
-                        pdos from a particular orbital to read from. If '' is
-                        given then the total pdos from the given atom is read.
-        :param spin_polarization: if True this will read the separate pdos for
-                                  up and down spin states.
-        :return: None
+
+        Parameters
+        ----------
+        method : Literal['Tetrahedron', 'Gaussian'], default: 'Tetrahedron'
+            Method used to calculate the density of states.
+        pdos : bool, default: False
+            True if the pseudo-density of states have been calculated,
+            False if only the total density of states has been calculated.
+        atom_index : int, default: 1
+            Atom index in the unit cell as specified in the OpenMX input file.
+        orbital : str, default: ''
+            '' or 's1' or 'p1', 'p2', 'p3' or 'd1', 'd2', 'd3', 'd4', 'd5' etc.
+            If pdos is True then this specifies the pdos from a particular
+            orbital to read from.
+            If '' is given, then the total pdos from the given atom is read.
+        spin_polarization : bool
+            If True, this reads the separate pdos for up and down spin states.
+
         """
         add = False
         if not spin_polarization and self.calc['initial_magnetic_moments']:
@@ -143,21 +147,29 @@ class DOS:
         """
         Plots a graph of (pseudo-)density of states against energy onto a given
         axis of a subplot.
-        :param axis: matplotlib.pyplot.Axes object. This allows the graph to
-                     plotted on any desired axis of a plot.
-        :param density: If True, the density of states will be plotted
-        :param cum: If True, the cumulative (or integrated) density of states
-                    will be plotted
-        :param pdos: If True, the pseudo-density of states will be plotted for
-                     a given atom and orbital
-        :param atom_index: If pdos is True, atom_index specifies which atom's
-                           PDOS to plot.
-        :param orbital: If pdos is True, orbital specifies which orbital's PDOS
-                        to plot.
-        :param spin: If '', density of states for both spin states will be
-                     combined into one plot. If 'up' or 'down', a given spin
-                     state's PDOS will be plotted.
-        :return: None
+
+        Parameters
+        ----------
+        axis : Axes
+            Matplotlib.pyplot.Axes object
+            This allows the graph to plotted on any desired axis of a plot.
+        density : bool, default: True
+            If True, the density of states will be plotted.
+        cum : bool, default: False
+            If True, the cumulative (or integrated) density of states
+            will be plotted.
+        pdos : bool, default: False
+            If True, the pseudo-density of states will be plotted for
+            a given atom and orbital.
+        atom_index: int, default: 1
+            If ``pdos`` is True, atom_index specifies which atom's PDOS to plot.
+        orbital : str, default: ''
+            If ``pdos`` is True, orbital specifies which orbital's PDOS to plot.
+        spin : Literal['', 'up', 'down'], default: ''
+            If '', density of states for both spin states will be
+            combined into one plot.
+            If 'up' or 'down', a given spin state's PDOS will be plotted.
+
         """
         p = ''
         bottom_index = 0
@@ -251,22 +263,33 @@ class DOS:
         """
         Generates a graphical figure containing possible subplots of different
         PDOSs of different atoms, orbitals and spin state combinations.
-        :param density: If True, density of states will be plotted
-        :param cum: If True, cumulative density of states will be plotted
-        :param pdos: If True, pseudo-density of states will be plotted for
-                     given atoms and orbitals
-        :param atom_index_list: If pdos is True, atom_index_list specifies
-                                which atoms will have their PDOS plotted.
-        :param orbital_list: If pdos is True, orbital_list specifies which
-                             orbitals will have their PDOS plotted.
-        :param spins: If '' in spins, density of states for both spin states
-                      will be combined into one graph. If 'up' or
-        'down' in spins, a given spin state's PDOS graph will be plotted.
-        :param spin_polarization: If spin_polarization is False then spin
-                                  states will not be separated in different
-                                  PDOS's.
-        :param erange: range of energies to view DOS
-        :return: matplotlib.figure.Figure and matplotlib.axes.Axes object
+
+        Parameters
+        ----------
+        density : bool, default: True
+            If True, density of states will be plotted.
+        cum : bool, default: False
+            If True, cumulative density of states will be plotted.
+        pdos : bool, default: False
+            If True, pseudo-density of states will be plotted for
+            given atoms and orbitals.
+        atom_index_list: list[int] | None, default: None
+            If ``pdos`` is True, PDOS is plotted for the specified atoms.
+        orbital_list : list[str] | None, default: None
+            If ``pdos`` is True, PDOS is plotted for the specified orbitals.
+        spins : tuple[Literal['', 'up', 'down'], ...], default: ('up', 'down')
+            If '' in spins, density of states for both spin states
+            will be combined into one graph. If 'up' or 'down' in spins,
+            a given spin state's PDOS graph will be plotted.
+        spin_polarization : bool, default: False
+            If False, spin states will not be separated in different PDOS's.
+        erange : tuple[int, int], default: (-25, 20)
+            Range of energies to view DOS.
+
+        Returns
+        -------
+        tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]
+
         """
         import matplotlib.pyplot as plt
         from matplotlib.lines import Line2D
@@ -364,19 +387,22 @@ class DOS:
         Python interface for DosMain (OpenMX's density of states calculator).
         Can automate the density of states
         calculations used in OpenMX by processing .Dos.val and .Dos.vec files.
-        :param method: method to be used to calculate the density of states
-                       from eigenvalues and eigenvectors.
-                       ('Tetrahedron' or 'Gaussian')
-        :param pdos: If True, the pseudo-density of states is calculated for a
-                     given list of atoms for each orbital. If the system is
-                     spin polarized, then each up and down state is also
-                     calculated.
-        :param gaussian_width: If the method is 'Gaussian' then gaussian_width
-                               is required (eV).
-        :param atom_index_list: If pdos is True, a list of atom indices are
-                                required to generate the pdos of each of those
-                                specified atoms.
-        :return: None
+
+        Parameters
+        ----------
+        method : Literal['Tetrahedron', 'Gaussian'], default: 'Tetrahedron'
+            Method to be used to calculate the density of states from
+            eigenvalues and eigenvectors.
+        pdos : bool, default: False
+            If True, the pseudo-density of states is calculated for a given
+            list of atoms for each orbital.  If the system is spin polarized,
+            then each up and down state is also calculated.
+        gaussian_width: float, default: 0.1
+            If ``method`` is 'Gaussian' then gaussian_width is required (eV).
+        atom_index_list : list[int] | None, default: None
+            If ``pdos`` is True, a list of atom indices are required to
+            generate the pdos of each of those specified atoms.
+
         """
         method_code = '2\n'
         if method == 'Tetrahedron':
@@ -416,29 +442,40 @@ class DOS:
         Wraps all the density of states processing functions. Can go from
         .Dos.val and .Dos.vec files to a graphical figure showing many
         different PDOS plots against energy in one step.
-        :param atom_index_list:
-        :param method: method to be used to calculate the density of states
-                       from eigenvalues and eigenvectors.
-                       ('Tetrahedron' or 'Gaussian')
-        :param gaussian_width: If the method is 'Gaussian' then gaussian_width
-                               is required (eV).
-        :param pdos: If True, the pseudo-density of states is calculated for a
-                     given list of atoms for each orbital. If the system is
-                     spin polarized, then each up and down state is also
-                     calculated.
-        :param orbital_list: If pdos is True, a list of atom indices are
-                             required to generate the pdos of each of those
-                             specified atoms.
-        :param spin_polarization: If spin_polarization is False then spin
-                                  states will not be separated in different
-                                  PDOS's.
-        :param density: If True, density of states will be plotted
-        :param cum: If True, cumulative (or integrated) density of states will
-                    be plotted
-        :param erange: range of energies to view the DOS
-        :param file_format: If not None, a file will be saved automatically in
-                            that format ('pdf', 'png', 'jpeg' etc.)
-        :return: matplotlib.figure.Figure object
+
+        Parameters
+        ----------
+        atom_index_list : list[int] | None, default: None
+            If ``pdos`` is True, a list of atom indices are required to
+            generate the pdos of each of those specified atoms.
+        method : Literal['Tetrahedron', 'Gaussian'], default: 'Tetrahedron'
+            Method to be used to calculate the density of states from
+            eigenvalues and eigenvectors.
+        gaussian_width : float, default: 0.1
+            If ``method`` is 'Gaussian' then gaussian_width is required (eV).
+        pdos : bool, default: False
+            If True, the pseudo-density of states is calculated for a given
+            list of atoms for each orbital. If the system is spin polarized,
+            then each up and down state is also calculated.
+        orbital_list : list[str] | None, default: None
+            If ``pdos`` is True, a list of orbital symbols are required to
+            generate the PDOS of each of those specified atoms.
+        spin_polarization : bool | None, default: None
+            If False, spin states will not be separated in different PDOS's.
+        density : bool, default: True
+            If True, density of states will be plotted.
+        cum : bool, default: False
+            If True, cumulative density of states will be plotted.
+        erange : tuple[int, int], default: (-25, 20)
+            Range of energies to view the DOS.
+        file_format : str | None, default: None
+            If not None, a file will be saved automatically in that format
+            ('pdf', 'png', 'jpeg' etc.)
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+
         """
         if spin_polarization is None:
             spin_polarization = bool(self.calc['initial_magnetic_moments'])

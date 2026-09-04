@@ -13,13 +13,16 @@ CALCULATION_END_MARK = "__end_of_ase_invoked_calculation__"
 def lammps_create_atoms(fileobj, parameters, atoms, prismobj):
     """Create atoms in lammps with 'create_box' and 'create_atoms'
 
-    :param fileobj: open stream for lammps input
-    :param parameters: dict of all lammps parameters
-    :type parameters: dict
-    :param atoms: Atoms object
-    :type atoms: Atoms
-    :param prismobj: coordinate transformation between ase and lammps
-    :type prismobj: Prism
+    Parameters
+    ----------
+    fileobj : IOBase
+        Open stream for LAMMPS input.
+    parameters : dict
+        Dictionary of all LAMMPS parameters.
+    atoms : Atoms
+        ASE Atoms object.
+    prismobj : Prism
+        Coordinate transformation between ASE and LAMMPS.
 
     """
     if parameters["verbose"]:
