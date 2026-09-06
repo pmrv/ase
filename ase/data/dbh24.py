@@ -1,5 +1,5 @@
-"""
-The following contains a database of 24 gas-phase reaction barrier heights for small molecules.
+"""Database of 24 gas-phase reaction barrier heights for small molecules.
+
 It is the DBH24 (diverse barrier heights) set of the Truhlar group,
 with 12 forward and 12 backward barriers.
 All geometries are from
