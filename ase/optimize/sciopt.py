@@ -1,5 +1,3 @@
-# fmt: off
-
 from typing import IO
 
 import numpy as np
@@ -145,46 +143,52 @@ class SciPyFminCG(SciPyOptimizer):
     """Non-linear (Polak-Ribiere) conjugate gradient algorithm"""
 
     def call_fmin(self, fmax, steps):
-        output = opt.fmin_cg(self.f,
-                             self.x0(),
-                             fprime=self.fprime,
-                             # args=(),
-                             gtol=fmax * 0.1,  # Should never be reached
-                             norm=np.inf,
-                             # epsilon=
-                             maxiter=steps,
-                             full_output=1,
-                             disp=0,
-                             # retall=0,
-                             callback=self.callback)
+        output = opt.fmin_cg(
+            self.f,
+            self.x0(),
+            fprime=self.fprime,
+            # args=(),
+            gtol=fmax * 0.1,  # Should never be reached
+            norm=np.inf,
+            # epsilon=
+            maxiter=steps,
+            full_output=1,
+            disp=0,
+            # retall=0,
+            callback=self.callback,
+        )
         warnflag = output[-1]
         if warnflag == 2:
             raise OptimizerConvergenceError(
                 'Warning: Desired error not necessarily achieved '
-                'due to precision loss')
+                'due to precision loss'
+            )
 
 
 class SciPyFminBFGS(SciPyOptimizer):
     """Quasi-Newton method (Broydon-Fletcher-Goldfarb-Shanno)"""
 
     def call_fmin(self, fmax, steps):
-        output = opt.fmin_bfgs(self.f,
-                               self.x0(),
-                               fprime=self.fprime,
-                               # args=(),
-                               gtol=fmax * 0.1,  # Should never be reached
-                               norm=np.inf,
-                               # epsilon=1.4901161193847656e-08,
-                               maxiter=steps,
-                               full_output=1,
-                               disp=0,
-                               # retall=0,
-                               callback=self.callback)
+        output = opt.fmin_bfgs(
+            self.f,
+            self.x0(),
+            fprime=self.fprime,
+            # args=(),
+            gtol=fmax * 0.1,  # Should never be reached
+            norm=np.inf,
+            # epsilon=1.4901161193847656e-08,
+            maxiter=steps,
+            full_output=1,
+            disp=0,
+            # retall=0,
+            callback=self.callback,
+        )
         warnflag = output[-1]
         if warnflag == 2:
             raise OptimizerConvergenceError(
                 'Warning: Desired error not necessarily achieved '
-                'due to precision loss')
+                'due to precision loss'
+            )
 
 
 class SciPyGradientlessOptimizer(Optimizer):
@@ -301,17 +305,19 @@ class SciPyFmin(SciPyGradientlessOptimizer):
     """
 
     def call_fmin(self, xtol, ftol, steps):
-        opt.fmin(self.f,
-                 self.x0(),
-                 # args=(),
-                 xtol=xtol,
-                 ftol=ftol,
-                 maxiter=steps,
-                 # maxfun=None,
-                 # full_output=1,
-                 disp=0,
-                 # retall=0,
-                 callback=self.callback)
+        opt.fmin(
+            self.f,
+            self.x0(),
+            # args=(),
+            xtol=xtol,
+            ftol=ftol,
+            maxiter=steps,
+            # maxfun=None,
+            # full_output=1,
+            disp=0,
+            # retall=0,
+            callback=self.callback,
+        )
 
 
 class SciPyFminPowell(SciPyGradientlessOptimizer):
@@ -337,15 +343,17 @@ class SciPyFminPowell(SciPyGradientlessOptimizer):
             self.direc = np.eye(len(self.x0()), dtype=float) * direc
 
     def call_fmin(self, xtol, ftol, steps):
-        opt.fmin_powell(self.f,
-                        self.x0(),
-                        # args=(),
-                        xtol=xtol,
-                        ftol=ftol,
-                        maxiter=steps,
-                        # maxfun=None,
-                        # full_output=1,
-                        disp=0,
-                        # retall=0,
-                        callback=self.callback,
-                        direc=self.direc)
+        opt.fmin_powell(
+            self.f,
+            self.x0(),
+            # args=(),
+            xtol=xtol,
+            ftol=ftol,
+            maxiter=steps,
+            # maxfun=None,
+            # full_output=1,
+            disp=0,
+            # retall=0,
+            callback=self.callback,
+            direc=self.direc,
+        )
