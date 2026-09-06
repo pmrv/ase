@@ -1,9 +1,9 @@
 """S22 and s26 databases of weakly interacting dimers and complexes.
 
 S22 geometry data are from P. Jurecka, J. Sponer, J. Cerny, P. Hobza;
-Phys Chem Chem Phys 2006, 8 (17), 1985-1993.  See
-http://www.begdb.com/index.php?action=106a6c241b8797f52e1e77317b96a201
-for the original files.  All geometries are optimized at either the
+Phys Chem Chem Phys 2006, 8 (17), 1985-1993.
+
+All geometries are optimized at either the
 CCSD(T) or MP2 level except for the methyl amide dimers where only the
 hydrogen position is optimized at the DFT level (the precise
 optimization is written as a comment).
