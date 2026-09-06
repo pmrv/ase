@@ -1,5 +1,3 @@
-# fmt: off
-
 # Copyright (C) 2003  CAMP
 # Please see the accompanying LICENSE file for further information.
 
@@ -29,8 +27,8 @@ def f(lamda, Gbar, b, radius):
 
 def scale_radius_energy(f, r):
     scale = 1.0
-#       if(r<=0.01):
-#               return scale
+    #       if(r<=0.01):
+    #               return scale
 
     if f < 0.01:
         scale *= 1.4
@@ -42,19 +40,19 @@ def scale_radius_energy(f, r):
         scale *= 1.4
 
     if f > 0.5:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
     if f > 0.7:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
     if f > 1.0:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
 
     return scale
 
 
 def scale_radius_force(f, r):
     scale = 1.0
-#       if(r<=0.01):
-#               return scale
+    #       if(r<=0.01):
+    #               return scale
     g = abs(f - 1)
     if g < 0.01:
         scale *= 1.4
@@ -66,11 +64,11 @@ def scale_radius_force(f, r):
         scale *= 1.4
 
     if g > 0.5:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
     if g > 0.7:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
     if g > 1.0:
-        scale *= 1. / 1.4
+        scale *= 1.0 / 1.4
 
     return scale
 
@@ -91,8 +89,7 @@ def find_lamda(upperlimit, Gbar, b, radius):
     converged = False
 
     while not converged:
-
-        midt = (upperlimit + lowerlimit) / 2.
+        midt = (upperlimit + lowerlimit) / 2.0
         lamda = midt
         fmidt = f(midt, Gbar, b, radius)
         fupper = f(upperlimit, Gbar, b, radius)
@@ -109,7 +106,6 @@ def find_lamda(upperlimit, Gbar, b, radius):
 
 
 class GoodOldQuasiNewton(Optimizer):
-
     def __init__(
         self,
         atoms: Atoms,
@@ -223,6 +219,7 @@ class GoodOldQuasiNewton(Optimizer):
 
     def update_hessian(self, pos, G):
         import copy
+
         if hasattr(self, 'oldG'):
             if self.hessianupdate == 'BFGS':
                 self.update_hessian_bfgs(pos, G)
@@ -270,9 +267,12 @@ class GoodOldQuasiNewton(Optimizer):
         if (abs(dott) > self.eps) and (abs(dotg) > self.eps):
             for i in range(n):
                 for j in range(n):
-                    h = tvec[i] * dpos[j] + dpos[i] * \
-                        tvec[j] - ddot * dpos[i] * dpos[j]
-                    h *= 1. / absdpos
+                    h = (
+                        tvec[i] * dpos[j]
+                        + dpos[i] * tvec[j]
+                        - ddot * dpos[i] * dpos[j]
+                    )
+                    h *= 1.0 / absdpos
                     self.hessian[i][j] += h
 
     def update_hessian_bofill(self, pos, G):
@@ -288,29 +288,32 @@ class GoodOldQuasiNewton(Optimizer):
         tvecdot = np.dot(tvec, tvec)
         tvecdpos = np.dot(tvec, dpos)
 
-        coef1 = 1. - tvecdpos * tvecdpos / (absdpos * tvecdot)
-        coef2 = (1. - coef1) * absdpos / tvecdpos
+        coef1 = 1.0 - tvecdpos * tvecdpos / (absdpos * tvecdot)
+        coef2 = (1.0 - coef1) * absdpos / tvecdpos
         coef3 = coef1 * tvecdpos / absdpos
 
         dott = np.dot(dpos, tvec)
         if (abs(dott) > self.eps) and (abs(dotg) > self.eps):
             for i in range(n):
                 for j in range(n):
-                    h = coef1 * (tvec[i] * dpos[j] + dpos[i] * tvec[j]) - \
-                        dpos[i] * dpos[j] * coef3 + coef2 * tvec[i] * tvec[j]
-                    h *= 1. / absdpos
+                    h = (
+                        coef1 * (tvec[i] * dpos[j] + dpos[i] * tvec[j])
+                        - dpos[i] * dpos[j] * coef3
+                        + coef2 * tvec[i] * tvec[j]
+                    )
+                    h *= 1.0 / absdpos
                     self.hessian[i][j] += h
 
     def step(self, forces=None):
-        """ Do one QN step
-        """
+        """Do one QN step"""
         G = self._get_gradient(forces)
         pos = self.optimizable.get_x()
         energy = self.optimizable.get_value()
 
         if hasattr(self, 'oldenergy'):
-            self.write_log('energies ' + str(energy) +
-                           ' ' + str(self.oldenergy))
+            self.write_log(
+                'energies ' + str(energy) + ' ' + str(self.oldenergy)
+            )
 
             if self.forcemin:
                 de = 1e-4
@@ -332,29 +335,35 @@ class GoodOldQuasiNewton(Optimizer):
                 forces = 1.0
                 if self.forcemin:
                     self.write_log(
-                        "energy change; actual: %f estimated: %f " %
-                        (de, self.energy_estimate))
+                        'energy change; actual: %f estimated: %f '
+                        % (de, self.energy_estimate)
+                    )
                     if abs(self.energy_estimate) > self.eps:
                         forces = abs((de / self.energy_estimate) - 1)
-                        self.write_log('Energy prediction factor '
-                                       + str(forces))
+                        self.write_log(
+                            'Energy prediction factor ' + str(forces)
+                        )
                         # fg = self.get_force_prediction(G)
                         self.radius *= scale_radius_energy(forces, self.radius)
 
                 else:
-                    self.write_log("energy change; actual: %f " % (de))
+                    self.write_log('energy change; actual: %f ' % (de))
                     self.radius *= 1.5
 
                 fg = self.get_force_prediction(G)
-                self.write_log("Scale factors %f %f " %
-                               (scale_radius_energy(forces, self.radius),
-                                scale_radius_force(fg, self.radius)))
+                self.write_log(
+                    'Scale factors %f %f '
+                    % (
+                        scale_radius_energy(forces, self.radius),
+                        scale_radius_force(fg, self.radius),
+                    )
+                )
 
             self.radius = max(min(self.radius, self.maxradius), 0.0001)
         else:
             self.update_hessian(pos, G)
 
-        self.write_log("new radius %f " % (self.radius))
+        self.write_log('new radius %f ' % (self.radius))
         self.oldenergy = energy
 
         b, V = eigh(self.hessian)
@@ -413,11 +422,12 @@ class GoodOldQuasiNewton(Optimizer):
                     return lamdas
                 else:
                     self.write_log(
-                        "Wrong inertia of Hessian matrix: %2.2f %2.2f " %
-                        (b[0], b[1]))
+                        'Wrong inertia of Hessian matrix: %2.2f %2.2f '
+                        % (b[0], b[1])
+                    )
 
         else:
-            self.write_log("Corrected Newton step: abs(D) = %2.2f " % (absD))
+            self.write_log('Corrected Newton step: abs(D) = %2.2f ' % (absD))
 
         if not self.transitionstate:
             # upper limit
@@ -448,7 +458,8 @@ class GoodOldQuasiNewton(Optimizer):
         dGbar_actual = Gbar - self.old_gbar
         dGbar_predicted = Gbar - self.gbar_estimate
 
-        f = np.dot(dGbar_actual, dGbar_predicted) / \
-            np.dot(dGbar_actual, dGbar_actual)
+        f = np.dot(dGbar_actual, dGbar_predicted) / np.dot(
+            dGbar_actual, dGbar_actual
+        )
         self.write_log('Force prediction factor ' + str(f))
         return f

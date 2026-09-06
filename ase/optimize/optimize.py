@@ -1,6 +1,5 @@
-# fmt: off
+"""Structure optimization."""
 
-"""Structure optimization. """
 import time
 import warnings
 from collections.abc import Callable
@@ -58,7 +57,8 @@ class OptimizableAtoms(Optimizable):
     def get_value(self):
         force_consistent = self._use_force_consistent_energy
         return self.atoms.get_potential_energy(
-            force_consistent=force_consistent)
+            force_consistent=force_consistent
+        )
 
     def iterimages(self):
         # XXX document purpose of iterimages
@@ -89,12 +89,14 @@ class Log:
             fd.write(msg)
 
     def flush(self):
-        warnings.warn('Log flushes by default now.  Please do not call '
-                      'flush().  If you want a different flushing behaviour '
-                      'please open logfile yourself and choose '
-                      'buffering mode as appropriate.  '
-                      'This flush() method currently does nothing.',
-                      FutureWarning)
+        warnings.warn(
+            'Log flushes by default now.  Please do not call '
+            'flush().  If you want a different flushing behaviour '
+            'please open logfile yourself and choose '
+            'buffering mode as appropriate.  '
+            'This flush() method currently does nothing.',
+            FutureWarning,
+        )
 
 
 class BaseDynamics(IOContext):
@@ -106,6 +108,7 @@ class BaseDynamics(IOContext):
     We should try to remove the "atoms" parameter from this class,
     since Optimizers only require Optimizables.
     """
+
     def __init__(
         self,
         atoms: Atoms,
@@ -140,8 +143,11 @@ class BaseDynamics(IOContext):
                 trajectory.unlink(missing_ok=True)
 
         if trajectory is not None:
-            self.attach(self._traj_write_image, interval=loginterval,
-                        description={'interval': loginterval})
+            self.attach(
+                self._traj_write_image,
+                interval=loginterval,
+                description={'interval': loginterval},
+            )
 
         self.trajectory = trajectory
 
@@ -151,6 +157,7 @@ class BaseDynamics(IOContext):
     @contextmanager
     def _opentraj(self):
         from ase.io.trajectory import Trajectory
+
         assert self._orig_trajectory is not None
 
         if hasattr(self._orig_trajectory, 'write'):
@@ -159,8 +166,10 @@ class BaseDynamics(IOContext):
             return
 
         with Trajectory(
-                self._orig_trajectory,
-                master=self._master, mode='a', comm=self.comm,
+            self._orig_trajectory,
+            master=self._master,
+            mode='a',
+            comm=self.comm,
         ) as traj:
             yield traj
 
@@ -178,9 +187,11 @@ class BaseDynamics(IOContext):
 
     def _get_gradient(self, forces=None):
         if forces is not None:
-            warnings.warn('Please do not pass forces to step().  '
-                          'This argument will be removed in '
-                          'ase 3.28.0.')
+            warnings.warn(
+                'Please do not pass forces to step().  '
+                'This argument will be removed in '
+                'ase 3.28.0.'
+            )
             return -forces.ravel()
         return self.optimizable.get_gradient()
 
@@ -378,18 +389,18 @@ class Dynamics(BaseDynamics):
         return converged
 
     def gradient_converged(self, gradient):
-        """" a dummy function as placeholder for a real criterion, e.g. in
-        Optimizer """
+        """ " a dummy function as placeholder for a real criterion, e.g. in
+        Optimizer"""
         return False
 
     def log(self, *args, **kwargs):
-        """ a dummy function as placeholder for a real logger, e.g. in
-        Optimizer """
+        """a dummy function as placeholder for a real logger, e.g. in
+        Optimizer"""
         return True
 
     def step(self):
         """this needs to be implemented by subclasses"""
-        raise RuntimeError("step not implemented.")
+        raise RuntimeError('step not implemented.')
 
 
 class Optimizer(Dynamics):
@@ -510,8 +521,8 @@ class Optimizer(Dynamics):
         """Did the optimization converge?"""
         if gradient is not None:
             warnings.warn(
-                'The gradient keyword will be removed in 3.29.0',
-                FutureWarning)
+                'The gradient keyword will be removed in 3.29.0', FutureWarning
+            )
         elif forces is not None:
             gradient = -forces.ravel()
         else:
@@ -529,16 +540,17 @@ class Optimizer(Dynamics):
         if self.logfile is not None:
             name = self.__class__.__name__
             if self.nsteps == 0:
-                args = (" " * len(name), "Step", "Time", "Energy", "fmax")
-                msg = "%s  %4s %8s %15s  %12s\n" % args
+                args = (' ' * len(name), 'Step', 'Time', 'Energy', 'fmax')
+                msg = '%s  %4s %8s %15s  %12s\n' % args
                 self.logfile.write(msg)
 
             args = (name, self.nsteps, T[3], T[4], T[5], e, fmax)
-            msg = "%s:  %3d %02d:%02d:%02d %15.6f %15.6f\n" % args
+            msg = '%s:  %3d %02d:%02d:%02d %15.6f %15.6f\n' % args
             self.logfile.write(msg)
 
     def dump(self, data):
         from ase.io.jsonio import write_json
+
         if self.comm.rank == 0 and self.restart is not None:
             with open(self.restart, 'w') as fd:
                 write_json(fd, data)
@@ -552,8 +564,9 @@ class Optimizer(Dynamics):
         from ase.io.trajectory import Trajectory
 
         if not hasattr(self, '_replay_trajectory'):
-            raise TypeError('This optimizer does not provide '
-                            '_replay_trajectory()')
+            raise TypeError(
+                'This optimizer does not provide _replay_trajectory()'
+            )
 
         with ExitStack() as stack:
             if isinstance(traj, str):
@@ -563,21 +576,25 @@ class Optimizer(Dynamics):
 
     def load(self):
         from ase.io.jsonio import read_json
+
         with open(self.restart) as fd:
             try:
                 from ase.optimize import BFGS
+
                 if not isinstance(self, BFGS) and isinstance(
                     self.atoms, UnitCellFilter
                 ):
                     warnings.warn(
-                        "WARNING: restart function is untested and may result "
-                        "in unintended behavior. Namely orig_cell is not "
-                        "loaded in the UnitCellFilter. Please test on your own"
-                        " to ensure consistent results."
+                        'WARNING: restart function is untested and may result '
+                        'in unintended behavior. Namely orig_cell is not '
+                        'loaded in the UnitCellFilter. Please test on your own'
+                        ' to ensure consistent results.'
                     )
                 return read_json(fd, always_array=False)
             except Exception as ex:
-                msg = ('Could not decode restart file as JSON.  '
-                       'You may need to delete the restart file '
-                       f'{self.restart}')
+                msg = (
+                    'Could not decode restart file as JSON.  '
+                    'You may need to delete the restart file '
+                    f'{self.restart}'
+                )
                 raise RestartError(msg) from ex

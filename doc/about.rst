@@ -16,7 +16,7 @@ number of "design goals" that make it:
   dynamics simulation with ASE is simple and straightforward.  ASE can
   be used via a :mod:`graphical user interface <ase.gui>`, :ref:`cli`
   and the Python language.  Python scripts are
-  easy to follow (see :ref:`pythonintroduction` for a short introduction).
+  easy to follow.
   It is simple for new users to get access to all of the functionality
   of ASE.
 
@@ -41,9 +41,8 @@ number of "design goals" that make it:
 - **Pythonic**:
 
   It fits nicely into the rest of the Python world with
-  use of the popular NumPy package for numerical work
-  (see :ref:`numpy` for a short introduction). The
-  use of the Python language allows ASE to be used both interactively
+  use of the popular NumPy package for numerical work.
+  The use of the Python language allows ASE to be used both interactively
   as well as in scripts.
 
 - **Open to participation**:

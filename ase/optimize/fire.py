@@ -1,5 +1,3 @@
-# fmt: off
-
 from collections.abc import Callable
 from typing import IO, Any
 
@@ -27,9 +25,9 @@ def _forbid_maxmove(args: list, kwargs: dict[str, Any]) -> bool:
         return to_pop
 
     if len(args) > maxstep_index and args[maxstep_index] is None:
-        value = args[maxstep_index] = _pop_arg("maxmove")
-    elif kwargs.get("maxstep", None) is None:
-        value = kwargs["maxstep"] = _pop_arg("maxmove")
+        value = args[maxstep_index] = _pop_arg('maxmove')
+    elif kwargs.get('maxstep', None) is None:
+        value = kwargs['maxstep'] = _pop_arg('maxmove')
     else:
         return False
 
@@ -38,7 +36,7 @@ def _forbid_maxmove(args: list, kwargs: dict[str, Any]) -> bool:
 
 class FIRE(Optimizer):
     @deprecated(
-        "Use of `maxmove` is deprecated. Use `maxstep` instead.",
+        'Use of `maxmove` is deprecated. Use `maxstep` instead.',
         category=FutureWarning,
         callback=_forbid_maxmove,
     )
@@ -166,7 +164,7 @@ class FIRE(Optimizer):
         if maxstep is not None:
             self.maxstep = maxstep
         else:
-            self.maxstep = self.defaults["maxstep"]
+            self.maxstep = self.defaults['maxstep']
 
         self.dtmax = dtmax
         self.Nmin = Nmin
@@ -204,8 +202,8 @@ class FIRE(Optimizer):
                     # If not, reset to old positions...
                     if self.position_reset_callback is not None:
                         self.position_reset_callback(
-                            optimizable, self.r_last, e,
-                            self.e_last)
+                            optimizable, self.r_last, e, self.e_last
+                        )
                     optimizable.set_x(self.r_last)
                     is_uphill = True
                 self.e_last = optimizable.get_value()
@@ -216,8 +214,10 @@ class FIRE(Optimizer):
             grad2 = np.vdot(gradient, gradient)
             if vf > 0.0 and not is_uphill:
                 self.vel = (
-                    (1.0 - self.a) * self.vel + self.a * gradient / np.sqrt(
-                        grad2) * np.sqrt(np.vdot(self.vel, self.vel)))
+                    1.0 - self.a
+                ) * self.vel + self.a * gradient / np.sqrt(grad2) * np.sqrt(
+                    np.vdot(self.vel, self.vel)
+                )
                 if self.Nsteps > self.Nmin:
                     self.dt = min(self.dt * self.finc, self.dtmax)
                     self.a *= self.fa

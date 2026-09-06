@@ -1,5 +1,3 @@
-# fmt: off
-
 # ######################################
 # Implementation of FIRE2.0 and ABC-FIRE
 
@@ -159,7 +157,7 @@ class FIRE2(Optimizer):
         if maxstep is not None:
             self.maxstep = maxstep
         else:
-            self.maxstep = self.defaults["maxstep"]
+            self.maxstep = self.defaults['maxstep']
 
         self.dtmax = dtmax
         self.dtmin = dtmin
@@ -196,7 +194,7 @@ class FIRE2(Optimizer):
                 self.dt = max(self.dt * self.fdec, self.dtmin)
                 self.a = self.astart
 
-                dr = - 0.5 * self.dt * self.v
+                dr = -0.5 * self.dt * self.v
                 r = optimizable.get_x()
                 optimizable.set_x(r + dr)
                 self.v[:] *= 0.0
@@ -207,10 +205,10 @@ class FIRE2(Optimizer):
 
         if self.use_abc:
             self.a = max(self.a, 1e-10)
-            abc_multiplier = 1. / (1. - (1. - self.a)**(self.Nsteps + 1))
-            v_mix = ((1.0 - self.a) * self.v + self.a * gradient / np.sqrt(
-                np.vdot(gradient, gradient)) * np.sqrt(np.vdot(self.v,
-                                                               self.v)))
+            abc_multiplier = 1.0 / (1.0 - (1.0 - self.a) ** (self.Nsteps + 1))
+            v_mix = (1.0 - self.a) * self.v + self.a * gradient / np.sqrt(
+                np.vdot(gradient, gradient)
+            ) * np.sqrt(np.vdot(self.v, self.v))
             self.v = abc_multiplier * v_mix
 
             def clip_velocity(vel):
@@ -225,9 +223,10 @@ class FIRE2(Optimizer):
                 for car_dir in range(3):
                     v_i = np.where(
                         np.abs(v[:, car_dir]) * self.dt > self.maxstep,
-                        (self.maxstep / self.dt) *
-                        (v[:, car_dir] / np.abs(v[:, car_dir])),
-                        v[:, car_dir])
+                        (self.maxstep / self.dt)
+                        * (v[:, car_dir] / np.abs(v[:, car_dir])),
+                        v[:, car_dir],
+                    )
                     v_tmp.append(v_i)
                 return np.array(v_tmp).T.ravel()
 
@@ -242,9 +241,9 @@ class FIRE2(Optimizer):
                 assert abs(v1 - v2).max() < 1e-12
             self.v = v1
         else:
-            self.v = ((1.0 - self.a) * self.v + self.a * gradient / np.sqrt(
-                np.vdot(gradient, gradient)) * np.sqrt(np.vdot(self.v,
-                                                               self.v)))
+            self.v = (1.0 - self.a) * self.v + self.a * gradient / np.sqrt(
+                np.vdot(gradient, gradient)
+            ) * np.sqrt(np.vdot(self.v, self.v))
 
         dr = self.dt * self.v
 

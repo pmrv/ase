@@ -52,6 +52,37 @@ def Trajectory(filename, mode='r', atoms=None, properties=None, master=None,
         Communicator to handle parallel file reading and writing.
 
     The atoms, properties and master arguments are ignored in read mode.
+
+    Examples
+    --------
+
+    >>> from ase import Atoms
+    >>> atoms = Atoms('H2', positions=[(0, 0, 0), (0, 0, 0.74)])
+
+    Writing a configuration:
+
+    >>> from ase.io.trajectory import Trajectory
+    >>> with Trajectory('example.traj', 'w') as traj:
+    ...     traj.write(atoms)
+
+    Reading all configurations:
+
+    >>> with Trajectory('example.traj') as traj:
+    ...     for atoms in traj:
+    ...         pass
+
+    Writing every 10th time step in a molecular dynamics simulation:
+
+    >>> from ase.md.verlet import VelocityVerlet
+    >>> from ase.calculators.emt import EMT
+    >>> atoms.calc = EMT()
+    >>> dyn = VelocityVerlet(atoms, timestep=1.0)
+    >>> with Trajectory('md.traj', 'w', atoms) as traj:
+    ...     dyn.attach(traj.write, interval=10)
+    ...     converged = dyn.run(20)
+    >>> converged
+    True
+
     """
     if mode == 'r':
         return TrajectoryReader(filename)
@@ -139,7 +170,7 @@ class TrajectoryWriter:
         If the atoms argument is not given, the atoms object specified
         when creating the trajectory object is used.
 
-        Use keyword arguments to add extra properties::
+        Use keyword arguments to add extra properties:
 
             writer.write(atoms, energy=117, dipole=[0, 0, 1.0])
         """

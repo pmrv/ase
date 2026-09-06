@@ -2,6 +2,17 @@ import pytest
 
 from ase.atoms import Atoms
 
+LAMMPS_LJ_PARAMS = {
+    'pair_style': 'lj/cut 8.0',
+    'pair_coeff': ['1 1 0.0108102 3.345'],
+}
+
+
+def calculate_energy(factory, atoms: Atoms, **params) -> float:
+    with factory.calc(specorder=['Ar'], **params) as calc:
+        atoms.calc = calc
+        return atoms.get_potential_energy()
+
 
 @pytest.mark.calculator_lite()
 @pytest.mark.calculator('lammpsrun')
@@ -25,17 +36,26 @@ def test_no_data_file_wrap(factory):
         symbols=['Ar'] * 2, positions=pos, cell=[10.0, 10.0, 10.0], pbc=True
     )
 
-    # Set parameters for calculator
-    params = {}
-    params['pair_style'] = 'lj/cut 8.0'
-    params['pair_coeff'] = ['1 1 0.0108102 3.345']
-
     # Don't write a data file string. This will force
     # ase.calculators.lammps.inputwriter.write_lammps_in to write a bunch of
     # 'create_atoms' commands into the LAMMPS input file
-    params['no_data_file'] = True
+    calculate_energy(
+        factory,
+        atoms,
+        **LAMMPS_LJ_PARAMS,
+        no_data_file=True,
+    )
 
-    with factory.calc(specorder=['Ar'], **params) as calc:
-        atoms.calc = calc
-        atoms.get_potential_energy()
-        # assert something?
+
+@pytest.mark.parametrize('pbc', (False, True))
+@pytest.mark.calculator_lite()
+@pytest.mark.calculator('lammpsrun')
+def test_single_atom(factory, pbc: bool) -> None:
+    """Test calculations for a single atom."""
+    atoms = Atoms(
+        'Ar',
+        positions=[[5.0, 5.0, 5.0]],
+        cell=[10.0, 10.0, 10.0],
+        pbc=pbc,
+    )
+    calculate_energy(factory, atoms, **LAMMPS_LJ_PARAMS)
