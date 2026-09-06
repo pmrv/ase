@@ -338,9 +338,9 @@ _eval_block = _define_pattern(
   ----- ------------  ---------------      ----- ------------  ---------------
      6      0.708998  1 O  s                  1     -0.229426  1 O  s          
      2      0.217752  1 O  s          
-     """,
+     """,  # noqa: W291
     re.M,
-)  # noqa: W291
+)
 
 
 # Parses the eigenvalues and occupations from a GTO calculation
@@ -551,9 +551,9 @@ _nwpw_eval_block = _define_pattern(
      0.3910472E+00 (  10.641eV) occ=1.000     0.4124238E+00 (  11.223eV) occ=1.000
      0.3153977E+00 (   8.582eV) occ=1.000     0.3379797E+00 (   9.197eV) occ=1.000
      0.2801606E+00 (   7.624eV) occ=1.000     0.3052478E+00 (   8.306eV) occ=1.000
-""",
+""",  # noqa: E501, W291
     re.M,
-)  # noqa: E501, W291
+)
 
 # Parser for kpoint weights for a plane wave calculation
 _kpt_weight = _define_pattern(
@@ -562,9 +562,9 @@ _kpt_weight = _define_pattern(
     """\
  Brillouin zone point:      1
     weight=  0.074074  
-""",
+""",  # noqa: W291
     re.M,
-)  # noqa: W291
+)
 
 
 # Parse eigenvalues and occupancies from a plane wave calculation
@@ -649,9 +649,9 @@ _kpt = _define_pattern(
      0.3544000E+00 (   9.644eV) occ=1.000     0.3782641E+00 (  10.293eV) occ=1.000
      0.3531137E+00 (   9.609eV) occ=1.000     0.3778819E+00 (  10.283eV) occ=1.000
      0.2596367E+00 (   7.065eV) occ=1.000     0.2820723E+00 (   7.676eV) occ=1.000
-""",
+""",  # noqa: E501, W291
     re.M,
-)  # noqa: E501, W291
+)
 
 
 # Extracts kpoints from a plane wave calculation
