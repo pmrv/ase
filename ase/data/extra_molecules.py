@@ -99,9 +99,10 @@ data = {
     'C60': {
         'description': 'Buckminsterfullerene, I*h symm.',
         'name': 'C_{60}',
-        # The Buckyball has two degrees of freedom, the C-C bond, and the C=C bond.
-        # This is an LDA-gpaw relaxed structure with bond lengths 1.437 and 1.385.
-        # Experimentally, the two bond lengths are 1.45 and 1.40 Angstrom.
+        # The Buckyball has two degrees of freedom, the C-C bond, and
+        # the C=C bond.  This is an LDA-gpaw relaxed structure with
+        # bond lengths 1.437 and 1.385.  Experimentally, the two bond
+        # lengths are 1.45 and 1.40 Angstrom.
         'symbols': 'C60',
         'magmoms': None,
         'positions': [
