@@ -27,7 +27,16 @@ ase.geometry.minkowski_reduction
 ase.io.ulm
 ase.lattice
 ase.neighborlist
-ase.optimize
+ase.optimize.bfgs
+ase.optimize.cellawarebfgs
+ase.optimize.fire
+ase.optimize.fire2
+ase.optimize.gpmin.gpmin
+ase.optimize.lbfgs
+ase.optimize.mdmin
+ase.optimize.oldqn
+ase.optimize.rfo
+ase.optimize.sciopt
 ase.parallel
 ase.phonons
 ase.spacegroup.spacegroup
