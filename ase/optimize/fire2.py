@@ -147,7 +147,7 @@ class FIRE2(Optimizer):
         FIRE2:    5 ...        0.311649        1.823901
         FIRE2:    6 ...        0.262793        0.035743
         ...
-       """
+        """
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)
 
         self.dt = dt
