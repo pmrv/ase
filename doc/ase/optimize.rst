@@ -544,10 +544,17 @@ higher than the previous minimum, it is acccepted and :math:`E_\mathrm{diff}`
 is decreased; if it is more than :math:`E_\mathrm{diff}` eV higher it is
 rejected and :math:`E_\mathrm{diff}` is increased. The method is used as::
 
-   from ase.optimize.minimahopping import MinimaHopping
-   ...
-   opt = MinimaHopping(atoms=system)
-   opt(totalsteps=10)
+  from ase import Atoms
+  from ase.optimize.minimahopping import MinimaHopping
+  from ase.calculators.emt import EMT
+
+  system = Atoms(
+                'N2',
+                positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+                calculator=EMT()
+                )
+  opt = MinimaHopping(atoms=system)
+  opt(totalsteps=10)
 
 This example will run the algorithm until 10 steps are taken (once ``system``
 is defined). If ``totalsteps`` is not specified the algorithm will run

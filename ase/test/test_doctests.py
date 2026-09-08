@@ -28,6 +28,7 @@ ase.io.ulm
 ase.lattice
 ase.neighborlist
 ase.optimize.bfgs
+ase.optimize.basin
 ase.optimize.cellawarebfgs
 ase.optimize.fire
 ase.optimize.fire2
