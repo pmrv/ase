@@ -141,16 +141,16 @@ class GPMin(Optimizer, GaussianProcess):
         --------
 
         >>> from ase import Atoms
-        >>> from ase.optimize import LBFGS
         >>> from ase.calculators.emt import EMT
+        >>> from ase.optimize.gpmin.gpmin import GPMin
         ...
         >>> system = Atoms(
         ... 'N2',
         ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
         ... calculator=EMT()
         ... )
-        >>> dyn = LBFGS(system)
-        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+        >>> dyn = GPMin(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS, +NORMALIZE_WHITESPACE
                Step     Time          Energy          fmax
         GPMin:    0 ...        0.440344        3.251800
         GPMin:    1 ...        0.357046        2.961912
