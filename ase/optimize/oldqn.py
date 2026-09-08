@@ -152,6 +152,21 @@ class GoodOldQuasiNewton(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import LBFGS
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = LBFGS(system)
+        >>> dyn.run(fmax=0.05) # doctest:+SKIP
+
         """
 
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)

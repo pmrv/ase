@@ -43,6 +43,27 @@ class BasinHopping(Dynamics):
         logfile: file object or str
             If *logfile* is a string, a file with that name will be opened.
             Use '-' for stdout.
+
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import LBFGS
+        >>> from ase.calculators.emt import EMT
+        >>> from ase.optimize.basin import BasinHopping
+        >>> from ase.units import kB
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = BasinHopping(atoms=system,         # the system to optimize
+        ... temperature=100 * kB, # 'temperature' to overcome barriers
+        ... dr=0.5,               # maximal stepwidth
+        ... optimizer=LBFGS,      # optimizer to find local minima
+        ... fmax=0.1,             # maximal force for the optimizer
+        ... )# doctest:+SKIP
         """
         self.kT = temperature
         self.optimizer = optimizer

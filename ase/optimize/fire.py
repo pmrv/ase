@@ -132,6 +132,28 @@ class FIRE(Optimizer):
         .. deprecated:: 3.19.3
             Use of ``maxmove`` is deprecated; please use ``maxstep``.
 
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize import FIRE
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = FIRE(system, dtmax = 1.0, dt = 2.0)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+              Step     Time          Energy          fmax
+        FIRE:    0 ...        0.440344        3.251800
+        FIRE:    1 ...        1.076992       10.112458
+        FIRE:    2 ...        0.440344        3.251800
+        FIRE:    3 ...        1.076992       10.112458
+        FIRE:    4 ...        0.440344        3.251800
+        FIRE:    5 ...        0.262779        0.013728
+        ...
         """
         super().__init__(atoms, restart, logfile, trajectory, **kwargs)
 

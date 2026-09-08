@@ -41,8 +41,8 @@ class BFGSClimbFixInternals(BFGS):
        remaining degrees of freedom without the projected forces. The projected
        forces can be inspected using the :meth:`get_projected_forces` method:
 
-       >>> for _ in dyn.irun():
-       ...     projected_forces = dyn.get_projected_forces()
+       for _ in dyn.irun():
+           projected_forces = dyn.get_projected_forces()
 
     Example
     -------
