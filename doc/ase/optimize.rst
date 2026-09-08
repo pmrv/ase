@@ -312,24 +312,10 @@ and SciPyFminCG.
 
 BFGSLineSearch
 --------------
-
-.. class:: BFGSLineSearch
-.. class:: QuasiNewton
-
 BFGSLineSearch is the BFGS algorithm with a line search mechanism
 that enforces the step taken fulfills the Wolfe conditions, so that
 the energy and absolute value of the force decrease monotonically. Like
 the LBFGS algorithm the inverse of the Hessian Matrix is updated.
-
-The usage of BFGSLineSearch algorithm is similar to other BFGS type
-algorithms. A typical optimization should look like::
-
-  from ase.optimize.bfgslinesearch import BFGSLineSearch
-  [...]
-  dyn = BFGSLineSearch(atoms=system, trajectory='bfgs_ls.traj', restart='bfgs_ls.pckl')
-
-where the trajectory and the restart save the trajectory of the
-optimization and the information needed to generate the Hessian Matrix.
 
 .. note::
 
@@ -338,6 +324,9 @@ optimization and the information needed to generate the Hessian Matrix.
 
 The BFGSLineSearch algorithm is not compatible with nudged elastic band
 calculations.
+
+.. autoclass:: BFGSLineSearch
+.. autoclass:: QuasiNewton
 
 .. module:: ase.optimize.precon
 
@@ -501,17 +490,25 @@ Basin hopping
 The global optimization algorithm can be used similarly to the other
 optimizers described above as a local optimization algorithm::
 
+  from ase import Atoms
   from ase.optimize import LBFGS
   from ase.optimize.basin import BasinHopping
   from ase.units import kB
-  [...]
+  from ase.calculators.emt import EMT
 
-  bh = BasinHopping(atoms=system,         # the system to optimize
+  system = Atoms(
+          'N2',
+          positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+          calculator=EMT()
+          )
+  dyn = BasinHopping(atoms=system,         # the system to optimize
                     temperature=100 * kB, # 'temperature' to overcome barriers
                     dr=0.5,               # maximal stepwidth
                     optimizer=LBFGS,      # optimizer to find local minima
                     fmax=0.1,             # maximal force for the optimizer
                     )
+  # To run further steps:
+  dyn.run(steps = 2)
 
 Read more about this algorithm here:
 
@@ -548,7 +545,7 @@ is decreased; if it is more than :math:`E_\mathrm{diff}` eV higher it is
 rejected and :math:`E_\mathrm{diff}` is increased. The method is used as::
 
    from ase.optimize.minimahopping import MinimaHopping
-   [...]
+   ...
    opt = MinimaHopping(atoms=system)
    opt(totalsteps=10)
 

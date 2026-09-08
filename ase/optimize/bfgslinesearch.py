@@ -67,6 +67,26 @@ class BFGSLineSearch(Optimizer):
             Extra arguments passed to
             :class:`~ase.optimize.optimize.Optimizer`.
 
+        Examples
+        --------
+
+        >>> from ase import Atoms
+        >>> from ase.optimize.bfgslinesearch import BFGSLineSearch
+        >>> from ase.calculators.emt import EMT
+        ...
+        >>> system = Atoms(
+        ... 'N2',
+        ... positions = [(0.0, 0.0, 0.0), (0.0, 0.0, 1.1)],
+        ... calculator=EMT()
+        ... )
+        >>> dyn = BFGSLineSearch(system)
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS, +NORMALIZE_WHITESPACE
+                        Step[ FC]     Time          Energy          fmax
+        BFGSLineSearch:    0[  0] ...        0.440344       3.2518
+        BFGSLineSearch:    1[  2] ...        0.265703       0.4702
+        BFGSLineSearch:    2[  3] ...        0.262932       0.1103
+        BFGSLineSearch:    3[  4] ...        0.262777       0.0027
+        ...
         """
         if maxstep is None:
             self.maxstep = self.defaults['maxstep']
