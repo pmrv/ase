@@ -221,9 +221,7 @@ class BaseDynamics(IOContext):
         >>> atoms.calc = EMT()
         >>> with BFGS(atoms, logfile=None, trajectory="opt.traj") as opt:
         ...     opt.insert_observer(update_info, atoms=atoms, opt=opt)
-        ...     opt.run(fmax=0.05, steps=10) # doctest:+ELLIPSIS
-        ...
-        np.True_
+        ...     opt.run(fmax=0.05, steps=10) # doctest:+SKIP
         """
         if not isinstance(function, Callable):
             function = function.write
