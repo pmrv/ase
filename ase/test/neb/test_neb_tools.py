@@ -3,9 +3,11 @@
 import numpy as np
 import pytest
 
+import ase.io
 from ase import Atoms
 from ase.calculators.emt import EMT
-from ase.mep.neb import _guess_nimages
+from ase.mep.neb import NEB, NEBTools, _guess_nimages
+from ase.optimize import BFGS
 
 
 @pytest.fixture
@@ -54,3 +56,40 @@ def test_guess_nimages(images: list[Atoms], repetition: int) -> None:
             images_extended.append(atoms)
 
     assert _guess_nimages(images_extended) == number_of_images
+
+
+class _HeavyWeightEMT(EMT):
+    """`EMT` mimicking a heavy-weight calculator.
+
+    A "heavy-weight" calculator does not compute forces when
+    `get_potential_energy` is called.
+    This class mimics such a calculator by removing `forces` from the results.
+    """
+
+    def get_potential_energy(self, *args, **kwargs):
+        # store forces if already computed
+        forces = self.results.pop('forces', None)
+        energy = super().get_potential_energy(*args, **kwargs)
+        # restore the previous forces
+        self.results['forces'] = forces
+        return energy
+
+
+def test_heavy_weight_calculator(tmp_path, images):
+    """Test if `NEBTools` works for heavy-weight calculators.
+
+    This function tests the case where (1) end-point images used heavy-weight
+    calculators that did not compute forces when `get_potential_energy` was
+    called and (2) the computed data are transferred to `SinglePointCalculator`,
+    where the properties cannot be recomputed.
+    """
+    for atoms in images:
+        atoms.calc = _HeavyWeightEMT()
+
+    BFGS(NEB(images)).run(steps=1)
+
+    # write images and then read again to switch to `SinglePointCalculator`
+    ase.io.write(tmp_path / 'tmp.traj', images)
+    images = ase.io.read(tmp_path / 'tmp.traj', index=':')
+
+    NEBTools(images).get_barrier(fit=True)
