@@ -657,8 +657,7 @@ class ASEGUIWindow(MainWindow):
         self.fg = config['gui_foreground_color']
         self.bg = config['gui_background_color']
 
-        # Uncomment if GUI icons become a reality
-        # gui.icons.set_scaling(self.win.tk.call('tk', 'scaling'))
+        gui.icons.set_scaling(self.win.tk.call('tk', 'scaling'))
 
         self.moviebar = MovieToolbar(self.win, gui)
         self.moviebar.tkframe.pack(

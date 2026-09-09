@@ -121,7 +121,7 @@ class MovieToolbar:
         self.graphbutton = add(
             tk.Button(
                 tkframe,
-                text=self.graphbutton_icon,
+                image=self.graphbutton_icon,
                 bd=0,
                 command=self.gui.plot_graph_standard,
             )
@@ -133,7 +133,7 @@ class MovieToolbar:
         self.moviebutton = add(
             tk.Button(
                 tkframe,
-                text=self.moviebutton_icon,
+                image=self.moviebutton_icon,
                 bd=0,
                 command=self.gui.movie,
             )
@@ -158,7 +158,7 @@ class MovieToolbar:
         self.firstbutton = add(
             tk.Button(
                 tkframe,
-                text=self.firstbutton_icon,
+                image=self.firstbutton_icon,
                 bd=0,
                 command=partial(self.click, -1, True),
             )
@@ -167,7 +167,7 @@ class MovieToolbar:
         self.backbutton = add(
             tk.Button(
                 tkframe,
-                text=self.backbutton_icon,
+                image=self.backbutton_icon,
                 bd=0,
                 command=partial(self.click, -1),
             )
@@ -175,20 +175,20 @@ class MovieToolbar:
         self.playbutton_icon = gui.icons['play']
         self.playbutton = add(
             tk.Button(
-                tkframe, text=self.playbutton_icon, bd=0, command=self.play
+                tkframe, image=self.playbutton_icon, bd=0, command=self.play
             )
         )
         self.pausebutton_icon = gui.icons['pause']
         self.pausebutton = add(
             tk.Button(
-                tkframe, text=self.pausebutton_icon, bd=0, command=self.stop
+                tkframe, image=self.pausebutton_icon, bd=0, command=self.stop
             )
         )
         self.forwardbutton_icon = gui.icons['forward']
         self.forwardbutton = add(
             tk.Button(
                 tkframe,
-                text=self.forwardbutton_icon,
+                image=self.forwardbutton_icon,
                 bd=0,
                 command=partial(self.click, 1),
             )
@@ -197,7 +197,7 @@ class MovieToolbar:
         self.lastbutton = add(
             tk.Button(
                 tkframe,
-                text=self.lastbutton_icon,
+                image=self.lastbutton_icon,
                 bd=0,
                 command=partial(self.click, 1, True),
             )
