@@ -565,8 +565,10 @@ class NEB:
                 minimize_rotation_and_translation(images[i - 1], images[i])
 
         if self.method != 'aseneb':
-            energies[0] = images[0].get_potential_energy()
-            energies[-1] = images[-1].get_potential_energy()
+            for i in (0, -1):
+                # Call `get_forces` to store forces needed by `NEBTools`.
+                real_forces[i] = images[i].get_forces(apply_constraint=False)
+                energies[i] = images[i].get_potential_energy()
 
         if not self.parallel:
             # Do all images - one at a time:
