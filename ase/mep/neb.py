@@ -11,7 +11,7 @@ from scipy.interpolate import CubicSpline
 
 import ase.parallel
 from ase.build import minimize_rotation_and_translation
-from ase.calculators.calculator import Calculator
+from ase.calculators.calculator import Calculator, compare_atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.geometry import find_mic
 from ase.optimize import MDMin
@@ -1279,7 +1279,7 @@ class NEBTools:
         from matplotlib.backends.backend_pdf import PdfPages
 
         if nimages is None:
-            nimages = self._guess_nimages()
+            nimages = _guess_nimages(self.images)
         nebsteps = len(self.images) // nimages
         if constant_x or constant_y:
             sys.stdout.write('Scaling axes.\n')
@@ -1309,45 +1309,18 @@ class NEBTools:
                 pyplot.close(fig)  # Reference counting "bug" in pyplot.
         sys.stdout.write('\n')
 
-    def _guess_nimages(self):
-        """Attempts to guess the number of images per band from
-        a trajectory, based on the repetition of the potential
-        energy and atomic positions of images. This should also
-        work for symmetric cases."""
-        e_first = self.images[0].get_potential_energy()
-        positions_first = self.images[0].get_positions()
-        nimages = None
-        for index, image in enumerate(self.images[1:], start=1):
-            e = image.get_potential_energy()
-            positions = image.get_positions()
-            if e == e_first and (positions == positions_first).all():
-                # Need to check for symmetric case when e_first = e_last.
-                try:
-                    e_next = self.images[index + 1].get_potential_energy()
-                    positions_next = self.images[index + 1].get_positions()
-                except IndexError:
-                    pass
-                else:
-                    if e_next == e_first and (positions_next == positions_first).all():
-                        nimages = index + 1  # Symmetric
-                        break
-                nimages = index  # Normal
-                print(nimages)
-                break
-        if nimages is None:
-            sys.stdout.write('Appears to be only one band in the images.\n')
-            return len(self.images)
-        # Sanity check that the energies of the last images line up too.
-        e_last = self.images[nimages - 1].get_potential_energy()
-        positions_last = self.images[nimages - 1].get_positions()
-        e_nextlast = self.images[2 * nimages - 1].get_potential_energy()
-        positions_nextlast = self.images[2 * nimages - 1].get_positions()
-        if not (e_last == e_nextlast and (positions_last == positions_nextlast).all()):
-            raise RuntimeError('Could not guess number of images per band.')
-        sys.stdout.write(
-            'Number of images per band guessed to be {:d}.\n'.format(nimages)
-        )
-        return nimages
+
+def _guess_nimages(images: list[ase.Atoms]) -> int:
+    """Guess the number of images per band from a trajectory.
+
+    The guess is based on the (reasonable) assumption that the image at the
+    first end point does not change during the NEB simulation.
+    The function should also work for symmetric cases and for single-band cases.
+    """
+    for index, atoms in enumerate(images[1:], start=1):
+        if not compare_atoms(atoms, images[0]):
+            return index
+    return len(images)  # only one band in the trajectory
 
 
 class NEBtools(NEBTools):
