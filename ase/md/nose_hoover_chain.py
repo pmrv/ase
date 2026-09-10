@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 from scipy.special import exprel
 
 import ase.units
@@ -613,7 +614,7 @@ class MTKNPT(MolecularDynamics):
         self._init_cell_momenta()
 
     @property
-    def mask(self) -> tuple[bool, bool, bool] | None:
+    def mask(self) -> npt.NDArray[np.bool_] | None:
         return None
 
     @mask.setter
@@ -765,15 +766,15 @@ class MaskedMTKNPT(MTKNPT):
         self._p_c = np.zeros(3)  # Cell momenta for axis
 
     @property
-    def mask(self) -> np.ndarray:
+    def mask(self) -> npt.NDArray[np.bool_]:
         return self._mask
 
     @mask.setter
     def mask(self, mask: tuple[bool, bool, bool]) -> None:
-        mask = np.asarray(mask, dtype=bool)
-        if mask.shape != (3,):
+        _mask = np.asarray(mask, dtype=bool)
+        if _mask.shape != (3,):
             raise ValueError('mask must contain exactly three booleans')
-        self._mask = mask
+        self._mask = _mask
 
     @property
     def _p_g(self) -> np.ndarray:
@@ -824,7 +825,7 @@ class MTKBarostat:
         pdamp: float,
         pchain: int = 3,
         ploop: int = 1,
-        mask: tuple[bool, bool, bool] | None = None,
+        mask: npt.NDArray[np.bool_] | tuple[bool, bool, bool] | None = None,
     ):
         self._num_atoms_global = num_atoms_global
         self._pdamp = pdamp

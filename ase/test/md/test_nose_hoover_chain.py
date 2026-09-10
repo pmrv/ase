@@ -8,7 +8,6 @@ import pytest
 import ase.build
 import ase.units
 from ase import Atoms
-from ase.calculators.emt import EMT
 from ase.constraints import FixAtoms, FixBondLengths, FixConstraint
 from ase.md import thermalize_momenta
 from ase.md.nose_hoover_chain import (
