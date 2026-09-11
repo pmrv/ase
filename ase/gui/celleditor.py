@@ -121,7 +121,14 @@ class CellEditor:
 
         newcell = atoms.cell.copy()
         for i in range(3):
-            newcell[i] *= new_mags[i] / old_mags[i]
+            if old_mags[i]:
+                newcell[i] *= new_mags[i] / old_mags[i]
+            else:
+                from ase.gui.ui import showwarning
+                showwarning(
+                    _('Null vector'),
+                    _("Can't change the magnitude of a null vector")
+                )
 
         atoms.set_cell(newcell,
                        scale_atoms=self.scale_atoms.var.get())
