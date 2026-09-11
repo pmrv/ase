@@ -305,15 +305,15 @@ class NEBOptimizable(Optimizable):
 class NEB:
     def __init__(
         self,
-        images,
-        k=0.1,
-        climb=False,
-        parallel=False,
-        remove_rotation_and_translation=False,
+        images: list[ase.Atoms],
+        k: float | list[float] = 0.1,
+        climb: bool = False,
+        parallel: bool = False,
+        remove_rotation_and_translation: bool = False,
         world=None,
-        method=None,
-        allow_shared_calculator=False,
-        precon=None,
+        method: str | None = None,
+        allow_shared_calculator: bool = False,
+        precon: str | None = None,
     ):
         """Nudged elastic band.
 
