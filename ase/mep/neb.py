@@ -1,9 +1,9 @@
 import sys
-import threading
 import time
 import warnings
 from abc import ABC, abstractmethod
 from functools import cached_property
+from threading import Thread
 
 import numpy as np
 import numpy.typing as npt
@@ -664,22 +664,13 @@ class NEB:
     ) -> None:
         images = self.images
 
-        def run(image, energies, forces, real_forces):
-            forces[:] = image.get_forces()
-            energies[:] = image.get_potential_energy()
-            real_forces[:] = image.get_forces(apply_constraint=False)
+        def run(i: int) -> None:
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            real_forces[i] = images[i].get_forces(apply_constraint=False)
 
         threads = [
-            threading.Thread(
-                target=run,
-                args=(
-                    images[i],
-                    energies[i : i + 1],
-                    forces[i - 1 : i],
-                    real_forces[i : i + 1],
-                ),
-            )
-            for i in range(1, self.nimages - 1)
+            Thread(target=run, args=(i,)) for i in range(1, self.nimages - 1)
         ]
         for thread in threads:
             thread.start()
