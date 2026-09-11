@@ -117,8 +117,6 @@ class Widget:
     def pack(self, parent, side='top', anchor='center'):
         widget = self.create(parent)
         widget.pack(side=side, anchor=anchor)
-        if not isinstance(self, (Rows, RadioButtons)):
-            pass
 
     def grid(self, parent):
         widget = self.create(parent)
