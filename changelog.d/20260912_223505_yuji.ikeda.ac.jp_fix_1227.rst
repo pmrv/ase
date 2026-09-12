@@ -1,0 +1,6 @@
+Bugfixes
+--------
+
+- Fixed :class:`~ase.mep.neb.NEB` so that it stores computed properties other
+  than `energy` and `forces` for intermediate images in the trajectory file
+  (:mr:`4263`)
