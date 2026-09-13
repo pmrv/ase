@@ -78,7 +78,7 @@ def set_m_constr(atoms, lnoncollinear, m_constr, sorting):
     return mag_dict
 
 
-def compactify_maglst(magmom):
+def _compactify_magmom_list(magmom):
     lst = [[1, magmom[0]]]
     for n in range(1, len(magmom)):
         if magmom[n] == magmom[n - 1]:
@@ -128,7 +128,7 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
     else:
         return spinpol, {}
     # Compactify the magmom list to symbol order
-    line = compactify_maglst(magmom)
+    line = _compactify_magmom_list(magmom)
     magmom_dct['magmom'] = line
     return spinpol, magmom_dct
 
