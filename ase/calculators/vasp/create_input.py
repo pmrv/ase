@@ -36,7 +36,7 @@ import numpy as np
 
 import ase
 from ase import Atoms
-from ase.calculators.calculator import kpts2ndarray
+from ase.calculators.calculator import kpts2ndarray, InputError
 from ase.calculators.vasp.setups import get_default_setups
 from ase.config import cfg
 from ase.io.vasp_parsers.incar_writer import write_incar
@@ -66,6 +66,10 @@ def set_m_constr(atoms, lnoncollinear, m_constr, sorting):
 
     m_constr = np.array(m_constr)
     if m_constr.shape != (len(atoms), 3):
+        raise InputError(
+    f"Expected m_constr tag to be of shape ({len(atoms)}, 3), "
+    f"i.e, 1 vector per atom, "
+    f"but got {m_constr.shape}"
     )
 
     m_constr = m_constr[sorting].flatten()
