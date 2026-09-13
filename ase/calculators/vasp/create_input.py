@@ -59,7 +59,7 @@ def check_ichain(ichain, ediffg, iopt):
     return ichain_dct
 
 
-def set_constr(atoms, lnoncollinear, magmom, sorting):
+def set_m_constr(atoms, lnoncollinear, magmom, sorting):
     mag_dict = {}
     if not lnoncollinear or magmom is None:
         return {}
@@ -1829,7 +1829,7 @@ class GenerateVaspInput:
         incar_params.update(magmom_dct)
 
         # set non-llinear magmoms m_constr.
-        magm_constr_dct = set_constr(
+        magm_constr_dct = set_m_constr(
             atoms=atoms,
             lnoncollinear=self.bool_params.get("lnoncollinear", False),
             magmom=float_dct.get("m_constr", None),
