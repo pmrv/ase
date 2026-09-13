@@ -59,19 +59,17 @@ def check_ichain(ichain, ediffg, iopt):
     return ichain_dct
 
 
-def set_m_constr(atoms, lnoncollinear, magmom, sorting):
+def set_m_constr(atoms, lnoncollinear, m_constr, sorting):
     mag_dict = {}
-    if not lnoncollinear or magmom is None:
+    if not lnoncollinear or m_constr is None:
         return {}
 
-    magmom = np.array(magmom)
-    assert magmom.shape == (len(atoms), 3), (
-    f"magmoms must have shape ({len(atoms)}, 3), "
-    f"but got {magmom.shape}"
+    m_constr = np.array(m_constr)
+    if m_constr.shape != (len(atoms), 3):
     )
 
-    magmom = magmom[sorting].flatten()
-    line = compactify_maglst(magmom)
+    m_constr = m_constr[sorting].flatten()
+    line = _compactify_magmom_list(m_constr)
     mag_dict['m_constr'] = line
     return mag_dict
 
@@ -1832,7 +1830,7 @@ class GenerateVaspInput:
         magm_constr_dct = set_m_constr(
             atoms=atoms,
             lnoncollinear=self.bool_params.get("lnoncollinear", False),
-            magmom=float_dct.get("m_constr", None),
+            m_constr=float_dct.get("m_constr", None),
             sorting=self.sort,
         )
         incar_params.update(magm_constr_dct)
