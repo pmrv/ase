@@ -168,11 +168,25 @@ class TestReadMagneticMoments:
         'tot          0.026   0.014   0.659  13.755  14.454\n',
     ]
 
+    # non-collinear magnetic moments
+    # using lines_spd for Fe from above in all three directions
+    lines_spd_3d_mag = lines_spd.copy()
+    lines_spd_3d_mag += ['\n', '\n', '\n']
+
+    lines_y = lines_spd.copy()
+    lines_y[0] = ' magnetization (y)\n'
+    lines_spd_3d_mag += lines_y + ['\n', '\n', '\n']
+
+    lines_z = lines_spd.copy()
+    lines_z[0] = ' magnetization (z)\n'
+    lines_spd_3d_mag += lines_z
+
     @pytest.mark.parametrize(
         'lines, magmoms_ref',
         (
             (lines_spd, (2.315, 2.315)),
             (lines_spdf, (7.227, 7.227)),
+            (lines_spd_3d_mag, ((2.315, 2.315, 2.315), (2.315, 2.315, 2.315))),
         ),
     )
     def test(self, lines, magmoms_ref):
