@@ -95,3 +95,11 @@ def test_dict_key(
     parameters = {'ldau_luj': {'H': {'L': 2, 'U': 4.0, 'J': 0.0}}}
     expected_output = 'LDAU = .TRUE.\nLDAUL = 2\nLDAUU = 4.000\nLDAUJ = 0.000\n'
     check_written_incar(parameters, expected_output, vaspinput_factory, tmpdir)
+
+def test_m_constr_key(
+        vaspinput_factory, tmpdir
+):
+    parameters = {"m_constr": [[0.0, 0.0, 1.5], [ 1.5, 0.0, 0.0]],
+                  "lnoncollinear": True}
+    expected_output = 'M_CONSTR = 2*0.0000 2*1.5000 2*0.0000\nLNONCOLLINEAR = .TRUE.\n'
+    check_written_incar(parameters, expected_output, vaspinput_factory, tmpdir)
