@@ -36,7 +36,7 @@ import numpy as np
 
 import ase
 from ase import Atoms
-from ase.calculators.calculator import kpts2ndarray, InputError
+from ase.calculators.calculator import InputError, kpts2ndarray
 from ase.calculators.vasp.setups import get_default_setups
 from ase.config import cfg
 from ase.io.vasp_parsers.incar_writer import write_incar

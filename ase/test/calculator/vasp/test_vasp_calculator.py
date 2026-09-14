@@ -186,8 +186,7 @@ class TestReadMagneticMoments:
         (
             (lines_spd, (2.315, 2.315)),
             (lines_spdf, (7.227, 7.227)),
-            (lines_spd_3d_mag, [[2.315, 2.315, 2.315,],
-                                [2.315, 2.315, 2.315]]),
+            (lines_spd_3d_mag, ((2.315, 2.315, 2.315), (2.315, 2.315, 2.315))),
         ),
     )
     def test(self, lines, magmoms_ref):
