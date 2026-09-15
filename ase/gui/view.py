@@ -118,6 +118,8 @@ class View:
             self.b1 = 3
             self.b3 = 1
 
+        self.t0 = 0
+
     @property
     def atoms(self):
         return self.images[self.frame]
