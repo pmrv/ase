@@ -1,11 +1,12 @@
 import sys
-import threading
 import time
 import warnings
 from abc import ABC, abstractmethod
 from functools import cached_property
+from threading import Thread
 
 import numpy as np
+import numpy.typing as npt
 from scipy.integrate import cumulative_trapezoid
 from scipy.interpolate import CubicSpline
 
@@ -304,15 +305,15 @@ class NEBOptimizable(Optimizable):
 class NEB:
     def __init__(
         self,
-        images,
-        k=0.1,
-        climb=False,
-        parallel=False,
-        remove_rotation_and_translation=False,
+        images: list[ase.Atoms],
+        k: float | list[float] = 0.1,
+        climb: bool = False,
+        parallel: bool = False,
+        remove_rotation_and_translation: bool = False,
         world=None,
-        method=None,
-        allow_shared_calculator=False,
-        precon=None,
+        method: str | None = None,
+        allow_shared_calculator: bool = False,
+        precon: str | None = None,
     ):
         """Nudged elastic band.
 
@@ -570,57 +571,7 @@ class NEB:
                 real_forces[i] = images[i].get_forces(apply_constraint=False)
                 energies[i] = images[i].get_potential_energy()
 
-        if not self.parallel:
-            # Do all images - one at a time:
-            for i in range(1, self.nimages - 1):
-                forces[i - 1] = images[i].get_forces()
-                energies[i] = images[i].get_potential_energy()
-                real_forces[i] = images[i].get_forces(apply_constraint=False)
-
-        elif self.world.size == 1:
-
-            def run(image, energies, forces, real_forces):
-                forces[:] = image.get_forces()
-                energies[:] = image.get_potential_energy()
-                real_forces[:] = image.get_forces(apply_constraint=False)
-
-            threads = [
-                threading.Thread(
-                    target=run,
-                    args=(
-                        images[i],
-                        energies[i : i + 1],
-                        forces[i - 1 : i],
-                        real_forces[i : i + 1],
-                    ),
-                )
-                for i in range(1, self.nimages - 1)
-            ]
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-        else:
-            # Parallelize over images:
-            i = self.world.rank * (self.nimages - 2) // self.world.size + 1
-            try:
-                forces[i - 1] = images[i].get_forces()
-                energies[i] = images[i].get_potential_energy()
-                real_forces[i] = images[i].get_forces(apply_constraint=False)
-            except Exception:
-                # Make sure other images also fail:
-                error = self.world.sum(1.0)
-                raise
-            else:
-                error = self.world.sum(0.0)
-                if error:
-                    raise RuntimeError('Parallel NEB failed!')
-
-            for i in range(1, self.nimages - 1):
-                root = (i - 1) * self.world.size // (self.nimages - 2)
-                self.world.broadcast(energies[i : i + 1], root)
-                self.world.broadcast(forces[i - 1], root)
-                self.world.broadcast(real_forces[i], root)
+        self._evaluate_images(energies, forces, real_forces)
 
         # if this is the first force call, we need to build the preconditioners
         if self.precon is None or isinstance(self.precon, (str, Precon, list)):
@@ -680,6 +631,81 @@ class NEB:
             spring1 = spring2
 
         return precon_forces.reshape((-1, 3))
+
+    def _evaluate_images(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        real_forces: npt.NDArray[np.float64],
+    ) -> None:
+        if not self.parallel:
+            self._evaluate_images_serial(energies, forces, real_forces)
+        elif self.world.size == 1:
+            self._evaluate_images_threaded(energies, forces, real_forces)
+        else:
+            self._evaluate_images_mpi(energies, forces, real_forces)
+
+    def _evaluate_images_serial(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        real_forces: npt.NDArray[np.float64],
+    ) -> None:
+        images = self.images
+        # Do all images - one at a time:
+        for i in range(1, self.nimages - 1):
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            real_forces[i] = images[i].get_forces(apply_constraint=False)
+
+    def _evaluate_images_threaded(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        real_forces: npt.NDArray[np.float64],
+    ) -> None:
+        images = self.images
+
+        def run(i: int) -> None:
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            real_forces[i] = images[i].get_forces(apply_constraint=False)
+
+        threads = [
+            Thread(target=run, args=(i,)) for i in range(1, self.nimages - 1)
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+    def _evaluate_images_mpi(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        real_forces: npt.NDArray[np.float64],
+    ) -> None:
+        images = self.images
+        # Parallelize over images:
+        i = self.world.rank * (self.nimages - 2) // self.world.size + 1
+        try:
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            real_forces[i] = images[i].get_forces(apply_constraint=False)
+        except Exception:
+            # Make sure other images also fail:
+            error = self.world.sum(1.0)
+            raise
+        else:
+            error = self.world.sum(0.0)
+            if error:
+                raise RuntimeError('Parallel NEB failed!')
+
+        for i in range(1, self.nimages - 1):
+            root = (i - 1) * self.world.size // (self.nimages - 2)
+            self.world.broadcast(energies[i : i + 1], root)
+            self.world.broadcast(forces[i - 1], root)
+            self.world.broadcast(real_forces[i], root)
 
     def get_residual(self):
         """Return residual force along the band.
