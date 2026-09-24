@@ -36,7 +36,7 @@ import numpy as np
 
 import ase
 from ase import Atoms
-from ase.calculators.calculator import kpts2ndarray
+from ase.calculators.calculator import InputError, kpts2ndarray
 from ase.calculators.vasp.setups import get_default_setups
 from ase.config import cfg
 from ase.io.vasp_parsers.incar_writer import write_incar
@@ -59,7 +59,38 @@ def check_ichain(ichain, ediffg, iopt):
     return ichain_dct
 
 
-def set_magmom(ispin, spinpol, atoms, magmom_input, sorting):
+def set_m_constr(atoms, lnoncollinear, m_constr, sorting):
+    mag_dict = {}
+    if not lnoncollinear or m_constr is None:
+        return {}
+
+    m_constr = np.array(m_constr)
+    if m_constr.shape != (len(atoms), 3):
+        raise InputError(
+    f"Expected m_constr tag to be of shape ({len(atoms)}, 3), "
+    f"i.e, 1 vector per atom, "
+    f"but got {m_constr.shape}"
+    )
+
+    m_constr = m_constr[sorting].flatten()
+    line = _compactify_magmom_list(m_constr)
+    mag_dict['m_constr'] = line
+    return mag_dict
+
+
+def _compactify_magmom_list(magmom):
+    lst = [[1, magmom[0]]]
+    for n in range(1, len(magmom)):
+        if magmom[n] == magmom[n - 1]:
+            lst[-1][0] += 1
+        else:
+            lst.append([1, magmom[n]])
+    line = ' '.join(['{:d}*{:.4f}'.format(mom[0], mom[1])
+                     for mom in lst])
+    return line
+
+
+def set_magmom(ispin, spinpol, atoms, magmom_input, sorting, lnoncollinear):
     """Helps to set the magmom tag in the INCAR file with correct formatting"""
     magmom_dct = {}
     if magmom_input is not None:
@@ -71,17 +102,23 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting):
 
             # Check if user remembered to specify ispin
             # note: we do not overwrite ispin if ispin=1
-        if not ispin:
+            # do not change ispin if lnoncollinear has been set by the user.
+            # vasp ispin and lnoncollinear do not go together.
+        if not ispin and not lnoncollinear:
             spinpol = True
             # note that ispin is an int key, but for the INCAR it does not
             # matter
             magmom_dct['ispin'] = 2
         magmom = np.array(magmom_input)
         magmom = magmom[sorting]
-    elif (spinpol and atoms.get_initial_magnetic_moments().any()):
-        # We don't want to write magmoms if they are all 0.
+
+        if magmom.ndim > 1:
+            magmom = magmom.flatten()
+
+    elif spinpol:  # and atoms.get_initial_magnetic_moments().any()):
+        # We will write the magnetic moments even if they are zero.
         # but we could still be doing a spinpol calculation
-        if not ispin:
+        if not ispin and not lnoncollinear:
             magmom_dct['ispin'] = 2
         # Write out initial magnetic moments
         magmom = atoms.get_initial_magnetic_moments()[sorting]
@@ -91,14 +128,7 @@ def set_magmom(ispin, spinpol, atoms, magmom_input, sorting):
     else:
         return spinpol, {}
     # Compactify the magmom list to symbol order
-    lst = [[1, magmom[0]]]
-    for n in range(1, len(magmom)):
-        if magmom[n] == magmom[n - 1]:
-            lst[-1][0] += 1
-        else:
-            lst.append([1, magmom[n]])
-    line = ' '.join(['{:d}*{:.4f}'.format(mom[0], mom[1])
-                     for mom in lst])
+    line = _compactify_magmom_list(magmom)
     magmom_dct['magmom'] = line
     return spinpol, magmom_dct
 
@@ -1795,9 +1825,19 @@ class GenerateVaspInput:
             spinpol=self.spinpol,
             magmom_input=float_dct.get('magmom', None),
             sorting=self.sort,
+            lnoncollinear=self.bool_params.get("lnoncollinear", False),
         )
         self.spinpol = spinpol
         incar_params.update(magmom_dct)
+
+        # set non-llinear magmoms m_constr.
+        magm_constr_dct = set_m_constr(
+            atoms=atoms,
+            lnoncollinear=self.bool_params.get("lnoncollinear", False),
+            m_constr=float_dct.get("m_constr", None),
+            sorting=self.sort,
+        )
+        incar_params.update(magm_constr_dct)
 
         # Custom key-value pairs, which receive no formatting
         # Use the comment "# <Custom ASE key>" to denote such

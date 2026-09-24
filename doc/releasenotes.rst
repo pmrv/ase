@@ -385,7 +385,8 @@ Algorithms:
   convergence status *after* logging and dumping for the corresponding step
   (:issue:`1339`; :mr:`3072`)
 
-* :class:`ExpCellFilter` is deprecated. Use :class:`FrechetCellFilter` instead.
+* :class:`~ase.filters.ExpCellFilter` is deprecated.
+  Use :class:`~ase.filters.FrechetCellFilter` instead.
   (:mr:`2981`)
 
 * Fix inconsistency of ``mask`` in :class:`FixCartesian` between the argument
@@ -1426,13 +1427,15 @@ Algorithms:
   <https://gpaw.readthedocs.io/devel/ase_optimize/ase_optimize.html>`_.
 
 * New filter for lattice optimization,
-  :class:`~ase.constraints.ExpCellFilter`, based on an exponential
+  :class:`~ase.filters.ExpCellFilter`, based on an exponential
   reformulation of the degrees of freedom pertaining to the cell.
   This is probably significantly faster than
-  :class:`~ase.constraints.UnitCellFilter`.
+  :class:`~ase.filters.UnitCellFilter`.
+  (:mr:`794`)
 
-* :class:`~ase.constraints.UnitCellFilter` now supports scalar pressure and
+* :class:`~ase.filters.UnitCellFilter` now supports scalar pressure and
   hydrostatic strain.
+  (:mr:`255`, :mr:`261`)
 
 * Compare if two bulk structure are symmetrically equivalent with
   :class:`~ase.utils.structure_comparator.SymmetryEquivalenceCheck`.

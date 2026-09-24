@@ -325,6 +325,7 @@ def test_surface(gui):
 
 
 def test_movie(animation):
+    animation.movie()
     movie = animation.movie_window
     assert movie is not None
 
@@ -582,6 +583,8 @@ def runcallbacks(win):
 def test_callbacks(display):
     win = window()
     win.win.after_idle(runcallbacks)
+    # We have created an illicit instance of tk.Tk so we must destroy it:
+    win.win.destroy()
 
 
 def test_atoms_editor_set_values(gui, atoms):

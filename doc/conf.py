@@ -42,10 +42,13 @@ nitpick_ignore = [
 ]
 sphinx_gallery_conf = {
     'filename_pattern': r'/*\.py',
-    'ignore_pattern': r'/*prerequisites\.py',
+    'ignore_pattern': (
+        r'(/*prerequisites\.py)|'
+        r'(/*qmmm.py)'  # New GPAW removes .embed() causing this to crash
+    ),
     # "copyfile_regex": r".*\.(xyz|dat)",
-    'examples_dirs': ['../examples'],
-    'gallery_dirs': ['examples_generated'],
+    'examples_dirs': ['../examples/tutorials', '../examples/howtos'],
+    'gallery_dirs': ['examples_generated', 'howtos_generated'],
     'min_reported_time': 60,
     'reference_url': {'ase': None},
     'remove_config_comments': True,
@@ -81,7 +84,7 @@ latex_documents = [
 
 intersphinx_mapping = {
     'gpaw': ('https://gpaw.readthedocs.io', None),
-    'python': ('https://docs.python.org/3.10', None),
+    'python': ('https://docs.python.org/3.11', None),
 }
 
 # Avoid GUI windows during doctest:

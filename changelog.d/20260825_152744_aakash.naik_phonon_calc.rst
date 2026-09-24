@@ -1,0 +1,7 @@
+Documentation
+-------------
+
+- :class:`~ase.phonons.Phonons` (the doc-string example changed to use EMT).
+- Moved the phonon bandstructure and dos example from docs under `examples/tutorials/03-tutorials/phonons.py`
+- Fixed doc-strings formatting issues of :class:`~ase.phonons.Phonons.read_born_charges` and :class:`~ase.phonons.Phonons.write_modes`
+- Removed redundant example codeblock under :class:`~ase.phonons.Phonons.get_band_structure`

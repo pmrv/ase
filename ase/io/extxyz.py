@@ -730,7 +730,10 @@ def read_xyz(fileobj, index=-1, properties_parser=key_val_str_to_dict):
         frame_pos, natoms, nvec = frames[index]
         fileobj.seek(frame_pos)
         # check for consistency with frame index table
-        assert int(fileobj.readline()) == natoms
+        frame_natoms = int(fileobj.readline())
+        if frame_natoms != natoms:
+            msg = f"ase.io.extxyz: Frame has {frame_natoms}, expected {natoms}"
+            raise XYZError(msg)
         yield _read_xyz_frame(fileobj, natoms, properties_parser, nvec)
 
 
