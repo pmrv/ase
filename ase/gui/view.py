@@ -715,6 +715,8 @@ class View:
         self.center0 = self.center
 
     def move(self, event):
+        from ase.gui.ui import UNCACHED_PRIMITIVES_TAG
+
         x = event.x
         y = event.y
         x0, y0 = self.xy
@@ -722,7 +724,8 @@ class View:
             x0 = int(round(x0))
             y0 = int(round(y0))
             self.draw()
-            self.window.canvas.create_rectangle((x, y, x0, y0))
+            self.window.canvas.create_rectangle(
+                (x, y, x0, y0), tags=UNCACHED_PRIMITIVES_TAG)
             return
 
         if event.modifier == 'shift':
