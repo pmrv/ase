@@ -14,6 +14,7 @@ from ase.gui.i18n import _, ngettext
 from ase.gui.render import Render
 from ase.gui.repeat import Repeat
 from ase.gui.rotate import Rotate
+from ase.gui.ui import UNCACHED_PRIMITIVES_TAG
 from ase.gui.utils import get_magmoms
 from ase.utils import rotate
 
@@ -721,7 +722,7 @@ class View:
             y0 = int(round(y0))
             self.draw()
             self.window.canvas.create_rectangle(
-                (x, y, x0, y0), tags='_ase_transient')
+                (x, y, x0, y0), tags=UNCACHED_PRIMITIVES_TAG)
             return
 
         if event.modifier == 'shift':

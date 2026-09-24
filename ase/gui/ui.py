@@ -22,6 +22,10 @@ __all__ = [
     'Window', 'Tooltip', 'MenuItem', 'RadioButton', 'RadioButtons', 'Rows',
     'Scale', 'showinfo', 'showwarning', 'SpinBox', 'Text']
 
+# Shapes with this tag, specifically the selection box while dragging, are
+# cleared more eagerly than retained atoms, bonds, and labels.
+UNCACHED_PRIMITIVES_TAG = '_ase_transient'
+
 
 def error(title, message=None):
     if message is None:
@@ -706,14 +710,15 @@ class ASEGUIWindow(MainWindow):
         """Start a new retained-mode canvas frame.
 
         Items are reused by primitive type instead of deleting and recreating
-        the entire canvas for every redraw.  This matters especially over X11,
-        where creating each canvas object is expensive.  A later frame may use
-        a different number of atoms, bonds, or labels: unused pooled items are
-        hidden in update(), and pools grow when more are needed.
+        the entire canvas for every redraw.  This matters especially over X11
+        network connections, where creating each canvas object is expensive.
+        A render frame may use a different number of atoms, bonds, or labels:
+        unused pooled items are hidden in update(), and pools grow when more
+        are needed.
         """
         for kind in self._canvas_pool_indices:
             self._canvas_pool_indices[kind] = 0
-        self.canvas.delete('_ase_transient')
+        self.canvas.delete(UNCACHED_PRIMITIVES_TAG)
 
     def update(self):
         for kind, pool in self._canvas_pools.items():
@@ -733,20 +738,21 @@ class ASEGUIWindow(MainWindow):
         if index == len(pool):
             creator = getattr(self.canvas, f'create_{kind}')
             item = {
-                'id': creator(*coords, **options),
-                'options': options,
+                'id': creator(*([0] * len(coords))),
+                'options': {},
                 'visible': True,
             }
             pool.append(item)
         else:
             item = pool[index]
-            self.canvas.coords(item['id'], *coords)
-            if item['options'] != options:
-                self.canvas.itemconfigure(item['id'], **options)
-                item['options'] = options
             if not item['visible']:
                 self.canvas.itemconfigure(item['id'], state=tk.NORMAL)
                 item['visible'] = True
+
+        self.canvas.coords(item['id'], *coords)
+        if item['options'] != options:
+            self.canvas.itemconfigure(item['id'], **options)
+            item['options'] = options
 
         # View.draw() emits primitives in depth order.  Reestablish that order
         # even though the underlying Tk item was created in an earlier frame.
