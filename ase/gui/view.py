@@ -14,7 +14,6 @@ from ase.gui.i18n import _, ngettext
 from ase.gui.render import Render
 from ase.gui.repeat import Repeat
 from ase.gui.rotate import Rotate
-from ase.gui.ui import UNCACHED_PRIMITIVES_TAG
 from ase.gui.utils import get_magmoms
 from ase.utils import rotate
 
@@ -716,6 +715,8 @@ class View:
         self.center0 = self.center
 
     def move(self, event):
+        from ase.gui.ui import UNCACHED_PRIMITIVES_TAG
+
         x = event.x
         y = event.y
         x0, y0 = self.xy
