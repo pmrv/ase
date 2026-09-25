@@ -829,73 +829,54 @@ class NEB:
 class DyNEB(NEB):
     def __init__(
         self,
-        images,
-        k=0.1,
-        fmax=0.05,
-        climb=False,
-        parallel=False,
-        remove_rotation_and_translation=False,
-        world=None,
-        dynamic_relaxation=True,
-        scale_fmax=0.0,
-        method=None,
-        allow_shared_calculator=False,
-        precon=None,
-    ):
-        """
-        Subclass of NEB that allows for scaled and dynamic optimizations of
-        images. This method, which only works in series, does not perform
+        *args,
+        fmax: float = 0.05,
+        scale_fmax: float = 0.0,
+        **kwargs,
+    ) -> None:
+        r"""Subclass of :class:`~ase.mep.neb.NEB` that allows for scaled and
+        dynamic optimizations of images [Lindgren2019]_.
+
+        This method does not perform
         force calls on images that are below the convergence criterion.
         The convergence criteria can be scaled with a displacement metric
         to focus the optimization on the saddle point region.
 
-        'Scaled and Dynamic Optimizations of Nudged Elastic Bands',
-        P. Lindgren, G. Kastlunger and A. A. Peterson,
-        J. Chem. Theory Comput. 15, 11, 5787-5793 (2019).
+        .. [Lindgren2019]
+            P. Lindgren, G. Kastlunger and A. A. Peterson,
+            Scaled and Dynamic Optimizations of Nudged Elastic Bands,
+            J. Chem. Theory Comput. 15, 11, 5787-5793 (2019).
+            :doi:`10.1021/acs.jctc.9b00633`
 
         Parameters
         ----------
-        dynamic_relaxation: bool
-            True skips images with forces below the convergence criterion.
-            This is updated after each force call; if a previously converged
-            image goes out of tolerance (due to spring adjustments between
-            the image and its neighbors), it will be optimized again.
-            False reverts to the default NEB implementation.
-
-        fmax: float
-            Must be identical to the fmax of the optimizer.
-
-        scale_fmax: float
+        fmax : float, default: 0.05
+            Reference force convergence criterion.
+            This must be identical to the `fmax` of the optimizer.
+        scale_fmax : float, default: 0.0
             Scale convergence criteria along band based on the distance between
             an image and the image with the highest potential energy. This
             keyword determines how rapidly the convergence criteria are scaled.
+            :math:`\alpha_\mathrm{s}` in Eq. (2) in [Lindgren2019]_.
+        *args, **kwargs
+            Additional arguments passed to :class:`~ase.mep.neb.NEB`.
+
+        Notes
+        -----
+        :class:`DyNEB` only works in series.
+
+        .. versionremoved :: 3.30.0
+
+            The `dynamic_relaxation` argument is removed.
+            This class now always performs DyNEB [Lindgren2019]_.
+
         """
-        super().__init__(
-            images,
-            k=k,
-            climb=climb,
-            parallel=parallel,
-            remove_rotation_and_translation=remove_rotation_and_translation,
-            world=world,
-            method=method,
-            allow_shared_calculator=allow_shared_calculator,
-            precon=precon,
-        )
+        super().__init__(*args, **kwargs)
         self.fmax = fmax
-        self.dynamic_relaxation = dynamic_relaxation
         self.scale_fmax = scale_fmax
 
-        if not self.dynamic_relaxation and self.scale_fmax:
-            msg = (
-                'Scaled convergence criteria only implemented in series '
-                'with dynamic relaxation.'
-            )
-            raise ValueError(msg)
-
     def set_positions(self, positions):
-        if not self.dynamic_relaxation:
-            return super().set_positions(positions)
-
+        """Update atomic positions but only for unconverged images."""
         n1 = 0
         for i, image in enumerate(self.images[1:-1]):
             if self.parallel:
@@ -905,18 +886,20 @@ class DyNEB(NEB):
                     'routine for freezing images in parallel.'
                 )
                 raise ValueError(msg)
-            else:
-                forces_dyn = self._fmax_all(self.images)
-                if forces_dyn[i] < self.fmax:
-                    n1 += self.natoms
-                else:
-                    n2 = n1 + self.natoms
-                    image.set_positions(positions[n1:n2])
-                    n1 = n2
 
-    def _fmax_all(self, images):
-        """Store maximum force acting on each image in list. This is used in
-        the dynamic optimization routine in the set_positions() function."""
+            forces_dyn = self._fmax_all()
+            if forces_dyn[i] < self.fmax:
+                n1 += self.natoms
+            else:
+                n2 = n1 + self.natoms
+                image.set_positions(positions[n1:n2])
+                n1 = n2
+
+    def _fmax_all(self) -> list[float]:
+        """Store maximum force acting on each image in list.
+
+        This is used in `set_positions`.
+        """
         n = self.natoms
         forces = self.get_forces()
         fmax_images = [
@@ -925,14 +908,17 @@ class DyNEB(NEB):
         ]
         return fmax_images
 
-    def get_forces(self):
-        forces = super().get_forces()
-        if not self.dynamic_relaxation:
-            return forces
+    def get_forces(self) -> npt.NDArray[np.float64]:
+        """Get NEB forces with applying the scaled convergence criteria.
 
-        """Get NEB forces and scale the convergence criteria to focus
-           optimization on saddle point region. The keyword scale_fmax
-           determines the rate of convergence scaling."""
+        For each image, if the forces are below the convergence criteria,
+        they are replaced with zero.
+        The keyword `scale_fmax` determines the rate of convergence scaling.
+        For non-zero `scale_fmax`, the convergence criteria become looser for
+        the images further away from the saddle point to focus optimization on
+        the saddle-point region.
+        """
+        forces = super().get_forces()
         n = self.natoms
         for i in range(self.nimages - 2):
             n1 = n * i
@@ -946,13 +932,13 @@ class DyNEB(NEB):
             """Scale convergence criteria based on distance between an
                image and the image with the highest potential energy."""
             rel_pos = np.sqrt(((positions[n1:n2] - pos_imax) ** 2).sum())
-            if force < self.fmax * (1 + rel_pos * self.scale_fmax):
+            if force < self.fmax * (1.0 + rel_pos * self.scale_fmax):
                 if i == self.imax - 1:
                     # Keep forces at saddle point for the log file.
                     pass
                 else:
                     # Set forces to zero before they are sent to optimizer.
-                    forces[n1:n2, :] = 0
+                    forces[n1:n2, :] = 0.0
         return forces
 
 
