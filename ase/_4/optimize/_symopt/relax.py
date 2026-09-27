@@ -909,7 +909,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         if Smax < smax:
             sSmax = green(sSmax)
 
-        gmax = np.max(np.abs(g))
+        gmax = np.max(np.abs(g), initial=0.0)
 
         cell = self.actual_atoms.cell
         a = cell.angles()
