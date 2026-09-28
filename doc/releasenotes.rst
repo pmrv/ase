@@ -518,6 +518,10 @@ I/O:
 
 .. _avogadro2: https://www.openchemistry.org/projects/avogadro2
 
+GUI:
+
+* Added Swedish translation.
+  (:mr:`2711`)
 
 Version 3.22.1
 ==============
@@ -637,6 +641,7 @@ Breaking changes:
 GUI:
 
 * Added Finnish translation.
+  (:mr:`2296`)
 
 Bug fixes:
 
@@ -1021,6 +1026,7 @@ GUI:
   them.
 
 * Added Russian translation.
+  (:mr:`1656`)
 
 Calculators:
 
@@ -1534,8 +1540,10 @@ GUI:
   in GUI.
 
 * Added Basque translation.
+  (:mr:`993`)
 
 * Added French translation.
+  (:mr:`892`)
 
 Version 3.16.2
 ==============
@@ -2027,9 +2035,6 @@ Version 3.7.0
 
 13 May 2013: :git:`3.7.0 <../3.7.0>`.
 
-* ASE's GUI can now be configured to be more friendly to visually
-  impaired users: :ref:`high contrast`.
-
 * The :class:`ase.neb.NEB` object now accepts a list of spring constants.
 
 * *Important backwards incompatible change*: The
@@ -2050,6 +2055,12 @@ Version 3.7.0
 
 * :ref:`minima_hopping` added to ASE.
 
+GUI:
+
+* ASE's GUI can now be configured to be more friendly to visually
+  impaired users: :ref:`high contrast`.
+
+* Added Chinese translation.
 
 Version 3.6.0
 =============
