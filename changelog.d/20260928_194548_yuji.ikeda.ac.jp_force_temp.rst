@@ -1,0 +1,6 @@
+Molecular dynamics
+------------------
+
+- Changed :func:`~ase.md.velocitydistribution.force_temperature` to accept
+  :class:`~ase.Atoms` with zero temperature when the target temperature is zero
+  (:mr:`2667`)
