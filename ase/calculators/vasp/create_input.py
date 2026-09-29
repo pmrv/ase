@@ -338,20 +338,6 @@ float_keys = [
     'pmass',  # Mass for latice degrees of freedom
     'bparam',  # B parameter for nonlocal VV10 vdW functional
     'cparam',  # C parameter for nonlocal VV10 vdW functional
-    'soltemp',  # Solvent temperature for isol 2 in Vaspsol++
-    'a_k',  # Smoothing length for FFT for isol 2 in Vaspsol++
-    'r_cav',  # Offset for solute surface area for isol 2 in Vaspsol++
-    'epsilon_inf',  # Bulk optical dielectric for isol 2 in Vaspsol++
-    'n_mol',  # Solvent density for isol 2 in Vaspsol++
-    'p_mol',  # Solvent dipole moment for isol 2 in Vaspsol++
-    'r_solv',  # Solvent radius for isol 2 in Vaspsol++
-    'r_diel',  # Dielectric radius for isol 2 in Vaspsol++
-    'r_b',  # Bound charge smearing length for isol 2 in Vaspsol++
-    'c_molar',  # Electrolyte concentration for isol 2 in Vaspsol++
-    'zion',  # Electrolyte ion valency for isol 2 in Vaspsol++
-    'd_ion',  # Packing diameter of electrolyte ions for isol 2 in Vaspsol++
-    'r_ion',  # Ionic radius of electrolyte ions for isol 2 in Vaspsol++
-    'efermi_ref',  # Potential vs vacuum for isol 2 in Vaspsol++
     'nupdown',  # fix spin moment to specified value
 ]
 
@@ -452,7 +438,6 @@ int_keys = [
     # response function calc.
     'taupar',
     'ntaupar',  # Number of groups in real time for response function calc.
-    'isol',  # vaspsol++ flag 1 linear, 2 nonlinear
 ]
 
 bool_keys = [
@@ -499,9 +484,6 @@ bool_keys = [
     'lwannier90',  # Switches on the interface between VASP and WANNIER90
     'lsorbit',  # Enable spin-orbit coupling
     'lsol',  # turn on solvation for Vaspsol
-    'lnldiel',  # turn on nonlinear dielectric in Vaspsol++
-    'lnlion',  # turn on nonlinear ionic in Vaspsol++
-    'lsol_scf',  # turn on solvation in SCF cycle in Vaspsol++
     'lautoscale',  # automatically calculate inverse curvature for VTST LBFGS
 ]
 
