@@ -175,10 +175,17 @@ class AtomsSymmetries:
             (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
             symprec=symprec,
         )
-        return cls.from_spglib(atoms, dataset)
+        return cls.from_spglib(atoms, dataset, atommap_maxerr=symprec * 1.1)
 
     @classmethod
-    def from_spglib(cls, atoms, dataset):
+    def from_spglib(cls, atoms, dataset, atommap_maxerr=1e-12):
+        """Get symmetry dataset from spglib.
+
+        By default we assume that the atoms have been symmetirized exactly.
+        However, if spglib dataset came for example with symprec 0.1, this
+        function needs to be caled with atommap_maxerr ~ 0.1 in order to pass
+        the sanity checks.
+        """
         from ase._4.optimize._symopt.atommap import build_atommaps
 
         args = argsort_rotations(dataset.rotations.transpose(0, 2, 1))
@@ -196,6 +203,7 @@ class AtomsSymmetries:
                 atoms.copy(),
                 rotations,
                 translations.copy(),
+                maxerr=atommap_maxerr,
             ),
         )
 
