@@ -316,7 +316,6 @@ float_keys = [
     'weimin',  # maximum weight for a band to be considered empty
     'zab_vdw',  # vdW-DF parameter
     'zval',  # ionic valence
-    'clz',  # electron count for core level shift
     'vdw_radius',  # Cutoff radius for Grimme's DFT-D2 and DFT-D3 and
     # Tkatchenko and Scheffler's DFT-TS dispersion corrections
     'vdw_scaling',  # Global scaling parameter for Grimme's DFT-D2 dispersion
@@ -420,10 +419,6 @@ int_keys = [
     # IBRION and POTIM are automatically set in the INCAR file
     'iopt',  # Controls which optimizer to use.  for iopt > 0, ibrion = 3
     # and potim = 0.0
-    'icorelevel',  # core level shifts
-    'clnt',  # species index
-    'cln',  # main quantum number of excited core electron
-    'cll',  # l quantum number of excited core electron
     'ivdw',  # Choose which dispersion correction method to use
     'nbandsgw',  # Number of bands for GW
     'nbandso',  # Number of occupied bands for electron-hole treatment
