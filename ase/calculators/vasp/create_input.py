@@ -493,9 +493,6 @@ list_int_keys = [
     # (Bucko)
 ]
 
-list_bool_keys = [
-]
-
 list_float_keys = [
     'dipol',  # center of cell for dipol
     'eint',  # energy range to calculate partial charge for
@@ -722,8 +719,6 @@ class GenerateVaspInput:
             self.int_params[key] = None
         for key in bool_keys:
             self.bool_params[key] = None
-        for key in list_bool_keys:
-            self.list_bool_params[key] = None
         for key in list_int_keys:
             self.list_int_params[key] = None
         for key in list_float_keys:
@@ -1442,16 +1437,6 @@ class GenerateVaspInput:
                             f'Invalid value "{data[2]}" for bool key "{key}"'
                         ) from exc
                     self.set_if_none(self.bool_params, key, bool_val)
-
-                elif key in list_bool_keys:
-                    self.set_if_none(
-                        self.list_bool_params,
-                        key,
-                        [
-                            _from_vasp_bool(x)
-                            for x in _args_without_comment(data[2:])
-                        ],
-                    )
 
                 elif key in list_int_keys:
                     self.set_if_none(
