@@ -42,6 +42,9 @@ from ase.io.vasp_parsers.incar_writer import write_incar
 FLOAT_FORMAT = '5.6f'
 EXP_FORMAT = '5.2e'
 
+_T_STRINGS = {'t', 'true', '.true.'}
+_F_STRINGS = {'f', 'false', '.false.'}
+
 
 def check_ichain(ichain, ediffg, iopt):
     ichain_dct = {}
@@ -1501,10 +1504,20 @@ class GenerateVaspInput:
                             self.special_params[key] = data[2]
 
                 # non-registered keys
-                elif data[2].lower() in {'t', 'true', '.true.'}:
-                    self.set_if_none(self.bool_params, key, True)
-                elif data[2].lower() in {'f', 'false', '.false.'}:
-                    self.set_if_none(self.bool_params, key, False)
+                elif len(_args_without_comment(data)) > 3:  # multiple values
+                    data = _args_without_comment(data)
+                    if data[2].lower() in _T_STRINGS | _F_STRINGS:
+                        value = [_from_vasp_bool(x) for x in data[2:]]
+                        self.set_if_none(self.list_bool_params, key, value)
+                    elif data[2].isdigit():
+                        value = [int(x) for x in data[2:]]
+                        self.set_if_none(self.list_int_params, key, value)
+                    else:
+                        value = [float(x) for x in data[2:]]
+                        self.set_if_none(self.list_float_params, key, value)
+                elif data[2].lower() in _T_STRINGS | _F_STRINGS:
+                    value = _from_vasp_bool(data[2])
+                    self.set_if_none(self.bool_params, key, value)
                 elif data[2].isdigit():
                     self.set_if_none(self.int_params, key, int(data[2]))
                 else:
