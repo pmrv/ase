@@ -503,9 +503,6 @@ bool_keys = [
     'lnlion',  # turn on nonlinear ionic in Vaspsol++
     'lsol_scf',  # turn on solvation in SCF cycle in Vaspsol++
     'lautoscale',  # automatically calculate inverse curvature for VTST LBFGS
-    # The next keyword pertains to the periodic NBO code of JR Schmidt's group
-    # at UW-Madison (https://github.com/jrschmidt2/periodic-NBO)
-    'lnbo',  # Enable NBO analysis
 ]
 
 list_int_keys = [
