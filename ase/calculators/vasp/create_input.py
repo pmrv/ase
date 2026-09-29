@@ -316,25 +316,6 @@ float_keys = [
     'weimin',  # maximum weight for a band to be considered empty
     'zab_vdw',  # vdW-DF parameter
     'zval',  # ionic valence
-    # The next keywords pertain to the VTST add-ons from Graeme Henkelman's
-    # group at UT Austin
-    'jacobian',  # Weight of lattice to atomic motion
-    'ddr',  # (DdR) dimer separation
-    'dfnmin',  # (DFNMin) rotational force below which dimer is not rotated
-    'dfnmax',  # (DFNMax) rotational force below which dimer rotation stops
-    'sltol',  # convergence ratio for minimum eigenvalue
-    'sdr',  # finite difference for setting up Lanczos matrix and step
-    # size when translating
-    'maxmove',  # Max step for translation for IOPT > 0
-    'invcurv',  # Initial curvature for LBFGS (IOPT = 1)
-    'timestep',  # Dynamical timestep for IOPT = 3 and IOPT = 7
-    'sdalpha',  # Ratio between force and step size for IOPT = 4
-    # The next keywords pertain to IOPT = 7 (i.e. FIRE)
-    'ftimemax',  # Max time step
-    'ftimedec',  # Factor to dec. dt
-    'ftimeinc',  # Factor to inc. dt
-    'falpha',  # Parameter for velocity damping
-    'falphadec',  # Factor to dec. alpha
     'clz',  # electron count for core level shift
     'vdw_radius',  # Cutoff radius for Grimme's DFT-D2 and DFT-D3 and
     # Tkatchenko and Scheffler's DFT-TS dispersion corrections
@@ -453,10 +434,6 @@ int_keys = [
     # IBRION and POTIM are automatically set in the INCAR file
     'iopt',  # Controls which optimizer to use.  for iopt > 0, ibrion = 3
     # and potim = 0.0
-    'drotmax',  # (DRotMax) number of rotation steps per translation step
-    'snl',  # Maximum dimentionality of the Lanczos matrix
-    'lbfgsmem',  # Steps saved for inverse Hessian for IOPT = 1 (LBFGS)
-    'fnmin',  # Max iter. before adjusting dt and alpha for IOPT = 7 (FIRE)
     'icorelevel',  # core level shifts
     'clnt',  # species index
     'cln',  # main quantum number of excited core electron
@@ -510,14 +487,6 @@ bool_keys = [
     'lvhar',  # write Hartree potential to LOCPOT (vasp 5.x)
     'lvtot',  # create WAVECAR/CHGCAR/LOCPOT
     'lwave',  #
-    # The next keywords pertain to the VTST add-ons from Graeme Henkelman's
-    # group at UT Austin
-    'lclimb',  # Turn on CI-NEB
-    'ltangentold',  # Old central difference tangent
-    'ldneb',  # Turn on modified double nudging
-    'lnebcell',  # Turn on SS-NEB
-    'lglobal',  # Optmize NEB globally for LBFGS (IOPT = 1)
-    'llineopt',  # Use force based line minimizer for translation (IOPT = 1)
     'lbeefens',  # Switch on print of BEE energy contributions in OUTCAR
     'lbeefbas',  # Switch off print of all BEEs in OUTCAR
     'lcalcpol',  # macroscopic polarization (vasp5.2). 'lcalceps'
