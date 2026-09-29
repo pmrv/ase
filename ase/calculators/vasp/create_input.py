@@ -487,8 +487,6 @@ bool_keys = [
     'lvhar',  # write Hartree potential to LOCPOT (vasp 5.x)
     'lvtot',  # create WAVECAR/CHGCAR/LOCPOT
     'lwave',  #
-    'lbeefens',  # Switch on print of BEE energy contributions in OUTCAR
-    'lbeefbas',  # Switch off print of all BEEs in OUTCAR
     'lcalcpol',  # macroscopic polarization (vasp5.2). 'lcalceps'
     'lcalceps',  # Macroscopic dielectric properties and Born effective charge
     # tensors (vasp 5.2)
