@@ -26,7 +26,7 @@ import os
 import re
 import shutil
 import warnings
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from os.path import join
 from typing import Any, TextIO
 
@@ -835,11 +835,11 @@ class GenerateVaspInput:
                 if len(value) == 0:
                     msg = f'empty list is given for {key}'
                     raise ValueError(msg)
-                if isinstance(value[0], bool):
+                if isinstance(_flatten(value)[0], bool):
                     self.list_bool_params[key] = value
-                elif isinstance(value[0], int):
+                elif isinstance(_flatten(value)[0], int):
                     self.list_int_params[key] = value
-                elif isinstance(value[0], float):
+                elif isinstance(_flatten(value)[0], float):
                     self.list_float_params[key] = value
                 else:
                     msg = f'cannot handle type of value for {key} = {value!r}'
@@ -1660,6 +1660,16 @@ def _to_vasp_bool(x):
         return '.TRUE.'
     else:
         return '.FALSE.'
+
+
+def _flatten(values: Iterable) -> Iterable:
+    result: list[Any] = []
+    for value in values:
+        if isinstance(value, Iterable) and not isinstance(value, (str, bytes)):
+            result.extend(_flatten(value))
+        else:
+            result.append(value)
+    return result
 
 
 def open_potcar(filename):
