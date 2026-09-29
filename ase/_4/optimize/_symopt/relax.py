@@ -173,9 +173,9 @@ class AtomsSymmetries:
 
         dataset = spglib_new_errorhandling(get_symmetry_dataset)(
             (atoms.cell, atoms.get_scaled_positions(), atoms.numbers),
-            atommap_maxerr=symprec * 1.1,
+            symprec=symprec,
         )
-        return cls.from_spglib(atoms, dataset, symprec=symprec)
+        return cls.from_spglib(atoms, dataset, atommap_maxerr=symprec * 1.1)
 
     @classmethod
     def from_spglib(cls, atoms, dataset, atommap_maxerr=1e-12):
