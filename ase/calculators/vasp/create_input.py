@@ -283,10 +283,6 @@ exp_keys = [
     'fdstep',  # Finite diference step for IOPT = 1 or 2
 ]
 
-special_keys = [
-    'lreal',  # non-local projectors in real space
-]
-
 dict_keys = [
     'ldau_luj',  # dictionary with L(S)DA+U parameters, e.g. {'Fe':{'L':2,
     # 'U':4.0, 'J':0.9}, ...}
@@ -470,8 +466,6 @@ class GenerateVaspInput:
         self.atoms = None
         for key in exp_keys:
             self.exp_params[key] = None
-        for key in special_keys:
-            self.special_params[key] = None
         for key in dict_keys:
             self.dict_params[key] = None
 
@@ -573,8 +567,9 @@ class GenerateVaspInput:
                 self.int_params[key] = value
             elif isinstance(value, float):
                 self.float_params[key] = value
-            elif (isinstance(value, Iterable)
-                  and not isinstance(value, (str, bytes))):
+            elif isinstance(value, Iterable) and not isinstance(
+                value, (str, bytes)
+            ):
                 if len(value) == 0:
                     msg = f'empty list is given for {key}'
                     raise ValueError(msg)
@@ -1016,9 +1011,6 @@ class GenerateVaspInput:
             for key, val in self.special_params.items()
             if val is not None
         }
-        if 'lreal' in special_dct.keys():
-            if isinstance(special_dct['lreal'], bool):
-                special_dct['lreal'] = _to_vasp_bool(special_dct['lreal'])
         incar_params.update(special_dct)
 
         # dict params
@@ -1188,19 +1180,6 @@ class GenerateVaspInput:
                         self.atoms.set_initial_magnetic_moments(
                             lst[self.resort]
                         )
-                elif key == 'lreal':
-                    # can't use set_if_none since value might be in one of
-                    # two dicts
-                    if (
-                        self.bool_params.get(key) is not None
-                        or self.special_params.get(key) is not None
-                    ):
-                        continue
-                    try:
-                        val = _from_vasp_bool(data[2])
-                        self.bool_params[key] = val
-                    except ValueError:
-                        self.special_params[key] = data[2]
 
                 # non-registered keys
                 elif len(_args_without_comment(data)) > 3:  # multiple values
