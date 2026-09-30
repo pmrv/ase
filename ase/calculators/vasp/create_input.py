@@ -274,75 +274,6 @@ def format_kpoints(kpts, atoms, reciprocal=False, gamma=False):
     return ''.join(tokens)
 
 
-# Parameters that can be set in INCAR. The values which are None
-# are not written and default parameters of VASP are used for them.
-
-float_keys = [
-    'aexx',  # Fraction of exact/DFT exchange
-    'aggac',  # Fraction of gradient correction to correlation
-    'aggax',  # Fraction of gradient correction to exchange
-    'aldac',  # Fraction of LDA correlation energy
-    'amggac',  # parameter that multiplies the meta-GGA correlation functional
-    'amggax',  # parameter that multiplies the meta-GGA exchange functional
-    'amin',  # minimal mixing parameter in Kerker's initial approximatio
-    'amix',  # linear mixing parameter
-    'amix_mag',  # linear mixing parameter for the magnetization density
-    'bmix',  # tags for mixing
-    'bmix_mag',  #
-    'cshift',  # Complex shift for dielectric tensor calculation (LOPTICS)
-    'deper',  # relative stopping criterion for optimization of eigenvalue
-    'ebreak',  # absolute stopping criterion for optimization of eigenvalues
-    # (EDIFF/N-BANDS/4)
-    'efield',  # applied electrostatic field
-    'emax',  # energy-range for DOSCAR file
-    'emin',  #
-    'enaug',  # Density cutoff
-    'encut',  # Planewave cutoff
-    'encutgw',  # energy cutoff for response function
-    'encutfock',  # FFT grid in the HF related routines
-    'hfscreen',  # attribute to change from PBE0 to HSE
-    'kspacing',  # determines the number of k-points if the KPOINTS
-    # file is not present. KSPACING is the smallest
-    # allowed spacing between k-points in units of
-    # $\AA$^{-1}$.
-    'potim',  # time-step for ion-motion (fs)
-    'nelect',  # total number of electrons
-    'param1',  # Exchange parameter
-    'param2',  # Exchange parameter
-    'pomass',  # mass of ions in am
-    'pstress',  # add this stress to the stress tensor, and energy E = V *
-    # pstress
-    'sigma',  # broadening in eV
-    'smass',  # Nose mass-parameter (am)
-    'spring',  # spring constant for NEB
-    'time',  # special control tag
-    'weimin',  # maximum weight for a band to be considered empty
-    'zab_vdw',  # vdW-DF parameter
-    'zval',  # ionic valence
-    'vdw_radius',  # Cutoff radius for Grimme's DFT-D2 and DFT-D3 and
-    # Tkatchenko and Scheffler's DFT-TS dispersion corrections
-    'vdw_scaling',  # Global scaling parameter for Grimme's DFT-D2 dispersion
-    # correction
-    'vdw_d',  # Global damping parameter for Grimme's DFT-D2 and Tkatchenko
-    # and Scheffler's DFT-TS dispersion corrections
-    'vdw_cnradius',  # Cutoff radius for calculating coordination number in
-    # Grimme's DFT-D3 dispersion correction
-    'vdw_s6',  # Damping parameter for Grimme's DFT-D2 and DFT-D3 and
-    # Tkatchenko and Scheffler's DFT-TS dispersion corrections
-    'vdw_s8',  # Damping parameter for Grimme's DFT-D3 dispersion correction
-    'vdw_sr',  # Scaling parameter for Grimme's DFT-D2 and DFT-D3 and
-    # Tkatchenko and Scheffler's DFT-TS dispersion correction
-    'vdw_a1',  # Damping parameter for Grimme's DFT-D3 dispersion correction
-    'vdw_a2',  # Damping parameter for Grimme's DFT-D3 dispersion correction
-    'eb_k',  # solvent permitivity in Vaspsol
-    'tau',  # surface tension parameter in Vaspsol
-    'langevin_gamma_l',  # Friction for lattice degrees of freedom
-    'pmass',  # Mass for latice degrees of freedom
-    'bparam',  # B parameter for nonlocal VV10 vdW functional
-    'cparam',  # C parameter for nonlocal VV10 vdW functional
-    'nupdown',  # fix spin moment to specified value
-]
-
 exp_keys = [
     'ediff',  # stopping-criterion for electronic upd.
     'ediffg',  # stopping-criterion for ionic upd.
@@ -352,172 +283,6 @@ exp_keys = [
     'fdstep',  # Finite diference step for IOPT = 1 or 2
 ]
 
-string_keys = [
-    'algo',  # algorithm: Normal (Davidson) | Fast | Very_Fast (RMM-DIIS)
-    'bandgap',  # determines the verbosity for reporting the bandgap info
-    'bseprec',  # precision of the time-evolution algorithm
-    'gga',  # xc-type: PW PB LM or 91 (LDA if not set)
-    'metagga',  #
-    'prec',  # Precission of calculation (Low, Normal, Accurate)
-    'system',  # name of System
-    'precfock',  # FFT grid in the HF related routines
-    'efermi',  # Sets the FERMI level in VASP 6.4.0+
-]
-
-int_keys = [
-    'ialgo',  # algorithm: use only 8 (CG) or 48 (RMM-DIIS)
-    'ibrion',  # ionic relaxation: 0-MD 1-quasi-New 2-CG
-    'icharg',  # charge: 0-WAVECAR 1-CHGCAR 2-atom 10-const
-    'idipol',  # monopol/dipol and quadropole corrections
-    'images',  # number of images for NEB calculation
-    'imix',  # specifies density mixing
-    'iniwav',  # initial electr wf. : 0-lowe 1-rand
-    'isif',  # calculate stress and what to relax
-    'ismear',  # part. occupancies: -5 Blochl -4-tet -1-fermi 0-gaus >0 MP
-    'isearch',  # line-search algorithm for ALGO = All
-    'ispin',  # spin-polarized calculation
-    'istart',  # startjob: 0-new 1-cont 2-samecut
-    'isym',  # symmetry: 0-nonsym 1-usesym 2-usePAWsym
-    'iwavpr',  # prediction of wf.: 0-non 1-charg 2-wave 3-comb
-    'kpar',  # k-point parallelization paramater
-    'ldauprint',  # 0-silent, 1-occ. matrix written to OUTCAR, 2-1+pot. matrix
-    # written
-    'ldautype',  # L(S)DA+U: 1-Liechtenstein 2-Dudarev 4-Liechtenstein(LDAU)
-    'lmaxmix',  #
-    'lorbit',  # create PROOUT
-    'maxmix',  #
-    'ngx',  # FFT mesh for wavefunctions, x
-    'ngxf',  # FFT mesh for charges x
-    'ngy',  # FFT mesh for wavefunctions, y
-    'ngyf',  # FFT mesh for charges y
-    'ngz',  # FFT mesh for wavefunctions, z
-    'ngzf',  # FFT mesh for charges z
-    'nbands',  # Number of bands
-    'nblk',  # blocking for some BLAS calls (Sec. 6.5)
-    'nbmod',  # specifies mode for partial charge calculation
-    'nelm',  # nr. of electronic steps (default 60)
-    'nelmdl',  # nr. of initial electronic steps
-    'nelmgw',  # nr. of self-consistency cycles for GW
-    'nelmin',
-    'nfree',  # number of steps per DOF when calculting Hessian using
-    # finite differences
-    'nkred',  # define sub grid of q-points for HF with
-    # nkredx=nkredy=nkredz
-    'nkredx',  # define sub grid of q-points in x direction for HF
-    'nkredy',  # define sub grid of q-points in y direction for HF
-    'nkredz',  # define sub grid of q-points in z direction for HF
-    'nomega',  # number of frequency points
-    'nomegar',  # number of frequency points on real axis
-    'npar',  # parallelization over bands
-    'nsim',  # evaluate NSIM bands simultaneously if using RMM-DIIS
-    'nsw',  # number of steps for ionic upd.
-    'nwrite',  # verbosity write-flag (how much is written)
-    'vdwgr',  # extra keyword for Andris program
-    'vdwrn',  # extra keyword for Andris program
-    'voskown',  # use Vosko, Wilk, Nusair interpolation
-    # The next keywords pertain to the VTST add-ons from Graeme Henkelman's
-    # group at UT Austin
-    'ichain',  # Flag for controlling which method is being used (0=NEB,
-    # 1=DynMat, 2=Dimer, 3=Lanczos) if ichain > 3, then both
-    # IBRION and POTIM are automatically set in the INCAR file
-    'iopt',  # Controls which optimizer to use.  for iopt > 0, ibrion = 3
-    # and potim = 0.0
-    'ivdw',  # Choose which dispersion correction method to use
-    'nbandsgw',  # Number of bands for GW
-    'nbandso',  # Number of occupied bands for electron-hole treatment
-    'nbandsv',  # Number of virtual bands for electron-hole treatment
-    'ncore',  # Number of cores per band, equal to number of cores divided
-    # by npar
-    'mdalgo',  # Determines which MD method of Tomas Bucko to use
-    'nedos',  # Number of grid points in DOS
-    'turbo',  # Ewald, 0 = Normal, 1 = PME
-    'omegapar',  # Number of groups for response function calc.
-    # (Possibly Depricated) Number of groups in real time for
-    # response function calc.
-    'taupar',
-    'ntaupar',  # Number of groups in real time for response function calc.
-]
-
-bool_keys = [
-    'addgrid',  # finer grid for augmentation charge density
-    'kgamma',  # The generated kpoint grid (from KSPACING) is either
-    # centred at the $\Gamma$
-    # point (e.g. includes the $\Gamma$ point)
-    # (KGAMMA=.TRUE.)
-    'laechg',  # write AECCAR0/AECCAR1/AECCAR2
-    'lasph',  # non-spherical contributions to XC energy (and pot for
-    # VASP.5.X)
-    'lasync',  # overlap communcation with calculations
-    'lcharg',  #
-    'lcorr',  # Harris-correction to forces
-    'ldau',  # L(S)DA+U
-    'ldiag',  # algorithm: perform sub space rotation
-    'ldipol',  # potential correction mode
-    'lelf',  # create ELFCAR
-    'lepsilon',  # enables to calculate and to print the BEC tensors
-    'lhfcalc',  # switch to turn on Hartree Fock calculations
-    'loptics',  # calculate the frequency dependent dielectric matrix
-    'lpard',  # evaluate partial (band and/or k-point) decomposed charge
-    # density
-    'lplane',  # parallelisation over the FFT grid
-    'lscalapack',  # switch off scaLAPACK
-    'lscalu',  # switch of LU decomposition
-    'lsepb',  # write out partial charge of each band separately?
-    'lsepk',  # write out partial charge of each k-point separately?
-    'lthomas',  #
-    'luse_vdw',  # Invoke vdW-DF implementation by Klimes et. al
-    'lvdw',  # Invoke DFT-D2 method of Grimme
-    'lvhar',  # write Hartree potential to LOCPOT (vasp 5.x)
-    'lvtot',  # create WAVECAR/CHGCAR/LOCPOT
-    'lwave',  #
-    'lcalcpol',  # macroscopic polarization (vasp5.2). 'lcalceps'
-    'lcalceps',  # Macroscopic dielectric properties and Born effective charge
-    # tensors (vasp 5.2)
-    'lvdw',  # Turns on dispersion correction
-    'lvdw_ewald',  # Turns on Ewald summation for Grimme's DFT-D2 and
-    # Tkatchenko and Scheffler's DFT-TS dispersion correction
-    'lspectral',  # Use the spectral method to calculate independent particle
-    # polarizability
-    'lrpa',  # Include local field effects on the Hartree level only
-    'lwannier90',  # Switches on the interface between VASP and WANNIER90
-    'lsorbit',  # Enable spin-orbit coupling
-    'lsol',  # turn on solvation for Vaspsol
-    'lautoscale',  # automatically calculate inverse curvature for VTST LBFGS
-]
-
-list_int_keys = [
-    'iband',  # bands to calculate partial charge for
-    'kpuse',  # k-point to calculate partial charge for
-    'ldaul',  # DFT+U parameters, overruled by dict key 'ldau_luj'
-    'random_seed',  # List of ints used to seed RNG for advanced MD routines
-    # (Bucko)
-]
-
-list_float_keys = [
-    'dipol',  # center of cell for dipol
-    'eint',  # energy range to calculate partial charge for
-    'ferwe',  # Fixed band occupation (spin-paired)
-    'ferdo',  # Fixed band occupation (spin-plarized)
-    'magmom',  # initial magnetic moments
-    'ropt',  # number of grid points for non-local proj in real space
-    'rwigs',  # Wigner-Seitz radii
-    'ldauu',  # ldau parameters, has potential to redundant w.r.t. dict
-    'ldauj',  # key 'ldau_luj', but 'ldau_luj' can't be read direct from
-    # the INCAR (since it needs to know information about atomic
-    # species. In case of conflict 'ldau_luj' gets written out
-    # when a calculation is set up
-    'vdw_c6',  # List of floats of C6 parameters (J nm^6 mol^-1) for each
-    # species (DFT-D2 and DFT-TS)
-    'vdw_c6au',  # List of floats of C6 parameters (a.u.) for each species
-    # (DFT-TS)
-    'vdw_r0',  # List of floats of R0 parameters (angstroms) for each
-    # species (DFT-D2 and DFT-TS)
-    'vdw_r0au',  # List of floats of R0 parameters (a.u.) for each species
-    # (DFT-TS)
-    'vdw_alpha',  # List of floats of free-atomic polarizabilities for each
-    # species (DFT-TS)
-]
-
 special_keys = [
     'lreal',  # non-local projectors in real space
 ]
@@ -525,12 +290,6 @@ special_keys = [
 dict_keys = [
     'ldau_luj',  # dictionary with L(S)DA+U parameters, e.g. {'Fe':{'L':2,
     # 'U':4.0, 'J':0.9}, ...}
-]
-
-keys: list[str] = [
-    # 'NBLOCK' and KBLOCK       inner block; outer block
-    # 'NPACO' and APACO         distance and nr. of slots for P.C.
-    # 'WEIMIN, EBREAK, DEPER    special control tags
 ]
 
 
@@ -709,20 +468,8 @@ class GenerateVaspInput:
         self.special_params = {}
         self.dict_params = {}
         self.atoms = None
-        for key in float_keys:
-            self.float_params[key] = None
         for key in exp_keys:
             self.exp_params[key] = None
-        for key in string_keys:
-            self.string_params[key] = None
-        for key in int_keys:
-            self.int_params[key] = None
-        for key in bool_keys:
-            self.bool_params[key] = None
-        for key in list_int_keys:
-            self.list_int_params[key] = None
-        for key in list_float_keys:
-            self.list_float_params[key] = None
         for key in special_keys:
             self.special_params[key] = None
         for key in dict_keys:
@@ -1414,79 +1161,45 @@ class GenerateVaspInput:
                     # Add everything before comment as a string to custom dict
                     value = value.split('#', 1)[0].strip()
                     self.set_if_none(self.inputs_params['custom'], key, value)
-                elif key in float_keys:
-                    self.set_if_none(self.float_params, key, float(data[2]))
                 elif key in exp_keys:
                     self.set_if_none(self.exp_params, key, float(data[2]))
-                elif key in string_keys:
-                    self.set_if_none(self.string_params, key, str(data[2]))
-                elif key in int_keys:
-                    if key == 'ispin':
-                        # JRK added. not sure why we would want to leave ispin
-                        # out
-                        self.set_if_none(self.int_params, key, int(data[2]))
-                        if int(data[2]) == 2:
-                            self.spinpol = True
-                    else:
-                        self.set_if_none(self.int_params, key, int(data[2]))
-                elif key in bool_keys:
-                    try:
-                        bool_val = _from_vasp_bool(data[2])
-                    except ValueError as exc:
-                        raise ValueError(
-                            f'Invalid value "{data[2]}" for bool key "{key}"'
-                        ) from exc
-                    self.set_if_none(self.bool_params, key, bool_val)
-
-                elif key in list_int_keys:
-                    self.set_if_none(
-                        self.list_int_params,
-                        key,
-                        [int(x) for x in _args_without_comment(data[2:])],
-                    )
-
-                elif key in list_float_keys:
-                    if key == 'magmom':
-                        lst = []
-                        i = 2
-                        while i < len(data):
-                            if data[i] in ['#', '!']:
-                                break
-                            if data[i] == '*':
-                                b = lst.pop()
-                                i += 1
-                                for _ in range(int(b)):
-                                    lst.append(float(data[i]))
-                            else:
-                                lst.append(float(data[i]))
+                elif key == 'ispin':
+                    self.set_if_none(self.int_params, key, int(data[2]))
+                    if int(data[2]) == 2:
+                        self.spinpol = True
+                elif key == 'magmom':
+                    lst = []
+                    i = 2
+                    while i < len(data):
+                        if data[i] in ['#', '!']:
+                            break
+                        if data[i] == '*':
+                            b = lst.pop()
                             i += 1
-                        self.set_if_none(self.list_float_params, 'magmom', lst)
-                        lst = np.array(lst)
-                        if self.atoms is not None:
-                            self.atoms.set_initial_magnetic_moments(
-                                lst[self.resort]
-                            )
-                    else:
-                        data = _args_without_comment(data)
-                        self.set_if_none(
-                            self.list_float_params,
-                            key,
-                            [float(x) for x in data[2:]],
+                            for _ in range(int(b)):
+                                lst.append(float(data[i]))
+                        else:
+                            lst.append(float(data[i]))
+                        i += 1
+                    self.set_if_none(self.list_float_params, 'magmom', lst)
+                    lst = np.array(lst)
+                    if self.atoms is not None:
+                        self.atoms.set_initial_magnetic_moments(
+                            lst[self.resort]
                         )
-                elif key in special_keys:
-                    if key == 'lreal':
-                        # can't use set_if_none since value might be in one of
-                        # two dicts
-                        if (
-                            self.bool_params.get(key) is not None
-                            or self.special_params.get(key) is not None
-                        ):
-                            continue
-                        try:
-                            val = _from_vasp_bool(data[2])
-                            self.bool_params[key] = val
-                        except ValueError:
-                            self.special_params[key] = data[2]
+                elif key == 'lreal':
+                    # can't use set_if_none since value might be in one of
+                    # two dicts
+                    if (
+                        self.bool_params.get(key) is not None
+                        or self.special_params.get(key) is not None
+                    ):
+                        continue
+                    try:
+                        val = _from_vasp_bool(data[2])
+                        self.bool_params[key] = val
+                    except ValueError:
+                        self.special_params[key] = data[2]
 
                 # non-registered keys
                 elif len(_args_without_comment(data)) > 3:  # multiple values
