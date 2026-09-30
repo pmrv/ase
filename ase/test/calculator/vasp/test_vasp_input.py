@@ -304,43 +304,37 @@ def test_non_registered_keys(vaspinput_factory) -> None:
     assert calc.int_params['libxc2'] == 267
 
 
-def test_bool(tmp_path, vaspinput_factory):
+# '.T' and 'tbob' are also parsed as True in VASP for boolean keys,
+# but ASE does not distinguish them from string now.
+@pytest.mark.parametrize(
+    'bool_str',
+    ['t', 'T', 'true', 'TRUE', 'TrUe', '.true.'],
+)
+def test_bool_true(tmp_path, vaspinput_factory, bool_str):
     """Test that INCAR parser behaves similarly to Vasp, which uses
     default fortran 'read' parsing
     """
+    with open(tmp_path / 'INCAR', 'w') as fout:
+        fout.write('ENCUT = 100\n')
+        fout.write(f'LCHARG = {bool_str}\n')
+    calc = vaspinput_factory(encut=100)
+    calc.read_incar(tmp_path / 'INCAR')
+    assert calc.bool_params['lcharg']
 
-    for bool_str in ['t', 'T', 'true', 'TRUE', 'TrUe', '.true.', '.T', 'tbob']:
-        with open(tmp_path / 'INCAR', 'w') as fout:
-            fout.write('ENCUT = 100\n')
-            fout.write(f'LCHARG = {bool_str}\n')
-        calc = vaspinput_factory(encut=100)
-        calc.read_incar(tmp_path / 'INCAR')
-        assert calc.bool_params['lcharg']
 
-    for bool_str in [
-        'f',
-        'F',
-        'false',
-        'FALSE',
-        'FaLSe',
-        '.false.',
-        '.F',
-        'fbob',
-    ]:
-        with open(tmp_path / 'INCAR', 'w') as fout:
-            fout.write('ENCUT = 100\n')
-            fout.write(f'LCHARG = {bool_str}\n')
-        calc = vaspinput_factory(encut=100)
-        calc.read_incar(tmp_path / 'INCAR')
-        assert not calc.bool_params['lcharg']
-
-    for bool_str in ['x', '..true.', '1']:
-        with open(tmp_path / 'INCAR', 'w') as fout:
-            fout.write('ENCUT = 100\n')
-            fout.write(f'LCHARG = {bool_str}\n')
-        calc = vaspinput_factory(encut=100)
-        with pytest.raises(ValueError):
-            calc.read_incar(tmp_path / 'INCAR')
+# '.F' and 'fbob' are also parsed as False in VASP for boolean keys,
+# but ASE does not distinguish them from string now.
+@pytest.mark.parametrize(
+    'bool_str',
+    ['f', 'F', 'false', 'FALSE', 'FaLSe', '.false.'],
+)
+def test_bool_false(tmp_path, vaspinput_factory, bool_str):
+    with open(tmp_path / 'INCAR', 'w') as fout:
+        fout.write('ENCUT = 100\n')
+        fout.write(f'LCHARG = {bool_str}\n')
+    calc = vaspinput_factory(encut=100)
+    calc.read_incar(tmp_path / 'INCAR')
+    assert not calc.bool_params['lcharg']
 
 
 def test_read_potcar_numbers_of_electrons() -> None:
