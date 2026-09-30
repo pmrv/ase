@@ -1592,6 +1592,8 @@ class _LimitedAtoms:
                     UserWarning,
                 )
             center = (0.0, 0.0, 0.0)
+        elif center is None:
+            center = 'COU'
         center = self._centering_as_array(center)
 
         if mask is None:
