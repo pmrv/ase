@@ -234,11 +234,11 @@ def test_vasp_xc(vaspinput_factory):
     assert calc_vdw.bool_params['luse_vdw'] is True
 
     calc_hse = vaspinput_factory(
-        xc='hse06', hfscreen=0.1, gga='RE', encut=400, sigma=0.5
+        xc='hse06', hfscreen=0.1, gga='RE', encut=400.0, sigma=0.5
     )
 
     assert dict_is_subset(
-        {'hfscreen': 0.1, 'encut': 400, 'sigma': 0.5}, calc_hse.float_params
+        {'hfscreen': 0.1, 'encut': 400.0, 'sigma': 0.5}, calc_hse.float_params
     )
     assert calc_hse.bool_params['lhfcalc'] is True
     assert dict_is_subset({'gga': 'RE'}, calc_hse.string_params)
