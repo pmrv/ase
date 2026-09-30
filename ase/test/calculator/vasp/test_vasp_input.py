@@ -95,7 +95,7 @@ def magmoms_factory(rng, request):
     elif kind == 'binaries':
         # Array of 0's and 1's
         def rand_binary(x):
-            return rng.randint(2, size=x)
+            return rng.randint(2, size=x).astype(float)
 
         func = rand_binary
     else:
