@@ -374,7 +374,7 @@ def test_first_instance(tmp_path, vaspinput_factory):
         ('KGAMMA', 'bool', (True, False)),
         ('IBAND', 'list_int', ([1, 2], [2, 3])),
         ('LRCTYPE', 'list_bool', ([True, False], [False, True])),
-        ('DIPOL', 'list_float', ([1, 1, 1], [2, 2, 2])),
+        ('DIPOL', 'list_float', ([1.0, 1.0, 1.0], [2.0, 2.0, 2.0])),
         ('LREAL', 'special', ('auto', 'off')),
     ]:
         with open(tmp_path / 'INCAR', 'w') as fout:
