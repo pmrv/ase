@@ -1557,7 +1557,7 @@ class _LimitedAtoms:
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
 
-    def mirror(self, v, center='COU', mask=None, mirror_cell=False):
+    def mirror(self, v, center=None, mask=None, mirror_cell=False):
         """Reflect atoms across a plane.
 
         Parameters
@@ -1566,9 +1566,9 @@ class _LimitedAtoms:
         v : array_like or {'x', 'y', 'z'}
             Normal vector of the plane of reflection, i.e. the direction in
             which the atoms are mirrored. Vectors can be specified numerically
-            e.g.: (1, 0, 0); or as a string: 'x', 'y', 'z'
+            e.g.: (1, 0, 0); or as one of the strings 'x', 'y', or 'z'.
 
-        center : array_like or {'COM', 'COP', 'COU'}, default: 'COU'
+        center : array_like or {'COM', 'COP', 'COU'} or None, default: None
             The plane of reflection is shifted to include the center point. Use
             'COM' to fix the center of mass (of all atoms), 'COP' to fix the
             center of positions (all atoms) or 'COU' to fix the center of the
@@ -1579,11 +1579,18 @@ class _LimitedAtoms:
             Select which atoms are moved. If None, then all atoms are affected.
 
         mirror_cell : bool, default: False
-            If True, transform the cell with its contents.
+            If True, transform the cell with its contents. Can not be used
+            together with 'center', which will automatically be set to origin.
         """
         v = string2vector(v)
         v = v / np.linalg.norm(v)
         if mirror_cell:
+            if center is not None:
+                warnings.warn(
+                    "The 'center' keyword is ignored when mirroring the cell "
+                    'vectors.',
+                    UserWarning,
+                )
             center = (0.0, 0.0, 0.0)
         center = self._centering_as_array(center)
 
