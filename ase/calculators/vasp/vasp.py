@@ -573,8 +573,8 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
     def update_atoms(self, atoms):
         """Update the atoms object with new positions and cell"""
         if (
-            self.int_params['ibrion'] is not None
-            and self.int_params['nsw'] is not None
+            self.int_params.get('ibrion') is not None
+            and self.int_params.get('nsw') is not None
         ):
             if self.int_params['ibrion'] > -1 and self.int_params['nsw'] > 0:
                 # Update atomic positions and unit cell with the ones read
@@ -1074,9 +1074,9 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
                     continue
         # Then if ibrion in [1,2,3] check whether ionic relaxation
         # condition been fulfilled
-        if self.int_params['ibrion'] in [1, 2, 3] and self.int_params[
+        if self.int_params.get('ibrion') in [1, 2, 3] and self.int_params.get(
             'nsw'
-        ] not in [0]:
+        ) not in [0]:
             if not self.read_relaxed():
                 converged = False
             else:

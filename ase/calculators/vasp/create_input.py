@@ -603,7 +603,7 @@ class GenerateVaspInput:
         # set of pseudopotentials without 'pp' being set.
         # Usually, 'pp' will be set by 'xc'.
         if 'pp' not in p or p['pp'] is None:
-            if self.string_params['gga'] is None:
+            if self.string_params.get('gga') is None:
                 p.update({'pp': 'lda'})
             elif self.string_params['gga'].lower() == 'pe':
                 p.update({'pp': 'pbe'})
@@ -656,7 +656,7 @@ class GenerateVaspInput:
         return srt, resrt
 
     def _set_spinpol(self, atoms):
-        if self.int_params['ispin'] is None:
+        if self.int_params.get('ispin') is None:
             self.spinpol = atoms.get_initial_magnetic_moments().any()
         else:
             # VASP runs non-spin-polarized calculations when `ispin=1`,
@@ -852,7 +852,7 @@ class GenerateVaspInput:
         if os.path.isfile(dst):
             return
 
-        if self.bool_params['luse_vdw']:
+        if self.bool_params.get('luse_vdw'):
             src = None
             if vdw_env in cfg:
                 src = os.path.join(cfg[vdw_env], kernel)
@@ -1026,7 +1026,7 @@ class GenerateVaspInput:
         }
         if 'ldau_luj' in dict_dct.keys():
             ldau_dict = set_ldau(
-                ldau_param=self.bool_params['ldau'],
+                ldau_param=self.bool_params.get('ldau'),
                 luj_params=dict_dct['ldau_luj'],
                 symbol_count=self.symbol_count,
             )
@@ -1037,7 +1037,7 @@ class GenerateVaspInput:
         # set magmom based on input or initial atoms object
         spinpol, magmom_dct = set_magmom(
             atoms=atoms,
-            ispin=self.int_params['ispin'],
+            ispin=self.int_params.get('ispin'),
             spinpol=self.spinpol,
             magmom_input=float_dct.get('magmom', None),
             sorting=self.sort,
@@ -1076,7 +1076,7 @@ class GenerateVaspInput:
             atoms = self.atoms
 
         # Don't write anything if KSPACING is being used
-        if self.float_params['kspacing'] is not None:
+        if self.float_params.get('kspacing') is not None:
             if self.float_params['kspacing'] > 0:
                 return
             else:
@@ -1085,14 +1085,14 @@ class GenerateVaspInput:
                     'Please use None or a positive number.'
                     ''.format(self.float_params['kspacing'])
                 )
-        if self.input_params['kpts'] is None:
+        if self.input_params.get('kpts') is None:
             return
 
         kpointstring = format_kpoints(
-            kpts=self.input_params['kpts'],
+            kpts=self.input_params.get('kpts'),
             atoms=atoms,
-            reciprocal=self.input_params['reciprocal'],
-            gamma=self.input_params['gamma'],
+            reciprocal=self.input_params.get('reciprocal'),
+            gamma=self.input_params.get('gamma'),
         )
         with open(join(directory, 'KPOINTS'), 'w') as kpoints:
             kpoints.write(kpointstring)
@@ -1234,7 +1234,7 @@ class GenerateVaspInput:
     def read_kpoints(self, filename):
         """Read kpoints file, typically named KPOINTS."""
         # If we used VASP builtin kspacing,
-        if self.float_params['kspacing'] is not None:
+        if self.float_params.get('kspacing') is not None:
             # Don't update kpts array
             return
 
