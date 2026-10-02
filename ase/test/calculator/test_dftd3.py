@@ -210,8 +210,6 @@ def test_non_dftd3_property(factory):
     print('magmoms', magmoms)
 
 
-
-
 def test_bad_parameter(factory):
     from ase.calculators.dftd3 import PureDFTD3
 
