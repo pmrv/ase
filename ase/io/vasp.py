@@ -15,6 +15,7 @@ import numpy as np
 
 from ase import Atoms
 from ase.constraints import FixAtoms, FixedLine, FixedPlane, FixScaled
+from ase.constraints.constraint import FixConstraint
 from ase.io import ParseError
 from ase.io.formats import string2index
 from ase.io.utils import ImageIterator
@@ -507,40 +508,7 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
 
                 elif (elem.tag == 'structure'
                       and elem.attrib.get('name') == 'initialpos'):
-                    cell_init = np.zeros((3, 3), dtype=float)
-
-                    for i, v in enumerate(
-                            elem.find("crystal/varray[@name='basis']")):
-                        cell_init[i] = np.array(
-                            [float(val) for val in v.text.split()])
-
-                    scpos_init = np.zeros((natoms, 3), dtype=float)
-
-                    for i, v in enumerate(
-                            elem.find("varray[@name='positions']")):
-                        scpos_init[i] = np.array(
-                            [float(val) for val in v.text.split()])
-
-                    constraints = []
-                    fixed_indices = []
-
-                    for i, entry in enumerate(
-                            elem.findall("varray[@name='selective']/v")):
-                        flags = (np.array(
-                            entry.text.split() == np.array(['F', 'F', 'F'])))
-                        if flags.all():
-                            fixed_indices.append(i)
-                        elif flags.any():
-                            constraints.append(FixScaled(i, flags, cell_init))
-
-                    if fixed_indices:
-                        constraints.append(FixAtoms(fixed_indices))
-
-                    atoms_init = Atoms(species,
-                                       cell=cell_init,
-                                       scaled_positions=scpos_init,
-                                       constraint=constraints,
-                                       pbc=True)
+                    atoms_init = _read_vasp_xml_structure(elem, species)
 
             elif event == 'start' and elem.tag == 'calculation':
                 calculation.append(elem)
@@ -710,6 +678,41 @@ def atoms_from_step(
     atoms.calc.kpts = kpoints if len(kpoints) else None
     atoms.calc.parameters = parameters
     return atoms
+
+
+def _read_vasp_xml_structure(elem, species) -> Atoms:
+    cell = np.array([
+        [float(x) for x in vector.text.split()]
+        for vector in elem.find("crystal/varray[@name='basis']")
+    ])
+
+    scaled_positions = np.array([
+        [float(x) for x in vector.text.split()]
+        for vector in elem.find("varray[@name='positions']")
+    ])
+
+    constraints: list[FixConstraint] = []
+    fixed_indices = []
+
+    for i, entry in enumerate(
+            elem.findall("varray[@name='selective']/v")):
+        flags = (np.array(
+            entry.text.split() == np.array(['F', 'F', 'F'])))
+        if flags.all():
+            fixed_indices.append(i)
+        elif flags.any():
+            constraints.append(FixScaled(i, flags, cell))
+
+    if fixed_indices:
+        constraints.append(FixAtoms(fixed_indices))
+
+    return Atoms(
+        species,
+        cell=cell,
+        scaled_positions=scaled_positions,
+        constraint=constraints,
+        pbc=True,
+    )
 
 
 @writer
