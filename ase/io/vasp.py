@@ -557,32 +557,10 @@ def atoms_from_step(
         cell[i] = np.array([float(val) for val in vector.text.split()])
     volume = np.linalg.det(cell)
 
-    free_energy = float(step.find('energy/i[@name="e_fr_energy"]').text)
+    energy, free_energy = _read_vasp_xml_energy(step, parameters, volume)
 
-    # https://gitlab.com/ase/ase/-/merge_requests/2685
-    # e_fr_energy in calculation/energy is actually an enthalpy including
-    # the PV term, unlike that in /calculation/scstep/energy or in OUTCAR,
-    # and therefore we need to subtract the PV term.
-    pressure = parameters.get('pstress', 0.0)
-    pressure *= 1e-22 / EVTOJ  # kbar -> eV/A3
-    free_energy -= pressure * volume
-
-    # Workaround for VASP bug, e_0_energy contains the wrong value
-    # in calculation/energy, but calculation/scstep/energy does not
-    # include classical VDW corrections. So, first calculate
-    # e_0_energy - e_fr_energy from calculation/scstep/energy, then
-    # apply that correction to e_fr_energy from calculation/energy.
-    lastscf = step.findall('scstep/energy')[-1]
     dipoles = step.findall('scstep/dipole')
-    if dipoles:
-        lastdipole = dipoles[-1]
-    else:
-        lastdipole = None
-
-    de = (float(lastscf.find('i[@name="e_0_energy"]').text) -
-          float(lastscf.find('i[@name="e_fr_energy"]').text))
-
-    energy = free_energy + de
+    lastdipole = dipoles[-1] if dipoles else None
 
     scpos = np.zeros((natoms, 3), dtype=float)
     for i, vector in enumerate(
@@ -713,6 +691,36 @@ def _read_vasp_xml_structure(elem, species) -> Atoms:
         constraint=constraints,
         pbc=True,
     )
+
+
+def _read_vasp_xml_energy(
+    step,
+    parameters: dict,
+    volume: float,
+) -> tuple[float, float]:
+    free_energy = float(step.find('energy/i[@name="e_fr_energy"]').text)
+
+    # https://gitlab.com/ase/ase/-/merge_requests/2685
+    # e_fr_energy in calculation/energy is actually an enthalpy including
+    # the PV term, unlike that in /calculation/scstep/energy or in OUTCAR,
+    # and therefore we need to subtract the PV term.
+    pressure = parameters.get('pstress', 0.0)
+    pressure *= 1e-22 / EVTOJ  # kbar -> eV/A3
+    free_energy -= pressure * volume
+
+    # Workaround for VASP bug, e_0_energy contains the wrong value
+    # in calculation/energy, but calculation/scstep/energy does not
+    # include classical VDW corrections. So, first calculate
+    # e_0_energy - e_fr_energy from calculation/scstep/energy, then
+    # apply that correction to e_fr_energy from calculation/energy.
+    lastscf = step.findall('scstep/energy')[-1]
+
+    de = (float(lastscf.find('i[@name="e_0_energy"]').text) -
+          float(lastscf.find('i[@name="e_fr_energy"]').text))
+
+    energy = free_energy + de
+
+    return energy, free_energy
 
 
 @writer
