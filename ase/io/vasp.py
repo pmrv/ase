@@ -550,21 +550,23 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
             raise parse_error
         if calculation and calculation[-1].find("energy") is None:
             calculation = calculation[:-1]
-        if not calculation:
-            yield atoms_init
 
-    if calculation:
-        if isinstance(index, int):
-            steps = [calculation[index]]
-        else:
-            steps = calculation[index]
-    else:
-        steps = []
+    steps = calculation if calculation else [atoms_init]
+
+    steps = [steps[index]] if isinstance(index, int) else steps[index]
 
     for step in steps:
-        yield atoms_from_step(step, ibz_kpts=ibz_kpts, kpt_weights=kpt_weights,
-                              parameters=parameters, atoms=atoms_init.copy(),
-                              natoms=natoms)
+        if isinstance(step, Atoms):
+            yield step
+        else:
+            yield atoms_from_step(
+                step,
+                ibz_kpts=ibz_kpts,
+                kpt_weights=kpt_weights,
+                parameters=parameters,
+                atoms=atoms_init.copy(),
+                natoms=natoms,
+            )
 
 
 def atoms_from_step(
