@@ -567,7 +567,14 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
                               natoms=natoms)
 
 
-def atoms_from_step(step, ibz_kpts, kpt_weights, parameters, atoms, natoms):
+def atoms_from_step(
+    step,
+    ibz_kpts: np.ndarray,
+    kpt_weights: list,
+    parameters: dict,
+    atoms: Atoms,
+    natoms: int,
+) -> Atoms:
     from ase.calculators.singlepoint import (
         SinglePointDFTCalculator,
         SinglePointKPoint,
@@ -664,8 +671,6 @@ def atoms_from_step(step, ibz_kpts, kpt_weights, parameters, atoms, natoms):
                 kpoints.append(
                     SinglePointKPoint(kpt_weights[ikpt - 1], spin, ikpt,
                                       eps_n, f_n))
-    if len(kpoints) == 0:
-        kpoints = None
 
     # DFPT properties
     # dielectric tensor
@@ -700,7 +705,7 @@ def atoms_from_step(step, ibz_kpts, kpt_weights, parameters, atoms, natoms):
         born_effective_charges=born_charges
     )
     atoms.calc.name = 'vasp'
-    atoms.calc.kpts = kpoints
+    atoms.calc.kpts = kpoints if len(kpoints) else None
     atoms.calc.parameters = parameters
     return atoms
 
