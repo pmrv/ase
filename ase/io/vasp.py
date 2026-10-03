@@ -502,42 +502,43 @@ def _read_vasp_xml_header(tree):
 
     try:
         for event, elem in tree:
+            if event != 'end':
+                continue
 
-            if event == 'end':
-                if elem.tag == 'kpoints':
-                    for subelem in elem.iter(tag='generation'):
-                        kpts_params = OrderedDict()
-                        parameters['kpoints_generation'] = kpts_params
-                        for par in subelem.iter():
-                            if par.tag in ['v', 'i'] and "name" in par.attrib:
-                                parname = par.attrib['name'].lower()
-                                kpts_params[parname] = __get_xml_parameter(par)
-
-                    kpts = elem.findall("varray[@name='kpointlist']/v")
-                    ibz_kpts = np.zeros((len(kpts), 3))
-
-                    for i, kpt in enumerate(kpts):
-                        ibz_kpts[i] = [float(val) for val in kpt.text.split()]
-
-                    kpt_weights = elem.findall('varray[@name="weights"]/v')
-                    kpt_weights = [float(val.text) for val in kpt_weights]
-
-                elif elem.tag == 'parameters':
-                    for par in elem.iter():
-                        if par.tag in ['v', 'i']:
+            if elem.tag == 'kpoints':
+                for subelem in elem.iter(tag='generation'):
+                    kpts_params = OrderedDict()
+                    parameters['kpoints_generation'] = kpts_params
+                    for par in subelem.iter():
+                        if par.tag in ['v', 'i'] and "name" in par.attrib:
                             parname = par.attrib['name'].lower()
-                            parameters[parname] = __get_xml_parameter(par)
+                            kpts_params[parname] = __get_xml_parameter(par)
 
-                elif elem.tag == 'atominfo':
-                    species = []
+                kpts = elem.findall("varray[@name='kpointlist']/v")
+                ibz_kpts = np.zeros((len(kpts), 3))
 
-                    for entry in elem.find("array[@name='atoms']/set"):
-                        species.append(entry[0].text.strip())
+                for i, kpt in enumerate(kpts):
+                    ibz_kpts[i] = [float(val) for val in kpt.text.split()]
 
-                elif (elem.tag == 'structure'
-                      and elem.attrib.get('name') == 'initialpos'):
-                    atoms_init = _read_vasp_xml_structure(elem, species)
-                    break
+                kpt_weights = elem.findall('varray[@name="weights"]/v')
+                kpt_weights = [float(val.text) for val in kpt_weights]
+
+            elif elem.tag == 'parameters':
+                for par in elem.iter():
+                    if par.tag in ['v', 'i']:
+                        parname = par.attrib['name'].lower()
+                        parameters[parname] = __get_xml_parameter(par)
+
+            elif elem.tag == 'atominfo':
+                species = []
+
+                for entry in elem.find("array[@name='atoms']/set"):
+                    species.append(entry[0].text.strip())
+
+            elif (elem.tag == 'structure'
+                  and elem.attrib.get('name') == 'initialpos'):
+                atoms_init = _read_vasp_xml_structure(elem, species)
+                break
 
     except ET.ParseError as parse_error:
         if atoms_init is None:
