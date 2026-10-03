@@ -8,6 +8,7 @@ Atoms object in VASP POSCAR format.
 from __future__ import annotations
 
 import re
+from collections import OrderedDict
 from pathlib import Path
 from typing import TextIO
 
@@ -20,7 +21,7 @@ from ase.io import ParseError
 from ase.io.formats import string2index
 from ase.io.utils import ImageIterator
 from ase.symbols import Symbols
-from ase.units import Ang, fs
+from ase.units import Ang, GPa, fs
 from ase.utils import reader, writer
 
 from .vasp_parsers import vasp_outcar_parsers as vop
@@ -458,14 +459,43 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
         >>> import ase.io
         >>> ase.io.write("out.traj", ase.io.read("vasprun.xml", index=":"))
     """
-
     import xml.etree.ElementTree as ET
-    from collections import OrderedDict
 
     tree = ET.iterparse(filename, events=['start', 'end'])
 
-    atoms_init = None
+    atoms_init, ibz_kpts, kpt_weights, parameters = _read_vasp_xml_header(tree)
+
     calculation = []
+    try:
+        for event, elem in tree:
+            if event == 'start' and elem.tag == 'calculation':
+                calculation.append(elem)
+
+    except ET.ParseError:
+        if calculation and calculation[-1].find("energy") is None:
+            calculation = calculation[:-1]
+
+    steps = calculation if calculation else [atoms_init]
+
+    steps = [steps[index]] if isinstance(index, int) else steps[index]
+
+    for step in steps:
+        if isinstance(step, Atoms):
+            yield step
+        else:
+            yield atoms_from_step(
+                step,
+                ibz_kpts=ibz_kpts,
+                kpt_weights=kpt_weights,
+                parameters=parameters,
+                atoms=atoms_init.copy(),
+            )
+
+
+def _read_vasp_xml_header(tree):
+    import xml.etree.ElementTree as ET
+
+    atoms_init = None
     ibz_kpts = None
     kpt_weights = None
     parameters = OrderedDict()
@@ -504,37 +534,16 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
                     for entry in elem.find("array[@name='atoms']/set"):
                         species.append(entry[0].text.strip())
 
-                    natoms = len(species)
-
                 elif (elem.tag == 'structure'
                       and elem.attrib.get('name') == 'initialpos'):
                     atoms_init = _read_vasp_xml_structure(elem, species)
-
-            elif event == 'start' and elem.tag == 'calculation':
-                calculation.append(elem)
+                    break
 
     except ET.ParseError as parse_error:
         if atoms_init is None:
             raise parse_error
-        if calculation and calculation[-1].find("energy") is None:
-            calculation = calculation[:-1]
 
-    steps = calculation if calculation else [atoms_init]
-
-    steps = [steps[index]] if isinstance(index, int) else steps[index]
-
-    for step in steps:
-        if isinstance(step, Atoms):
-            yield step
-        else:
-            yield atoms_from_step(
-                step,
-                ibz_kpts=ibz_kpts,
-                kpt_weights=kpt_weights,
-                parameters=parameters,
-                atoms=atoms_init.copy(),
-                natoms=natoms,
-            )
+    return atoms_init, ibz_kpts, kpt_weights, parameters
 
 
 def atoms_from_step(
@@ -543,13 +552,13 @@ def atoms_from_step(
     kpt_weights: list,
     parameters: dict,
     atoms: Atoms,
-    natoms: int,
 ) -> Atoms:
     from ase.calculators.singlepoint import (
         SinglePointDFTCalculator,
         SinglePointKPoint,
     )
-    from ase.units import GPa
+
+    natoms = len(atoms)
 
     cell = np.zeros((3, 3), dtype=float)
     for i, vector in enumerate(
