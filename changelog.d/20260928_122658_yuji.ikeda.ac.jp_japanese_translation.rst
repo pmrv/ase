@@ -1,0 +1,5 @@
+GUI
+---
+
+- Added Japanese translation.
+  (:mr:`4267`)
