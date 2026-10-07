@@ -2,6 +2,8 @@
 # CAMd (see accompanying license files for details).
 import warnings
 
+from ase.config import ASE_CONFIG_FILE, Config, cfg
+
 
 class CLICommand:
     """ASE's graphical user interface.
@@ -93,13 +95,27 @@ class CLICommand:
             type=float,
             help='Scale covalent radii.',
         )
+        add(
+            '--configfile',
+            metavar='FILE',
+            default=None,
+            type=str,
+            help='Load GUI settings from the specified file (.ini format). '
+            'If not specified, defaults to the global ASE configfile '
+            + str(ASE_CONFIG_FILE) + '.'
+        )
 
     @staticmethod
     def run(args):
         from ase.atoms import Atoms
         from ase.gui.images import Images
 
-        images = Images()
+        if args.configfile:
+            config = Config.read(args.configfile)
+        else:
+            config = cfg
+
+        images = Images(config=config)
 
         if args.filenames:
             images.read(args.filenames, args.image_number)
@@ -148,7 +164,9 @@ class CLICommand:
             if 'inline' in backend:
                 os.environ['MPLBACKEND'] = 'TkAgg'
 
-            gui = GUI(images, args.rotations, args.bonds, args.graph)
+            gui = GUI(
+                images, args.rotations, args.bonds, args.graph, config=config
+            )
             images.notify_new_images = gui.obs.new_images.notify  # XXX hack
             gui.run()
 
