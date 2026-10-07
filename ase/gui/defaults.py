@@ -84,7 +84,7 @@ class GUIConfig(Config):
     def read_dict(self, dct: dict) -> None:
         self.parser.read_dict({'gui': {k: str(dct[k]) for k in dct}})
 
-    def read_ase_config(self, config: Config | None = None) -> None:
+    def read_ase_config(self, config: Config) -> None:
         self.parser.read_dict(config.as_dict())
 
 
@@ -104,7 +104,7 @@ def read_defaults(
             FutureWarning,
         )
         runpy.run_path(
-            old_configfile,
+            str(old_configfile),
             init_globals={'gui_default_settings': gui_default_settings},
         )
 
