@@ -7,9 +7,9 @@ necessary.
 """
 
 import ast
-import os
 import runpy
 import warnings
+from pathlib import Path
 
 from ase.config import ASE_CONFIG_FILE, Config, cfg
 
@@ -74,6 +74,11 @@ class GUIConfig(Config):
             self.parser.add_section('gui')
         self.parser.set('gui', option, str(value))
 
+    def read_dict(self, dct: dict) -> None:
+        self.parser.read_dict(
+            {'gui': {k: str(dct[k]) for k in dct}}
+        )
+
 
 def read_defaults(
     user_cfg: GUIConfig | Config | dict | None = None,
@@ -83,11 +88,11 @@ def read_defaults(
     is specified, parses and adapts the provided configuration instead, ignoring
     the global config.
     """
-    old_configfile = os.path.expanduser('~/.ase/gui.py')
-    if os.path.exists(old_configfile):
+    old_configfile = Path.home() / '.ase/gui.py'
+    if old_configfile.exists():
         warnings.warn(
             'Found GUI configuration file gui.py which is deprecated'
-            '. Use ' + str(ASE_CONFIG_FILE) + ' instead.',
+            f'. Use {ASE_CONFIG_FILE} instead.',
             FutureWarning,
         )
         runpy.run_path(
@@ -100,10 +105,7 @@ def read_defaults(
     else:
         if isinstance(user_cfg, dict):
             config = GUIConfig()
-            config.parser.read_dict(
-                {'gui': {k: str(user_cfg[k]) for k in user_cfg}}
-            )
-            config.paths.append('dict')
+            config.read_dict(user_cfg)
         else:
             config = GUIConfig(user_cfg)
 

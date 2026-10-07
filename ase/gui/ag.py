@@ -1,6 +1,7 @@
 # Copyright 2008, 2009
 # CAMd (see accompanying license files for details).
 import warnings
+from pathlib import Path
 
 from ase.config import ASE_CONFIG_FILE, Config, cfg
 
@@ -102,8 +103,7 @@ class CLICommand:
             type=str,
             help='Load GUI settings from the specified file (.ini format). '
             'If not specified, defaults to the global ASE configfile '
-            + str(ASE_CONFIG_FILE)
-            + '.',
+            f'{str(ASE_CONFIG_FILE)}.',
         )
 
     @staticmethod
@@ -112,7 +112,7 @@ class CLICommand:
         from ase.gui.images import Images
 
         if args.configfile:
-            config = Config.read(args.configfile)
+            config = Config.read(Path(args.configfile))
         else:
             config = cfg
 
