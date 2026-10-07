@@ -317,10 +317,8 @@ def read_velocities_if_present(fd, natoms) -> np.ndarray | None:
     return atoms_vel * (Ang / fs)
 
 
-def set_constraints(atoms: Atoms, selective_flags: np.ndarray):
+def set_constraints(atoms: Atoms, selective_flags: np.ndarray) -> None:
     """Set constraints based on selective_flags"""
-    from ase.constraints import FixAtoms, FixConstraint, FixScaled
-
     constraints: list[FixConstraint] = []
     indices = []
     for ind, sflags in enumerate(selective_flags):
