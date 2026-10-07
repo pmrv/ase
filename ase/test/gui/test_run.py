@@ -4,7 +4,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import ase.config
 import ase.gui.ui as ui
 from ase import Atoms
 from ase.build import bulk, molecule
