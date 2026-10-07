@@ -41,7 +41,7 @@
 Other changes
 -------------
 
-- Added Atoms.mirror method for reflecting structures.
+- Added :meth:`~ase.Atoms.mirror` method for reflecting structures.
 
 .. Bugfixes
 .. --------
