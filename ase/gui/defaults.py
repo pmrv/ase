@@ -38,30 +38,36 @@ class GUIConfig(Config):
     hopefully forwards compatible way. Designed to be operated like
     a ConfigParser object.
     """
-
-    def __init__(self, config: Config | None = None):
+    def __init__(self):
         super().__init__()
-        if config is not None:
-            self.parser = config.parser
-            self.paths = config.paths
 
-    def _env(self):
+    @property
+    def _parser(self):
         if self.parser.has_section('gui'):
             return self.parser['gui']
         else:
             return self.parser
 
+    def __iter__(self):
+        yield from self._parser
+
+    def __getitem__(self, key):
+        return self._parser[key]
+
+    def __len__(self):
+        return len(self._parser)
+
     def get(self, option, fallback=None):
-        return self.parser.get('gui', option, fallback=fallback)
+        return self._parser.get(option, fallback=fallback)
 
     def getint(self, option, fallback=None):
-        return self.parser.getint('gui', option, fallback=fallback)
+        return self._parser.getint(option, fallback=fallback)
 
     def getfloat(self, option, fallback=None):
-        return self.parser.getfloat('gui', option, fallback=fallback)
+        return self._parser.getfloat(option, fallback=fallback)
 
     def getboolean(self, option, fallback=None):
-        return self.parser.getboolean('gui', option, fallback=fallback)
+        return self._parser.getboolean(option, fallback=fallback)
 
     def getliteral(self, option, fallback=None):
         value = self.get(option, fallback)
@@ -78,6 +84,9 @@ class GUIConfig(Config):
         self.parser.read_dict(
             {'gui': {k: str(dct[k]) for k in dct}}
         )
+
+    def read_ase_config(self, config: Config | None = None) -> None:
+        self.parser.read_dict(config.as_dict())
 
 
 def read_defaults(
@@ -100,17 +109,15 @@ def read_defaults(
             init_globals={'gui_default_settings': gui_default_settings},
         )
 
+    config = GUIConfig()
+    config.read_dict(gui_default_settings)
+
     if user_cfg is None:
-        config = GUIConfig(cfg)
+        config.read_ase_config(cfg)
     else:
         if isinstance(user_cfg, dict):
-            config = GUIConfig()
             config.read_dict(user_cfg)
         else:
-            config = GUIConfig(user_cfg)
-
-    for k in gui_default_settings:
-        if k not in config:
-            config.set(k, gui_default_settings[k])
+            config.read_ase_config(user_cfg)
 
     return config
