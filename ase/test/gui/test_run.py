@@ -54,16 +54,11 @@ def no_blocking_errors_monkeypatch(monkeypatch):
 
 
 @pytest.fixture()
-def suppress_user_config(monkeypatch):
-    monkeypatch.setattr(ase.config, 'ASE_CONFIG_FILE', '')
-
-
-@pytest.fixture()
-def guifactory(display, suppress_user_config):
+def guifactory(display):
     guis = []
 
     def factory(images):
-        gui = GUI(images)
+        gui = GUI(images, config={})
         guis.append(gui)
         return gui
 
