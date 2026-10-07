@@ -130,7 +130,7 @@ class Config(Mapping):
         self.paths += self.parser.read(paths)
 
     @classmethod
-    def read(cls, *configfiles, defaults=None):
+    def read(cls, *configfiles):
         envpath = os.environ.get("ASE_CONFIG_PATH")
         if configfiles:
             paths = [f for f in configfiles]
@@ -140,10 +140,6 @@ class Config(Mapping):
             paths = [Path(p) for p in envpath.split(":")]
 
         cfg = cls()
-        if defaults:
-            # The 'defaults' dictionary needs to have a very specific
-            # structure, see the ConfigParser.read_dict() documentation.
-            cfg.parser.read_dict(defaults)
         cfg._read_paths(paths)
 
         # add sections for builtin calculators
