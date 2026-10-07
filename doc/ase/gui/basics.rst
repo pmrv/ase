@@ -132,7 +132,7 @@ the form of a dictionary, and atoms can be referred to using atomic symbols.
 
 .. code:: ini
 
-  gui_graphs_string = i, e - min(E), fmax
+  default_graphs_string = i, e - min(E), fmax
   covalent_radii = [[29, 1.6]]  # or {29: 1.6} or {'Cu': 1.6} etc...
 
 These are the settings that can be changed, along with their default
@@ -158,8 +158,8 @@ done in ``~/.config/ase/config.ini``:
 
 .. code:: ini
 
-  gui_foreground_color = #ffffff
-  gui_background_color = #000000
+  foreground_color = #ffffff
+  background_color = #000000
 
 Colors can be specified using hex codes or by picking one of many
 `named colors <https://cs111.wellesley.edu/archive/cs111_fall14/public_html/labs/lab12/tkintercolor.html>`_ 

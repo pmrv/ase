@@ -14,9 +14,9 @@ from pathlib import Path
 from ase.config import ASE_CONFIG_FILE, Config, cfg
 
 gui_default_settings = {
-    'gui_graphs_string': 'i, e - E[-1]',
-    'gui_foreground_color': '#000000',  # hex or named color
-    'gui_background_color': '#ffffff',  # hex or named color
+    'default_graphs_string': 'i, e - E[-1]',
+    'foreground_color': '#000000',  # hex or named color
+    'background_color': '#ffffff',  # hex or named color
     'covalent_radii': None,  # Dictionary of {atomic number/symbol: radius}
     'radii_scale': 0.89,
     'force_vector_scale': 1.0,

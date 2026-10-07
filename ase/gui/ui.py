@@ -656,8 +656,8 @@ class ASEGUIWindow(MainWindow):
 
         self.size = np.array([450, 450])
 
-        self.fg = config.get('gui_foreground_color')
-        self.bg = config.get('gui_background_color')
+        self.fg = config.get('foreground_color')
+        self.bg = config.get('background_color')
 
         gui.icons.set_scaling(self.win.tk.call('tk', 'scaling'))
 

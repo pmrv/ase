@@ -112,7 +112,7 @@ class GUI(View):
     def plot_graph_standard(self):
         expr = self._caller_expr
         if expr is None:
-            expr = self.config.get('gui_graphs_string')
+            expr = self.config.get('default_graphs_string')
 
         if expr is not None and expr != '' and len(self.images) > 1:
             self.plot_graphs(expr=expr, ignore_if_nan=True)
