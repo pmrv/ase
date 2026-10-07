@@ -102,7 +102,8 @@ class CLICommand:
             type=str,
             help='Load GUI settings from the specified file (.ini format). '
             'If not specified, defaults to the global ASE configfile '
-            + str(ASE_CONFIG_FILE) + '.'
+            + str(ASE_CONFIG_FILE)
+            + '.',
         )
 
     @staticmethod
