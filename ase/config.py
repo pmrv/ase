@@ -130,9 +130,11 @@ class Config(Mapping):
         self.paths += self.parser.read(paths)
 
     @classmethod
-    def read(cls, *, defaults=None):
+    def read(cls, *configfiles, defaults=None):
         envpath = os.environ.get("ASE_CONFIG_PATH")
-        if envpath is None:
+        if configfiles:
+            paths = [f for f in configfiles]
+        elif envpath is None:
             paths = [ASE_CONFIG_FILE, ]
         else:
             paths = [Path(p) for p in envpath.split(":")]
