@@ -38,6 +38,7 @@ class GUIConfig(Config):
     hopefully forwards compatible way. Designed to be operated like
     a ConfigParser object.
     """
+
     def __init__(self):
         super().__init__()
 
@@ -81,9 +82,7 @@ class GUIConfig(Config):
         self.parser.set('gui', option, str(value))
 
     def read_dict(self, dct: dict) -> None:
-        self.parser.read_dict(
-            {'gui': {k: str(dct[k]) for k in dct}}
-        )
+        self.parser.read_dict({'gui': {k: str(dct[k]) for k in dct}})
 
     def read_ase_config(self, config: Config | None = None) -> None:
         self.parser.read_dict(config.as_dict())
