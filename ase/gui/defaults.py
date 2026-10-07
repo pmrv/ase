@@ -11,7 +11,7 @@ import os
 import runpy
 import warnings
 
-from ase.config import Config
+from ase.config import Config, cfg
 
 gui_default_settings = {
     'gui_graphs_string': 'i, e - E[-1]',
@@ -39,6 +39,12 @@ class GUIConfig(Config):
     a ConfigParser object.
     """
 
+    def __init__(self, config: Config | None = None):
+        super().__init__()
+        if config is not None:
+            self.parser = config.parser
+            self.paths = config.paths
+
     def _env(self):
         if self.parser.has_section('gui'):
             return self.parser['gui']
@@ -64,17 +70,19 @@ class GUIConfig(Config):
         return ast.literal_eval(value)
 
     def set(self, option, value):
-        self.parser.set('gui', option, value)
+        if not self.parser.has_section('gui'):
+            self.parser.add_section('gui')
+        self.parser.set('gui', option, str(value))
 
 
-def read_defaults():
-    """Read ASE configuration files and return an object from which settings
-    can be retrieved.
+def read_defaults(
+    user_cfg: GUIConfig | Config | dict | None = None,
+) -> GUIConfig:
+    """Retrieves configuration from ASE configuration files (see ase.config).
+    Returns a GUIConfig object from which one can get the settings. If user_cfg
+    is specified, parses and adapts the provided configuration instead, ignoring
+    the global config.
     """
-
-    # should look for .config/ase/gui.py
-    # if 'XDG_CONFIG_HOME' in os.environ:
-    #    name = os.environ['XDG_CONFIG_HOME'] + '/ase/gui.py'
     old_configfile = os.path.expanduser('~/.ase/gui.py')
     if os.path.exists(old_configfile):
         from ase.config import ASE_CONFIG_FILE
@@ -89,11 +97,20 @@ def read_defaults():
             init_globals={'gui_default_settings': gui_default_settings},
         )
 
-    config = GUIConfig.read(
-        defaults={
-            'gui': {
-                k: str(gui_default_settings[k]) for k in gui_default_settings
-            }
-        }
-    )
+    if user_cfg is None:
+        config = GUIConfig(cfg)
+    else:
+        if isinstance(user_cfg, dict):
+            config = GUIConfig()
+            config.parser.read_dict(
+                {'gui': {k: str(user_cfg[k]) for k in user_cfg}}
+            )
+            config.paths.append('dict')
+        else:
+            config = GUIConfig(user_cfg)
+
+    for k in gui_default_settings:
+        if k not in config:
+            config.set(k, gui_default_settings[k])
+
     return config

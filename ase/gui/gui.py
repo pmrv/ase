@@ -39,9 +39,13 @@ class GUI(View):
     ARROWKEY_MOVE = 1
     ARROWKEY_ROTATE = 2
 
-    def __init__(self, images=None,
+    def __init__(self,
+                 images=None,
                  rotations='',
-                 show_bonds=False, expr=None):
+                 show_bonds=False,
+                 expr=None,
+                 *,
+                 config=None):
 
         if not isinstance(images, Images):
             images = Images(images)
@@ -64,7 +68,8 @@ class GUI(View):
         self.obs.new_images.register(self.goto_last_frame)
         self.images = images
 
-        self.config = read_defaults()
+        self.config = read_defaults(config)
+
         if show_bonds:
             self.config.set('show_bonds', True)
 

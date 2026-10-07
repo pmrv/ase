@@ -15,9 +15,11 @@ from ase.io import read, string2index, write
 
 
 class Images:
-    def __init__(self, images=None, *, notify_new_images=lambda: None):
+    def __init__(
+        self, images=None, *, config=None, notify_new_images=lambda: None
+    ):
         self.covalent_radii = covalent_radii.copy()
-        self.config = read_defaults()
+        self.config = read_defaults(config)
         self.configure_radii(self.config.getliteral('covalent_radii'))
         self.atom_scale = self.config.getfloat('radii_scale')
         if images is None:
