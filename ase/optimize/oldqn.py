@@ -15,6 +15,7 @@ from numpy.linalg import eigh
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 def f(lamda, Gbar, b, radius):
@@ -106,6 +107,7 @@ def find_lamda(upperlimit, Gbar, b, radius):
 
 
 class GoodOldQuasiNewton(Optimizer):
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

@@ -6,6 +6,7 @@ from ase import Atoms
 from ase.constraints import FixInternals
 from ase.optimize.bfgs import BFGS
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 class BFGSClimbFixInternals(BFGS):
@@ -50,6 +51,7 @@ class BFGSClimbFixInternals(BFGS):
        :end-before: # end example for documentation
     """
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

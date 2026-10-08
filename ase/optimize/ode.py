@@ -4,6 +4,7 @@ import numpy as np
 
 from ase import Atoms
 from ase.optimize.sciopt import OptimizerConvergenceError, SciPyOptimizer
+from ase.utils import deprecate_positionals
 
 
 def ode12r(
@@ -205,6 +206,7 @@ class ODE12r(SciPyOptimizer):
     Optimizer based on adaptive ODE solver :func:`ode12r`
     """
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,
@@ -218,7 +220,12 @@ class ODE12r(SciPyOptimizer):
         **kwargs,
     ):
         super().__init__(
-            atoms, logfile, trajectory, callback_always, alpha, **kwargs
+            atoms,
+            logfile=logfile,
+            trajectory=trajectory,
+            callback_always=callback_always,
+            alpha=alpha,
+            **kwargs,
         )
         self._actual_atoms = atoms
         from ase.optimize.precon.precon import make_precon  # avoid circular dep

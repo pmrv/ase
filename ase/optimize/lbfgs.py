@@ -5,6 +5,7 @@ import numpy as np
 from ase import Atoms
 from ase._4.optimize.lbfgs import LBFGSMethod
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 from ase.utils.linesearch import LineSearch
 
 
@@ -17,6 +18,7 @@ class LBFGS(Optimizer):
 
     """
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

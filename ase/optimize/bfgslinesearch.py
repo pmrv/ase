@@ -13,6 +13,7 @@ from numpy import absolute, eye, isinf
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 from ase.utils.linesearch import LineSearch
 
 # These have been copied from Numeric's MLab.py
@@ -26,6 +27,7 @@ __version__ = '0.1'
 
 
 class BFGSLineSearch(Optimizer):
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

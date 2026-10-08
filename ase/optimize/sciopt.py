@@ -5,6 +5,7 @@ import scipy.optimize as opt
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 class Converged(Exception):
@@ -21,6 +22,7 @@ class SciPyOptimizer(Optimizer):
     Only the call to the optimizer is still needed
     """
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

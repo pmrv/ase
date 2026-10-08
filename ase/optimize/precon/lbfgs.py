@@ -9,6 +9,7 @@ import numpy as np
 from ase.filters import UnitCellFilter
 from ase.optimize.optimize import Optimizer
 from ase.optimize.precon.precon import make_precon
+from ase.utils import deprecate_positionals
 from ase.utils.linesearch import LineSearch
 from ase.utils.linesearcharmijo import LineSearchArmijo
 
@@ -36,6 +37,7 @@ class PreconLBFGS(Optimizer):
     """
 
     # CO : added parameters rigid_units and rotation_factors
+    @deprecate_positionals(2)
     def __init__(self, atoms, restart=None, logfile='-', trajectory=None,
                  maxstep=None, memory=100, damping=1.0, alpha=70.0,
                  precon='auto', variable_cell=False,

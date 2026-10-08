@@ -9,9 +9,11 @@ from ase.optimize.gpmin.kernel import SquaredExponential
 from ase.optimize.gpmin.prior import ConstantPrior
 from ase.optimize.optimize import Optimizer
 from ase.parallel import world
+from ase.utils import deprecate_positionals
 
 
 class GPMin(Optimizer, GaussianProcess):
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms,

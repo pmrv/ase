@@ -7,12 +7,14 @@ import numpy as np
 from ase import Atoms
 from ase._4.optimize.bfgs import BFGSMethod
 from ase.optimize.optimize import Optimizer, UnitCellFilter
+from ase.utils import deprecate_positionals
 
 
 class BFGS(Optimizer):
     # default parameters
     defaults = {**Optimizer.defaults, 'alpha': 70.0}
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,
