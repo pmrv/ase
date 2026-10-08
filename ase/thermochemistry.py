@@ -331,8 +331,9 @@ class BaseThermoChem(ABC):
             self.atoms = atoms
         if spin is not None and spin < 0:
             raise ValueError(
-                f"spin must be non-negative (got {spin}); it is the total "
-                "electronic spin magnitude, not a spin z-projection.")
+                f'spin must be non-negative (got {spin}); it is the total '
+                'electronic spin magnitude, not a spin z-projection.'
+            )
         self.spin = spin
 
     @classmethod

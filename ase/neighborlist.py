@@ -1085,15 +1085,16 @@ class PrimitiveNeighborList:
                 r=self.cutoffs + rcmax,
             )
 
-            counts = np.fromiter((len(ind) for ind in indices_all),
-                                 dtype=int, count=natoms)
+            counts = np.fromiter(
+                (len(ind) for ind in indices_all), dtype=int, count=natoms
+            )
             if counts.sum() == 0:
                 continue
 
             first = np.repeat(arange, counts)
             second = np.concatenate(
-                [np.asarray(ind, dtype=int)
-                 for ind in indices_all if len(ind)])
+                [np.asarray(ind, dtype=int) for ind in indices_all if len(ind)]
+            )
             delta = positions[second] + displacement - positions[first]
             distances = np.sqrt(np.einsum('ij,ij->i', delta, delta))
             mask = distances < self.cutoffs[second] + self.cutoffs[first]
@@ -1135,8 +1136,9 @@ class PrimitiveNeighborList:
         # get_neighbors (and that NeighborList relies on).
         splits = np.cumsum(np.bincount(first, minlength=natoms))[:-1]
         self.neighbors = [nbs.astype(int) for nbs in np.split(second, splits)]
-        self.displacements = [d.astype(int).reshape((-1, 3))
-                              for d in np.split(disp, splits)]
+        self.displacements = [
+            d.astype(int).reshape((-1, 3)) for d in np.split(disp, splits)
+        ]
 
         if self.sorted:
             _sort_neighbors(self.neighbors, self.displacements)
