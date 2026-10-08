@@ -139,13 +139,10 @@ class Precon(ABC):
         -------
         precon_forces: array
             (len(atoms), 3) array of preconditioned forces
-        residual: float
-            inf-norm of original forces, i.e. maximum absolute force
         """
         self.make_precon(atoms)
-        residual = np.linalg.norm(forces, np.inf)
         precon_forces = self.solve(forces)
-        return precon_forces, residual
+        return precon_forces
 
     @abstractmethod
     def copy(self):
@@ -1341,7 +1338,7 @@ class PreconImages:
                                          self.images[index],
                                          all_forces):
             f_vec = forces.reshape(-1)
-            pf_vec, _ = precon.apply(f_vec, image)
+            pf_vec = precon.apply(f_vec, image)
             precon_forces.append(pf_vec.reshape(-1, 3))
 
         return np.array(precon_forces)
@@ -1376,9 +1373,10 @@ class PreconImages:
         return tangent.reshape(-1, 3)
 
     def get_residual(self, i, imgforce):
-        # residuals computed according to eq. 11 in the paper
+        # residuals computed consistent with ASE-standard fmax norm
+        # (slight change from eq 11 of the paper)
         P_dot_imgforce = self.precon[i].Pdot(imgforce.reshape(-1))
-        return np.linalg.norm(P_dot_imgforce, np.inf)
+        return np.linalg.norm(P_dot_imgforce.reshape(-1, 3), axis=1).max()
 
     def get_spring_force(self, i, k1, k2, tangent):
         """Spring force on image

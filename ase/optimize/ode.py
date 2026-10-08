@@ -229,8 +229,9 @@ class ODE12r(SciPyOptimizer):
 
     def apply_precon(self, Fn, X):
         self.optimizable.set_x(X)
-        Fn, Rn = self.precon.apply(Fn, self._actual_atoms)
-        return Fn, Rn
+        Fp = self.precon.apply(Fn, self._actual_atoms)
+        Rn = self.optimizable.gradient_norm(Fn)
+        return Fp, Rn
 
     def call_fmin(self, fmax, steps):
         ode12r(
