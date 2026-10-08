@@ -40,7 +40,17 @@ def test_mirror_mask():
     atoms.center(1)
     atoms_pos = atoms.positions.copy()
 
-    atoms.mirror('z', center=(0, 0, 0), mask=[1, 0])
+    atoms.mirror('z', center=(0, 0, 0), indices=[True, False])
+    assert pytest.approx(atoms[0].position) == atoms_pos[0] * (1, 1, -1)
+    assert pytest.approx(atoms[1].position) == atoms_pos[1]
+
+
+def test_mirror_indices():
+    atoms = molecule('H2')
+    atoms.center(1)
+    atoms_pos = atoms.positions.copy()
+
+    atoms.mirror('z', center=(0, 0, 0), indices=[0])
     assert pytest.approx(atoms[0].position) == atoms_pos[0] * (1, 1, -1)
     assert pytest.approx(atoms[1].position) == atoms_pos[1]
 

@@ -1557,7 +1557,7 @@ class _LimitedAtoms:
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
 
-    def mirror(self, v, center=None, mask=None, mirror_cell=False):
+    def mirror(self, v, center=None, indices=None, mirror_cell=False):
         """Reflect atoms across a plane.
 
         Parameters
@@ -1575,8 +1575,9 @@ class _LimitedAtoms:
             cell (or origin if cell is not defined). Has no effect, if
             mirror_cell is True.
 
-        mask : array_like or None, default: None
-            Select which atoms are moved. If None, then all atoms are affected.
+        indices : array_like or None, default: None
+            Select which atoms are moved using an array of indices (or a
+            boolean mask). If None, then all atoms are affected.
 
         mirror_cell : bool, default: False
             If True, transform the cell with its contents. Can not be used
@@ -1594,12 +1595,8 @@ class _LimitedAtoms:
             center = 'COU'
         center = self._centering_as_array(center)
 
-        if mask is None:
-            mask = np.ones(len(self), int)
-        indices = []
-        for i, tv in enumerate(mask):
-            if tv:
-                indices.append(i)
+        if indices is None:
+            indices = np.ones(len(self), dtype=bool)
 
         tmp_pos = self.positions.copy()
         tmp_pos -= center
