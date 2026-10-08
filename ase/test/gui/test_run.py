@@ -57,7 +57,7 @@ def guifactory(display):
     guis = []
 
     def factory(images):
-        gui = GUI(images)
+        gui = GUI(images, config={})
         guis.append(gui)
         return gui
 

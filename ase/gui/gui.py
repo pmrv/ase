@@ -39,9 +39,13 @@ class GUI(View):
     ARROWKEY_MOVE = 1
     ARROWKEY_ROTATE = 2
 
-    def __init__(self, images=None,
+    def __init__(self,
+                 images=None,
                  rotations='',
-                 show_bonds=False, expr=None):
+                 show_bonds=False,
+                 expr=None,
+                 *,
+                 config=None):
 
         if not isinstance(images, Images):
             images = Images(images)
@@ -64,9 +68,10 @@ class GUI(View):
         self.obs.new_images.register(self.goto_last_frame)
         self.images = images
 
-        self.config = read_defaults()
+        self.config = read_defaults(config)
+
         if show_bonds:
-            self.config['show_bonds'] = True
+            self.config.set('show_bonds', True)
 
         self.icons = Icons()
 
@@ -107,7 +112,7 @@ class GUI(View):
     def plot_graph_standard(self):
         expr = self._caller_expr
         if expr is None:
-            expr = self.config['gui_graphs_string']
+            expr = self.config.get('default_graphs_string')
 
         if expr is not None and expr != '' and len(self.images) > 1:
             self.plot_graphs(expr=expr, ignore_if_nan=True)
@@ -627,11 +632,11 @@ class GUI(View):
 
             (_('_View'),
              [M(_('Show _unit cell'), self.toggle_show_unit_cell, 'Ctrl+U',
-                value=self.config['show_unit_cell']),
+                value=self.config.getboolean('show_unit_cell')),
               M(_('Show _axes'), self.toggle_show_axes,
-                value=self.config['show_axes']),
+                value=self.config.getboolean('show_axes')),
               M(_('Show _bonds'), self.toggle_show_bonds, 'Ctrl+B',
-                value=self.config['show_bonds']),
+                value=self.config.getboolean('show_bonds')),
               M(_('Show _velocities'), self.toggle_show_velocities, 'Ctrl+G',
                 value=False),
               M(_('Show _forces'), self.toggle_show_forces, 'Ctrl+F',

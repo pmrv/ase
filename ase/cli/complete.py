@@ -70,7 +70,8 @@ commands = {
     'gui':
         ['-n', '--image-number', '-r', '--repeat', '-R', '--rotations',
          '-o', '--output', '-g', '--graph', '-t', '--terminal',
-         '--interpolate', '-b', '--bonds', '-s', '--scale'],
+         '--interpolate', '-b', '--bonds', '-s', '--scale',
+         '--configfile'],
     'info':
         ['--files', '-v', '--verbose', '--formats', '--calculators',
          '--all-calculators', '--plugins'],
