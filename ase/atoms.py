@@ -1580,16 +1580,14 @@ class _LimitedAtoms:
 
         mirror_cell : bool, default: False
             If True, transform the cell with its contents. Can not be used
-            together with 'center', which will automatically be set to origin.
+            together with 'center'.
         """
         v = string2vector(v)
         v = v / np.linalg.norm(v)
         if mirror_cell:
             if center is not None:
-                warnings.warn(
-                    "The 'center' keyword is ignored when mirroring the cell "
-                    'vectors.',
-                    UserWarning,
+                raise ValueError(
+                    "The 'center' keyword can't be used when mirroring cell."
                 )
             center = (0.0, 0.0, 0.0)
         elif center is None:
