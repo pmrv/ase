@@ -1,3 +1,11 @@
+Optimizers
+----------
+
+- Deprecated :attr:`ase.mep.neb.NEB.real_forces`.
+  Raw forces without constraints can be obtained with
+  `images[i].get_forces(apply_constraint=False)`.
+  (:mr:`4263`)
+
 Bugfixes
 --------
 

@@ -448,6 +448,15 @@ class NEB:
         self.energies = None  # ndarray of shape (nimages,)
         self.residuals = None  # ndarray of shape (nimages,)
 
+    @property
+    @deprecated('Please use `images[i].get_forces(apply_constraint=False)`.')
+    def real_forces(self):
+        # TODO: to be removed in ASE 3.31.0 or later
+        forces = np.full((self.nimages, self.natoms, 3), np.nan)
+        for i in range(self.nimages):
+            forces[i] = self._results[i]['forces']
+        return forces
+
     def __ase_optimizable__(self):
         return NEBOptimizable(self)
 
