@@ -27,7 +27,8 @@ class DiffusionCoefficient:
           https://en.wikibooks.org/wiki/Molecular_Simulation/
           Diffusion_Coefficients
 
-        Parameters:
+        Parameters
+        ----------
             traj (Trajectory):
                 Trajectory of atoms objects (images)
             timestep (Float):
@@ -100,7 +101,8 @@ class DiffusionCoefficient:
         average diffusivity for species in any given segment, and
         objects to store gradient and intercept from fitting.
 
-        Parameters:
+        Parameters
+        ----------
             ignore_n_images (Int):
                 Number of images you want to ignore from the start of the
                 trajectory, e.g. during equilibration
@@ -147,7 +149,8 @@ class DiffusionCoefficient:
         Option is also provided to ignore initial images if data is
         perhaps unequilibrated initially.
 
-        Parameters:
+        Parameters
+        ----------
             ignore_n_images (Int):
                 Number of images you want to ignore from the start of
                 the trajectory, e.g. during equilibration
@@ -235,7 +238,8 @@ class DiffusionCoefficient:
         """Private function that returns slope and intercept for
         linear fit to mean square diffusion data
 
-        Parameters:
+        Parameters
+        ----------
             x (Array of floats):
                 Linear list of timesteps in the calculation
             y (Array of floats):
@@ -286,7 +290,8 @@ class DiffusionCoefficient:
         """Auto-plot of Diffusion Coefficient data. Provides basic
         framework for visualising analysis.
 
-         Parameters:
+         Parameters
+        ----------
             ax (Matplotlib.axes.Axes)
                 Axes object on to which plot can be created
             show (Boolean)
