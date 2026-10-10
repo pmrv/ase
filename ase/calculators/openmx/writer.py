@@ -265,7 +265,7 @@ def get_definition_of_atomic_species(atoms, parameters):
       Since the pseudo-atomic orbitals are used for projectors,
       the specification of them is the same as for the basis functions.
       An example setting, for silicon in diamond structure, is as following:
-   Species.Number          2
+    Species.Number          2
       <Definition.of.Atomic.Species
         Si       Si7.0-s2p2d1    Si_CA13
         proj1    Si5.5-s1p1d1f1  Si_CA13
