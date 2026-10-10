@@ -2269,8 +2269,8 @@ atoms_g22: List[str] = []
 for f in data:
     s = Atoms(
         symbols=data[f]['symbols'],  # type: ignore[index]
-        positions=data[f]['positions'],
-    )  # type: ignore[index]
+        positions=data[f]['positions'],  # type: ignore[index]
+    )
     atoms_g22.extend(a.symbol for a in s)
 # unique atoms
 atoms_g22 = list(set(atoms_g22))
