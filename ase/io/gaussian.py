@@ -603,7 +603,7 @@ def _get_key_value_pairs(line):
     for index_range in index_ranges:
         start = index_range[0]
         stop = index_range[1]
-        line = line[0:start:] + line[stop + 1 : :]
+        line = line[0:start:] + line[stop + 1 :]
 
     # Next, get the keywords and options separated with
     # an equals sign, and those without an equals sign
