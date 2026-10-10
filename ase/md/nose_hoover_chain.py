@@ -1,5 +1,3 @@
-# fmt: off
-
 from __future__ import annotations
 
 import numpy as np
@@ -163,6 +161,7 @@ class NoseHooverChainThermostat:
 
     See `NoseHooverChainNVT` for the references.
     """
+
     def __init__(
         self,
         *,
@@ -204,14 +203,13 @@ class NoseHooverChainThermostat:
         """Integrate exp(i * L_NHC * delta) and update momenta `p`."""
         for _ in range(self._tloop):
             for coeff in FOURTH_ORDER_COEFFS:
-                p = self._integrate_nhc_loop(
-                    p, coeff * delta / self._tloop
-                )
+                p = self._integrate_nhc_loop(p, coeff * delta / self._tloop)
 
         return p
 
-    def _integrate_p_eta_j(self, p: np.ndarray, j: int,
-                           delta2: float, delta4: float) -> None:
+    def _integrate_p_eta_j(
+        self, p: np.ndarray, j: int, delta2: float, delta4: float
+    ) -> None:
         if j < self._tchain - 1:
             self._p_eta[j] *= np.exp(
                 -delta4 * self._p_eta[j + 1] / self._Q[j + 1]
@@ -258,6 +256,7 @@ class IsotropicMTKNPT(MolecularDynamics):
     - [1] G. J. Martyna, D. J. Tobias, and M. L. Klein, J. Chem. Phys. 101,
           4177-4189 (1994). https://doi.org/10.1063/1.467468
     """
+
     def __init__(
         self,
         atoms: Atoms,
@@ -310,7 +309,7 @@ class IsotropicMTKNPT(MolecularDynamics):
 
         if len(atoms.constraints) > 0:
             raise NotImplementedError(
-                "Current implementation does not support constraints"
+                'Current implementation does not support constraints'
             )
 
         self._num_atoms_global = self.atoms.get_global_number_of_atoms()
@@ -397,15 +396,18 @@ class IsotropicMTKNPT(MolecularDynamics):
     def _integrate_q(self, delta: float) -> None:
         """Integrate exp(i * L_1 * delta)"""
         x = delta * self._p_eps / self._barostat.W
-        self._q = (
-            self._q * np.exp(x)
-            + self._p * delta / self.masses * exprel(x)
+        self._q = self._q * np.exp(x) + self._p * delta / self.masses * exprel(
+            x
         )
 
     def _integrate_p(self, delta: float) -> None:
         """Integrate exp(i * L_2 * delta)"""
-        x = (1 + 1 / self._num_atoms_global) * self._p_eps * delta \
-                / self._barostat.W
+        x = (
+            (1 + 1 / self._num_atoms_global)
+            * self._p_eps
+            * delta
+            / self._barostat.W
+        )
         forces = self._get_forces()
         self._p = self._p * np.exp(-x) + delta * forces * exprel(-x)
 
@@ -429,6 +431,7 @@ class IsotropicMTKBarostat:
 
     See `IsotropicMTKNPT` for the references.
     """
+
     def __init__(
         self,
         num_atoms_global: int,
@@ -461,9 +464,8 @@ class IsotropicMTKBarostat:
 
     def get_barostat_energy(self) -> float:
         """Return energy-like contribution from the barostat variables."""
-        energy = (
-            + np.sum(0.5 * self._p_xi**2 / self._R)
-            + self._kT * np.sum(self._xi)
+        energy = +np.sum(0.5 * self._p_xi**2 / self._R) + self._kT * np.sum(
+            self._xi
         )
         return float(energy)
 
@@ -489,15 +491,16 @@ class IsotropicMTKBarostat:
 
         return p_eps
 
-    def _integrate_p_xi_j(self, p_eps: float, j: int,
-                          delta2: float, delta4: float) -> None:
+    def _integrate_p_xi_j(
+        self, p_eps: float, j: int, delta2: float, delta4: float
+    ) -> None:
         if j < self._pchain - 1:
             self._p_xi[j] *= np.exp(
                 -delta4 * self._p_xi[j + 1] / self._R[j + 1]
             )
 
         if j == 0:
-            g_j = p_eps ** 2 / self._W - self._kT
+            g_j = p_eps**2 / self._W - self._kT
         else:
             g_j = self._p_xi[j - 1] ** 2 / self._R[j - 1] - self._kT
         self._p_xi[j] += delta2 * g_j
@@ -511,9 +514,7 @@ class IsotropicMTKBarostat:
         self._xi += delta * self._p_xi / self._R
 
     def _integrate_nhc_p_eps(self, p_eps: float, delta: float) -> float:
-        p_eps_new = p_eps * float(
-            np.exp(-delta * self._p_xi[0] / self._R[0])
-        )
+        p_eps_new = p_eps * float(np.exp(-delta * self._p_xi[0] / self._R[0]))
         return p_eps_new
 
 
@@ -527,6 +528,7 @@ class MTKNPT(MolecularDynamics):
     - [1] G. J. Martyna, D. J. Tobias, and M. L. Klein, J. Chem. Phys. 101,
           4177-4189 (1994). https://doi.org/10.1063/1.467468
     """
+
     def __init__(
         self,
         atoms: Atoms,
@@ -579,7 +581,7 @@ class MTKNPT(MolecularDynamics):
 
         if len(atoms.constraints) > 0:
             raise NotImplementedError(
-                "Current implementation does not support constraints"
+                'Current implementation does not support constraints'
             )
 
         self._num_atoms_global = self.atoms.get_global_number_of_atoms()
@@ -678,9 +680,10 @@ class MTKNPT(MolecularDynamics):
         y = self._p @ U  # (num_atoms, 3-eigvec)
         sol = (
             x * np.exp(eigvals * delta / self._barostat.W)[None, :]
-            + delta * y / self.masses * exprel(
-                eigvals * delta / self._barostat.W
-            )[None, :]
+            + delta
+            * y
+            / self.masses
+            * exprel(eigvals * delta / self._barostat.W)[None, :]
         )  # (num_atoms, 3-eigvec)
         self._q = sol @ U.T
 
@@ -690,14 +693,15 @@ class MTKNPT(MolecularDynamics):
 
         # eigvals: (3-eigvec), U: (3-xyz, 3-eigvec)
         eigvals, U = np.linalg.eigh(self._p_g)
-        kappas = eigvals \
-            + np.trace(self._p_g) / (3 * self._num_atoms_global)  # (3-eigvec)
+        kappas = eigvals + np.trace(self._p_g) / (
+            3 * self._num_atoms_global
+        )  # (3-eigvec)
         y = self._p @ U  # (num_atoms, 3-eigvec)
         sol = (
             y * np.exp(-kappas * delta / self._barostat.W)[None, :]
-            + delta * (forces @ U) * exprel(
-                -kappas * delta / self._barostat.W
-            )[None, :]
+            + delta
+            * (forces @ U)
+            * exprel(-kappas * delta / self._barostat.W)[None, :]
         )  # (num_atoms, 3-eigvec)
         self._p = sol @ U.T
 
@@ -707,9 +711,9 @@ class MTKNPT(MolecularDynamics):
         # eigvals: (3-eigvec), U: (3-xyz, 3-eigvec)
         eigvals, U = np.linalg.eigh(self._p_g)
         n = self._h @ U  # (3-axis, 3-eigvec)
-        sol = n * np.exp(
-            eigvals * delta / self._barostat.W
-        )[None, :]  # (3-axis, 3-eigvec)
+        sol = (
+            n * np.exp(eigvals * delta / self._barostat.W)[None, :]
+        )  # (3-axis, 3-eigvec)
         self._h = sol @ U.T
 
     def _integrate_p_cell(self, delta: float) -> None:
@@ -738,6 +742,7 @@ class MaskedMTKNPT(MTKNPT):
     - [1] G. J. Martyna, D. J. Tobias, and M. L. Klein, J. Chem. Phys. 101,
           4177-4189 (1994). https://doi.org/10.1063/1.467468
     """
+
     def __init__(
         self,
         *args,
@@ -795,9 +800,10 @@ class MaskedMTKNPT(MTKNPT):
         particle_dof = 3 * self._num_atoms_global
         kinetic_term = np.sum(self._p**2 / self.masses) / particle_dof
         pv_tensor = volume * (stress - self._pressure_au * np.eye(3))
-        gc = np.diag(
-            self._h0_basis @ pv_tensor @ self._h0_basis.T
-        ) + kinetic_term
+        gc = (
+            np.diag(self._h0_basis @ pv_tensor @ self._h0_basis.T)
+            + kinetic_term
+        )
         self._p_c[self.mask] += delta * gc[self.mask]
 
     def _integrate_p_cell_by_barostat(self, delta: float) -> None:
@@ -818,6 +824,7 @@ class MTKBarostat:
         Other cell fluctuations such as partially allowed off-diagonal
         components are not supported in the current implementation.
     """
+
     def __init__(
         self,
         num_atoms_global: int,
@@ -861,8 +868,8 @@ class MTKBarostat:
         return float(energy)
 
     def integrate_nhc_baro(
-            self, p_cell: np.ndarray, delta: float
-        ) -> np.ndarray:
+        self, p_cell: np.ndarray, delta: float
+    ) -> np.ndarray:
         """Integrate exp(i * L_NHC-baro * delta)"""
         for _ in range(self._ploop):
             for coeff in FOURTH_ORDER_COEFFS:
