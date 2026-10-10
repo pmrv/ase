@@ -4,12 +4,14 @@ import numpy as np
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 class MDMin(Optimizer):
     # default parameters
     defaults = {**Optimizer.defaults, 'dt': 0.2}
 
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

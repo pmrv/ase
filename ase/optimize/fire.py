@@ -5,7 +5,7 @@ import numpy as np
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
-from ase.utils import deprecated
+from ase.utils import deprecate_positionals, deprecated
 
 
 def _forbid_maxmove(args: list, kwargs: dict[str, Any]) -> bool:
@@ -40,6 +40,7 @@ class FIRE(Optimizer):
         category=FutureWarning,
         callback=_forbid_maxmove,
     )
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

@@ -6,10 +6,12 @@ import numpy as np
 
 from ase.filters import UnitCellFilter
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 class PreconFIRE(Optimizer):
 
+    @deprecate_positionals(2)
     def __init__(self, atoms, restart=None, logfile='-', trajectory=None,
                  dt=0.1, maxmove=0.2, dtmax=1.0, Nmin=5, finc=1.1, fdec=0.5,
                  astart=0.1, fa=0.99, a=0.1, theta=0.1,

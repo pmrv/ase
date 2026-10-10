@@ -26,9 +26,11 @@ import numpy as np
 
 from ase import Atoms
 from ase.optimize.optimize import Optimizer
+from ase.utils import deprecate_positionals
 
 
 class FIRE2(Optimizer):
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,

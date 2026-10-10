@@ -8,6 +8,7 @@ from ase.geometry import cell_to_cellpar
 from ase.optimize import BFGS
 from ase.optimize.optimize import Dynamics
 from ase.units import GPa
+from ase.utils import deprecate_positionals
 
 
 def calculate_isotropic_elasticity_tensor(
@@ -58,6 +59,7 @@ def calculate_isotropic_elasticity_tensor(
 
 
 class CellAwareBFGS(BFGS):
+    @deprecate_positionals(2)
     def __init__(
         self,
         atoms: Atoms,
