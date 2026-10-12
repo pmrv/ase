@@ -290,7 +290,7 @@ class DiffusionCoefficient:
         """Auto-plot of Diffusion Coefficient data. Provides basic
         framework for visualising analysis.
 
-         Parameters
+        Parameters
         ----------
             ax (Matplotlib.axes.Axes)
                 Axes object on to which plot can be created
