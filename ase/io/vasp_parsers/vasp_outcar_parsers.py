@@ -746,9 +746,8 @@ class OutcarHeaderParser(HeaderParser):
         for required_key in ('ion_types', 'species'):
             if required_key not in results:
                 raise ParseError(
-                    'Did not find required key "{}" in parsed header results.'.format(
-                        required_key
-                    )
+                    'Did not find required key "{}" in parsed header '
+                    'results.'.format(required_key)
                 )
 
         ion_types = results.pop('ion_types')

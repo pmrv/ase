@@ -809,7 +809,7 @@ class IdentityPrecon(Precon):
 
 
 class C1(SparseCoeffPrecon):
-    """Creates matrix by inserting a constant whenever r_ij is less than r_cut."""
+    """Creates matrix by inserting a constant where r_ij is less than r_cut."""
 
     def __init__(
         self,
