@@ -99,6 +99,7 @@ def update(
             print(''.join(lines), end='', file=fd)
         new.rename(path)
         path.chmod(0o775)
+        print(f'Updated {path}')
         check_call(['ruff', 'format', str(path)])
 
 
