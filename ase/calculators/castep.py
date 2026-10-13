@@ -462,10 +462,6 @@ class Castep(BaseCalculator):
            pp.567- 570 (2005) PDF_.
 
     .. _PDF: https://www.tcm.phy.cam.ac.uk/castep/papers/ZKristallogr_2005.pdf
-
-
-    End CASTEP Interface Documentation
-
     """
 
     # Class attributes !
