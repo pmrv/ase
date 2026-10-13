@@ -568,7 +568,7 @@ class NEB:
 
         forces = np.empty(((self.nimages - 2), self.natoms, 3))
         energies = np.empty(self.nimages)
-        results = self.nimages * [{}]
+        results = [{} for _ in range(self.nimages)]
 
         if self.remove_rotation_and_translation:
             for i in range(1, self.nimages):
