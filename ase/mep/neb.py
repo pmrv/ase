@@ -12,7 +12,7 @@ from scipy.interpolate import CubicSpline
 
 import ase.parallel
 from ase.build import minimize_rotation_and_translation
-from ase.calculators.calculator import Calculator, compare_atoms
+from ase.calculators.calculator import Calculator, all_properties, compare_atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.geometry import find_mic
 from ase.optimize import MDMin
@@ -444,9 +444,18 @@ class NEB:
                 raise RuntimeError(
                     'Cannot use shared calculators in parallel in NEB.'
                 )
-        self.real_forces = None  # ndarray of shape (nimages, natom, 3)
+        self._results = None  # placeholder of `calc.results` for all images
         self.energies = None  # ndarray of shape (nimages,)
         self.residuals = None  # ndarray of shape (nimages,)
+
+    @property
+    @deprecated('Please use `images[i].get_forces(apply_constraint=False)`.')
+    def real_forces(self):
+        # TODO: to be removed in ASE 3.31.0 or later
+        forces = np.full((self.nimages, self.natoms, 3), np.nan)
+        for i in range(self.nimages):
+            forces[i] = self._results[i]['forces']
+        return forces
 
     def __ase_optimizable__(self):
         return NEBOptimizable(self)
@@ -559,7 +568,7 @@ class NEB:
 
         forces = np.empty(((self.nimages - 2), self.natoms, 3))
         energies = np.empty(self.nimages)
-        real_forces = np.zeros((self.nimages, self.natoms, 3))
+        results = [{} for _ in range(self.nimages)]
 
         if self.remove_rotation_and_translation:
             for i in range(1, self.nimages):
@@ -568,10 +577,11 @@ class NEB:
         if self.method != 'aseneb':
             for i in (0, -1):
                 # Call `get_forces` to store forces needed by `NEBTools`.
-                real_forces[i] = images[i].get_forces(apply_constraint=False)
+                images[i].get_forces()
+                results[i] = _filter_results(images[i])
                 energies[i] = images[i].get_potential_energy()
 
-        self._evaluate_images(energies, forces, real_forces)
+        self._evaluate_images(energies, forces, results)
 
         # if this is the first force call, we need to build the preconditioners
         if self.precon is None or isinstance(self.precon, (str, Precon, list)):
@@ -583,7 +593,7 @@ class NEB:
 
         # Save for later use in iterimages:
         self.energies = energies
-        self.real_forces = real_forces
+        self._results = results
 
         state = NEBState(self, images, energies)
 
@@ -636,40 +646,40 @@ class NEB:
         self,
         energies: npt.NDArray[np.float64],
         forces: npt.NDArray[np.float64],
-        real_forces: npt.NDArray[np.float64],
+        results: list[dict],
     ) -> None:
         if not self.parallel:
-            self._evaluate_images_serial(energies, forces, real_forces)
+            self._evaluate_images_serial(energies, forces, results)
         elif self.world.size == 1:
-            self._evaluate_images_threaded(energies, forces, real_forces)
+            self._evaluate_images_threaded(energies, forces, results)
         else:
-            self._evaluate_images_mpi(energies, forces, real_forces)
+            self._evaluate_images_mpi(energies, forces, results)
 
     def _evaluate_images_serial(
         self,
         energies: npt.NDArray[np.float64],
         forces: npt.NDArray[np.float64],
-        real_forces: npt.NDArray[np.float64],
+        results: list[dict],
     ) -> None:
         images = self.images
         # Do all images - one at a time:
         for i in range(1, self.nimages - 1):
             forces[i - 1] = images[i].get_forces()
             energies[i] = images[i].get_potential_energy()
-            real_forces[i] = images[i].get_forces(apply_constraint=False)
+            results[i] = _filter_results(images[i])
 
     def _evaluate_images_threaded(
         self,
         energies: npt.NDArray[np.float64],
         forces: npt.NDArray[np.float64],
-        real_forces: npt.NDArray[np.float64],
+        results: list[dict],
     ) -> None:
         images = self.images
 
         def run(i: int) -> None:
             forces[i - 1] = images[i].get_forces()
             energies[i] = images[i].get_potential_energy()
-            real_forces[i] = images[i].get_forces(apply_constraint=False)
+            results[i] = _filter_results(images[i])
 
         threads = [
             Thread(target=run, args=(i,)) for i in range(1, self.nimages - 1)
@@ -683,7 +693,7 @@ class NEB:
         self,
         energies: npt.NDArray[np.float64],
         forces: npt.NDArray[np.float64],
-        real_forces: npt.NDArray[np.float64],
+        results: list[dict],
     ) -> None:
         images = self.images
         # Parallelize over images:
@@ -691,7 +701,7 @@ class NEB:
         try:
             forces[i - 1] = images[i].get_forces()
             energies[i] = images[i].get_potential_energy()
-            real_forces[i] = images[i].get_forces(apply_constraint=False)
+            results[i] = _filter_results(images[i])
         except Exception:
             # Make sure other images also fail:
             error = self.world.sum(1.0)
@@ -705,7 +715,7 @@ class NEB:
             root = (i - 1) * self.world.size // (self.nimages - 2)
             self.world.broadcast(energies[i : i + 1], root)
             self.world.broadcast(forces[i - 1], root)
-            self.world.broadcast(real_forces[i], root)
+            self.world.broadcast(results[i], root)
 
     def get_residual(self):
         """Return residual force along the band.
@@ -769,10 +779,7 @@ class NEB:
                 yield atoms
             else:
                 atoms = atoms.copy()
-                self.freeze_results_on_image(
-                    atoms, energy=self.energies[i], forces=self.real_forces[i]
-                )
-
+                self.freeze_results_on_image(atoms, **self._results[i])
                 yield atoms
 
     def spline_fit(self, positions=None, norm='precon'):
@@ -824,6 +831,10 @@ class NEB:
         F = dE.sum(axis=1)
         E = -cumulative_trapezoid(F, s, initial=0.0)
         return s, E, F
+
+
+def _filter_results(atoms: ase.Atoms) -> dict:
+    return {k: v for k, v in atoms.calc.results.items() if k in all_properties}
 
 
 class DyNEB(NEB):
