@@ -1,5 +1,3 @@
-# fmt: off
-
 import tkinter as tk
 import tkinter.ttk as ttk
 from functools import partial
@@ -14,30 +12,34 @@ class Movie:
     def __init__(self, gui):
         self.win = win = ui.Window(_('Movie'), close=self.close)
         win.add(_('Image number:'))
-        self.frame_number = ui.Scale(gui.frame, 0,
-                                     len(gui.images) - 1,
-                                     callback=self.new_frame)
+        self.frame_number = ui.Scale(
+            gui.frame, 0, len(gui.images) - 1, callback=self.new_frame
+        )
         win.add(self.frame_number)
 
-        win.add([ui.Button(_('First'), self.click, -1, True),
-                 ui.Button(_('Back'), self.click, -1),
-                 ui.Button(_('Forward'), self.click, 1),
-                 ui.Button(_('Last'), self.click, 1, True)])
+        win.add(
+            [
+                ui.Button(_('First'), self.click, -1, True),
+                ui.Button(_('Back'), self.click, -1),
+                ui.Button(_('Forward'), self.click, 1),
+                ui.Button(_('Last'), self.click, 1, True),
+            ]
+        )
 
         play = ui.Button(_('Play'), self.play)
         stop = ui.Button(_('Stop'), self.stop)
 
         # TRANSLATORS: This function plays an animation forwards and backwards
         # alternatingly, e.g. for displaying vibrational movement
-        self.rock = ui.CheckButton(_('Rock'),
-                                   value=gui.config.getboolean('movie_rock'))
+        self.rock = ui.CheckButton(
+            _('Rock'), value=gui.config.getboolean('movie_rock')
+        )
 
         win.add([play, stop, self.rock])
 
         if len(gui.images) > 150:
             skipdefault = len(gui.images) // 150
-            tdefault = min(max(len(gui.images) / (skipdefault * 5.0),
-                               1.0), 30)
+            tdefault = min(max(len(gui.images) / (skipdefault * 5.0), 1.0), 30)
         else:
             skipdefault = 0
             tdefault = min(max(len(gui.images) / 5.0, 1.0), 30)
@@ -47,8 +49,7 @@ class Movie:
             skipdefault = gui.config.getliteral('movie_skip')
         self.time = ui.SpinBox(tdefault, 1.0, 99, 0.1)
         self.skip = ui.SpinBox(skipdefault, 0, 99, 1)
-        win.add([_(' Frame rate: '), self.time, _(' Skip frames: '),
-                 self.skip])
+        win.add([_(' Frame rate: '), self.time, _(' Skip frames: '), self.skip])
 
         self.gui = gui
         self.direction = 1
@@ -141,17 +142,19 @@ class MovieToolbar:
         )
 
         self.slider = add(
-            tk.Scale(tkframe, from_=0,
-                     orient='horizontal',
-                     command=self.slidercommand,
-                     showvalue=False),
-            padx=(4, 2)
-            )
+            tk.Scale(
+                tkframe,
+                from_=0,
+                orient='horizontal',
+                command=self.slidercommand,
+                showvalue=False,
+            ),
+            padx=(4, 2),
+        )
         add(tk.Label(tkframe, text=_('Image:')))
         nlwidth = len(str(len(self.gui.images) - 1))
         self.numlabel = add(
-            tk.Label(tkframe, text='0', width=nlwidth, anchor='w'),
-            padx=(0, 4)
+            tk.Label(tkframe, text='0', width=nlwidth, anchor='w'), padx=(0, 4)
         )
         self._update_number_of_images()
 
