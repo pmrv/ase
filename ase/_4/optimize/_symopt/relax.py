@@ -962,33 +962,9 @@ class Relax:
 
         self.atoms = atoms
         if atoms_symmetries is None:
-            atoms_symmetries1 = AtomsSymmetries.from_spglib_auto(
+            atoms_symmetries = AtomsSymmetries.from_spglib_auto(
                 self.atoms, symprec=symprec
             )
-            atoms_symmetries2 = AtomsSymmetries.from_GPAW(
-                self.atoms,
-                tolerance=symprec,
-                symmorphic=symmorphic,
-                log=self.log,
-            )
-
-            assert len(atoms_symmetries1.rotation_scc) == len(
-                atoms_symmetries2.rotation_scc
-            )
-
-            for rot1, rot2 in zip(
-                atoms_symmetries1.rotation_scc, atoms_symmetries2.rotation_scc
-            ):
-                assert (rot1.ravel() == rot2.ravel()).all()
-
-            # for T1, T2 in zip(
-            #    atoms_symmetries1.translation_sc,
-            #    atoms_symmetries2.translation_sc,
-            # ):
-            #    err = abs(T2 - T1).max()
-            #    assert err < 1e-13, err
-
-            atoms_symmetries = atoms_symmetries1
 
         self.symmetry_adapted_atoms = SymmetryAdaptedAtoms(
             self.atoms, atoms_symmetries
