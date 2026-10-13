@@ -7,6 +7,7 @@ Run this when ever options are changed::
 
 import sys
 from pathlib import Path
+from subprocess import check_call
 
 # Path of the complete.py script:
 path = Path(__file__).with_name('complete.py')
@@ -98,6 +99,7 @@ def update(
             print(''.join(lines), end='', file=fd)
         new.rename(path)
         path.chmod(0o775)
+        check_call(['ruff', 'format', str(path)])
 
 
 if __name__ == '__main__':
