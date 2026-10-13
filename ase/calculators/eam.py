@@ -49,7 +49,7 @@ class EAM(Calculator):
     sets of data to define the dipole and quadrupole directional terms for
     each alloy and their cross interactions.
 
-    The total energy `E_{\rm tot}` of an arbitrary arrangement of atoms is
+    The total energy :math:`E_{\rm tot}` of an arbitrary arrangement of atoms is
     given by the EAM potential as
 
     .. math::
@@ -61,12 +61,12 @@ class EAM(Calculator):
     .. math::
        \bar\rho_i = \sum_j \rho(r_{ij})
 
-    where `F` is an embedding function, namely the energy to embed an
-    atom `i` in the combined electron density `\bar\rho_i` which is
-    contributed from each of its neighbouring atoms `j` by an amount
-    `\rho(r_{ij})`, `\phi(r_{ij})` is the pair potential function
-    representing the energy in bond `ij` which is due to the
-    short-range electro-static interaction between atoms, and `r_{ij}`
+    where :math:`F` is an embedding function, namely the energy to embed an
+    atom :math:`i` in the combined electron density :math:`\bar\rho_i` which is
+    contributed from each of its neighbouring atoms :math:`j` by an amount
+    :math:`\rho(r_{ij})`, :math:`\phi(r_{ij})` is the pair potential function
+    representing the energy in bond :math:`ij` which is due to the
+    short-range electro-static interaction between atoms, and :math:`r_{ij}`
     is the distance between an atom and its neighbour for that bond.
 
     The ADP potential is defined as
@@ -78,9 +78,10 @@ class EAM(Calculator):
        + \frac{1}{2} \sum_{i,\alpha,\beta} (\lambda_i^{\alpha\beta})^2
        - \frac{1}{6} \sum_i \nu_i^2
 
-    where `\mu_i^\alpha` is the dipole vector, `\lambda_i^{\alpha\beta}`
-    is the quadrupole tensor and `\nu_i` is the trace of
-    `\lambda_i^{\alpha\beta}`.
+    where :math:`\mu_i^\alpha` is the dipole vector,
+    :math:`\lambda_i^{\alpha\beta}`
+    is the quadrupole tensor and :math:`\nu_i` is the trace of
+    :math:`\lambda_i^{\alpha\beta}`.
 
     The fs potential is defined as
 
@@ -88,9 +89,10 @@ class EAM(Calculator):
        E_i = F_\alpha (\sum_{j\neq i} \rho_{\alpha \beta}(r_{ij}))
        + \frac{1}{2}\sum_{j\neq i}\phi_{\alpha \beta}(r_{ij})
 
-    where `\alpha` and `\beta` are element types of atoms. This form
-    is similar to original EAM formula above, except that `\rho` and
-    `\phi` are determined by element types.
+    where :math:`\alpha` and :math:`\beta` are element types of atoms.
+    This form
+    is similar to original EAM formula above, except that :math:`\rho` and
+    :math:`\phi` are determined by element types.
 
     Running the Calculator
     ======================
@@ -119,8 +121,8 @@ class EAM(Calculator):
     The breakdown of energy contribution from the indvidual components are
     stored in the calculator instance ``.results['energy_components']``
 
-    Arguments
-    =========
+    Arguments:
+    ==========
 
     =========================  ================================================
     Keyword                    Description
@@ -206,7 +208,7 @@ class EAM(Calculator):
       function requires the installation of the Matplotlib libraries.
 
     Notes/Issues
-    =============
+    ============
 
     * Although currently not fast, this calculator can be good for trying
       small calculations or for creating new potentials by matching baseline
@@ -234,10 +236,6 @@ class EAM(Calculator):
 
     .. [2] Y. Mishin, M.J. Mehl, and D.A. Papaconstantopoulos,
            Acta Materialia 53 2005 4029--4041.
-
-
-    End EAM Interface Documentation
-
     """
 
     implemented_properties = ['energy', 'free_energy', 'forces', 'stress']
