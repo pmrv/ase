@@ -147,7 +147,7 @@ class MovieToolbar:
                      showvalue=False),
             padx=(4, 2)
             )
-        add(tk.Label(tkframe, text='Image'))
+        add(tk.Label(tkframe, text=_('Image:')))
         nlwidth = len(str(len(self.gui.images) - 1))
         self.numlabel = add(
             tk.Label(tkframe, text='0', width=nlwidth, anchor='w'),
