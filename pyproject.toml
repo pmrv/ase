@@ -121,7 +121,6 @@ ignore = [
     'UP031',  # Use format specifiers instead of percent format
     'UP032',  # Use f-string instead of `format` call
     'UP030',  # Use implicit references for positional format fields
-    'UP035',  # Import from `collections.abc` instead: `Iterator`
 ]
 
 [tool.ruff.lint.mccabe]

@@ -6,7 +6,7 @@ Note: GEN format only supports single snapshot.
 """
 
 import re
-from typing import Sequence
+from collections.abc import Sequence
 
 from ase.atoms import Atoms
 from ase.utils import reader, writer
