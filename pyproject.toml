@@ -118,13 +118,16 @@ select = [
 ignore = [
     'E741',   # ambiguous-variable-name
     'W505',   # doc-line-too-long
+    'UP031',  # Use format specifiers instead of percent format
+    'UP032',  # Use f-string instead of `format` call
+    'UP030',  # Use implicit references for positional format fields
+    'UP035',  # Import from `collections.abc` instead: `Iterator`
 ]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 50
 
 [tool.ruff.lint.per-file-ignores]
-"!doc/tutorials/**.py" = ["UP"]  # Only pyupgrade tutorials (for now)
 "examples/**.py" = ["E402"]
 "examples/**_prerequisites.py"= ["F401"]
 
