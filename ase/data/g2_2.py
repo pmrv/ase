@@ -23,7 +23,6 @@ B3LYP geometries and vibrations.
 For details about G2-1 and G2-2 sets see doi:10.1063/1.477422.
 """
 
-from typing import List
 
 from ase.atoms import Atoms
 from ase.data.g2_1 import data as data1
@@ -2265,7 +2264,7 @@ data = {
 
 
 # all constituent atoms
-atoms_g22: List[str] = []
+atoms_g22: list[str] = []
 for f in data:
     s = Atoms(
         symbols=data[f]['symbols'],  # type: ignore[index]

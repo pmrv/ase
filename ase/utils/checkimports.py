@@ -44,7 +44,7 @@ def exec_and_check_modules(expression: str) -> set[str]:
     proc = run(
         [sys.executable, '-c', command],
         capture_output=True,
-        universal_newlines=True,
+        text=True,
         check=True,
     )
     return set(json.loads(proc.stdout))

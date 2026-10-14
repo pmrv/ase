@@ -589,7 +589,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         self._ndofs = self._ndofs_cell + self._ndofs_atoms
 
         if value_z is None:
-            value_z = np.zeros((self._ndofs))
+            value_z = np.zeros(self._ndofs)
 
         self.value_z = value_z
         # !!! This actually symmetrizes actual atoms
