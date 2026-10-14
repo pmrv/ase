@@ -7,6 +7,7 @@ Run this when ever options are changed::
 
 import sys
 from pathlib import Path
+from subprocess import check_call
 
 # Path of the complete.py script:
 path = Path(__file__).with_name('complete.py')
@@ -86,18 +87,23 @@ def update(
     b = lines.index('# End of computer generated data\n')
 
     if test:
-        if ''.join(lines[a + 1 : b]) != txt:
+        from ase.cli.complete import commands as existing_commands
+
+        if dct != existing_commands:
             raise ValueError(
                 'Please update ase/cli/complete.py using '
                 '"python3 -m ase.cli.completion".'
             )
     else:
         lines[a + 1 : b] = [txt]
-        new = path.with_name('complete.py.new')
+        new = path.with_name('complete_new.py')
+
         with new.open('w') as fd:
             print(''.join(lines), end='', file=fd)
         new.rename(path)
         path.chmod(0o775)
+        print(f'Updated {path}')
+        check_call(['ruff', 'format', str(path)])
 
 
 if __name__ == '__main__':
