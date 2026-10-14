@@ -1,6 +1,5 @@
 """Tools for analyzing instances of :class:`~ase.Atoms`"""
 
-
 import numpy as np
 
 from ase import Atoms

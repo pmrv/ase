@@ -23,7 +23,6 @@ B3LYP geometries and vibrations.
 For details about G2-1 and G2-2 sets see doi:10.1063/1.477422.
 """
 
-
 from ase.atoms import Atoms
 from ase.data.g2_1 import data as data1
 
