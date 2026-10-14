@@ -52,6 +52,30 @@ class Settings:
         )
         win.add([_('Scale magmom vectors:'), self.magmom_vector_scale])
 
+        # Performance (only has an effect on large structures)
+        win.add(_('Rendering (large structures only):'))
+        self.interactive_level_of_detail = ui.CheckButton(
+            _('Reduce detail while dragging'),
+            self.gui.interactive_level_of_detail,
+            self.update_interactive_level_of_detail)
+        win.add(self.interactive_level_of_detail)
+        self.occlusion_culling = ui.CheckButton(
+            _('Do not render obscured atoms'),
+            self.gui.occlusion_culling,
+            self.update_occlusion_culling)
+        win.add(self.occlusion_culling)
+
+    def update_interactive_level_of_detail(self, *args):
+        self.gui.interactive_level_of_detail = (
+            self.interactive_level_of_detail.value)
+        self.gui.draw()
+        return True
+
+    def update_occlusion_culling(self, *args):
+        self.gui.occlusion_culling = self.occlusion_culling.value
+        self.gui.draw()
+        return True
+
     def scale_radii(self):
         self.gui.images.atom_scale = self.scale.value
         self.gui.draw()

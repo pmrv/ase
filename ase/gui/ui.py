@@ -646,6 +646,36 @@ def show_io_error(filename, err):
               _(f'Could not read {filename}: {err}'))
 
 
+class MotionCoalescer:
+    """Handle only the most recent of a burst of mouse-motion events.
+
+    Tk can deliver motion events much faster than a large structure can be
+    redrawn.  If every event triggers a redraw, the events queue up and the
+    window keeps redrawing for seconds after the mouse is released.
+
+    Instead, each event just replaces the stored one, and a single redraw is
+    scheduled for when Tk is idle.  Skipping the intermediate events loses
+    nothing, because rotating and panning are computed relative to where the
+    button was pressed, not relative to the previous motion event.
+    """
+
+    def __init__(self, widget, callback):
+        self.widget = widget
+        self.callback = callback
+        # The newest event not yet handled, or None if there is none.
+        self.latest_event = None
+
+    def __call__(self, event):
+        if self.latest_event is None:
+            self.widget.after_idle(self.handle_latest_event)
+        self.latest_event = event
+
+    def handle_latest_event(self):
+        event = self.latest_event
+        self.latest_event = None
+        self.callback(event)
+
+
 class ASEGUIWindow(MainWindow):
     def __init__(self, close, menu, config,
                  scroll, scroll_event,
@@ -685,7 +715,8 @@ class ASEGUIWindow(MainWindow):
 
         self.canvas.bind('<ButtonPress>', bind(press))
         for button in range(1, 4):
-            self.canvas.bind(f'<B{button}-Motion>', bind(move))
+            self.canvas.bind(f'<B{button}-Motion>',
+                             MotionCoalescer(self.win, bind(move)))
         self.canvas.bind('<ButtonRelease>', bind(release))
         self.canvas.bind('<Control-ButtonRelease>', bind(release, 'ctrl'))
         self.canvas.bind('<Shift-ButtonRelease>', bind(release, 'shift'))
@@ -693,10 +724,10 @@ class ASEGUIWindow(MainWindow):
         if not config['swap_mouse']:
             for button in (2, 3):
                 self.canvas.bind(f'<Shift-B{button}-Motion>',
-                                 bind(scroll))
+                                 MotionCoalescer(self.win, bind(scroll)))
         else:
             self.canvas.bind('<Shift-B1-Motion>',
-                             bind(scroll))
+                             MotionCoalescer(self.win, bind(scroll)))
 
         self.win.bind('<MouseWheel>', bind(scroll_event))
         self.win.bind('<Key>', bind(scroll))

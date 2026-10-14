@@ -111,6 +111,18 @@ class View:
         self.velocity_vector_scale = self.config['velocity_vector_scale']
         self.magmom_vector_scale = self.config['magmom_vector_scale']
 
+        # Performance options, see _draw_indices().  "Level of detail" is
+        # the usual computer-graphics term for drawing a cheaper version of
+        # the scene when full detail would be too slow: here, while the user
+        # is dragging/zooming (self.interactive is True).  _settle_timer
+        # restores full detail once interaction stops.
+        self.interactive_level_of_detail = self.config.get(
+            'interactive_level_of_detail', True)
+        self.occlusion_culling = self.config.get('occlusion_culling', True)
+        self.interactive = False
+        self._settle_timer = None
+        self.bonds = np.empty((0, 5), int)
+
         # buttons
         self.b1 = 1  # left
         self.b3 = 3  # right
@@ -175,6 +187,11 @@ class View:
             bonds = self.get_bonds(atomscopy)
         else:
             bonds = np.empty((0, 5), int)
+
+        # Columns 0 and 1 are the atom indices each bond connects.  Keep
+        # them so draw() can tell which bonds belong to culled atoms; the
+        # shortened endpoints in X_bonds/B no longer carry that information.
+        self.bonds = bonds
 
         # X is all atomic coordinates, and starting points of vectors
         # like bonds and cell segments.
@@ -415,6 +432,123 @@ class View:
             atoms = self.atoms
         return self.images.get_radii(atoms)
 
+    # Redraw cost is close to linear in the number of drawable objects, at
+    # roughly 5 µs each.  Below ~10000 objects a frame still takes under
+    # ~50 ms, which is smooth enough that dropping detail would only be
+    # visible as bonds flickering on and off for no gain.
+    LEVEL_OF_DETAIL_MIN_OBJECTS = 10000
+
+    def begin_interaction(self):
+        """Enter reduced-detail mode and arm the full-quality redraw.
+
+        Dragging emits far more motion events than we can draw frames, and
+        zooming has no release event at all, so detail is restored by a
+        timer once interaction stops.  Re-arming cancels the pending timer,
+        so during a continuous drag it only fires after the user lets go.
+        """
+        self.interactive = True
+        if self._settle_timer is not None:
+            self._settle_timer.cancel()
+        self._settle_timer = self.window.after(0.15, self.end_interaction)
+
+    def end_interaction(self):
+        """Leave reduced-detail mode and redraw at full quality."""
+        if self._settle_timer is not None:
+            self._settle_timer.cancel()
+            self._settle_timer = None
+        if self.interactive:
+            self.interactive = False
+            self.draw()
+
+    def _reducing_detail(self):
+        return (self.interactive and self.interactive_level_of_detail
+                and len(self.X) > self.LEVEL_OF_DETAIL_MIN_OBJECTS)
+
+    def _visible_atoms(self, P, z, r, keep=3):
+        """Indices of atoms that are not hidden behind nearer atoms.
+
+        Screen space is bucketed into cells roughly one atom across, and
+        only the ``keep`` frontmost atoms of each cell are kept.  Atoms
+        behind those are covered by opaque circles and cannot contribute a
+        pixel.  ``keep=3`` was chosen by pixel-diffing culled against
+        unculled renders over bulk, slab, nanoparticle and molecule
+        geometries at several orientations: the worst case differed in
+        0.06% of non-background pixels, while keep=1 reached 4%.
+
+        Sparse structures put at most a few atoms in any cell, so small
+        molecules keep every atom and are unaffected.
+
+        The single cell size assumes all atoms are drawn at roughly the
+        same screen radius.  That holds under orthographic projection,
+        where radius depends only on the element; callers must not use
+        this where it does not.  See _draw_indices().
+        """
+        natoms = len(P)
+        if natoms == 0:
+            return np.empty(0, int)
+        c = max(int(r.mean()), 1)
+        ix = np.floor(P[:, 0] / c).astype(np.int64)
+        iy = np.floor(P[:, 1] / c).astype(np.int64)
+        # Group by cell, and within a cell sort front-most first.
+        order = np.lexsort((-z, iy, ix))
+        ix = ix[order]
+        iy = iy[order]
+        first = np.empty(natoms, bool)
+        first[0] = True
+        first[1:] = (ix[1:] != ix[:-1]) | (iy[1:] != iy[:-1])
+        arange = np.arange(natoms)
+        rank = arange - np.maximum.accumulate(np.where(first, arange, 0))
+        return order[rank < keep]
+
+    def _draw_indices(self, X, n, r, vector_arrays, labels):
+        """Which drawable objects to actually render this frame.
+
+        ``self.indices`` deliberately stays the complete z-order: it is
+        also what release() walks for click hit-testing, so filtering it
+        would silently make atoms unselectable rather than merely undrawn.
+        """
+        indices = self.indices
+        ncell = len(self.X_cell)
+        reducing = self._reducing_detail()
+
+        if reducing:
+            # Bonds are ~87% of the objects in a dense periodic system.
+            indices = indices[indices < n + ncell]
+
+        if (not self.occlusion_culling
+                or len(self.X) <= self.LEVEL_OF_DETAIL_MIN_OBJECTS):
+            return indices
+
+        # Labels and vectors are drawn outside the atom's own circle, so a
+        # hidden atom can still contribute ink.  Don't cull in that case.
+        # While interacting they are suppressed anyway, so culling applies.
+        if labels is not None or vector_arrays:
+            return indices
+
+        # Statically, keep enough atoms per cell that the result is
+        # indistinguishable from drawing all of them.  While the view is
+        # moving, one per cell is plenty: it is a transient frame, and with
+        # bonds hidden this is the only thing that reduces the atom count
+        # at all.
+        keep = np.zeros(n, bool)
+        keep[self._visible_atoms(X[:n, :2], X[:n, 2], r,
+                                 keep=1 if reducing else 3)] = True
+        # Selected atoms get a heavier outline and moving atoms a halo that
+        # extends beyond the circle; keep them whether or not they show.
+        keep |= self.images.selected[:n]
+        if self.moving:
+            mask = np.asarray(self.move_atoms_mask[:n], bool)
+            keep[:len(mask)] |= mask
+
+        drawable = np.ones(len(self.X), bool)
+        drawable[:n] = keep
+        nbonds = len(self.X) - n - ncell
+        if nbonds > 0 and len(self.bonds) == nbonds:
+            # A bond is visible if either atom it connects is.
+            drawable[n + ncell:] = (keep[self.bonds[:, 0]]
+                                    | keep[self.bonds[:, 1]])
+        return indices[drawable[indices]]
+
     def draw(self, status=True):
         self.window.clear()
         axes = self.scale * self.axes * (1, -1, 1)
@@ -423,8 +557,11 @@ class View:
         X = np.dot(self.X, axes) - offset
         n = len(self.atoms)
 
-        # The indices enumerate drawable objects in z order:
+        # The indices enumerate drawable objects in z order.  This stays
+        # complete even when only a subset is drawn: release() uses it to
+        # hit-test clicks.
         self.indices = X[:, 2].argsort()
+        reduce_detail = self._reducing_detail()
         r = self.get_covalent_radii() * self.scale
         if self.window['toggle-show-bonds']:
             r *= 0.65
@@ -437,16 +574,16 @@ class View:
         d = (2 * r).round().astype(int)
 
         vector_arrays = []
-        if self.window['toggle-show-velocities']:
+        if not reduce_detail and self.window['toggle-show-velocities']:
             # Scale ugly?
             v = self.atoms.get_velocities()
             if v is not None:
                 vector_arrays.append(v * 10.0 * self.velocity_vector_scale)
-        if self.window['toggle-show-forces']:
+        if not reduce_detail and self.window['toggle-show-forces']:
             f = self.get_forces()
             vector_arrays.append(f * self.force_vector_scale)
 
-        if self.window['toggle-show-magmoms']:
+        if not reduce_detail and self.window['toggle-show-magmoms']:
             magmom = get_magmoms(self.atoms)
             # Turn this into a 3D vector if it is a scalar
             magmom_vecs = []
@@ -475,14 +612,14 @@ class View:
         ncell = len(self.X_cell)
         bond_linewidth = self.scale * 0.15
 
-        labels = self.get_labels()
+        labels = None if reduce_detail else self.get_labels()
 
         if self.arrowkey_mode == self.ARROWKEY_MOVE:
             movecolor = GREEN
         elif self.arrowkey_mode == self.ARROWKEY_ROTATE:
             movecolor = PURPLE
 
-        for a in self.indices:
+        for a in self._draw_indices(X, n, r, vector_arrays, labels):
             if a < n:
                 ra = d[a]
                 if visible[a]:
@@ -654,7 +791,15 @@ class View:
             self.scroll_event(event)
             return
 
+        # Interaction is over: restore full detail before hit-testing below,
+        # so self.P and self.indices describe the final frame.
+        self.interactive = False
+        if self._settle_timer is not None:
+            self._settle_timer.cancel()
+            self._settle_timer = None
+
         if event.button != self.b1:
+            self.draw()
             return
 
         selected = self.images.selected
@@ -723,10 +868,14 @@ class View:
         if self.button == self.b1:
             x0 = int(round(x0))
             y0 = int(round(y0))
-            self.draw()
+            # The scene does not change while rubber-band selecting, so
+            # replace just the rectangle instead of redrawing everything.
+            self.window.canvas.delete(UNCACHED_PRIMITIVES_TAG)
             self.window.canvas.create_rectangle(
                 (x, y, x0, y0), tags=UNCACHED_PRIMITIVES_TAG)
             return
+
+        self.begin_interaction()
 
         if event.modifier == 'shift':
             self.center = (self.center0 -
