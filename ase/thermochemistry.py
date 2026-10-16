@@ -1410,7 +1410,7 @@ class IdealGasThermo(BaseThermoChem):
                 if len(vib_energies) != num_vibs:
                     raise ValueError(
                         f'Too few vibration modes ({len(vib_energies)}) '
-                        + 'after selection. {num_vibs} expected'
+                        + f'after selection. {num_vibs} expected'
                     )
             else:
                 raise ValueError(
