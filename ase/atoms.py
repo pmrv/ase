@@ -1040,16 +1040,21 @@ class _LimitedAtoms:
         Centers the atoms in the unit cell, so there is the same
         amount of vacuum on all sides.
 
-        vacuum: float (default: None)
+        Parameters
+        ----------
+        vacuum: float, default: None
             If specified adjust the amount of vacuum when centering.
             If vacuum=10.0 there will thus be 10 Angstrom of vacuum
             on each side.
-        axis: int or sequence of ints
+        axis: int | Sequence[int], default: (0, 1, 2)
             Axis or axes to act on.  Default: Act on all axes.
-        about: float or array (default: None)
-            If specified, center the atoms about <about>.
-            I.e., about=(0., 0., 0.) (or just "about=0.", interpreted
-            identically), to center about the origin.
+        about: float | Sequence[float] | None, default: None
+            If specified, center the atoms about the given point.
+
+            .. versionadded:: 3.30.0
+                A float value is accepted, which is applied to all the axes
+                selected by `axis`.
+
         """
 
         # Find the orientations of the faces of the unit cell
@@ -1108,6 +1113,9 @@ class _LimitedAtoms:
 
         # Optionally, translate to center about a point in space.
         if about is not None:
+            # Convert scalar to a 3-element array to prevent subscriptable error
+            if np.isscalar(about):
+                about = [about] * 3
             for n, vector in enumerate(self.cell):
                 if n in axes:
                     translation -= vector / 2.0

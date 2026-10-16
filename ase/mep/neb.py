@@ -1,17 +1,18 @@
 import sys
-import threading
 import time
 import warnings
 from abc import ABC, abstractmethod
 from functools import cached_property
+from threading import Thread
 
 import numpy as np
+import numpy.typing as npt
 from scipy.integrate import cumulative_trapezoid
 from scipy.interpolate import CubicSpline
 
 import ase.parallel
 from ase.build import minimize_rotation_and_translation
-from ase.calculators.calculator import Calculator
+from ase.calculators.calculator import Calculator, all_properties, compare_atoms
 from ase.calculators.singlepoint import SinglePointCalculator
 from ase.geometry import find_mic
 from ase.optimize import MDMin
@@ -304,15 +305,15 @@ class NEBOptimizable(Optimizable):
 class NEB:
     def __init__(
         self,
-        images,
-        k=0.1,
-        climb=False,
-        parallel=False,
-        remove_rotation_and_translation=False,
+        images: list[ase.Atoms],
+        k: float | list[float] = 0.1,
+        climb: bool = False,
+        parallel: bool = False,
+        remove_rotation_and_translation: bool = False,
         world=None,
-        method=None,
-        allow_shared_calculator=False,
-        precon=None,
+        method: str | None = None,
+        allow_shared_calculator: bool = False,
+        precon: str | None = None,
     ):
         """Nudged elastic band.
 
@@ -443,9 +444,18 @@ class NEB:
                 raise RuntimeError(
                     'Cannot use shared calculators in parallel in NEB.'
                 )
-        self.real_forces = None  # ndarray of shape (nimages, natom, 3)
+        self._results = None  # placeholder of `calc.results` for all images
         self.energies = None  # ndarray of shape (nimages,)
         self.residuals = None  # ndarray of shape (nimages,)
+
+    @property
+    @deprecated('Please use `images[i].get_forces(apply_constraint=False)`.')
+    def real_forces(self):
+        # TODO: to be removed in ASE 3.31.0 or later
+        forces = np.full((self.nimages, self.natoms, 3), np.nan)
+        for i in range(self.nimages):
+            forces[i] = self._results[i]['forces']
+        return forces
 
     def __ase_optimizable__(self):
         return NEBOptimizable(self)
@@ -558,67 +568,20 @@ class NEB:
 
         forces = np.empty(((self.nimages - 2), self.natoms, 3))
         energies = np.empty(self.nimages)
-        real_forces = np.zeros((self.nimages, self.natoms, 3))
+        results = [{} for _ in range(self.nimages)]
 
         if self.remove_rotation_and_translation:
             for i in range(1, self.nimages):
                 minimize_rotation_and_translation(images[i - 1], images[i])
 
         if self.method != 'aseneb':
-            energies[0] = images[0].get_potential_energy()
-            energies[-1] = images[-1].get_potential_energy()
-
-        if not self.parallel:
-            # Do all images - one at a time:
-            for i in range(1, self.nimages - 1):
-                forces[i - 1] = images[i].get_forces()
+            for i in (0, -1):
+                # Call `get_forces` to store forces needed by `NEBTools`.
+                images[i].get_forces()
+                results[i] = _filter_results(images[i])
                 energies[i] = images[i].get_potential_energy()
-                real_forces[i] = images[i].get_forces(apply_constraint=False)
 
-        elif self.world.size == 1:
-
-            def run(image, energies, forces, real_forces):
-                forces[:] = image.get_forces()
-                energies[:] = image.get_potential_energy()
-                real_forces[:] = image.get_forces(apply_constraint=False)
-
-            threads = [
-                threading.Thread(
-                    target=run,
-                    args=(
-                        images[i],
-                        energies[i : i + 1],
-                        forces[i - 1 : i],
-                        real_forces[i : i + 1],
-                    ),
-                )
-                for i in range(1, self.nimages - 1)
-            ]
-            for thread in threads:
-                thread.start()
-            for thread in threads:
-                thread.join()
-        else:
-            # Parallelize over images:
-            i = self.world.rank * (self.nimages - 2) // self.world.size + 1
-            try:
-                forces[i - 1] = images[i].get_forces()
-                energies[i] = images[i].get_potential_energy()
-                real_forces[i] = images[i].get_forces(apply_constraint=False)
-            except Exception:
-                # Make sure other images also fail:
-                error = self.world.sum(1.0)
-                raise
-            else:
-                error = self.world.sum(0.0)
-                if error:
-                    raise RuntimeError('Parallel NEB failed!')
-
-            for i in range(1, self.nimages - 1):
-                root = (i - 1) * self.world.size // (self.nimages - 2)
-                self.world.broadcast(energies[i : i + 1], root)
-                self.world.broadcast(forces[i - 1], root)
-                self.world.broadcast(real_forces[i], root)
+        self._evaluate_images(energies, forces, results)
 
         # if this is the first force call, we need to build the preconditioners
         if self.precon is None or isinstance(self.precon, (str, Precon, list)):
@@ -630,7 +593,7 @@ class NEB:
 
         # Save for later use in iterimages:
         self.energies = energies
-        self.real_forces = real_forces
+        self._results = results
 
         state = NEBState(self, images, energies)
 
@@ -678,6 +641,81 @@ class NEB:
             spring1 = spring2
 
         return precon_forces.reshape((-1, 3))
+
+    def _evaluate_images(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        results: list[dict],
+    ) -> None:
+        if not self.parallel:
+            self._evaluate_images_serial(energies, forces, results)
+        elif self.world.size == 1:
+            self._evaluate_images_threaded(energies, forces, results)
+        else:
+            self._evaluate_images_mpi(energies, forces, results)
+
+    def _evaluate_images_serial(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        results: list[dict],
+    ) -> None:
+        images = self.images
+        # Do all images - one at a time:
+        for i in range(1, self.nimages - 1):
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            results[i] = _filter_results(images[i])
+
+    def _evaluate_images_threaded(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        results: list[dict],
+    ) -> None:
+        images = self.images
+
+        def run(i: int) -> None:
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            results[i] = _filter_results(images[i])
+
+        threads = [
+            Thread(target=run, args=(i,)) for i in range(1, self.nimages - 1)
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+    def _evaluate_images_mpi(
+        self,
+        energies: npt.NDArray[np.float64],
+        forces: npt.NDArray[np.float64],
+        results: list[dict],
+    ) -> None:
+        images = self.images
+        # Parallelize over images:
+        i = self.world.rank * (self.nimages - 2) // self.world.size + 1
+        try:
+            forces[i - 1] = images[i].get_forces()
+            energies[i] = images[i].get_potential_energy()
+            results[i] = _filter_results(images[i])
+        except Exception:
+            # Make sure other images also fail:
+            error = self.world.sum(1.0)
+            raise
+        else:
+            error = self.world.sum(0.0)
+            if error:
+                raise RuntimeError('Parallel NEB failed!')
+
+        for i in range(1, self.nimages - 1):
+            root = (i - 1) * self.world.size // (self.nimages - 2)
+            self.world.broadcast(energies[i : i + 1], root)
+            self.world.broadcast(forces[i - 1], root)
+            self.world.broadcast(results[i], root)
 
     def get_residual(self):
         """Return residual force along the band.
@@ -741,10 +779,7 @@ class NEB:
                 yield atoms
             else:
                 atoms = atoms.copy()
-                self.freeze_results_on_image(
-                    atoms, energy=self.energies[i], forces=self.real_forces[i]
-                )
-
+                self.freeze_results_on_image(atoms, **self._results[i])
                 yield atoms
 
     def spline_fit(self, positions=None, norm='precon'):
@@ -798,76 +833,61 @@ class NEB:
         return s, E, F
 
 
+def _filter_results(atoms: ase.Atoms) -> dict:
+    return {k: v for k, v in atoms.calc.results.items() if k in all_properties}
+
+
 class DyNEB(NEB):
     def __init__(
         self,
-        images,
-        k=0.1,
-        fmax=0.05,
-        climb=False,
-        parallel=False,
-        remove_rotation_and_translation=False,
-        world=None,
-        dynamic_relaxation=True,
-        scale_fmax=0.0,
-        method=None,
-        allow_shared_calculator=False,
-        precon=None,
-    ):
-        """
-        Subclass of NEB that allows for scaled and dynamic optimizations of
-        images. This method, which only works in series, does not perform
+        *args,
+        fmax: float = 0.05,
+        scale_fmax: float = 0.0,
+        **kwargs,
+    ) -> None:
+        r"""Subclass of :class:`~ase.mep.neb.NEB` that allows for scaled and
+        dynamic optimizations of images [Lindgren2019]_.
+
+        This method does not perform
         force calls on images that are below the convergence criterion.
         The convergence criteria can be scaled with a displacement metric
         to focus the optimization on the saddle point region.
 
-        'Scaled and Dynamic Optimizations of Nudged Elastic Bands',
-        P. Lindgren, G. Kastlunger and A. A. Peterson,
-        J. Chem. Theory Comput. 15, 11, 5787-5793 (2019).
+        .. [Lindgren2019]
+            P. Lindgren, G. Kastlunger and A. A. Peterson,
+            Scaled and Dynamic Optimizations of Nudged Elastic Bands,
+            J. Chem. Theory Comput. 15, 11, 5787-5793 (2019).
+            :doi:`10.1021/acs.jctc.9b00633`
 
         Parameters
         ----------
-        dynamic_relaxation: bool
-            True skips images with forces below the convergence criterion.
-            This is updated after each force call; if a previously converged
-            image goes out of tolerance (due to spring adjustments between
-            the image and its neighbors), it will be optimized again.
-            False reverts to the default NEB implementation.
-
-        fmax: float
-            Must be identical to the fmax of the optimizer.
-
-        scale_fmax: float
+        fmax : float, default: 0.05
+            Reference force convergence criterion.
+            This must be identical to the `fmax` of the optimizer.
+        scale_fmax : float, default: 0.0
             Scale convergence criteria along band based on the distance between
             an image and the image with the highest potential energy. This
             keyword determines how rapidly the convergence criteria are scaled.
+            :math:`\alpha_\mathrm{s}` in Eq. (2) in [Lindgren2019]_.
+        *args, **kwargs
+            Additional arguments passed to :class:`~ase.mep.neb.NEB`.
+
+        Notes
+        -----
+        :class:`DyNEB` only works in series.
+
+        .. versionremoved :: 3.30.0
+
+            The `dynamic_relaxation` argument is removed.
+            This class now always performs DyNEB [Lindgren2019]_.
+
         """
-        super().__init__(
-            images,
-            k=k,
-            climb=climb,
-            parallel=parallel,
-            remove_rotation_and_translation=remove_rotation_and_translation,
-            world=world,
-            method=method,
-            allow_shared_calculator=allow_shared_calculator,
-            precon=precon,
-        )
+        super().__init__(*args, **kwargs)
         self.fmax = fmax
-        self.dynamic_relaxation = dynamic_relaxation
         self.scale_fmax = scale_fmax
 
-        if not self.dynamic_relaxation and self.scale_fmax:
-            msg = (
-                'Scaled convergence criteria only implemented in series '
-                'with dynamic relaxation.'
-            )
-            raise ValueError(msg)
-
     def set_positions(self, positions):
-        if not self.dynamic_relaxation:
-            return super().set_positions(positions)
-
+        """Update atomic positions but only for unconverged images."""
         n1 = 0
         for i, image in enumerate(self.images[1:-1]):
             if self.parallel:
@@ -877,18 +897,20 @@ class DyNEB(NEB):
                     'routine for freezing images in parallel.'
                 )
                 raise ValueError(msg)
-            else:
-                forces_dyn = self._fmax_all(self.images)
-                if forces_dyn[i] < self.fmax:
-                    n1 += self.natoms
-                else:
-                    n2 = n1 + self.natoms
-                    image.set_positions(positions[n1:n2])
-                    n1 = n2
 
-    def _fmax_all(self, images):
-        """Store maximum force acting on each image in list. This is used in
-        the dynamic optimization routine in the set_positions() function."""
+            forces_dyn = self._fmax_all()
+            if forces_dyn[i] < self.fmax:
+                n1 += self.natoms
+            else:
+                n2 = n1 + self.natoms
+                image.set_positions(positions[n1:n2])
+                n1 = n2
+
+    def _fmax_all(self) -> list[float]:
+        """Store maximum force acting on each image in list.
+
+        This is used in `set_positions`.
+        """
         n = self.natoms
         forces = self.get_forces()
         fmax_images = [
@@ -897,14 +919,17 @@ class DyNEB(NEB):
         ]
         return fmax_images
 
-    def get_forces(self):
-        forces = super().get_forces()
-        if not self.dynamic_relaxation:
-            return forces
+    def get_forces(self) -> npt.NDArray[np.float64]:
+        """Get NEB forces with applying the scaled convergence criteria.
 
-        """Get NEB forces and scale the convergence criteria to focus
-           optimization on saddle point region. The keyword scale_fmax
-           determines the rate of convergence scaling."""
+        For each image, if the forces are below the convergence criteria,
+        they are replaced with zero.
+        The keyword `scale_fmax` determines the rate of convergence scaling.
+        For non-zero `scale_fmax`, the convergence criteria become looser for
+        the images further away from the saddle point to focus optimization on
+        the saddle-point region.
+        """
+        forces = super().get_forces()
         n = self.natoms
         for i in range(self.nimages - 2):
             n1 = n * i
@@ -918,13 +943,13 @@ class DyNEB(NEB):
             """Scale convergence criteria based on distance between an
                image and the image with the highest potential energy."""
             rel_pos = np.sqrt(((positions[n1:n2] - pos_imax) ** 2).sum())
-            if force < self.fmax * (1 + rel_pos * self.scale_fmax):
+            if force < self.fmax * (1.0 + rel_pos * self.scale_fmax):
                 if i == self.imax - 1:
                     # Keep forces at saddle point for the log file.
                     pass
                 else:
                     # Set forces to zero before they are sent to optimizer.
-                    forces[n1:n2, :] = 0
+                    forces[n1:n2, :] = 0.0
         return forces
 
 
@@ -1279,7 +1304,7 @@ class NEBTools:
         from matplotlib.backends.backend_pdf import PdfPages
 
         if nimages is None:
-            nimages = self._guess_nimages()
+            nimages = _guess_nimages(self.images)
         nebsteps = len(self.images) // nimages
         if constant_x or constant_y:
             sys.stdout.write('Scaling axes.\n')
@@ -1309,39 +1334,18 @@ class NEBTools:
                 pyplot.close(fig)  # Reference counting "bug" in pyplot.
         sys.stdout.write('\n')
 
-    def _guess_nimages(self):
-        """Attempts to guess the number of images per band from
-        a trajectory, based solely on the repetition of the
-        potential energy of images. This should also work for symmetric
-        cases."""
-        e_first = self.images[0].get_potential_energy()
-        nimages = None
-        for index, image in enumerate(self.images[1:], start=1):
-            e = image.get_potential_energy()
-            if e == e_first:
-                # Need to check for symmetric case when e_first = e_last.
-                try:
-                    e_next = self.images[index + 1].get_potential_energy()
-                except IndexError:
-                    pass
-                else:
-                    if e_next == e_first:
-                        nimages = index + 1  # Symmetric
-                        break
-                nimages = index  # Normal
-                break
-        if nimages is None:
-            sys.stdout.write('Appears to be only one band in the images.\n')
-            return len(self.images)
-        # Sanity check that the energies of the last images line up too.
-        e_last = self.images[nimages - 1].get_potential_energy()
-        e_nextlast = self.images[2 * nimages - 1].get_potential_energy()
-        if e_last != e_nextlast:
-            raise RuntimeError('Could not guess number of images per band.')
-        sys.stdout.write(
-            'Number of images per band guessed to be {:d}.\n'.format(nimages)
-        )
-        return nimages
+
+def _guess_nimages(images: list[ase.Atoms]) -> int:
+    """Guess the number of images per band from a trajectory.
+
+    The guess is based on the (reasonable) assumption that the image at the
+    first end point does not change during the NEB simulation.
+    The function should also work for symmetric cases and for single-band cases.
+    """
+    for index, atoms in enumerate(images[1:], start=1):
+        if not compare_atoms(atoms, images[0]):
+            return index
+    return len(images)  # only one band in the trajectory
 
 
 class NEBtools(NEBTools):

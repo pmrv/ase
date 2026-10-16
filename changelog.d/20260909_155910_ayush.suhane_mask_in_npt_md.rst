@@ -1,0 +1,4 @@
+Bugfixes
+--------
+
+- Fixed incorrect indexing in MaskedMTKNPT when mask is a tuple of booleans  (:mr:`4225`)

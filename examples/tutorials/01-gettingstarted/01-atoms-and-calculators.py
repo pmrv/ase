@@ -13,10 +13,8 @@ Python
 ------
 
 In ASE, calculations are performed by writing and running Python
-scripts.  A very short primer on Python can be found in the
-:ref:`ASE examples <pythonintroduction>`.
-If you are new to Python it would be wise to look through
-this to understand the basic syntax, datatypes, and
+scripts.  If you are new to Python it would be wise to look through
+any online tutorials to understand the basic syntax, datatypes, and
 things like imports.  Or you can just wing it --- we won't judge.
 
 

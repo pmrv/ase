@@ -1,9 +1,12 @@
 import numpy as np
 
+from ase.transport.greenfunction import asetransport_deprecated
+
 
 class LeadSelfEnergy:
     conv = 1e-8  # Convergence criteria for surface Green function
 
+    @asetransport_deprecated
     def __init__(self, hs_dii, hs_dij, hs_dim, eta=1e-4):
         self.h_ii, self.s_ii = hs_dii  # onsite principal layer
         self.h_ij, self.s_ij = hs_dij  # coupling between principal layers

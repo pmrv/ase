@@ -1,0 +1,1566 @@
+# Japanese translations for ase package
+# Copyright (C) 2026 ASE developers
+# This file is distributed under the same license as the ase package.
+# Yuji Ikeda <yuji.ikeda.ac.jp@gmail.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ase\n"
+"Report-Msgid-Bugs-To: ase-users@listserv.fysik.dtu.dk\n"
+"POT-Creation-Date: 2026-09-27 20:01+0200\n"
+"PO-Revision-Date: 2026-10-05 20:08+0200\n"
+"Last-Translator: Yuji Ikeda <yuji.ikeda.ac.jp@gmail.com>\n"
+"Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.9\n"
+
+#: ../add.py:10
+msgid "(selection)"
+msgstr "（選択範囲）"
+
+#: ../add.py:16
+msgid "Add atoms"
+msgstr "原子を追加"
+
+#: ../add.py:17
+msgid "Specify chemical symbol, formula, or filename."
+msgstr "元素記号、化学式、またはファイル名を指定してください。"
+
+#: ../add.py:46
+msgid "Add:"
+msgstr "追加:"
+
+#: ../add.py:48
+msgid "File ..."
+msgstr "ファイル ..."
+
+#: ../add.py:61
+msgid "Coordinates:"
+msgstr "座標:"
+
+#: ../add.py:65
+msgid "Coordinates are relative to the center of the selection, if any, else absolute."
+msgstr "座標は、選択範囲がある場合はその中心を基準とし、それ以外の場合は絶対座標です。"
+
+#: ../add.py:69
+msgid "Check positions"
+msgstr "位置を確認"
+
+#: ../add.py:70 ../nanoparticle.py:276
+msgid "Add"
+msgstr "追加"
+
+#: ../add.py:117
+msgid "Cannot add atoms"
+msgstr "原子を追加できません"
+
+#: ../add.py:118
+msgid "{} is neither atom, molecule, nor file"
+msgstr "{} は原子、分子、ファイルのいずれでもありません"
+
+#: ../add.py:157
+msgid "Bad positions"
+msgstr "不正な位置"
+
+#: ../add.py:159
+msgid "Atom would be less than 0.5 Å from an existing atom.  To override, uncheck the check positions option."
+msgstr "原子が既存の原子から 0.5 Å 未満の位置になります。許可するには「位置を確認」をオフにしてください。"
+
+#. TRANSLATORS: This is a title of a window.
+#: ../celleditor.py:51
+msgid "Cell Editor"
+msgstr "セルエディター"
+
+#: ../celleditor.py:55
+msgid "A:"
+msgstr "A:"
+
+#: ../celleditor.py:55
+msgid "||A||:"
+msgstr "||A||:"
+
+#: ../celleditor.py:56 ../celleditor.py:58 ../celleditor.py:60
+msgid "periodic:"
+msgstr "周期境界:"
+
+#: ../celleditor.py:57
+msgid "B:"
+msgstr "B:"
+
+#: ../celleditor.py:57
+msgid "||B||:"
+msgstr "||B||:"
+
+#: ../celleditor.py:59
+msgid "C:"
+msgstr "C:"
+
+#: ../celleditor.py:59
+msgid "||C||:"
+msgstr "||C||:"
+
+#: ../celleditor.py:61
+msgid "∠BC:"
+msgstr "∠BC:"
+
+#: ../celleditor.py:61
+msgid "∠AC:"
+msgstr "∠AC:"
+
+#: ../celleditor.py:62
+msgid "∠AB:"
+msgstr "∠AB:"
+
+#: ../celleditor.py:63
+msgid "Scale atoms with cell:"
+msgstr "セルに合わせて原子をスケール:"
+
+#: ../celleditor.py:64
+msgid "Apply Vectors"
+msgstr "ベクトルを適用"
+
+#: ../celleditor.py:65
+msgid "Apply Magnitudes"
+msgstr "大きさを適用"
+
+#: ../celleditor.py:66
+msgid "Apply Angles"
+msgstr "角度を適用"
+
+#: ../celleditor.py:67
+msgid "Pressing 〈Enter〉 as you enter values will automatically apply correctly"
+msgstr "値の入力中に〈Enter〉を押すと、自動的に正しく適用されます"
+
+#. TRANSLATORS: verb
+#: ../celleditor.py:70
+msgid "Center"
+msgstr "中央に配置"
+
+#: ../celleditor.py:71
+msgid "Wrap"
+msgstr "折り返す"
+
+#: ../celleditor.py:72
+msgid "Vacuum:"
+msgstr "真空層:"
+
+#: ../celleditor.py:73
+msgid "Apply Vacuum"
+msgstr "真空層を適用"
+
+#: ../celleditor.py:129
+msgid "Null vector"
+msgstr "零ベクトル"
+
+#: ../celleditor.py:130
+msgid "Can't change the magnitude of a null vector"
+msgstr "零ベクトルの大きさは変更できません"
+
+#: ../colors.py:18
+msgid "Colors"
+msgstr "色"
+
+#: ../colors.py:20
+msgid "Choose how the atoms are colored:"
+msgstr "原子の色分け方法を選択してください:"
+
+#: ../colors.py:31
+msgid "By atomic number, default \"jmol\" colors"
+msgstr "原子番号（標準の「jmol」配色）"
+
+#: ../colors.py:32
+msgid "By tag"
+msgstr "タグ"
+
+#: ../colors.py:33
+msgid "By force"
+msgstr "力"
+
+#: ../colors.py:34
+msgid "By velocity"
+msgstr "速度"
+
+#: ../colors.py:35
+msgid "By initial charge"
+msgstr "初期電荷"
+
+#: ../colors.py:36
+msgid "By magnetic moment"
+msgstr "磁気モーメント"
+
+#: ../colors.py:37
+msgid "By number of neighbors"
+msgstr "近接原子数"
+
+#: ../colors.py:119
+msgid "cmap:"
+msgstr "カラーマップ:"
+
+#: ../colors.py:121
+msgid "N:"
+msgstr "N:"
+
+#: ../colors.py:141
+msgid "min:"
+msgstr "最小:"
+
+#: ../colors.py:150
+msgid "max:"
+msgstr "最大:"
+
+#: ../constraints.py:7
+msgid "Constraints"
+msgstr "拘束条件"
+
+#: ../constraints.py:8 ../settings.py:14
+msgid "Fix"
+msgstr "固定"
+
+#: ../constraints.py:8 ../constraints.py:10
+msgid "selected atoms"
+msgstr "選択した原子"
+
+#: ../constraints.py:10
+msgid "Release"
+msgstr "解除"
+
+#: ../constraints.py:12 ../settings.py:18
+msgid "Clear all constraints"
+msgstr "すべての拘束条件を消去"
+
+#: ../graphs.py:9
+msgid ""
+"Symbols:\n"
+"<c>e</c>: total energy\n"
+"<c>epot</c>: potential energy\n"
+"<c>ekin</c>: kinetic energy\n"
+"<c>fmax</c>: maximum force\n"
+"<c>fave</c>: average force\n"
+"<c>R[n,0-2]</c>: position of atom number <c>n</c>\n"
+"<c>d(n<sub>1</sub>,n<sub>2</sub>)</c>: distance between two atoms <c>n<sub>1</sub></c> and <c>n<sub>2</sub></c>\n"
+"<c>i</c>: current image number\n"
+"<c>E[i]</c>: energy of image number <c>i</c>\n"
+"<c>F[n,0-2]</c>: force on atom number <c>n</c>\n"
+"<c>V[n,0-2]</c>: velocity of atom number <c>n</c>\n"
+"<c>M[n]</c>: magnetic moment of atom number <c>n</c>\n"
+"<c>A[0-2,0-2]</c>: unit-cell basis vectors\n"
+"<c>s</c>: path length\n"
+"<c>a(n1,n2,n3)</c>: angle between atoms <c>n<sub>1</sub></c>, <c>n<sub>2</sub></c> and <c>n<sub>3</sub></c>, centered on <c>n<sub>2</sub></c>\n"
+"<c>dih(n1,n2,n3,n4)</c>: dihedral angle between <c>n<sub>1</sub></c>, <c>n<sub>2</sub></c>, <c>n<sub>3</sub></c> and <c>n<sub>4</sub></c>\n"
+"<c>T</c>: temperature (K)"
+msgstr ""
+"記号:\n"
+"<c>e</c>: 全エネルギー\n"
+"<c>epot</c>: ポテンシャルエネルギー\n"
+"<c>ekin</c>: 運動エネルギー\n"
+"<c>fmax</c>: 最大の力\n"
+"<c>fave</c>: 平均の力\n"
+"<c>R[n,0-2]</c>: 原子番号 <c>n</c> の位置\n"
+"<c>d(n<sub>1</sub>,n<sub>2</sub>)</c>: 2 原子 <c>n<sub>1</sub></c> と <c>n<sub>2</sub></c> の間の距離\n"
+"<c>i</c>: 現在のイメージ番号\n"
+"<c>E[i]</c>: イメージ番号 <c>i</c> のエネルギー\n"
+"<c>F[n,0-2]</c>: 原子番号 <c>n</c> に働く力\n"
+"<c>V[n,0-2]</c>: 原子番号 <c>n</c> の速度\n"
+"<c>M[n]</c>: 原子番号 <c>n</c> の磁気モーメント\n"
+"<c>A[0-2,0-2]</c>: 単位セルの基底ベクトル\n"
+"<c>s</c>: 経路長\n"
+"<c>a(n1,n2,n3)</c>: <c>n<sub>2</sub></c> を中心とする原子 <c>n<sub>1</sub></c>、<c>n<sub>2</sub></c>、<c>n<sub>3</sub></c> の間の角度\n"
+"<c>dih(n1,n2,n3,n4)</c>: <c>n<sub>1</sub></c>、<c>n<sub>2</sub></c>、<c>n<sub>3</sub></c>、<c>n<sub>4</sub></c> の二面角\n"
+"<c>T</c>: 温度 (K)"
+
+#: ../graphs.py:40 ../graphs.py:41
+msgid "Plot"
+msgstr "プロット"
+
+#: ../graphs.py:42
+msgid "Save"
+msgstr "保存"
+
+#: ../graphs.py:65
+msgid "Save data to file ... "
+msgstr "データをファイルに保存 ... "
+
+#: ../gui.py:168 ../modify.py:20
+msgid "No atoms selected!"
+msgstr "原子が選択されていません!"
+
+#: ../gui.py:169
+msgid "You need to select one or more atoms to do this"
+msgstr "この操作には 1 個以上の原子を選択する必要があります"
+
+#: ../gui.py:326
+msgid "Delete atoms"
+msgstr "原子を削除"
+
+#: ../gui.py:327
+msgid "Delete selected atoms?"
+msgstr "選択した原子を削除しますか?"
+
+#. Subprocess probably crashed
+#: ../gui.py:397
+msgid "Failure in subprocess"
+msgstr "サブプロセスでエラーが発生しました"
+
+#: ../gui.py:404
+msgid "Plotting failed"
+msgstr "プロットに失敗しました"
+
+#: ../gui.py:411
+msgid "Images must have energies and forces, and atoms must not be stationary."
+msgstr "イメージにエネルギーと力があり、原子が静止していない必要があります。"
+
+#: ../gui.py:424
+msgid "Images must have energies and varying cell."
+msgstr "イメージにエネルギーがあり、セルが変化している必要があります。"
+
+#: ../gui.py:431
+msgid "Requires 3D cell."
+msgstr "3 次元セルが必要です。"
+
+#: ../gui.py:469
+msgid "Quick Info"
+msgstr "クイック情報"
+
+#: ../gui.py:592
+msgid "_File"
+msgstr "_ファイル"
+
+#: ../gui.py:593
+msgid "_Open"
+msgstr "_開く"
+
+#: ../gui.py:594
+msgid "_New"
+msgstr "_新規"
+
+#: ../gui.py:595
+msgid "_Save"
+msgstr "_保存"
+
+#: ../gui.py:597
+msgid "_Quit"
+msgstr "_終了"
+
+#: ../gui.py:599
+msgid "_Edit"
+msgstr "_編集"
+
+#: ../gui.py:600
+msgid "Undo"
+msgstr "元に戻す"
+
+#: ../gui.py:601
+msgid "Redo"
+msgstr "やり直す"
+
+#: ../gui.py:603
+msgid "Select _all"
+msgstr "すべて_選択"
+
+#: ../gui.py:604
+msgid "_Invert selection"
+msgstr "選択を_反転"
+
+#: ../gui.py:605
+msgid "Select _constrained atoms"
+msgstr "_拘束された原子を選択"
+
+#: ../gui.py:606
+msgid "Select _immobile atoms"
+msgstr "_動かない原子を選択"
+
+#. M('---'),
+#: ../gui.py:608
+msgid "_Cut"
+msgstr "_切り取り"
+
+#: ../gui.py:609
+msgid "_Copy"
+msgstr "_コピー"
+
+#: ../gui.py:610
+msgid "_Paste"
+msgstr "_貼り付け"
+
+#: ../gui.py:612
+msgid "Hide selected atoms"
+msgstr "選択した原子を隠す"
+
+#: ../gui.py:613
+msgid "Show selected atoms"
+msgstr "選択した原子を表示"
+
+#: ../gui.py:615
+msgid "_Modify"
+msgstr "_変更"
+
+#: ../gui.py:616
+msgid "_Add atoms"
+msgstr "原子を_追加"
+
+#: ../gui.py:617
+msgid "_Delete selected atoms"
+msgstr "選択した原子を_削除"
+
+#: ../gui.py:619
+msgid "Edit _cell …"
+msgstr "_セルを編集 …"
+
+#: ../gui.py:620
+msgid "Edit _atoms …"
+msgstr "_原子を編集 …"
+
+#: ../gui.py:622
+msgid "_First image"
+msgstr "_最初のイメージ"
+
+#: ../gui.py:623
+msgid "_Previous image"
+msgstr "_前のイメージ"
+
+#: ../gui.py:624
+msgid "_Next image"
+msgstr "_次のイメージ"
+
+#: ../gui.py:625
+msgid "_Last image"
+msgstr "_最後のイメージ"
+
+#: ../gui.py:626
+msgid "Append image copy"
+msgstr "イメージのコピーを追加"
+
+#: ../gui.py:628
+msgid "_View"
+msgstr "_表示"
+
+#: ../gui.py:629
+msgid "Show _unit cell"
+msgstr "_単位セルを表示"
+
+#: ../gui.py:631
+msgid "Show _axes"
+msgstr "_座標軸を表示"
+
+#: ../gui.py:633
+msgid "Show _bonds"
+msgstr "_結合を表示"
+
+#: ../gui.py:635
+msgid "Show _velocities"
+msgstr "_速度を表示"
+
+#: ../gui.py:637
+msgid "Show _forces"
+msgstr "_力を表示"
+
+#: ../gui.py:639
+msgid "Show _magmoms"
+msgstr "_磁気モーメントを表示"
+
+#: ../gui.py:641
+msgid "Show _labels"
+msgstr "_ラベルを表示"
+
+#: ../gui.py:642
+msgid "_None"
+msgstr "_なし"
+
+#: ../gui.py:643
+msgid "Atom _index"
+msgstr "原子_番号"
+
+#: ../gui.py:644
+msgid "_Magnetic moments"
+msgstr "_磁気モーメント"
+
+#. XXX check if exist
+#: ../gui.py:645
+msgid "_Element symbol"
+msgstr "_元素記号"
+
+#: ../gui.py:646
+msgid "_Initial charges"
+msgstr "_初期電荷"
+
+#: ../gui.py:649
+msgid "Quick info ..."
+msgstr "クイック情報 ..."
+
+#: ../gui.py:650
+msgid "Repeat ..."
+msgstr "繰り返し ..."
+
+#: ../gui.py:651
+msgid "Rotate ..."
+msgstr "回転 ..."
+
+#: ../gui.py:652
+msgid "Colors ..."
+msgstr "色 ..."
+
+#. TRANSLATORS: verb
+#: ../gui.py:654
+msgid "Focus"
+msgstr "フォーカス"
+
+#: ../gui.py:655
+msgid "Zoom in"
+msgstr "拡大"
+
+#: ../gui.py:656
+msgid "Zoom out"
+msgstr "縮小"
+
+#: ../gui.py:657
+msgid "Change view"
+msgstr "表示方向を変更"
+
+#: ../gui.py:659
+msgid "Reset view"
+msgstr "表示をリセット"
+
+#: ../gui.py:660
+msgid "xy-plane"
+msgstr "xy 面"
+
+#: ../gui.py:661
+msgid "yz-plane"
+msgstr "yz 面"
+
+#: ../gui.py:662
+msgid "zx-plane"
+msgstr "zx 面"
+
+#: ../gui.py:663
+msgid "yx-plane"
+msgstr "yx 面"
+
+#: ../gui.py:664
+msgid "zy-plane"
+msgstr "zy 面"
+
+#: ../gui.py:665
+msgid "xz-plane"
+msgstr "xz 面"
+
+#: ../gui.py:666
+msgid "a2,a3-plane"
+msgstr "a2,a3 面"
+
+#: ../gui.py:667
+msgid "a3,a1-plane"
+msgstr "a3,a1 面"
+
+#: ../gui.py:668
+msgid "a1,a2-plane"
+msgstr "a1,a2 面"
+
+#: ../gui.py:669
+msgid "a3,a2-plane"
+msgstr "a3,a2 面"
+
+#: ../gui.py:670
+msgid "a1,a3-plane"
+msgstr "a1,a3 面"
+
+#: ../gui.py:671
+msgid "a2,a1-plane"
+msgstr "a2,a1 面"
+
+#: ../gui.py:672
+msgid "Settings ..."
+msgstr "設定 ..."
+
+#: ../gui.py:674
+msgid "VMD"
+msgstr "VMD"
+
+#: ../gui.py:675
+msgid "RasMol"
+msgstr "RasMol"
+
+#: ../gui.py:676
+msgid "xmakemol"
+msgstr "xmakemol"
+
+#: ../gui.py:677
+msgid "avogadro"
+msgstr "avogadro"
+
+#: ../gui.py:679
+msgid "_Tools"
+msgstr "_ツール"
+
+#: ../gui.py:680
+msgid "Graphs ..."
+msgstr "グラフ ..."
+
+#: ../gui.py:681
+msgid "Movie ..."
+msgstr "動画 ..."
+
+#: ../gui.py:682
+msgid "Constraints ..."
+msgstr "拘束条件 ..."
+
+#: ../gui.py:683
+msgid "Render scene ..."
+msgstr "シーンをレンダリング ..."
+
+#: ../gui.py:684
+msgid "_Move selected atoms"
+msgstr "選択した原子を_移動"
+
+#: ../gui.py:685
+msgid "_Rotate selected atoms"
+msgstr "選択した原子を_回転"
+
+#: ../gui.py:687
+msgid "NE_B plot"
+msgstr "NE_B プロット"
+
+#: ../gui.py:688
+msgid "B_ulk modulus"
+msgstr "_体積弾性率"
+
+#: ../gui.py:689
+msgid "Reciprocal space ..."
+msgstr "逆格子空間 ..."
+
+#: ../gui.py:690
+msgid "Wrap atoms"
+msgstr "原子をセル内に折り返す"
+
+#. TRANSLATORS: Set up (i.e. build) surfaces, nanoparticles, ...
+#: ../gui.py:693
+msgid "_Setup"
+msgstr "_作成"
+
+#: ../gui.py:694
+msgid "_Surface slab"
+msgstr "_表面スラブ"
+
+#: ../gui.py:695
+msgid "_Nanoparticle"
+msgstr "_ナノ粒子"
+
+#: ../gui.py:697
+msgid "Nano_tube"
+msgstr "ナノ_チューブ"
+
+#. (_('_Calculate'),
+#. [M(_('Set _Calculator'), self.calculator_window, disabled=True),
+#. M(_('_Energy and Forces'), self.energy_window, disabled=True),
+#. M(_('Energy Minimization'), self.energy_minimize_window,
+#. disabled=True)]),
+#: ../gui.py:705
+msgid "_Help"
+msgstr "_ヘルプ"
+
+#: ../gui.py:706
+msgid "_About"
+msgstr "_ASE について"
+
+#: ../gui.py:710
+msgid "Webpage ..."
+msgstr "ウェブページ ..."
+
+#: ../images.py:302
+msgid "Constraints discarded"
+msgstr "拘束条件を破棄しました"
+
+#: ../images.py:303
+msgid "Constraints other than FixAtoms have been discarded."
+msgstr "FixAtoms 以外の拘束条件は破棄されました。"
+
+#: ../modify.py:23
+msgid "Modify"
+msgstr "変更"
+
+#: ../modify.py:27
+msgid "Change element"
+msgstr "元素を変更"
+
+#: ../modify.py:30
+msgid "Tag"
+msgstr "タグ"
+
+#: ../modify.py:32
+msgid "Moment"
+msgstr "モーメント"
+
+#: ../movie.py:15
+msgid "Movie"
+msgstr "動画"
+
+#: ../movie.py:16
+msgid "Image number:"
+msgstr "イメージ番号:"
+
+#: ../movie.py:22
+msgid "First"
+msgstr "最初"
+
+#: ../movie.py:23
+msgid "Back"
+msgstr "戻る"
+
+#: ../movie.py:24
+msgid "Forward"
+msgstr "進む"
+
+#: ../movie.py:25
+msgid "Last"
+msgstr "最後"
+
+#: ../movie.py:27
+msgid "Play"
+msgstr "再生"
+
+#: ../movie.py:28
+msgid "Stop"
+msgstr "停止"
+
+#. TRANSLATORS: This function plays an animation forwards and backwards
+#. alternatingly, e.g. for displaying vibrational movement
+#: ../movie.py:32
+msgid "Rock"
+msgstr "往復再生"
+
+#: ../movie.py:49
+msgid " Frame rate: "
+msgstr " フレームレート: "
+
+#: ../movie.py:49
+msgid " Skip frames: "
+msgstr " スキップするフレーム数: "
+
+#. Delayed imports:
+#. ase.cluster.data
+#: ../nanoparticle.py:19
+msgid ""
+"Create a nanoparticle either by specifying the number of layers, or using the\n"
+"Wulff construction.  Please press the [Help] button for instructions on how to\n"
+"specify the directions.\n"
+"WARNING: The Wulff construction currently only works with cubic crystals!\n"
+msgstr ""
+"層数を指定するか、Wulff 構築を用いてナノ粒子を作成します。\n"
+"方向の指定方法については [ヘルプ] ボタンを押してください。\n"
+"警告: 現在、Wulff 構築は立方晶でのみ動作します!\n"
+
+#: ../nanoparticle.py:26
+#, python-brace-format
+msgid ""
+"\n"
+"The nanoparticle module sets up a nano-particle or a cluster with a given\n"
+"crystal structure.\n"
+"\n"
+"1) Select the element, the crystal structure and the lattice constant(s).\n"
+"   The [Get structure] button will find the data for a given element.\n"
+"\n"
+"2) Choose if you want to specify the number of layers in each direction, or if\n"
+"   you want to use the Wulff construction.  In the latter case, you must\n"
+"   specify surface energies in each direction, and the size of the cluster.\n"
+"\n"
+"How to specify the directions:\n"
+"------------------------------\n"
+"\n"
+"First time a direction appears, it is interpreted as the entire family of\n"
+"directions, i.e. (0,0,1) also covers (1,0,0), (-1,0,0) etc.  If one of these\n"
+"directions is specified again, the second specification overrules that specific\n"
+"direction.  For this reason, the order matters and you can rearrange the\n"
+"directions with the [Up] and [Down] keys.  You can also add a new direction,\n"
+"remember to press [Add] or it will not be included.\n"
+"\n"
+"Example: (1,0,0) (1,1,1), (0,0,1) would specify the {100} family of directions,\n"
+"the {111} family and then the (001) direction, overruling the value given for\n"
+"the whole family of directions.\n"
+msgstr ""
+"\n"
+"ナノ粒子モジュールは、指定した結晶構造を持つナノ粒子またはクラスターを作成します。\n"
+"\n"
+"1) 元素、結晶構造、格子定数を選択します。\n"
+"   [構造を取得] ボタンを押すと、指定した元素のデータが検索されます。\n"
+"\n"
+"2) 各方向の層数を指定するか、Wulff 構築を使用するかを選択します。\n"
+"   後者の場合は、各方向の表面エネルギーとクラスターの大きさを指定する必要があります。\n"
+"\n"
+"方向の指定方法:\n"
+"----------------\n"
+"\n"
+"ある方向が最初に現れたときは、方向族全体として解釈されます。つまり、\n"
+"(0,0,1) は (1,0,0)、(-1,0,0) なども含みます。同じ方向を再度指定すると、\n"
+"2 回目の指定がその特定の方向について優先されます。このため順序が重要で、\n"
+"[上へ] と [下へ] キーで方向を並べ替えられます。新しい方向を追加することも\n"
+"できますが、[追加] を押さないと反映されません。\n"
+"\n"
+"例: (1,0,0) (1,1,1), (0,0,1) は {100} 方向族、{111} 方向族、続いて (001)\n"
+"方向を指定し、最後の値が方向族全体に指定された値より優先されます。\n"
+
+#: ../nanoparticle.py:86
+msgid "Face centered cubic (fcc)"
+msgstr "面心立方 (fcc)"
+
+#: ../nanoparticle.py:87
+msgid "Body centered cubic (bcc)"
+msgstr "体心立方 (bcc)"
+
+#: ../nanoparticle.py:88
+msgid "Simple cubic (sc)"
+msgstr "単純立方 (sc)"
+
+#: ../nanoparticle.py:89
+msgid "Hexagonal closed-packed (hcp)"
+msgstr "六方最密充填 (hcp)"
+
+#: ../nanoparticle.py:90
+msgid "Graphite"
+msgstr "グラファイト"
+
+#: ../nanoparticle.py:140
+msgid "Nanoparticle"
+msgstr "ナノ粒子"
+
+#: ../nanoparticle.py:144
+msgid "Get structure"
+msgstr "構造を取得"
+
+#: ../nanoparticle.py:159 ../surfaceslab.py:72
+msgid "Structure:"
+msgstr "構造:"
+
+#: ../nanoparticle.py:163
+msgid "Lattice constant:  a ="
+msgstr "格子定数:  a ="
+
+#: ../nanoparticle.py:167
+msgid "Layer specification"
+msgstr "層の指定"
+
+#: ../nanoparticle.py:167
+msgid "Wulff construction"
+msgstr "Wulff 構築"
+
+#: ../nanoparticle.py:171
+msgid "Method: "
+msgstr "方法: "
+
+#: ../nanoparticle.py:179
+msgid "Add new direction:"
+msgstr "新しい方向を追加:"
+
+#. Information
+#: ../nanoparticle.py:185
+msgid "Information about the created cluster:"
+msgstr "作成したクラスターの情報:"
+
+#: ../nanoparticle.py:187
+msgid "Number of atoms: "
+msgstr "原子数: "
+
+#: ../nanoparticle.py:189
+msgid "   Approx. diameter: "
+msgstr "   およその直径: "
+
+#: ../nanoparticle.py:199
+msgid "Automatic Apply"
+msgstr "自動適用"
+
+#: ../nanoparticle.py:204 ../nanotube.py:47
+msgid "Creating a nanoparticle."
+msgstr "ナノ粒子を作成しています。"
+
+#: ../nanoparticle.py:206 ../nanotube.py:48 ../surfaceslab.py:87
+msgid "Apply"
+msgstr "適用"
+
+#: ../nanoparticle.py:207 ../nanotube.py:49 ../surfaceslab.py:88
+msgid "OK"
+msgstr "OK"
+
+#: ../nanoparticle.py:238
+msgid "Up"
+msgstr "上へ"
+
+#: ../nanoparticle.py:239
+msgid "Down"
+msgstr "下へ"
+
+#: ../nanoparticle.py:240
+msgid "Delete"
+msgstr "削除"
+
+#: ../nanoparticle.py:283
+msgid "Number of atoms"
+msgstr "原子数"
+
+#: ../nanoparticle.py:283
+msgid "Diameter"
+msgstr "直径"
+
+#: ../nanoparticle.py:294
+msgid "above  "
+msgstr "以上  "
+
+#: ../nanoparticle.py:294
+msgid "below  "
+msgstr "以下  "
+
+#: ../nanoparticle.py:294
+msgid "closest  "
+msgstr "最も近い  "
+
+#: ../nanoparticle.py:298
+msgid "Smaller"
+msgstr "小さい方"
+
+#: ../nanoparticle.py:299
+msgid "Larger"
+msgstr "大きい方"
+
+#: ../nanoparticle.py:300
+msgid "Choose size using:"
+msgstr "大きさの指定方法:"
+
+#: ../nanoparticle.py:303
+msgid "atoms"
+msgstr "原子"
+
+#: ../nanoparticle.py:303
+msgid "Å³"
+msgstr "Å³"
+
+#: ../nanoparticle.py:306
+msgid "Rounding: If exact size is not possible, choose the size:"
+msgstr "丸め: 正確な大きさにできない場合に選択する大きさ:"
+
+#: ../nanoparticle.py:335
+msgid "Surface energies (as energy/area, NOT per atom):"
+msgstr "表面エネルギー（エネルギー/面積。原子当たりではありません）:"
+
+#: ../nanoparticle.py:338
+msgid "Number of layers:"
+msgstr "層数:"
+
+#: ../nanoparticle.py:366
+msgid "At least one index must be non-zero"
+msgstr "少なくとも 1 つの指数をゼロ以外にしてください"
+
+#: ../nanoparticle.py:371
+msgid "Invalid hexagonal indices"
+msgstr "六方晶の指数が無効です"
+
+#: ../nanoparticle.py:441
+msgid "Unsupported or unknown structure"
+msgstr "未対応または不明な構造です"
+
+#: ../nanoparticle.py:442
+#, python-brace-format
+msgid "Element = {0}, structure = {1}"
+msgstr "元素 = {0}、構造 = {1}"
+
+#: ../nanoparticle.py:568 ../nanotube.py:85 ../surfaceslab.py:241
+msgid "No valid atoms."
+msgstr "有効な原子がありません。"
+
+#: ../nanoparticle.py:570 ../nanotube.py:87 ../surfaceslab.py:243
+#: ../widgets.py:97
+msgid "You have not (yet) specified a consistent set of parameters."
+msgstr "整合するパラメーター一式が（まだ）指定されていません。"
+
+#: ../nanotube.py:8
+msgid ""
+"Set up a Carbon nanotube by specifying the (n,m) roll-up vector.\n"
+"Please note that m <= n.\n"
+"\n"
+"Nanotubes of other elements can be made by specifying the element\n"
+"and bond length."
+msgstr ""
+"(n,m) カイラルベクトルを指定してカーボンナノチューブを作成します。\n"
+"m <= n であることに注意してください。\n"
+"\n"
+"他の元素のナノチューブは、元素と結合長を指定して作成できます。"
+
+#: ../nanotube.py:22
+#, python-brace-format
+msgid "{natoms} atoms, diameter: {diameter:.3f} Å, total length: {total_length:.3f} Å"
+msgstr "原子数 {natoms}、直径: {diameter:.3f} Å、全長: {total_length:.3f} Å"
+
+#: ../nanotube.py:38
+msgid "Nanotube"
+msgstr "ナノチューブ"
+
+#: ../nanotube.py:41
+msgid "Bond length: "
+msgstr "結合長: "
+
+#: ../nanotube.py:41
+msgid "Å"
+msgstr "Å"
+
+#: ../nanotube.py:42
+msgid "Select roll-up vector (n,m) and tube length:"
+msgstr "カイラルベクトル (n,m) とチューブ長を選択:"
+
+#: ../nanotube.py:43
+msgid "Length:"
+msgstr "長さ:"
+
+#: ../quickinfo.py:27
+msgid "This frame has no atoms."
+msgstr "このフレームには原子がありません。"
+
+#: ../quickinfo.py:32
+msgid "Single image loaded."
+msgstr "1 枚のイメージを読み込みました。"
+
+#: ../quickinfo.py:34
+msgid "Image {} loaded (0–{})."
+msgstr "イメージ {} を読み込みました (0–{})。"
+
+#: ../quickinfo.py:36
+msgid "Number of atoms: {}"
+msgstr "原子数: {}"
+
+#: ../quickinfo.py:46
+msgid "Unit cell [Å]:"
+msgstr "単位セル [Å]:"
+
+#: ../quickinfo.py:49
+msgid "no"
+msgstr "いいえ"
+
+#: ../quickinfo.py:49
+msgid "yes"
+msgstr "はい"
+
+#. TRANSLATORS: This has the form Periodic: no, no, yes
+#: ../quickinfo.py:52
+msgid "Periodic: {}, {}, {}"
+msgstr "周期境界: {}, {}, {}"
+
+#: ../quickinfo.py:57
+msgid "Lengths [Å]: {:.3f}, {:.3f}, {:.3f}"
+msgstr "長さ [Å]: {:.3f}, {:.3f}, {:.3f}"
+
+#: ../quickinfo.py:58
+msgid "Angles: {:.1f}°, {:.1f}°, {:.1f}°"
+msgstr "角度: {:.1f}°, {:.1f}°, {:.1f}°"
+
+#: ../quickinfo.py:61
+msgid "Volume: {:.3f} Å³"
+msgstr "体積: {:.3f} Å³"
+
+#: ../quickinfo.py:67
+msgid "Unit cell is fixed."
+msgstr "単位セルは固定されています。"
+
+#: ../quickinfo.py:69
+msgid "Unit cell varies."
+msgstr "単位セルは変化します。"
+
+#: ../quickinfo.py:75
+msgid "Could not recognize the lattice type"
+msgstr "格子型を判別できませんでした"
+
+#: ../quickinfo.py:77
+msgid "Unexpected error determining lattice type"
+msgstr "格子型の判別中に予期しないエラーが発生しました"
+
+#: ../quickinfo.py:79
+msgid ""
+"Reduced Bravais lattice:\n"
+"{}"
+msgstr ""
+"簡約 Bravais 格子:\n"
+"{}"
+
+#: ../quickinfo.py:110
+msgid "Calculator: {} (cached)"
+msgstr "計算機: {}（キャッシュ済み）"
+
+#: ../quickinfo.py:112
+msgid "Calculator: {} (attached)"
+msgstr "計算機: {}（接続済み）"
+
+#: ../quickinfo.py:119
+msgid "Energy: {:.3f} eV"
+msgstr "エネルギー: {:.3f} eV"
+
+#: ../quickinfo.py:124
+msgid "Max force: {:.3f} eV/Å"
+msgstr "最大の力: {:.3f} eV/Å"
+
+#: ../quickinfo.py:128
+msgid "Magmom: {:.3f} µ"
+msgstr "磁気モーメント: {:.3f} µ"
+
+#: ../render.py:27
+msgid "Render current view in povray ... "
+msgstr "現在の表示を POV-Ray でレンダリング ... "
+
+#: ../render.py:28
+#, python-format
+msgid "Rendering %d atoms."
+msgstr "%d 個の原子をレンダリングしています。"
+
+#: ../render.py:35
+msgid "Size"
+msgstr "サイズ"
+
+#: ../render.py:47
+msgid "Line width"
+msgstr "線の幅"
+
+#: ../render.py:49
+msgid "Ångström"
+msgstr "オングストローム"
+
+#: ../render.py:53
+msgid "Render constraints"
+msgstr "拘束条件をレンダリング"
+
+#: ../render.py:54
+msgid "Render unit cell"
+msgstr "単位セルをレンダリング"
+
+#: ../render.py:61
+msgid "Output basename: "
+msgstr "出力のベース名: "
+
+#: ../render.py:63
+msgid "POVRAY executable"
+msgstr "POV-Ray 実行ファイル"
+
+#: ../render.py:65
+msgid "Output filename: "
+msgstr "出力ファイル名: "
+
+#: ../render.py:71
+msgid "Atomic texture set:"
+msgstr "原子テクスチャセット:"
+
+#: ../render.py:78
+msgid "Camera type: "
+msgstr "カメラの種類: "
+
+#: ../render.py:79
+msgid "Camera distance"
+msgstr "カメラ距離"
+
+#: ../render.py:83
+msgid "Render current frame"
+msgstr "現在のフレームをレンダリング"
+
+#: ../render.py:83
+msgid "Render all frames"
+msgstr "すべてのフレームをレンダリング"
+
+#: ../render.py:89
+msgid "Run povray"
+msgstr "POV-Ray を実行"
+
+#: ../render.py:90
+msgid "Keep povray files"
+msgstr "POV-Ray ファイルを保持"
+
+#: ../render.py:91
+msgid "Show output window"
+msgstr "出力ウィンドウを表示"
+
+#: ../render.py:92
+msgid "Transparent background"
+msgstr "背景を透明にする"
+
+#: ../render.py:101
+msgid "Render"
+msgstr "レンダリング"
+
+#: ../repeat.py:9
+msgid "Repeat"
+msgstr "繰り返し"
+
+#: ../repeat.py:10
+msgid "Repeat atoms:"
+msgstr "原子の繰り返し:"
+
+#: ../repeat.py:15
+msgid "Set unit cell"
+msgstr "単位セルを設定"
+
+#: ../rotate.py:11
+msgid "Rotate"
+msgstr "回転"
+
+#: ../rotate.py:12
+msgid "Rotation angles:"
+msgstr "回転角:"
+
+#: ../rotate.py:17
+msgid "Update"
+msgstr "更新"
+
+#: ../rotate.py:20
+msgid ""
+"Note:\n"
+"You can rotate freely\n"
+"with the mouse, by holding\n"
+"down mouse button 2."
+msgstr ""
+"注意:\n"
+"マウスボタン 2 を押したまま\n"
+"マウスを動かすと、自由に\n"
+"回転できます。"
+
+#: ../save.py:15
+msgid ""
+"Append name with \"@n\" in order to write image\n"
+"number \"n\" instead of the current image. Append\n"
+"\"@start:stop\" or \"@start:stop:step\" if you want\n"
+"to write a range of images. You can leave out\n"
+"\"start\" and \"stop\" so that \"name@:\" will give\n"
+"you all images. Negative numbers count from the\n"
+"last image. Examples: \"name@-1\": last image,\n"
+"\"name@-2:\": last two."
+msgstr ""
+"現在のイメージの代わりにイメージ番号「n」を書き出すには、\n"
+"名前に「@n」を付けます。複数のイメージを書き出すには、\n"
+"「@start:stop」または「@start:stop:step」を付けます。\n"
+"「start」と「stop」は省略でき、「name@:」ですべての\n"
+"イメージを書き出せます。負の数は最後のイメージから数えます。\n"
+"例: 「name@-1」は最後のイメージ、「name@-2:」は最後の 2 枚。"
+
+#: ../save.py:27
+msgid "Save ..."
+msgstr "保存 ..."
+
+#: ../save.py:82 ../ui.py:33
+msgid "Error"
+msgstr "エラー"
+
+#: ../settings.py:10
+msgid "Settings"
+msgstr "設定"
+
+#. Constraints
+#: ../settings.py:13
+msgid "Constraints:"
+msgstr "拘束条件:"
+
+#: ../settings.py:16
+msgid "release"
+msgstr "解除"
+
+#: ../settings.py:17 ../settings.py:25
+msgid " selected atoms"
+msgstr " 選択した原子"
+
+#. Visibility
+#: ../settings.py:21
+msgid "Visibility:"
+msgstr "表示:"
+
+#: ../settings.py:22
+msgid "Hide"
+msgstr "隠す"
+
+#: ../settings.py:24
+msgid "show"
+msgstr "表示"
+
+#: ../settings.py:26
+msgid "View all atoms"
+msgstr "すべての原子を表示"
+
+#. Miscellaneous
+#: ../settings.py:29
+msgid "Miscellaneous:"
+msgstr "その他:"
+
+#: ../settings.py:32
+msgid "Scale atomic radii:"
+msgstr "原子半径の倍率:"
+
+#: ../settings.py:39
+msgid "Scale force vectors:"
+msgstr "力ベクトルの倍率:"
+
+#: ../settings.py:46
+msgid "Scale velocity vectors:"
+msgstr "速度ベクトルの倍率:"
+
+#: ../settings.py:53
+msgid "Scale magmom vectors:"
+msgstr "磁気モーメントベクトルの倍率:"
+
+#: ../status.py:84
+#, python-format
+msgid " tag=%(tag)s"
+msgstr " タグ=%(tag)s"
+
+#. TRANSLATORS: mom refers to magnetic moment
+#: ../status.py:88
+msgid " mom={:1.2f}"
+msgstr " モーメント={:1.2f}"
+
+#: ../status.py:91
+msgid " q={:1.2f}"
+msgstr " 電荷={:1.2f}"
+
+#: ../status.py:136
+msgid "dihedral"
+msgstr "二面角"
+
+#: ../surfaceslab.py:9
+msgid ""
+"  Use this dialog to create surface slabs.  Select the element by\n"
+"writing the chemical symbol or the atomic number in the box.  Then\n"
+"select the desired surface structure.  Note that some structures can\n"
+"be created with an othogonal or a non-orthogonal unit cell, in these\n"
+"cases the non-orthogonal unit cell will contain fewer atoms.\n"
+"\n"
+"  If the structure matches the experimental crystal structure, you can\n"
+"look up the lattice constant, otherwise you have to specify it\n"
+"yourself."
+msgstr ""
+"  このダイアログでは表面スラブを作成できます。ボックスに元素記号または\n"
+"原子番号を入力して元素を選択し、目的の表面構造を選択してください。一部の\n"
+"構造は直交または非直交の単位セルで作成できます。その場合、非直交単位セルの\n"
+"方が含まれる原子数は少なくなります。\n"
+"\n"
+"  構造が実験的な結晶構造と一致する場合は格子定数を検索できます。それ以外の\n"
+"場合は自分で指定する必要があります。"
+
+#: ../surfaceslab.py:22
+msgid "FCC(100)"
+msgstr "FCC(100)"
+
+#: ../surfaceslab.py:22 ../surfaceslab.py:23 ../surfaceslab.py:24
+#: ../surfaceslab.py:25
+msgid "fcc"
+msgstr "fcc"
+
+#: ../surfaceslab.py:23
+msgid "FCC(110)"
+msgstr "FCC(110)"
+
+#: ../surfaceslab.py:24 ../surfaceslab.py:179
+msgid "FCC(111)"
+msgstr "FCC(111)"
+
+#: ../surfaceslab.py:25 ../surfaceslab.py:182
+msgid "FCC(211)"
+msgstr "FCC(211)"
+
+#: ../surfaceslab.py:26
+msgid "BCC(100)"
+msgstr "BCC(100)"
+
+#: ../surfaceslab.py:26 ../surfaceslab.py:27 ../surfaceslab.py:28
+msgid "bcc"
+msgstr "bcc"
+
+#: ../surfaceslab.py:27 ../surfaceslab.py:176
+msgid "BCC(110)"
+msgstr "BCC(110)"
+
+#: ../surfaceslab.py:28 ../surfaceslab.py:173
+msgid "BCC(111)"
+msgstr "BCC(111)"
+
+#: ../surfaceslab.py:29 ../surfaceslab.py:187
+msgid "HCP(0001)"
+msgstr "HCP(0001)"
+
+#: ../surfaceslab.py:29 ../surfaceslab.py:30 ../surfaceslab.py:139
+#: ../surfaceslab.py:197
+msgid "hcp"
+msgstr "hcp"
+
+#: ../surfaceslab.py:30 ../surfaceslab.py:190
+msgid "HCP(10-10)"
+msgstr "HCP(10-10)"
+
+#: ../surfaceslab.py:31
+msgid "DIAMOND(100)"
+msgstr "DIAMOND(100)"
+
+#: ../surfaceslab.py:31 ../surfaceslab.py:32
+msgid "diamond"
+msgstr "diamond"
+
+#: ../surfaceslab.py:32
+msgid "DIAMOND(111)"
+msgstr "DIAMOND(111)"
+
+#: ../surfaceslab.py:57
+msgid "Get from database"
+msgstr "データベースから取得"
+
+#: ../surfaceslab.py:69
+msgid "Surface"
+msgstr "表面"
+
+#: ../surfaceslab.py:73
+msgid "Orthogonal cell:"
+msgstr "直交セル:"
+
+#: ../surfaceslab.py:74
+msgid "Lattice constant:"
+msgstr "格子定数:"
+
+#: ../surfaceslab.py:75
+msgid "\ta"
+msgstr "\ta"
+
+#: ../surfaceslab.py:76
+msgid "\tc"
+msgstr "\tc"
+
+#: ../surfaceslab.py:77
+msgid "Size:"
+msgstr "サイズ:"
+
+#: ../surfaceslab.py:78
+msgid "\tx: "
+msgstr "\tx: "
+
+#: ../surfaceslab.py:78 ../surfaceslab.py:79 ../surfaceslab.py:80
+msgid " unit cells"
+msgstr " 単位セル"
+
+#: ../surfaceslab.py:79
+msgid "\ty: "
+msgstr "\ty: "
+
+#: ../surfaceslab.py:80
+msgid "\tz: "
+msgstr "\tz: "
+
+#: ../surfaceslab.py:81
+msgid "Vacuum: "
+msgstr "真空層: "
+
+#: ../surfaceslab.py:86
+msgid "Creating a surface."
+msgstr "表面を作成しています。"
+
+#: ../surfaceslab.py:117
+msgid "Error: Reference values assume {} crystal structure for {}!"
+msgstr "エラー: 参照値では {} に {} 結晶構造を仮定しています!"
+
+#: ../surfaceslab.py:170
+msgid "Please enter an even value for orthogonal cell"
+msgstr "直交セルには偶数を入力してください"
+
+#: ../surfaceslab.py:184
+msgid "Please enter a value divisible by 3 for orthogonal cell"
+msgstr "直交セルには 3 で割り切れる値を入力してください"
+
+#: ../surfaceslab.py:204
+msgid " Vacuum: {} Å."
+msgstr " 真空層: {} Å。"
+
+#. TRANSLATORS: e.g. "Au fcc100 surface with 2 atoms."
+#. or "Au fcc100 surface with 2 atoms. Vacuum: 5 Å."
+#: ../surfaceslab.py:212
+#, python-brace-format
+msgid "{symbol} {surf} surface with one atom.{vacuum}"
+msgid_plural "{symbol} {surf} surface with {natoms} atoms.{vacuum}"
+msgstr[0] "{symbol} {surf} 表面（原子数 {natoms}）。{vacuum}"
+
+#: ../ui.py:40
+msgid "Version"
+msgstr "バージョン"
+
+#: ../ui.py:41
+msgid "Web-page"
+msgstr "ウェブページ"
+
+#: ../ui.py:42
+msgid "About"
+msgstr "ASE について"
+
+#: ../ui.py:47 ../ui.py:51 ../widgets.py:14
+msgid "Help"
+msgstr "ヘルプ"
+
+#: ../ui.py:620
+msgid "Open ..."
+msgstr "開く ..."
+
+#: ../ui.py:621
+msgid "Automatic"
+msgstr "自動"
+
+#: ../ui.py:639
+msgid "Choose parser:"
+msgstr "パーサーを選択:"
+
+#: ../ui.py:645
+msgid "Read error"
+msgstr "読み込みエラー"
+
+#: ../ui.py:646
+#, python-brace-format
+msgid "Could not read {filename}: {err}"
+msgstr "{filename} を読み込めませんでした: {err}"
+
+#: ../view.py:143
+msgid "one image loaded"
+msgid_plural "{} images loaded"
+msgstr[0] "1 枚のイメージを読み込みました"
+
+#: ../view.py:616
+msgid "ROTATING"
+msgstr "回転モード"
+
+#: ../view.py:619
+msgid ""
+"Ctrl + Up/Down: rotate around the view axis\n"
+"Shift + Arrow keys: rotate in smaller increments"
+msgstr ""
+"Ctrl + 上/下: 視線軸を中心に回転\n"
+"Shift + 矢印キー: より細かい刻みで回転"
+
+#: ../view.py:623
+msgid "MOVING"
+msgstr "移動モード"
+
+#: ../view.py:626
+msgid ""
+"Ctrl + Up/Down: move along the view axis\n"
+"Shift + Arrow keys: move in smaller increments"
+msgstr ""
+"Ctrl + 上/下: 視線軸に沿って移動\n"
+"Shift + 矢印キー: より細かい刻みで移動"
+
+#: ../widgets.py:12
+msgid "Element:"
+msgstr "元素:"
+
+#: ../widgets.py:28
+msgid "Enter a chemical symbol or the atomic number."
+msgstr "元素記号または原子番号を入力してください。"
+
+#. Title of a popup window
+#: ../widgets.py:30
+msgid "Info"
+msgstr "情報"
+
+#: ../widgets.py:60
+msgid "No element specified!"
+msgstr "元素が指定されていません!"
+
+#: ../widgets.py:79
+msgid "ERROR: Invalid element!"
+msgstr "エラー: 無効な元素です!"
+
+#: ../widgets.py:96
+msgid "No Python code"
+msgstr "Python コードがありません"

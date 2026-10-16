@@ -1,0 +1,12 @@
+Optimizers
+----------
+
+- Deprecated positional arguments except :class:`~ase.Atoms` for
+  :class:`~ase.optimize.optimize.Optimizer` subclasses.
+  They should be passed as keyword arguments (:mr:`4280`)
+
+Other changes
+-------------
+
+- Added :func:`~ase.utils.deprecate_positionals` to facilitate deprecation of
+  positional arguments (:mr:`4280`)

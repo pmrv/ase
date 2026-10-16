@@ -22,6 +22,10 @@ __all__ = [
     'Window', 'Tooltip', 'MenuItem', 'RadioButton', 'RadioButtons', 'Rows',
     'Scale', 'showinfo', 'showwarning', 'SpinBox', 'Text']
 
+# Shapes with this tag, specifically the selection box while dragging, are
+# cleared more eagerly than retained atoms, bonds, and labels.
+UNCACHED_PRIMITIVES_TAG = '_ase_transient'
+
 
 def error(title, message=None):
     if message is None:
@@ -117,8 +121,6 @@ class Widget:
     def pack(self, parent, side='top', anchor='center'):
         widget = self.create(parent)
         widget.pack(side=side, anchor=anchor)
-        if not isinstance(self, (Rows, RadioButtons)):
-            pass
 
     def grid(self, parent):
         widget = self.create(parent)
@@ -647,13 +649,21 @@ def show_io_error(filename, err):
 class ASEGUIWindow(MainWindow):
     def __init__(self, close, menu, config,
                  scroll, scroll_event,
-                 press, move, release, resize):
+                 press, move, release, resize, gui):
+        from ase.gui.movie import MovieToolbar
+
         super().__init__('ASE-GUI', close, menu)
 
         self.size = np.array([450, 450])
 
-        self.fg = config['gui_foreground_color']
-        self.bg = config['gui_background_color']
+        self.fg = config.get('foreground_color')
+        self.bg = config.get('background_color')
+
+        gui.icons.set_scaling(self.win.tk.call('tk', 'scaling'))
+
+        self.moviebar = MovieToolbar(self.win, gui)
+        self.moviebar.tkframe.pack(
+            anchor=tk.N, side=tk.TOP, expand=False, fill=tk.X)
 
         self.canvas = tk.Canvas(self.win,
                                 width=self.size[0],
@@ -661,6 +671,14 @@ class ASEGUIWindow(MainWindow):
                                 bg=self.bg,
                                 highlightthickness=0)
         self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self._canvas_pools = {
+            'arc': [],
+            'line': [],
+            'oval': [],
+            'text': [],
+        }
+        self._canvas_pool_indices = {kind: 0
+                                     for kind in self._canvas_pools}
 
         self.status = tk.Label(self.win, text='', anchor=tk.W)
         self.status.pack(side=tk.BOTTOM, fill=tk.X)
@@ -672,7 +690,7 @@ class ASEGUIWindow(MainWindow):
         self.canvas.bind('<Control-ButtonRelease>', bind(release, 'ctrl'))
         self.canvas.bind('<Shift-ButtonRelease>', bind(release, 'shift'))
         self.canvas.bind('<Configure>', resize)
-        if not config['swap_mouse']:
+        if not config.getboolean('swap_mouse'):
             for button in (2, 3):
                 self.canvas.bind(f'<Shift-B{button}-Motion>',
                                  bind(scroll))
@@ -695,10 +713,56 @@ class ASEGUIWindow(MainWindow):
         self.callbacks[name]()
 
     def clear(self):
-        self.canvas.delete(tk.ALL)
+        """Start a new retained-mode canvas frame.
+
+        Items are reused by primitive type instead of deleting and recreating
+        the entire canvas for every redraw.  This matters especially over X11
+        network connections, where creating each canvas object is expensive.
+        A render frame may use a different number of atoms, bonds, or labels:
+        unused pooled items are hidden in update(), and pools grow when more
+        are needed.
+        """
+        for kind in self._canvas_pool_indices:
+            self._canvas_pool_indices[kind] = 0
+        self.canvas.delete(UNCACHED_PRIMITIVES_TAG)
 
     def update(self):
+        for kind, pool in self._canvas_pools.items():
+            used = self._canvas_pool_indices[kind]
+            for item in pool[used:]:
+                if item['visible']:
+                    self.canvas.itemconfigure(item['id'], state=tk.HIDDEN)
+                    item['visible'] = False
         self.canvas.update_idletasks()
+
+    def _canvas_item(self, kind, coords, **options):
+        """Reuse one canvas item and raise it into the requested z-order."""
+        pool = self._canvas_pools[kind]
+        index = self._canvas_pool_indices[kind]
+        self._canvas_pool_indices[kind] = index + 1
+
+        if index == len(pool):
+            creator = getattr(self.canvas, f'create_{kind}')
+            item = {
+                'id': creator(*([0] * len(coords))),
+                'options': {},
+                'visible': True,
+            }
+            pool.append(item)
+        else:
+            item = pool[index]
+            if not item['visible']:
+                self.canvas.itemconfigure(item['id'], state=tk.NORMAL)
+                item['visible'] = True
+
+        self.canvas.coords(item['id'], *coords)
+        if item['options'] != options:
+            self.canvas.itemconfigure(item['id'], **options)
+            item['options'] = options
+
+        # View.draw() emits primitives in depth order.  Reestablish that order
+        # even though the underlying Tk item was created in an earlier frame.
+        self.canvas.tag_raise(item['id'])
 
     def circle(self, color, selected, *bbox):
         if selected:
@@ -707,8 +771,8 @@ class ASEGUIWindow(MainWindow):
         else:
             outline = self.fg
             width = 1
-        self.canvas.create_oval(*tuple(int(x) for x in bbox), fill=color,
-                                outline=outline, width=width)
+        self._canvas_item('oval', tuple(int(x) for x in bbox),
+                          fill=color, outline=outline, width=width)
 
     def arc(self, color, selected, start, extent, *bbox):
         if selected:
@@ -717,22 +781,20 @@ class ASEGUIWindow(MainWindow):
         else:
             outline = self.fg
             width = 1
-        self.canvas.create_arc(*tuple(int(x) for x in bbox),
-                               start=start,
-                               extent=extent,
-                               fill=color,
-                               outline=outline,
-                               width=width)
+        self._canvas_item('arc', tuple(int(x) for x in bbox),
+                          start=start, extent=extent, fill=color,
+                          outline=outline, width=width)
 
     def line(self, bbox, width=1):
-        self.canvas.create_line(*tuple(int(x) for x in bbox), width=width,
-                                fill=self.fg)
+        self._canvas_item('line', tuple(int(x) for x in bbox), width=width,
+                          fill=self.fg)
 
     def text(self, x, y, txt, anchor=tk.CENTER, color=None):
         if color is None:
             color = self.fg
         anchor = {'SE': tk.SE}.get(anchor, anchor)
-        self.canvas.create_text((x, y), text=txt, anchor=anchor, fill=color)
+        self._canvas_item('text', (x, y), text=txt, anchor=anchor,
+                          fill=color)
 
     def show_widget(self, widget, x, y, anchor=tk.CENTER,):
         """Places a given widget on self.canvas"""

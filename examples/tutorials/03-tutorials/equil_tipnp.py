@@ -43,7 +43,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(atoms, ax)
-ax.set_axis_off()
 # %%
 # Since the TIPnP type water interpotentials are for rigid
 # molecules, there are no intramolecular force terms, and we need to

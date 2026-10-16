@@ -176,11 +176,7 @@ class PureDFTD3(FileIOCalculator):
         # user know that we don't understand what they're asking for.
         unknown_kwargs = set(kwargs) - set(self.default_parameters)
         if unknown_kwargs:
-            warn(
-                'WARNING: Ignoring the following unknown keywords: {}'.format(
-                    ', '.join(unknown_kwargs)
-                )
-            )
+            raise TypeError(f'Unknown keywords: {unknown_kwargs}')
 
         changed_parameters.update(FileIOCalculator.set(self, **kwargs))
 

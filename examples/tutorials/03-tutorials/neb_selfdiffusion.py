@@ -55,7 +55,6 @@ from ase.visualize.plot import plot_atoms
 
 fig, ax = plt.subplots()
 plot_atoms(initial, ax, rotation=('-60x, 10y,0z'))
-ax.set_axis_off()
 
 # %%
 # Then, lets add the Al addatom which will be the one moving on the surface.
@@ -69,7 +68,6 @@ initial.center(vacuum=4.0, axis=2)
 # Visualize the new atom in the cell
 fig, ax = plt.subplots()
 plot_atoms(initial, ax, rotation=('-60x, 10y,0z'))
-ax.set_axis_off()
 
 
 # %%
@@ -94,7 +92,6 @@ final.positions[-1, 1] += b
 # Visualize the new atom in the cell
 fig, ax = plt.subplots()
 plot_atoms(final, ax, rotation=('-60x, 10y,0z'))
-ax.set_axis_off()
 
 
 # %%
@@ -170,7 +167,6 @@ minimizer.run(fmax=0.05)
 for image in images:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-90x, 90y,0z'))
-    ax.set_axis_off()
 
 # %%
 # Plot the variation of potential energy
@@ -229,7 +225,6 @@ final.positions[-1, 0] += a
 for image in [initial, final]:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-90x, 0y, 0z'))
-    ax.set_axis_off()
 
 # %%
 #
@@ -278,7 +273,6 @@ minimizer.run(fmax=0.05)
 for image in images:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-90x, 0y, 0z'))
-    ax.set_axis_off()
 
 
 # %%
@@ -337,7 +331,6 @@ final.positions[14, :] = initial.positions[-1] + [a, b, 0]
 for image in [initial, final]:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-60x, 10y,0z'))
-    ax.set_axis_off()
 
 # %%
 # Construct a list of images:
@@ -385,7 +378,6 @@ minimizer.run(fmax=0.05)
 for image in images:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-60x, 10y,0z'))
-    ax.set_axis_off()
 
 # %%
 # Plot the variation of potential energy
@@ -504,7 +496,6 @@ dim_rlx.run(fmax=0.001)
 for image in [initial, initial_copy]:
     fig, ax = plt.subplots()
     plot_atoms(image, ax, rotation=('-90x, 90y,0z'))
-    ax.set_axis_off()
 
 
 diff = initial.get_potential_energy() - e0

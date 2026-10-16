@@ -1,0 +1,14 @@
+Optimizers
+----------
+
+- Deprecated :attr:`ase.mep.neb.NEB.real_forces`.
+  Raw forces without constraints can be obtained with
+  `images[i].get_forces(apply_constraint=False)`.
+  (:mr:`4263`)
+
+Bugfixes
+--------
+
+- Fixed :class:`~ase.mep.neb.NEB` so that it stores computed properties other
+  than `energy` and `forces` for intermediate images in the trajectory file
+  (:mr:`4263`)

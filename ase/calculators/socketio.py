@@ -367,7 +367,7 @@ class SocketServer(IOContext):
             try:
                 self.clientsocket, self.address = self.serversocket.accept()
                 self.closelater(self.clientsocket)
-            except socket.timeout:
+            except TimeoutError:
                 if self.proc is not None:
                     status = self.proc.poll()
                     if status is not None:

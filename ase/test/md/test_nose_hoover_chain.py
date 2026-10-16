@@ -382,3 +382,5 @@ def test_masked_npt(
     assert np.allclose(np.sum(atoms.get_momenta(), axis=0), 0.0)
     assert np.isclose(conserved_energy1, conserved_energy2, atol=1e-3)
     assert not np.allclose(atoms.get_positions(), positions1, atol=1e-6)
+    assert np.allclose(md._p_c[~np.asarray(mask)], 0.0)
+    assert not np.allclose(md._p_c[np.asarray(mask)], 0.0)
