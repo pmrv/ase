@@ -121,6 +121,10 @@ class View:
         self.occlusion_culling = self.config.get('occlusion_culling', True)
         self.interactive = False
         self._settle_timer = None
+        # See draw().  _status_on_redraw records whether any of the draw()
+        # calls since the last redraw asked for the status line to update.
+        self._redraw_scheduled = False
+        self._status_on_redraw = False
         self.bonds = np.empty((0, 5), int)
 
         # buttons
@@ -550,6 +554,32 @@ class View:
         return indices[drawable[indices]]
 
     def draw(self, status=True):
+        """Redraw the structure as soon as Tk is idle.
+
+        Event handlers call draw() after every change, and some events, like
+        a held-down key or a mouse drag, can arrive faster than a large
+        structure can be drawn.  Redrawing on every call would make the
+        window fall behind and keep redrawing long after the input stops.
+        Instead, the redraw waits until Tk has handled all pending events,
+        so a burst of draw() calls produces a single redraw of the latest
+        state.
+        """
+        self._status_on_redraw = self._status_on_redraw or status
+        if not self._redraw_scheduled:
+            self._redraw_scheduled = True
+            self.window.win.after_idle(self._redraw_if_scheduled)
+
+    def _redraw_if_scheduled(self):
+        # Nothing to do if redraw_now() was called directly in the meantime.
+        if self._redraw_scheduled:
+            self.redraw_now()
+
+    def redraw_now(self):
+        """Redraw the structure immediately."""
+        status = self._status_on_redraw
+        self._redraw_scheduled = False
+        self._status_on_redraw = False
+
         self.window.clear()
         axes = self.scale * self.axes * (1, -1, 1)
         offset = np.dot(self.center, axes)
@@ -790,6 +820,11 @@ class View:
         if event.button in [4, 5]:
             self.scroll_event(event)
             return
+
+        # Hit-testing uses the screen positions from the last redraw, so
+        # finish any redraw that is still waiting.
+        if self._redraw_scheduled:
+            self.redraw_now()
 
         # Interaction is over: restore full detail before hit-testing below,
         # so self.P and self.indices describe the final frame.
