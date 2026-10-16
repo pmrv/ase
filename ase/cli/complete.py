@@ -27,7 +27,12 @@ def match(word, *suffixes):
 
 # Beginning of computer generated data:
 commands = {
-    'band-structure': ['-o', '--output', '-r', '--range'],
+    'band-structure': [
+        '-o',
+        '--output',
+        '-r',
+        '--range',
+    ],
     'build': [
         '-M',
         '--magnetic-moment',
@@ -135,8 +140,16 @@ commands = {
         '--as-csv',
         '--precision',
     ],
-    'dimensionality': ['--display-all', '--no-merge'],
-    'eos': ['-p', '--plot', '-t', '--type'],
+    'dimensionality': [
+        '--display-all',
+        '--no-merge',
+    ],
+    'eos': [
+        '-p',
+        '--plot',
+        '-t',
+        '--type',
+    ],
     'exec': [
         '-e',
         '--exec-code',
@@ -187,7 +200,11 @@ commands = {
         '--all-calculators',
         '--plugins',
     ],
-    'nebplot': ['--nimages', '--share-x', '--share-y'],
+    'nebplot': [
+        '--nimages',
+        '--share-x',
+        '--share-y',
+    ],
     'reciprocal': [],
     'run': [
         '-p',
@@ -224,7 +241,14 @@ commands = {
         '--nogui',
         '--pytest',
     ],
-    'ulm': ['-n', '--index', '-d', '--delete', '-v', '--verbose'],
+    'ulm': [
+        '-n',
+        '--index',
+        '-d',
+        '--delete',
+        '-v',
+        '--verbose',
+    ],
 }
 # End of computer generated data
 
