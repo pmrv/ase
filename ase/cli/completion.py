@@ -7,7 +7,6 @@ Run this when ever options are changed::
 
 import sys
 from pathlib import Path
-from subprocess import check_call
 
 # Path of the complete.py script:
 path = Path(__file__).with_name('complete.py')
@@ -41,7 +40,6 @@ def update(
     Refactor with care!  This function is also used by GPAW.
     """
 
-    import textwrap
     from importlib import import_module
 
     dct: dict[str, list[str]] = {}
@@ -64,21 +62,20 @@ def update(
         module = import_module(module_name)
         module.CLICommand.add_arguments(Subparser(command))
 
-    txt = 'commands = {'
+    tokens = ['commands = {\n']
+
     for command, opts in sorted(dct.items()):
-        txt += "\n    '" + command + "':\n        ["
+        tokens.append(f"    '{command}': [")
         if opts:
-            txt += '\n'.join(
-                textwrap.wrap(
-                    "'" + "', '".join(opts) + "'],",
-                    width=65,
-                    break_on_hyphens=False,
-                    subsequent_indent='         ',
-                )
-            )
+            tokens.append('\n')
+            tokens += [f"        '{opt}',\n" for opt in opts]
+            tokens.append('    ],\n')
         else:
-            txt += '],'
-    txt = txt[:-1] + '}\n'
+            tokens.append('],\n')
+
+    tokens.append('}\n')
+
+    txt = ''.join(tokens)
 
     with path.open() as fd:
         lines = fd.readlines()
@@ -87,23 +84,19 @@ def update(
     b = lines.index('# End of computer generated data\n')
 
     if test:
-        from ase.cli.complete import commands as existing_commands
-
-        if dct != existing_commands:
+        if ''.join(lines[a + 1 : b]) != txt:
             raise ValueError(
                 'Please update ase/cli/complete.py using '
                 '"python3 -m ase.cli.completion".'
             )
     else:
         lines[a + 1 : b] = [txt]
-        new = path.with_name('complete_new.py')
-
+        new = path.with_name('complete.py.new')
         with new.open('w') as fd:
             print(''.join(lines), end='', file=fd)
         new.rename(path)
         path.chmod(0o775)
         print(f'Updated {path}')
-        check_call(['ruff', 'format', str(path)])
 
 
 if __name__ == '__main__':
