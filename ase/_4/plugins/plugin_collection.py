@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Collection, Iterator
+from collections.abc import Callable, Collection, Iterator
 from functools import cached_property
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Any, Callable, Self, TypeVar, cast
+from typing import Any, Self, TypeVar, cast
 
 from .io import IOFormatPlugin
 from .plugin import CalculatorPlugin, Plugin

@@ -183,7 +183,7 @@ class LangevinBAOAB(MolecularDynamics):
         # promote to ndarray to simplify code below
         externalstress = np.asarray(externalstress)
         if externalstress.shape == ():
-            externalstress = externalstress.reshape((-1))
+            externalstress = externalstress.reshape(-1)
 
         # reshape to scalar (iff hydrostatic) or 3x3 matrix (general var cell)
         if self.hydrostatic:

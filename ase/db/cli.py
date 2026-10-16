@@ -1,7 +1,7 @@
 import json
 import sys
 from collections import defaultdict
-from collections.abc import Iterable, Iterator
+from collections.abc import Generator, Iterable
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -352,7 +352,7 @@ def row2str(row) -> str:
 @contextmanager
 def no_progressbar(
     iterable: Iterable, length: int | None = None
-) -> Iterator[Iterable]:
+) -> Generator[Iterable, None, None]:
     """A do-nothing implementation."""
     yield iterable
 
