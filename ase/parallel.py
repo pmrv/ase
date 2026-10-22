@@ -234,7 +234,7 @@ def _asap_world():
 
     try:
         world = _asap.Communicator()
-    except AttributeError:
+    except (AttributeError, RuntimeError) :
         return None
 
     return world
