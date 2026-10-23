@@ -146,9 +146,13 @@ class VaspInteractive(GenerateVaspInput, Calculator):  # type: ignore[misc]
     def calculate(
         self,
         atoms=None,
-        properties=['energy'],
-        system_changes=['positions', 'numbers', 'cell'],
+        properties=None,
+        system_changes=None,
     ):
+        if system_changes is None:
+            system_changes = ['positions', 'numbers', 'cell']
+        if properties is None:
+            properties = ['energy']
         Calculator.calculate(self, atoms, properties, system_changes)
 
         if not system_changes:

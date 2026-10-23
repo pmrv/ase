@@ -706,8 +706,10 @@ class SocketIOCalculator(Calculator, IOContext):
         )
 
     def calculate(
-        self, atoms=None, properties=['energy'], system_changes=all_changes
+        self, atoms=None, properties=None, system_changes=all_changes
     ):
+        if properties is None:
+            properties = ['energy']
         bad = [
             change
             for change in system_changes

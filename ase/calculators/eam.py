@@ -748,7 +748,7 @@ class EAM(Calculator):
         self.neighbors.update(atoms)
 
     def calculate(
-        self, atoms=None, properties=['energy'], system_changes=all_changes
+        self, atoms=None, properties=None, system_changes=all_changes
     ):
         """EAM Calculator
 
@@ -763,6 +763,8 @@ class EAM(Calculator):
             'pbc', 'initial_charges' and 'initial_magmoms'.
         """
 
+        if properties is None:
+            properties = ['energy']
         Calculator.calculate(self, atoms, properties, system_changes)
 
         # we shouldn't really recalc if charges or magmos change

@@ -2081,13 +2081,15 @@ class GenerateVaspInput:
         return dct
 
 
-def _args_without_comment(data, marks=['!', '#']):
+def _args_without_comment(data, marks=None):
     """Check split arguments list for a comment, return data up to marker
 
     INCAR reader splits list arguments on spaces and leaves comment markers as
     individual items. This function returns only the data portion of the list.
 
     """
+    if marks is None:
+        marks = ['!', '#']
     comment_locs = [data.index(mark) for mark in marks if mark in data]
     if comment_locs == []:
         return data
