@@ -66,11 +66,11 @@ notebook. To utilize this functionality you need to have NGLView_ and
 ipywidgets_ packages installed in addition to the Jupyter_ notebook.
 
 The basic usage provided by the :func:`ase.visualize.view` function exposes
-only small fraction of the NGL_ widget capabilities. The simplest form:
+only a small fraction of the NGL_ widget capabilities. The simplest form:
 
 >>> view(atoms, viewer='ngl')
 
-creates interactive ngl viewer widget with the few additional control widgets
+creates an interactive ngl viewer widget with a few additional control widgets
 added on the side. The object returned by the above call is a reference to
 the ``.gui`` member of the :class:`ase.visualize.nglview.NGLDisplay` containing
 actual viewer (``.view`` member), a reference to control widgets box
@@ -83,11 +83,11 @@ may be further manipulated by the following code in the separate cell (the
 >>> v=_
 >>> v.custom_colors({'Mn':'green','As':'blue'})
 >>> v.view._remote_call("setSize", target="Widget", args=["400px", "400px"])
->>> v.view.center_view()
+>>> v.view.center()
 >>> v.view.background='#ffc'
 >>> v.view.parameters=dict(clipDist=-200)
 
-The ``.view`` member exposes full API of the NGLView_ widget. The
+The ``.view`` member exposes the full API of the NGLView_ widget. The
 ``.control_box`` member is a :class:`ipywidgets.HBox` containing
 :class:`nglview.widget.NGLWidget` and :class:`ipywidgets.VBox` with control
 widgets. For the full documentation of these objects consult the NGLView_,
@@ -156,8 +156,8 @@ degree of customizability.
 >>> plot_atoms(slab, axarr[2], radii=0.3, rotation=('45x,45y,0z'))
 >>> plot_atoms(slab, axarr[3], radii=0.3, rotation=('0x,0y,0z'))
 >>> axarr[0].set_title("No rotation")
->>> axarr[1].set_xlabel("X-axis, [$\mathrm{\AA}$]")
->>> axarr[1].set_ylabel("Y-axis, [$\mathrm{\AA}$]")
+>>> axarr[1].set_xlabel(r"X-axis, [$\mathrm{\AA}$]")
+>>> axarr[1].set_ylabel(r"Y-axis, [$\mathrm{\AA}$]")
 >>> axarr[2].set_axis_off()
 >>> axarr[3].set_xlim(2, 6)
 >>> axarr[3].set_ylim(2, 6)

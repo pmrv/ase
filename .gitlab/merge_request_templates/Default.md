@@ -1,5 +1,9 @@
 Here: Your concise description of the content of this merge request.
 
+# AI Disclosure
+
+**AI**: Please disclose any AI usage; see https://docs.ase-lib.org/development/vibecoding.html.  Noncompliant merge requests may be closed without review.
+
 # Checklist: `x` (done) or `~` (irrelevant)
 
 - [ ] [I am familiar with **ASE's contribution guidelines.**](https://docs.ase-lib.org/development/contribute.html)

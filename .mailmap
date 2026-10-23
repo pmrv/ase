@@ -16,6 +16,8 @@
 # This specifies that commits under Othername <oldemail@example.com> should
 # be listed as Name Lastname <email@example.com> instead.
 
+Aakash Naik <aakash.naik@bam.de> aakash.naik <aakash.naik@bam.de>
+Aakash Naik <aakash.naik@bam.de> anaik <aakash.naik@bam.de>
 Adam Arvidsson <adamar@chalmers.se>
 Adam Fekete <adam@fekete.co.uk> Adam Fekete <adam.fekete@kcl.ac.uk>
 Adam J. Jackson <a.j.jackson@physics.org> Adam J. Jackson <a.j.jackson@bath.ac.uk>
@@ -34,6 +36,7 @@ Andreas Röckert <andreas.rockert@gmail.com> Andreas Rockert <andreas.rockert@gm
 Andrew Logsdail <andrewlogsdail@hotmail.com> logsdail <andrewlogsdail@hotmail.com>
 Andrew Peterson <andrew_peterson@brown.edu> Andrew Peterson <Andrew Peterson andrew_peterson@brown.edu>
 Andrew Peterson <andrew_peterson@brown.edu> anpet <anpet@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Andrew Rosen <asrosen93@gmail.com> Andrew <asrosen93@gmail.com>
 Andrew Rosen <asrosen93@gmail.com> Andrew Rosen <rosen@u.northwestern.edu>
 Andrew Rosen <asrosen93@gmail.com> Andrew-S-Rosen <asrosen93@gmail.com>
 Andrey Sobolev <sobolev@fhi.mpg.de> Andrey Sobolev <andrey.n.sobolev@gmail.com>
@@ -41,6 +44,7 @@ anro <anro@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Antoni Macià <antoni.macia@ub.edu>
 Anubhab Haldar <jinxhaldar@gmail.com> Anubhab Haldar <ahaldar@bu.edu>
 Anubhab Haldar <jinxhaldar@gmail.com> Chronum94 <ahaldar@bu.edu>
+Anubhab Haldar <jinxhaldar@gmail.com> Chronum94 <jinxhaldar@gmail.com>
 Ask Hjorth Larsen <askhl@proton.me> Ask Hjorth Larsen <asklarsen@gmail.com>
 Ask Hjorth Larsen <askhl@proton.me> askhl <askhl@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Asmus Ougaard Dohn <asmus.od@gmail.com> Asmus O. Dohn <asod@hi.is>
@@ -50,6 +54,10 @@ Asmus Ougaard Dohn <asmus.od@gmail.com> Asmus O Dohn <asod@hi.is>
 Auguste TETENOIRE <auguste.tetenoire@gmail.com> Auguste TETENOIRE <auguste.tetenoire@epfl.ch>
 
 Ben Blaiszik <blaiszik@uchicago.edu>
+Benjamin Chen <benjaminchen22@hotmail.com> benjaminchen22 <benjamin_chen@ihpc.a-star.edu.sg>
+Benjamin Chen <benjaminchen22@hotmail.com> Benjamin <benjaminchen22@hotmail.com>
+Benjamin Heckscher Sjølin <benjaminsjolin@hotmail.dk> bsjoelin <benjaminsjolin@hotmail.dk>
+
 Bismarrck <Bismarrck@me.com>
 Jonas Bjork <J.Bjork@liverpool.ac.uk> bjork <bjork@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Pedro Brandimarte <brandimarte@gmail.com> brandimarte <brandimarte@gmail.com>
@@ -65,6 +73,9 @@ Daniele Selli <d.85.sello@gmail.com>  dselli <d.85.sello@gmail.com>
 Daniele Selli <d.85.sello@gmail.com>  Dselli <dselli@laser2.mater.unimib.it>
 Daniel S. Karls <dskpersistent@gmail.com> dskarls <dskpersistent@gmail.com>
 Daniel S. Karls <dskpersistent@gmail.com> dskarls <karl0100@umn.edu>
+Daniel Speckhard <dts@physik.hu-berlin.de> dts <speckhard@fhi.mpg.de>
+Daniel Speckhard <dts@physik.hu-berlin.de> daniel speckhard <dts@physik.hu-berlin.de>
+
 David Kleiven <david.kleiven@ntnu.no> David Kleiven <davidkleiven446@gmail.com>
 David Landis <?> dlandis <dlandis@5af997e4-4c3d-0410-961e-ac0512e437d9>
 David Ollodart <davidollodart@gmail.com> david <davidollodart@gmail.com>
@@ -73,9 +84,14 @@ Marcin Dułak <Marcin.Dulak@gmail.com> dulak <dulak@5af997e4-4c3d-0410-961e-ac05
 Marcin Dułak <Marcin.Dulak@gmail.com> dulak <dulak@337befb3-7485-0410-a06f-dd7acf69a9d1>
 
 Edward Tait <ewt23@cam.ac.uk>
+Elena Gelzinyte <elena.gelzinyte@gmail.com> elena <elena.gelzinyte@gmail.com>
+Elena Gelzinyte <elena.gelzinyte@gmail.com> gelzinyte <elena.gelzinyte@gmail.com>
 Eisuke Kawashima <2618741-e-kwsm@users.noreply.gitlab.com> E Kawashima <2618741-e-kwsm@users.noreply.gitlab.com>
-Elisabeth  Keller <ejoke@dtu.dk> elisabeth.keller <elisabeth.keller.jun@web.de>
-Elisabeth  Keller <ejoke@dtu.dk> elisabeth.keller <elisabeth.keller@gitlab.com>
+Elisabeth Keller <ejoke@dtu.dk> Elisabeth  Keller <ejoke@dtu.dk>
+Elisabeth Keller <ejoke@dtu.dk> elisabeth.keller <elisabeth.keller.jun@web.de>
+Elisabeth Keller <ejoke@dtu.dk> elisabeth.keller <elisabeth.keller@gitlab.com>
+Elisabeth Keller <ejoke@dtu.dk> Elisabeth Keller <elisabeth.keller.jun@web.de>
+Elisabeth Keller <ejoke@dtu.dk> Elisabeth  Keller <elisabeth.keller.jun@web.de>
 Emmanuel Farhi <farhi@ill.fr> Emmanuel FARHI <farhi@ill.fr>
 Enrique Zanardi Maffiotte <ezanardi@ull.edu.es> Enrique Zanardi <ezanardi@scheelita.ull.es>
 Eric Hermes <erichermes@gmail.com> ehermes <ehermes@5af997e4-4c3d-0410-961e-ac0512e437d9>
@@ -97,6 +113,7 @@ Felix Tim Bölle <felixtim.boelle@gmail.com> Feltbo <felixtim.boelle@gmail.com>
 Florian Knoop <florian_knoop@gmx.de> Florian Knoop <florian.knoop@liu.se>
 Florian Knoop <florian_knoop@gmx.de> Florian Knoop (DRACO) <knoop@fhi-berlin.mpg.de>
 Florian Knoop <florian_knoop@gmx.de> Florian Knoop <knoop@fhi-berlin.mpg.de>
+Floris van den Bosch <f.van.den.bosch@lic.leidenuniv.nl> floris <floris@host26.tc.lic.leidenuniv.nl>
 fras <fras@5af997e4-4c3d-0410-961e-ac0512e437d9>
 
 Gaël Donval <gdonval+gitlab@gmail.com> Gaël Donval <gitlab.com@umessage.me>
@@ -115,6 +132,8 @@ Graham Inggs <graham@nerve.org.za> Graham Inggs <ginggs@debian.org>
 Grigory Smirnov <grsmirnov@gmail.com>
 
 Hanna Tuerk <hanna.tuerk@hotmail.de> Hanna Türk <hanna.tuerk@tum.de>
+Hanna Tuerk <hanna.tuerk@hotmail.de> Hanna Tuerk <hanna.tuerk@bam.de>
+Hanna Tuerk <hanna.tuerk@hotmail.de> Hanna Türk <hct@hanna-tuerk.de>
 Heine Anton Hansen <?> hahansen <hahansen@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Hyeonsu Kim <kim1231232@kaist.ac.kr> KimHyeonsu <kim1231232@kaist.ac.kr>
 Hong Li <hongli520@gmail.com>
@@ -133,7 +152,6 @@ Jakob Schiøtz <schiotz@fysik.dtu.dk> Jakob Schiotz <schiotz@fysik.dtu.dk>
 James Kermode <james.kermode@gmail.com> kermode <kermode@5af997e4-4c3d-0410-961e-ac0512e437d9>
 James Kermode <james.kermode@gmail.com> James Kermode <J.R.Kermode@warwick.ac.uk>
 Jeppe Gavnholt <?> gavnholt <gavnholt@5af997e4-4c3d-0410-961e-ac0512e437d9>
-Jonas Amsler <jonas.amsler@kit.edu> jamsler <5144672-jamsler@users.noreply.gitlab.com>
 jber <jber@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Janne Blomqvist <?> jblomqvist <jblomqvist@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Jens Jørgen Mortensen <jensj@fysik.dtu.dk> jensj <jensj@5af997e4-4c3d-0410-961e-ac0512e437d9>
@@ -145,25 +163,33 @@ Jesper Friis <jesper.friis@sintef.no> jesperf <jesperf@5af997e4-4c3d-0410-961e-a
 Jess Wellendorff <?> jesswe <jesswe@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Jakob Gath <jag@psibox.dk> jg <jag@psibox.dk>
 Jin Chang <jchang@dtu.dk>
+Jinzhe Zeng <jinzhe.zeng@rutgers.edu> Jinzhe Zeng <njzjz@qq.com>
 Jingzhe Chen <?> jingzhe <jingzhe@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Joakim Löfgren <joalof@chalmers.se> joalof <joalof@chalmers.se>
+Joakim Brorsson <joabro@chalmers.se> yoobro <joabro@chalmers.se>
 Johanna Sanchez <ellaquimica@gmail.com>
 Johannes Laurin Hörmann <johannes.hoermann@imtek.uni-freiburg.de> Johannes Hörmann <johannes.hoermann@imtek.uni-freiburg.de>
 John Kitchin <jkitchin@andrew.cmu.edu> jk7683@kit.edu <jk7683@uc1n996.localdomain>
 John Kitchin <jkitchin@andrew.cmu.edu> jk7683@kit.edu <jk7683@uc1n997.localdomain>
 John Kitchin <jkitchin@andrew.cmu.edu> jkitchin <jkitchin@5af997e4-4c3d-0410-961e-ac0512e437d9>
 John Kitchin <jkitchin@andrew.cmu.edu> John Kitchin <jkitchin@cmu.edu>
+Jonas Amsler <jonas.amsler@kit.edu> jamsler <5144672-jamsler@users.noreply.gitlab.com>
+Jonas Amsler <jonas.amsler@kit.edu> jonas.amsler <jonas.amsler@kit.edu>
 Joseba Alberdi <j.alberdi@simuneatomistics.com> Joseba <joseba.alberdi@ehu.eus>
 Joshua Lansford <lansford.jl@gmail.com> Joshua Lansford <Joshua Lansford>
 Joshua Lansford <lansford.jl@gmail.com> JLans <lansford.jl@gmail.com>
 Juan M. Lorenzi <jmlorenzi@gmail.com>
+Julio Gutierrez <julio.gutierrez@bsc.es> juliogut <julio.gutierrez@bsc.es>
 Jussi Enkovaara <jussi.enkovaara@csc.fi> jussie <jussie@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Jun Yan <?> juya <juya@5af997e4-4c3d-0410-961e-ac0512e437d9>
-Keenan Lyon <klyon@uwaterloo.ca>
 
+Karina Bataeva <karbat@dtu.dk> Karina Bataeva <karbat@fjorm.fysik.dtu.dk>
+Keenan Lyon <klyon@uwaterloo.ca>
 Kirsten Winther <winther@stanford.edu> kirstenwinther <winther@stanford.edu>
 Kristen Kaasbjerg <kkaa@nanotech.dtu.dk> kkaa <kkaa@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Kristjan Eimre <kristjaneimre@gmail.com> KE <kristjaneimre@gmail.com>
 Jesper Kleis <?> kleis <kleis@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Kohei Shinohara <kshinohara0508@gmail.com> lan496 <kshinohara0508@gmail.com>
 Korina Kuhar <kokuha@fysik.dtu.dk>
 krbt <krbt@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Karsten Wedel Jacobsen <kwj@fysik.dtu.dk> kwj <kwj@5af997e4-4c3d-0410-961e-ac0512e437d9>
@@ -181,6 +207,7 @@ Lynza Sprowl <lynza.sprowl@gmail.com> Lynza Halberstadt <halbersl@oregonstate.ed
 Maarten Van de Put <vandeput.maarten@gmail.com> Maarten Van de Put <mvandeput@cometnet-10-21-36-185.utdallas.edu>
 Mads Engelund <mads.engelund@espeem.com> Mads Engelund <mads_engelund001@ehu.es>
 Mads Engelund <mads.engelund@espeem.com> mads.engelund <mads.engelund@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Mads Kruse <madkru@dtu.dk> madkru <madkru@dtu.dk>
 Mads-Peter Verner Christiansen <machri@phys.au.dk> Mads-Peter V. C <machri@phys.au.dk>
 Mads-Peter Verner Christiansen <machri@phys.au.dk> Mads-Peter <machri@phys.au.dk>
 Magnus Nord <Magnus.Nord@glasgow.ac.uk> Magnus Nord <magnunor@gmail.com>
@@ -195,6 +222,9 @@ Mark  Kamper Svendsen <markas@dtu.dk> Mark_Kamper <markas@dtu.dk>
 Marko Melander <marmela@dtu.dk>
 Markus Kaukonen <markus.kaukonen@iki.fi> paapu68 <markus.kaukonen@iki.fi>
 Markus Kaukonen <markus.kaukonen@iki.fi> markus <markus@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Markus Nygaard Pedersen <markus.markusnp@gmail.com> MarkusNPedersen <markus.markusnp@gmail.com>
+Markus Nygaard Pedersen <markus.markusnp@gmail.com> Markus Pedersen <markus.markusnp@gmail.com>
+Markus Nygaard Pedersen <markus.markusnp@gmail.com> mnygp <markus.markusnp@gmail.com>
 Martin Hangaard Hansen <?> mhah <mhah@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Martin Hangaard Hansen <?> mhangaard <mhangaard@gmail.com>
 Martin Hangaard Hansen <?> Martin Hangaard Hansen <mhah@surt.fysik.dtu.dk>
@@ -218,6 +248,7 @@ Michael J. Waters <michael.j.waters@northwestern.edu> Michael J Waters <michael.
 Michael J. Waters <michael.j.waters@northwestern.edu> Michael Waters <michael.j.waters@northwestern.edu>
 Michael J. Waters <michael.j.waters@northwestern.edu> Michael Waters <mjwaters@umich.edu>
 Michael J. Waters <michael.j.waters@northwestern.edu> MikeJWaters <michael.j.waters@northwestern.edu>
+Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael <mcoywalter@gmail.com>
 Michael Walter <Michael.Walter@fmf.uni-freiburg.de> U-IWM\walt <walt@PC-L323.iwm.fraunhofer.de>
 Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael Walter <mcoywalter@gmail.com>
 Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael Walter <@ PC-L192 mcoywalter@gmail.com>
@@ -227,9 +258,11 @@ Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael Linux IWM <mcoywalte
 Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael Walter <Michael.Walter@fmf.uni-freiburg.de>
 Michael Walter <Michael.Walter@fmf.uni-freiburg.de> Michael Walter @ PC-L192 <mcoywalter@gmail.com>
 Michael Wolloch <michael.wolloch@univie.ac.at> mwolloch <michael.wolloch@univie.ac.at>
-MichelangeloDomina <domina.michelangelo@gmail.com> ichelangelo Domina <dominam@parsons01.cluster>
+Michelangelo Domina <domina.michelangelo@gmail.com> MichelangeloDomina <domina.michelangelo@gmail.com>
+Michelangelo Domina <domina.michelangelo@gmail.com> Michelangelo Domina <dominam@parsons01.cluster>
 Miguel Caro <mcaroba@gmail.com>
 Mikael Kuisma <kuisma@dtu.dk> Mikael Kuisma <mikael.j.kuisma@jyu.fi>
+Mikkel Ohm Sauer <mikhik@yahoo.dk> the-ohm <mikhik@yahoo.dk>
 Mikkel Strange <mikst@fysik.dtu.dk> Mikkel Strange <strange@chem.ku.dk>
 Mikkel Strange <mikst@fysik.dtu.dk> Strange, Mikkel (smikk) <mikst@fysik.dtu.dk>
 Mikkel Strange <mikst@fysik.dtu.dk> strange <strange@5af997e4-4c3d-0410-961e-ac0512e437d9>
@@ -267,6 +300,7 @@ Otto Kohulák <pravod@gmail.com> Otto Kohulak <kohulak@Maxwell00>
 Otto Kohulák <pravod@gmail.com> addman <addman@Bobor>
 Otto Kohulák <pravod@gmail.com> addman <addman@X201>
 
+Pablo Piaggi <ppiaggi@gmail.com> PabloPiaggi <ppiaggi@gmail.com>
 Patrick Melix <patrick.melix@uni-leipzig.de> Patrick Mélix <git@melix.me>
 Patrick Melix <patrick.melix@uni-leipzig.de> Patrick Melix <gitlab@melix.me>
 Pavel V. Stishenko <mazay0@gmail.com> mazay <mazay@mzh>
@@ -297,18 +331,24 @@ prtkm <prateekm@cmu.edu>
 Ralf Meyer <meyer.ralf@yahoo.com> Ralf Meyer <ralf.meyer@tugraz.at>
 Rasmus K <shandolad@gmail.com>
 refreshx2 <jjmaldonis@gmail.com>
-Robert Warmbier <rwarmbier@uj.ac.za> Robert Warmbier <Robert.Warmbier@wits.ac.za>
-Robert Warmbier <rwarmbier@uj.ac.za> rowue <rowue@5af997e4-4c3d-0410-961e-ac0512e437d9>
-Robert Warmbier <rwarmbier@uj.ac.za> rbw <rwarmbier@uj.ac.za>
+Robert Warmbier <Robert.Warmbier@wits.ac.za> Robert Warmbier <rwarmbier@uj.ac.za>
+Robert Warmbier <Robert.Warmbier@wits.ac.za> rowue <rowue@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Robert Warmbier <Robert.Warmbier@wits.ac.za> rbw <rwarmbier@uj.ac.za>
 
 Janosch Michael Rauba <s042606@fysik.dtu.dk> s042606 <s042606@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Troels Kofoed Jacobsen <s052580@fysik.dtu.dk> <s052580@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Santiago Cingolani <santiago.cingolani@gmail.com>
 schenks  t <schenkst@5af997e4-4c3d-0410-961e-ac0512e437d9>
+Seán Kavanagh <sk2045@cam.ac.uk> Sean Kavanagh <s.kavanagh19@imperial.ac.uk>
+Seán Kavanagh <sk2045@cam.ac.uk> Seán Kavanagh <skavanagh@seas.harvard.edu>
+Sebastian Wellig <sebastian.wellig@gmail.com> SebastianWellig <sebastian.wellig@gmail.com>
 Shim JaeHwan <schinavro@gmail.com> SJH <schinavro@gmail.com>
 Shim JaeHwan <schinavro@gmail.com> SJH <schinavro@SJHui-MacBook-Pro.local>
 shrx <differenxe@gmail.com>
 Shuang Han <hanshuangshiren@gmail.com> Shuang Han <shuha@surt.fysik.dtu.dk>
+Shuang Han <hanshuangshiren@gmail.com> Shuang "Shaun" Han <hanshuangshiren@gmail.com>
+Silvan Kretschmer <silvan_kretschmer@gmx.de> SianK <silkr@dtu.dk>
+Silvan Kretschmer <silvan_kretschmer@gmx.de> Silvan Kretschmer <silkr@dtu.dk>
 Simon Brodersen <?> sihb <sihb@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Simone Sturniolo <wml08325@scpc044.esc.rl.ac.uk> Simone Sturniolo <simonesturniolo@gmail.com>
 Simone Sturniolo <wml08325@scpc044.esc.rl.ac.uk> Simone Sturniolo <simone.sturniolo@stfc.ac.uk>
@@ -327,24 +367,31 @@ Stefano Americo <steame@dtu.dk> aesteric_fooman <steame@dtu.dk>
 Sten Haastrup <sthaa@mott.fysik.dtu.dk> Sten Haastrup <sten.haastrup@gmail.com>
 Sucerquia <dsucerg@gmail.com> Sucerquia <danielsucerquia@hotmail.com>
 Sucerquia <dsucerg@gmail.com> Daniel Sucerquia Gaviria <danielsucerquia@hotmail.com>
+Sung Hoon Jung <sunghjung3@utexas.edu> Sung Jung <sunghjung3@utexas.edu>
+Sungwoo Kang <ksw1015@kaist.ac.kr> 강성우 <ksw1015@kaist.ac.kr>
 
 Tamas K. Stenczel <stenczelt@gmail.com> T. K. Stenczel <stenczelt@gmail.com>
 Tara Maria Boland <tara.boland01@gmail.com> Tara Maria Boland <tmabo@dtu.dk>
+Tara Maria Boland <tara.boland01@gmail.com> tboland1 <tmabo@dtu.dk>
 tdd20@cam.ac.uk <tdd20@cam.ac.uk>
 Thorsten Deilmann <thorsten.deilmann@uni-muenster.de> ithod <thod_@gmx.de>
 Tiziano Müller <tiziano.mueller@chem.uzh.ch>
 Tao Jiang <?> tjiang <tjiang@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Thang Nguyen <thangckt@gmail.com> Thang <thangckt@gmail.com>
+Théo Cavignac <theo.cavignac@gmail.com> Theo Cavignac <theo.cavignac@gmail.com>
 Thomas Olsen <?> tolsen <tolsen@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Thomas Purcell <purcellt@arizona.edu> Thomas Purcell <purcell@fhi-berlin.mpg.de>
 Thomas Purcell <purcellt@arizona.edu> Tom Purcell <purcellt@arizona.edu>
+Thomas Purcell <purcellt@arizona.edu> Thomas <purcell@fhi-berlin.mpg.de>
 Thorbjørn Skovhus <thosk@dtu.dk> tskovhus <thosk@dtu.dk>
 Thorbjørn Skovhus <thosk@dtu.dk> Thorbjørn Skovhus <s134264@student.dtu.dk>
 Toma Susi <toma.susi@iki.fi>
 Tom Daff <tdd20@cam.ac.uk>
-T.Demeyere <tom.dmre@gmail.com> TomD <tom.dmre@gmail.com>
-T.Demeyere <tom.dmre@gmail.com> TomD <T.Demeyere@soton.ac.uk>
-T.Demeyere <tom.dmre@gmail.com> T.Demeyere <td5g20@uos-219049.clients.soton.ac.uk>
+Tom Demeyere <tom.dmre@gmail.com> T.Demeyere <tom.dmre@gmail.com>
+Tom Demeyere <tom.dmre@gmail.com> TomD <tom.dmre@gmail.com>
+Tom Demeyere <tom.dmre@gmail.com> TomD <T.Demeyere@soton.ac.uk>
+Tom Demeyere <tom.dmre@gmail.com> T.Demeyere <td5g20@uos-219049.clients.soton.ac.uk>
+Tom Demeyere <tom.dmre@gmail.com> tomdemeyere <t.demeyere@icloud.com>
 Tristan Maxson <tgmaxson@gmail.com> Tristan G Maxson <tgmaxson@gmail.com>
 Tristan Maxson <tgmaxson@gmail.com> tgmaxson <tgmaxson@5af997e4-4c3d-0410-961e-ac0512e437d9>
 Tristan Maxson <tgmaxson@gmail.com> tgmaxson <tgmaxson@gmail.com>
@@ -357,6 +404,6 @@ Yann Pouillon <devops@materialsevolution.es> Yann Pouillon <y.pouillon@simuneato
 ycshao <shaoyecheng@zju.edu.cn>
 Yingchun Zhang <yczhang@smail.nju.edu.cn>
 Yinjia Zhang <yz144@login001.oscar.ccv.brown.edu>
-Yunqi Shao <yunqi@kemi.uu.se>
-
+Yuji Ikeda <yuji.ikeda.ac.jp@gmail.com> yuzie007 <yuji.ikeda.ac.jp@gmail.com>
+Yunqi Shao <yunqi.shao@kemi.uu.se> Yunqi Shao <yunqi@kemi.uu.se>
 Zhenhua Zeng <zeng46@purdue.edu> zeng <zeng@5af997e4-4c3d-0410-961e-ac0512e437d9>

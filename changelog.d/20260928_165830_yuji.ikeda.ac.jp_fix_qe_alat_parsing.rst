@@ -1,0 +1,6 @@
+I/O
+---
+
+- Add `__contains__` to :func:`ase.io.espresso_namelist.namelist.Namelist`
+  so that it can do a case-insensitive membership check
+  (:mr:`4268`)

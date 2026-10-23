@@ -1,7 +1,5 @@
 """Tools for analyzing instances of :class:`~ase.Atoms`"""
 
-from typing import List
-
 import numpy as np
 
 from ase import Atoms
@@ -16,14 +14,14 @@ from ase.utils import deprecated
 __all__ = ['Analysis']
 
 
-def get_max_containing_cell_length(images: List[Atoms]):
+def get_max_containing_cell_length(images: list[Atoms]):
     i2diff = np.zeros(3)
     for image in images:
         np.maximum(get_containing_cell_length(image), i2diff, out=i2diff)
     return i2diff
 
 
-def get_max_volume_estimate(images: List[Atoms]) -> float:
+def get_max_volume_estimate(images: list[Atoms]) -> float:
     return np.prod(get_max_containing_cell_length(images))
 
 

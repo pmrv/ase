@@ -408,7 +408,8 @@ class RamanPhonons(RamanData):
                 self.kpts_kc, modes=True, verbose=self.verbose
             )
 
-            self.im_r = self.vibrations.m_inv_x
+            m_inv_a = self.atoms.get_masses()[self.indices] ** -0.5
+            self.im_r = np.repeat(m_inv_a, 3)
             self.om_Q = omega_kl.ravel().real  # energies in eV
             self.modes_Qq = u_kl.reshape(len(self.om_Q), 3 * len(self.atoms))
             self.modes_Qq /= self.im_r

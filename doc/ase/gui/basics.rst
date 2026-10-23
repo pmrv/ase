@@ -33,7 +33,7 @@ are open in a Python session, use:
 
 
 Selecting a part of a trajectory
-................................
+--------------------------------
 
 When opening files that contain multiple atomic structures, a subset of
 the configurations can be selected using Python-like indexing
@@ -110,29 +110,41 @@ For instructions on creating valid graphing strings, refer to
 Configuring the GUI
 -------------------
 
-Certain defaults for the GUI can be set using a file ``~/.ase/gui.py``.
+Certain defaults for the GUI can be set using the configuration file
+:file:`~/.config/ase/config.ini`.
+
+.. versionchanged:: 3.29.0
+  Previously, a Python-based file :file:`~/.ase/gui.py` was used for
+  configuration. This is now deprecated.
+
 If the file exists, it is executed after initializing the variables and
-colors normally used in ASE.
+colors normally used in ASE. The format should follow the INI specification
+of a Python ConfigParser_ and GUI specific options should be placed under a
+subsection called ``[gui]``. The same file is also used for
+:ref:`calculator-configuration`.
 
 For example, one can change the default graphs that are plotted, and the
 default radii for displaying specific atoms. The following will change the
 default graph in the GUI to display the energy evolution and the maximal
 force and also display Cu atoms (Z=29) with a radius of 1.6 Angstrom. The
-``covalent_radii`` setting also accepts key-value pairs in the form of a
-dictionary, and atoms can be referred to using atomic symbols.
+``covalent_radii`` setting also accepts Python-syntax key-value pairs in
+the form of a dictionary, and atoms can be referred to using atomic symbols.
 
-::
+.. code:: ini
 
-  gui_default_settings['gui_graphs_string'] = "i, e - min(E), fmax"
-  gui_default_settings['covalent_radii'] = [[29,1.6]]  # or {29: 1.6}
+  default_graphs_string = i, e - min(E), fmax
+  covalent_radii = [[29, 1.6]]  # or {29: 1.6} or {'Cu': 1.6} etc...
 
-To see a list of all settings that can be changed, along with their
-default values, do:
+These are the settings that can be changed, along with their default
+values (as defined in Python):
 
-::
+.. literalinclude:: ../../../ase/gui/defaults.py
+  :dedent: 4
+  :language: python
+  :start-after: gui_default_settings = {
+  :end-before: }  # end
 
-  from ase.gui.defaults import gui_default_settings
-  print(gui_default_settings)
+.. _ConfigParser: https://docs.python.org/3/library/configparser.html
 
 
 .. _high contrast:
@@ -142,12 +154,16 @@ High contrast settings
 
 It is possible to change the foreground and background colors used to draw the
 atoms, for instance to draw white graphics on a black background. This can be
-done in ``~/.ase/gui.py``:
+done in ``~/.config/ase/config.ini``:
 
-::
+.. code:: ini
 
-  gui_default_settings['gui_foreground_color'] = '#ffffff' #white
-  gui_default_settings['gui_background_color'] = '#000000' #black
+  foreground_color = #ffffff
+  background_color = #000000
+
+Colors can be specified using hex codes or by picking one of many
+`named colors <https://cs111.wellesley.edu/archive/cs111_fall14/public_html/labs/lab12/tkintercolor.html>`_ 
+in Tkinter.
 
 The color scheme of the windows themselves (i.e. menus, buttons
 and text etc.) can be changed by choosing a different desktop theme. In

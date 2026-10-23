@@ -1,0 +1,6 @@
+Other changes
+-------------
+
+- Removed the `dynamic_relaxation` argument from :class:`~ase.mep.neb.DyNEB`.
+  This class now always performs the DyNEB algorithm.
+  (:mr:`4260`)

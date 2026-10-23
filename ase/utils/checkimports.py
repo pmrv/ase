@@ -44,7 +44,7 @@ def exec_and_check_modules(expression: str) -> set[str]:
     proc = run(
         [sys.executable, '-c', command],
         capture_output=True,
-        universal_newlines=True,
+        text=True,
         check=True,
     )
     return set(json.loads(proc.stdout))
@@ -85,8 +85,6 @@ def check_imports(
             assert not r.fullmatch(module), f'{module} was imported'
 
     if max_nonstdlib_module_count is not None:
-        assert sys.version_info >= (3, 10), 'Python 3.10+ required'
-
         nonstdlib_modules = []
         for module in modules:
             if (

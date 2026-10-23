@@ -1,0 +1,7 @@
+Bugfixes
+--------
+
+- Fix :class:`~ase.mep.neb.NEBTools` so that it can correctly guess the number
+  of images per band for the images with a symmetric path and single band.
+  (:mr:`3401`, :mr:`4257`)
+

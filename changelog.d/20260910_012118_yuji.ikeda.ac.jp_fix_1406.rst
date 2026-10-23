@@ -1,0 +1,6 @@
+Bugfixes
+--------
+
+- Fix :class:`~ase.mep.neb.NEB` to compute forces explicitly for end-point images
+  (:mr:`4258`)
+

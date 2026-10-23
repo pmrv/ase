@@ -107,16 +107,20 @@ class View:
             for i, rgb in enumerate(jmol_colors)
         }
         # scaling factors for vectors
-        self.force_vector_scale = self.config['force_vector_scale']
-        self.velocity_vector_scale = self.config['velocity_vector_scale']
-        self.magmom_vector_scale = self.config['magmom_vector_scale']
+        self.force_vector_scale = self.config.getfloat('force_vector_scale')
+        self.velocity_vector_scale = self.config.getfloat(
+            'velocity_vector_scale'
+        )
+        self.magmom_vector_scale = self.config.getfloat('magmom_vector_scale')
 
         # buttons
         self.b1 = 1  # left
         self.b3 = 3  # right
-        if self.config['swap_mouse']:
+        if self.config.getboolean('swap_mouse'):
             self.b1 = 3
             self.b3 = 1
+
+        self.t0 = 0
 
     @property
     def atoms(self):
@@ -163,7 +167,7 @@ class View:
 
         if self.showing_cell():
             B1, B2 = get_cell_coordinates(atoms.cell,
-                                          self.config['shift_cell'])
+                                          self.config.getboolean('shift_cell'))
         else:
             B1 = B2 = np.zeros((0, 3))
 
@@ -713,6 +717,8 @@ class View:
         self.center0 = self.center
 
     def move(self, event):
+        from ase.gui.ui import UNCACHED_PRIMITIVES_TAG
+
         x = event.x
         y = event.y
         x0, y0 = self.xy
@@ -720,7 +726,8 @@ class View:
             x0 = int(round(x0))
             y0 = int(round(y0))
             self.draw()
-            self.window.canvas.create_rectangle((x, y, x0, y0))
+            self.window.canvas.create_rectangle(
+                (x, y, x0, y0), tags=UNCACHED_PRIMITIVES_TAG)
             return
 
         if event.modifier == 'shift':

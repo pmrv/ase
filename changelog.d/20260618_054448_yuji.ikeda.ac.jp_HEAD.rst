@@ -1,0 +1,5 @@
+Bugfixes
+--------
+
+- Fix :class:`~ase.calculators.lammpsrun.LAMMPS`
+  so that it keeps a non-zero non-periodic cell (:mr:`4152`)

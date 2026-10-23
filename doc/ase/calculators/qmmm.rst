@@ -31,11 +31,6 @@ Other ASE-calculators that currently support EIQMMM:
 
 .. _GPAW: https://gpaw.readthedocs.io
 
-.. seealso::
-
-    The :ref:`example_qmmm` tutorial, on how to use the Explicit Interaction QMMM
-    calculator
-
 .. autoclass:: EIQMMM
 
 Here, you need to specify the interaction::

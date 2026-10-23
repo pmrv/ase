@@ -1,0 +1,5 @@
+Bugfixes
+--------
+
+- Fixed :meth:`ase.Atoms.center` so that it can accept a single float value for
+  `about` as documented (:mr:`4009`)
