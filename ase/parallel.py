@@ -259,6 +259,8 @@ def _gpaw_world():
 #   mechanisms and that must be avoided.
 mpiworld_importpath = os.environ.get('ASE_PARALLEL_WORLD_HOOK')
 
+world : MPI | MPICommunicator
+
 if mpiworld_importpath is None:
     # In the future this will be always serial!
     # We should detect if we would set a real communicator here
