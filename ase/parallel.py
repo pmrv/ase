@@ -229,33 +229,13 @@ class MPI4PY:
         return self._returnval(a, b)
 
 
-class AsapCommWrapper:
-    """Compatibility hack to save people from trouble with older asap.
-
-    We can definitely remove this in 2027."""
-
-    def __init__(self, world):
-        self.world = world
-
-    def __getattr__(self, attr):
-        return getattr(self.world, attr)
-
-    def sum_scalar(self, a, root=-1):
-        buf = np.array([a])
-        self.world.sum(buf, root=root)
-        return buf[0]
-
-
 def _asap_world():
     import _asap
 
     try:
         world = _asap.Communicator()
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         return None
-
-    if not hasattr(world, 'sum_scalar'):
-        world = AsapCommWrapper(world)
 
     return world
 
