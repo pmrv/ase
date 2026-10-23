@@ -189,7 +189,7 @@ class POVRAY:
         image_width,
         image_height,
         constraints=(),
-        isosurfaces=[],
+        isosurfaces=None,
         display=False,
         pause=True,
         transparent=True,
@@ -198,8 +198,8 @@ class POVRAY:
         camera_dist=50.0,
         image_plane=None,
         camera_type='orthographic',
-        point_lights=[],
-        area_light=[(2.0, 3.0, 40.0), 'White', 0.7, 0.7, 3, 3],
+        point_lights=None,
+        area_light=None,
         background='White',
         textures=None,
         transmittances=None,
@@ -207,7 +207,7 @@ class POVRAY:
         cue_density=5e-3,
         celllinewidth=0.05,
         bondlinewidth=0.10,
-        bondatoms=[],
+        bondatoms=None,
         exportconstraints=False,
     ):
         """
@@ -281,6 +281,14 @@ class POVRAY:
             honour FixAtoms and mark?"""
 
         # attributes from initialization
+        if bondatoms is None:
+            bondatoms = []
+        if area_light is None:
+            area_light = [(2.0, 3.0, 40.0), 'White', 0.7, 0.7, 3, 3]
+        if point_lights is None:
+            point_lights = []
+        if isosurfaces is None:
+            isosurfaces = []
         self.area_light = area_light
         self.background = background
         self.bondatoms = bondatoms

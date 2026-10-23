@@ -711,10 +711,12 @@ def print_ulm_info(filename, index=None, verbose=False):
 def copy(
     reader: str | Path | Reader,
     writer: str | Path | Writer,
-    exclude: set[str] = set(),
+    exclude: set[str] | None = None,
     name: str = '',
 ) -> None:
     """Copy from reader to writer except for keys in exclude."""
+    if exclude is None:
+        exclude = set()
     close_reader = False
     close_writer = False
     if not isinstance(reader, Reader):

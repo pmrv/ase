@@ -53,7 +53,7 @@ def exec_and_check_modules(expression: str) -> set[str]:
 def check_imports(
     expression: str,
     *,
-    forbidden_modules: list[str] = [],
+    forbidden_modules: list[str] | None = None,
     max_module_count: int | None = None,
     max_nonstdlib_module_count: int | None = None,
     do_print: bool = False,
@@ -73,6 +73,8 @@ def check_imports(
     do_print:
         Print loaded modules if set.
     """
+    if forbidden_modules is None:
+        forbidden_modules = []
     modules = exec_and_check_modules(expression)
 
     if do_print:
