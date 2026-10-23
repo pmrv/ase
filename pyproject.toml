@@ -224,7 +224,6 @@ ignore = [
     'unnecessary-iterable-allocation-for-first-element',
     'unnecessary-lambda',
     'unnecessary-list-index-lookup',
-    'unnecessary-literal-set',
     'unnecessary-map',
     'unnecessary-range-start',
     'unnecessary-return-none',
