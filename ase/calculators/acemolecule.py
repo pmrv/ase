@@ -320,7 +320,6 @@ class ACE(FileIOCalculator):
                 section = section_list.pop(0)
                 self.write_acemolecule_section(fpt, section, 1)
             fpt.write('%% End\n')
-        return
 
 
 def update_parameter(oldpar, newpar):
