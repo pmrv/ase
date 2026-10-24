@@ -73,6 +73,7 @@ class MPICommunicator(Protocol):
 class DummyMPI(MPICommunicator):
     rank = 0
     size = 1
+    backend = 'serial'
 
     def _returnval(self, a, root=-1):
         # MPI interface works either on numbers, in which case a number is
@@ -258,6 +259,8 @@ def _gpaw_world():
 #   mechanisms and that must be avoided.
 mpiworld_importpath = os.environ.get('ASE_PARALLEL_WORLD_HOOK')
 
+world: MPI | MPICommunicator
+
 if mpiworld_importpath is None:
     # In the future this will be always serial!
     # We should detect if we would set a real communicator here
@@ -272,6 +275,9 @@ else:
 
     mpiworld_module = importlib.import_module(mpiworld_importpath)
     world = mpiworld_module.ASE_PARALLEL_WORLD_HOOK()
+    if world is None:
+        # The application declined to make a parallel MPI communicator
+        world = DummyMPI()
 
 
 def barrier():
