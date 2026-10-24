@@ -601,8 +601,10 @@ class OPLSStructure(Atoms):
         """Append atom to end."""
         self.extend(Atoms([atom]))
 
-    def read_extended_xyz(self, fileobj, map={}):
+    def read_extended_xyz(self, fileobj, map=None):
         """Read extended xyz file with labeled atoms."""
+        if map is None:
+            map = {}
         atoms = read(fileobj)
         self.set_cell(atoms.get_cell())
         self.set_pbc(atoms.get_pbc())

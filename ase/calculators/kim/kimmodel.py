@@ -248,8 +248,8 @@ class KIMModelCalculator(Calculator):
     def calculate(
         self,
         atoms=None,
-        properties=['energy', 'forces', 'stress'],
-        system_changes=['positions', 'numbers', 'cell', 'pbc'],
+        properties=None,
+        system_changes=None,
     ):
         """
         Inherited method from the ase Calculator class that is called by
@@ -270,6 +270,10 @@ class KIMModelCalculator(Calculator):
             and 'pbc'.
         """
 
+        if system_changes is None:
+            system_changes = ['positions', 'numbers', 'cell', 'pbc']
+        if properties is None:
+            properties = ['energy', 'forces', 'stress']
         super().calculate(atoms, properties, system_changes)
 
         if self._parameters_changed:

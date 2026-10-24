@@ -478,7 +478,7 @@ def read_freeform(fd):
 
 @reader
 def read_castep_cell(
-    fd, index=None, calculator_args={}, find_spg=False, units=units_CODATA2002
+    fd, index=None, calculator_args=None, find_spg=False, units=units_CODATA2002
 ):
     """Read a .cell file and return an atoms object.
     Any value found that does not fit the atoms API
@@ -491,6 +491,8 @@ def read_castep_cell(
 
     from ase.calculators.castep import Castep
 
+    if calculator_args is None:
+        calculator_args = {}
     cell_units = {  # Units specifiers for CASTEP
         'bohr': units_CODATA2002['a0'],
         'ang': 1.0,

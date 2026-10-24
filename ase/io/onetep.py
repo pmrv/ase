@@ -262,8 +262,8 @@ def write_onetep_in(
     xc='PBE',
     ngwf_count=-1,
     ngwf_radius=9.0,
-    keywords={},
-    pseudopotentials={},
+    keywords=None,
+    pseudopotentials=None,
     pseudo_path='.',
     pseudo_suffix=None,
     **kwargs,
@@ -340,6 +340,10 @@ def write_onetep_in(
         pseudopotentials in pseudo_path.
     """
 
+    if pseudopotentials is None:
+        pseudopotentials = {}
+    if keywords is None:
+        keywords = {}
     label = kwargs.get('label', 'onetep')
     try:
         directory = kwargs.get('directory', Path(dirname(fd.name)))

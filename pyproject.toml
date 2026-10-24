@@ -114,6 +114,7 @@ select = [
     'D407',   # missing-dashed-underline-after-section
     'UP',     # pyupgrade
     'RUF013', # implicit-optional
+    'B006',   # mutable-argument-default
 ]
 ignore = [
     'E741',   # ambiguous-variable-name

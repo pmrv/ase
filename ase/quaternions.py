@@ -2,7 +2,9 @@ import numpy as np
 
 
 class Quaternion:
-    def __init__(self, qin=[1, 0, 0, 0]):
+    def __init__(self, qin=None):
+        if qin is None:
+            qin = [1, 0, 0, 0]
         assert len(qin) == 4
         self.q = np.array(qin)
 
