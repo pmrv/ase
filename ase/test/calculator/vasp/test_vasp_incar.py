@@ -46,7 +46,7 @@ def test_special_str_key(vaspinput_factory, tmpdir):
 
 
 def test_float_key(vaspinput_factory, tmpdir):
-    parameters = {'encut': 400}
+    parameters = {'encut': 400.0}
     expected_output = 'ENCUT = 400.000000\n'
     check_written_incar(parameters, expected_output, vaspinput_factory, tmpdir)
 
