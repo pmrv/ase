@@ -1,9 +1,25 @@
 import os
+from unittest.mock import patch
 
 import pytest
 
 from ase import Atoms
 from ase.calculators.vasp import Vasp
+
+
+@pytest.fixture()
+def incar_roundtrip(tmp_path):
+    """Return the written INCAR text without requiring pseudopotentials."""
+
+    def roundtrip(calc, atoms=None):
+        if atoms is None:
+            atoms = Atoms('H2', positions=[[0, 0, 0], [0, 0, 1.2]])
+        with patch.object(calc, '_build_pp_list', return_value=[]):
+            calc.initialize(atoms)
+        calc.write_incar(atoms, directory=tmp_path)
+        return (tmp_path / 'INCAR').read_text()
+
+    return roundtrip
 
 
 @pytest.fixture()
