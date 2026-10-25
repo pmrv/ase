@@ -648,7 +648,7 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
     @property
     def encut(self):
         """Direct access to the encut parameter"""
-        return self.float_params['encut']
+        return self.float_params.get('encut', self.int_params.get('encut'))
 
     @encut.setter
     def encut(self, encut):

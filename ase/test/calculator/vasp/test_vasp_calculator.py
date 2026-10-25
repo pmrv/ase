@@ -274,3 +274,26 @@ def test_as_dict():
     inputs = dct['inputs']
     assert inputs['lreal'] is False
     assert inputs['xc'] == 'pbe'
+
+
+@pytest.mark.parametrize('value', [None, 520, 520.0, np.int64(520)])
+def test_encut_property(value):
+    calc = Vasp(encut=value)
+    assert calc.encut == value
+    calc.encut = 400
+    assert calc.encut == 400
+    calc.encut = None
+    assert calc.encut is None
+
+
+def test_default_encut():
+    assert Vasp().encut is None
+
+
+@pytest.mark.parametrize('value', ['520', '520.0'])
+def test_read_encut_property(value, tmp_path):
+    path = tmp_path / 'INCAR'
+    path.write_text(f'ENCUT = {value}\n')
+    calc = Vasp()
+    calc.read_incar(path)
+    assert calc.encut == 520

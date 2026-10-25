@@ -557,15 +557,19 @@ class GenerateVaspInput:
                 self.dict_params[key] = value
             elif key in self.input_params:
                 self.input_params[key] = value
+            elif value is None:
+                # There is no value to write, and no existing typed parameter
+                # to clear.  Existing parameters are cleared above.
+                continue
             elif isinstance(value, str):
                 self.string_params[key] = value
             # `bool` is a subclass of `int` and should be checked earlier.
             # https://docs.python.org/3/c-api/bool.html
             elif isinstance(value, bool):
                 self.bool_params[key] = value
-            elif isinstance(value, int):
+            elif isinstance(value, (int, np.integer)):
                 self.int_params[key] = value
-            elif isinstance(value, float):
+            elif isinstance(value, (float, np.floating)):
                 self.float_params[key] = value
             elif isinstance(value, Iterable) and not isinstance(
                 value, (str, bytes)
@@ -575,9 +579,9 @@ class GenerateVaspInput:
                     raise ValueError(msg)
                 if isinstance(_flatten(value)[0], bool):
                     self.list_bool_params[key] = value
-                elif isinstance(_flatten(value)[0], int):
+                elif isinstance(_flatten(value)[0], (int, np.integer)):
                     self.list_int_params[key] = value
-                elif isinstance(_flatten(value)[0], float):
+                elif isinstance(_flatten(value)[0], (float, np.floating)):
                     self.list_float_params[key] = value
                 else:
                     msg = f'cannot handle type of value for {key} = {value!r}'
@@ -1032,7 +1036,7 @@ class GenerateVaspInput:
             atoms=atoms,
             ispin=self.int_params.get('ispin'),
             spinpol=self.spinpol,
-            magmom_input=float_dct.get('magmom', None),
+            magmom_input=incar_params.get('magmom'),
             sorting=self.sort,
             lnoncollinear=self.bool_params.get('lnoncollinear', False),
         )
@@ -1043,7 +1047,7 @@ class GenerateVaspInput:
         magm_constr_dct = set_m_constr(
             atoms=atoms,
             lnoncollinear=self.bool_params.get('lnoncollinear', False),
-            m_constr=float_dct.get('m_constr', None),
+            m_constr=incar_params.get('m_constr'),
             sorting=self.sort,
         )
         incar_params.update(magm_constr_dct)
