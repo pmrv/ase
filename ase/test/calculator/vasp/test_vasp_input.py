@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from ase.build import bulk
+from ase.calculators.vasp import Vasp
 from ase.calculators.vasp.create_input import (
     GenerateVaspInput,
     _args_without_comment,
@@ -381,3 +382,20 @@ def test_first_instance(tmp_path, vaspinput_factory):
         calc = vaspinput_factory()
         calc.read_incar(tmp_path / 'INCAR')
         assert getattr(calc, dict_name + '_params')[key.lower()] == vals[0]
+
+
+@pytest.mark.parametrize(
+    ('key', 'value'), [('encut', 520), ('npar', 4), ('magmom', [1, -1])]
+)
+def test_clear_parameter(key, value):
+    calc = Vasp(**{key: value})
+    assert key in calc.asdict()['inputs']
+    calc.set(**{key: None})
+    assert key not in calc.asdict()['inputs']
+
+
+@pytest.mark.parametrize('dtype', [np.float32, np.float64])
+def test_numpy_float(dtype):
+    calc = Vasp(encut=dtype(520), new_list=np.array([1.0, 2.0], dtype=dtype))
+    assert calc.encut == 520
+    np.testing.assert_array_equal(calc.list_float_params['new_list'], [1, 2])
