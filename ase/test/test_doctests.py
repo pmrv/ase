@@ -56,6 +56,9 @@ ase.phasediagram
 ase.pourbaix
 ase.utils
 ase.spectrum
+ase.collections
+ase.collections.create
+ase.collections.collection
 """.split()
 
 
