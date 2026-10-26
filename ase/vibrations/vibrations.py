@@ -129,10 +129,10 @@ class Vibrations(AtomicDisplacements):
     >>> n2 = Atoms('N2', [(0, 0, 0), (0, 0, 1.1)],
     ...            calculator=EMT())
     >>> BFGS(n2).run(fmax=0.01)
-    BFGS:   0  16:01:21        0.440339       3.2518
-    BFGS:   1  16:01:21        0.271928       0.8211
-    BFGS:   2  16:01:21        0.263278       0.1994
-    BFGS:   3  16:01:21        0.262777       0.0088
+    BFGS:   0  ...             0.440344        3.251800
+    BFGS:   1  ...             0.264361        0.347497
+    BFGS:   2  ...             0.262860        0.080535
+    BFGS:   3  ...             0.262777        0.001453
     >>> vib = Vibrations(n2)
     >>> vib.run()
     >>> vib.summary()
