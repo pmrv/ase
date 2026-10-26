@@ -14,7 +14,6 @@ from ase.atoms import Atoms
 from ase.constraints import FixAtoms
 from ase.parallel import paropen, world
 from ase.utils.filecache import get_json_cache
-
 from ase.vibrations.data import VibrationsData
 
 
@@ -149,7 +148,6 @@ class Vibrations(AtomicDisplacements):
       5  152.7    1231.3
     ---------------------
     Zero-point energy: 0.078 eV
-    
     >>> vib.write_mode(-1)  # write last mode to trajectory file
 
     """
