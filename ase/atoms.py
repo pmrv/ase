@@ -625,7 +625,7 @@ class _LimitedAtoms:
         >>> from ase.build import molecule
         >>> atoms = molecule('CH4')
         >>> atoms.get_masses()
-        array([ 12.011,   1.008,   1.008,   1.008,   1.008])
+        array([12.011,  1.008,  1.008,  1.008,  1.008])
         >>> total_mass = atoms.get_masses().sum()
         >>> print(f'{total_mass:f}')
         16.043000
