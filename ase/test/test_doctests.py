@@ -25,6 +25,15 @@ ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
 ase.vibrations
+ase.vibrations.albrecht
+ase.vibrations.data
+ase.vibrations.franck_condon
+ase.vibrations.infrared
+ase.vibrations.pickle2json
+ase.vibrations.placzek
+ase.vibrations.raman
+ase.vibrations.resonant_raman
+ase.vibrations.vibrations
 """.split()
 
 
@@ -33,3 +42,4 @@ def test_doctest(testdir, modname):
     mod = importlib.import_module(modname)
     with np.printoptions(legacy='1.13'):
         doctest.testmod(mod, raise_on_error=True, verbose=True)
+ 
