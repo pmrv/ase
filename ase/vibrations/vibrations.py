@@ -15,7 +15,7 @@ from ase.constraints import FixAtoms
 from ase.parallel import paropen, world
 from ase.utils.filecache import get_json_cache
 
-from .data import VibrationsData
+from ase.vibrations.data import VibrationsData
 
 
 class AtomicDisplacements:
@@ -479,6 +479,17 @@ Please remove them and recalculate or run \
             method=method, direction=direction
         ).get_frequencies()
 
+    def description(
+        self, method: str = 'standard', direction: str = 'central', freq=None
+    ) -> str:
+        if freq is not None:
+            energies = freq * units.invcm
+        else:
+            energies = self.get_energies(method=method, direction=direction)
+
+        summary_lines = VibrationsData._tabulate_from_energies(energies)
+        return '\n'.join(summary_lines) + '\n'
+
     def summary(
         self,
         method: str = 'standard',
@@ -486,13 +497,7 @@ Please remove them and recalculate or run \
         freq=None,
         log=sys.stdout,
     ):
-        if freq is not None:
-            energies = freq * units.invcm
-        else:
-            energies = self.get_energies(method=method, direction=direction)
-
-        summary_lines = VibrationsData._tabulate_from_energies(energies)
-        log_text = '\n'.join(summary_lines) + '\n'
+        log_text = self.description(method, direction, freq)
 
         if isinstance(log, str):
             with paropen(log, 'a') as log_file:
