@@ -8,6 +8,13 @@ Electron transport
 The :mod:`ase.transport` module of ASE assumes the generic setup of the system
 in question sketched below:
 
+.. note::
+
+   The :mod:`ase.transport` module is likely unused and has been deprecated.
+   It will be removed in a future version of ASE unless users express
+   interest in keeping it.  Please :ref:`contact the maintainers <contact>`
+   in that case.
+
 . . . |setup| . . .
 
 .. |setup| image:: transport_setup.png

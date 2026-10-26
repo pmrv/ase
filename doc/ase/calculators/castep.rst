@@ -4,13 +4,7 @@
 CASTEP
 ========
 
-
-
-.. include:: ../../../ase/calculators/castep.py
-   :encoding: utf-8
-   :start-after: CASTEP Interface Documentation
-   :end-before: End CASTEP Interface Documentation
-
+.. autoclass:: ase.calculators.castep.Castep
 
 Example:
 ========

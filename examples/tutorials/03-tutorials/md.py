@@ -82,7 +82,6 @@ atoms = LatticeFCC(
 # %%
 fig, ax = plt.subplots(figsize=(5, 5))
 plot_atoms(atoms, ax, rotation=('45x,45y,0z'), show_unit_cell=2, radii=0.75)
-ax.set_axis_off()
 plt.tight_layout()
 plt.show()
 
@@ -219,6 +218,7 @@ dyn = Langevin(
 
 # We also want to save the positions of all atoms after every 100th time step.
 traj = Trajectory('fccCu_NPT.traj', 'w', atoms)
+dyn.attach(traj.write, interval=100)
 
 # Now run the dynamics
 print('running a NVT simulation of fcc Cu')

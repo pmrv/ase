@@ -4,14 +4,4 @@
 EAM
 ===
 
-
-.. include:: ../../../ase/calculators/eam.py
-   :encoding: utf-8
-   :start-after: EAM Interface Documentation
-   :end-before: End EAM Interface Documentation
-
-
-Example:
-========
-
-.. literalinclude:: ../../../ase/test/calculator/test_eam.py
+.. autoclass:: ase.calculators.eam.EAM

@@ -132,7 +132,6 @@ from ase.visualize.plot import plot_atoms
 configs = read('vib.8.traj', ':')
 fig, ax = plt.subplots()
 plot_atoms(h2o, ax, rotation=('0x,0y,0z'))
-ax.set_axis_off()
 
 
 def animate(i):
@@ -141,7 +140,6 @@ def animate(i):
     plot_atoms(configs[i], ax, rotation=('0x,0y,0z'), show_unit_cell=1)
     ax.set_xlim(-4, 7)
     ax.set_ylim(-4, 7)
-    ax.set_axis_off()
     return (ax,)
 
 

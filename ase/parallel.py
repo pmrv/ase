@@ -5,6 +5,7 @@ import pickle
 import sys
 import time
 import warnings
+from typing import Protocol
 
 import numpy as np
 
@@ -31,9 +32,48 @@ def parprint(*args, comm=None, **kwargs):
         print(*args, **kwargs)
 
 
-class DummyMPI:
+class MPICommunicator(Protocol):
+    rank: int
+    size: int
+
+    def sum(self, a: np.ndarray, root: int = -1) -> None:
+        """In-place sum over ranks.
+
+        The sum is computed only on the rank specified by root,
+        or all ranks if root is -1."""
+
+    def sum_scalar(self, a, root: int = -1):
+        """Return the sum over ranks of a scalar.
+
+        See sum() for rules about root."""
+
+        # Input could be any kind of scalar, and we presumably want to
+        # return the same kind of scalar.  But actually, probably a
+        # python scalar becomes a numpy scalar in our various
+        # implementations.
+
+    def product(self, a: np.ndarray, root: int = -1) -> None:
+        """In-place product over ranks.
+
+        See sum() for rules about root."""
+
+    def broadcast(self, a: np.ndarray, root: int) -> None:
+        """Broadcast array from root across all ranks."""
+
+    def barrier(self) -> None:
+        """Wait until all ranks reach barrier."""
+
+    def abort(self, code: int) -> None:
+        """Abort runtime with given error code."""
+
+    # The mpi4py communicator actually defines .split() as well, but
+    # probably we don't want to advertise that.
+
+
+class DummyMPI(MPICommunicator):
     rank = 0
     size = 1
+    backend = 'serial'
 
     def _returnval(self, a, root=-1):
         # MPI interface works either on numbers, in which case a number is
@@ -64,6 +104,10 @@ class DummyMPI:
 
     def barrier(self):
         pass
+
+    def abort(self, code: int):
+        # Note: in practice we do not register an abort() call in serial.
+        raise SystemExit(code)
 
 
 class MPI:
@@ -186,33 +230,13 @@ class MPI4PY:
         return self._returnval(a, b)
 
 
-class AsapCommWrapper:
-    """Compatibility hack to save people from trouble with older asap.
-
-    We can definitely remove this in 2027."""
-
-    def __init__(self, world):
-        self.world = world
-
-    def __getattr__(self, attr):
-        return getattr(self.world, attr)
-
-    def sum_scalar(self, a, root=-1):
-        buf = np.array([a])
-        self.world.sum(buf, root=root)
-        return buf[0]
-
-
 def _asap_world():
     import _asap
 
     try:
         world = _asap.Communicator()
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         return None
-
-    if not hasattr(world, 'sum_scalar'):
-        world = AsapCommWrapper(world)
 
     return world
 
@@ -229,7 +253,31 @@ def _gpaw_world():
     return world
 
 
-world = MPI()
+# Note to implementors:
+#   Whoever sets this variable MUST check that it was not already set!
+#   If it is set in two places, there are two competing parallel
+#   mechanisms and that must be avoided.
+mpiworld_importpath = os.environ.get('ASE_PARALLEL_WORLD_HOOK')
+
+world: MPI | MPICommunicator
+
+if mpiworld_importpath is None:
+    # In the future this will be always serial!
+    # We should detect if we would set a real communicator here
+    # and issue a FutureWarning there.
+    mpiworld_module = None
+    world = MPI()
+
+    # Once we remove these MPI behaviours, all other MPI initialization
+    # code in ASE can be removed.
+else:
+    import importlib
+
+    mpiworld_module = importlib.import_module(mpiworld_importpath)
+    world = mpiworld_module.ASE_PARALLEL_WORLD_HOOK()
+    if world is None:
+        # The application declined to make a parallel MPI communicator
+        world = DummyMPI()
 
 
 def barrier():

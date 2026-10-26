@@ -2,9 +2,9 @@
 
 import sys
 from collections import namedtuple
+from collections.abc import Iterator
 from math import log, pi, sqrt
 from pathlib import Path
-from typing import Iterator
 
 import numpy as np
 

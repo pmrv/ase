@@ -172,12 +172,14 @@ def _eval(node):
         raise TypeError(node)
 
 
-def eval_expression(expression, param_dct={}):
+def eval_expression(expression, param_dct=None):
     """Parse a mathematical expression,
 
     Replaces variables with the values in param_dict and solves the expression
 
     """
+    if param_dct is None:
+        param_dct = {}
     if not isinstance(expression, str):
         raise TypeError('The expression must be a string')
     if len(expression) > 1e4:

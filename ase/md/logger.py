@@ -1,6 +1,5 @@
-# fmt: off
-
 """Logging for molecular dynamics."""
+
 import weakref
 from typing import IO, Any
 
@@ -38,28 +37,36 @@ class MDLogger(IOContext):
         header: bool = True,
         stress: bool = False,
         peratom: bool = False,
-        mode: str = "a",
+        mode: str = 'a',
         comm=world,
     ):
-        self.dyn = weakref.proxy(dyn) if hasattr(dyn, "get_time") else None
+        self.dyn = weakref.proxy(dyn) if hasattr(dyn, 'get_time') else None
         self.atoms = atoms
         global_natoms = atoms.get_global_number_of_atoms()
         self.logfile = self.openfile(file=logfile, mode=mode, comm=comm)
         self.stress = stress
         self.peratom = peratom
         if self.dyn is not None:
-            self.hdr = "%-9s " % ("Time[ps]",)
-            self.fmt = "%-10.4f "
+            self.hdr = '%-9s ' % ('Time[ps]',)
+            self.fmt = '%-10.4f '
         else:
-            self.hdr = ""
-            self.fmt = ""
+            self.hdr = ''
+            self.fmt = ''
         if self.peratom:
-            self.hdr += "%12s %12s %12s  %6s" % ("Etot/N[eV]", "Epot/N[eV]",
-                                                 "Ekin/N[eV]", "T[K]")
-            self.fmt += "%12.4f %12.4f %12.4f  %6.1f"
+            self.hdr += '%12s %12s %12s  %6s' % (
+                'Etot/N[eV]',
+                'Epot/N[eV]',
+                'Ekin/N[eV]',
+                'T[K]',
+            )
+            self.fmt += '%12.4f %12.4f %12.4f  %6.1f'
         else:
-            self.hdr += "%12s %12s %12s  %6s" % ("Etot[eV]", "Epot[eV]",
-                                                 "Ekin[eV]", "T[K]")
+            self.hdr += '%12s %12s %12s  %6s' % (
+                'Etot[eV]',
+                'Epot[eV]',
+                'Ekin[eV]',
+                'T[K]',
+            )
             # Choose a sensible number of decimals
             if global_natoms <= 100:
                 digits = 4
@@ -69,14 +76,16 @@ class MDLogger(IOContext):
                 digits = 2
             else:
                 digits = 1
-            self.fmt += 3 * ("%%12.%df " % (digits,)) + " %6.1f"
+            self.fmt += 3 * ('%%12.%df ' % (digits,)) + ' %6.1f'
         if self.stress:
-            self.hdr += ('      ---------------------- stress [GPa] '
-                         '-----------------------')
-            self.fmt += 6 * " %10.3f"
-        self.fmt += "\n"
+            self.hdr += (
+                '      ---------------------- stress [GPa] '
+                '-----------------------'
+            )
+            self.fmt += 6 * ' %10.3f'
+        self.fmt += '\n'
         if header:
-            self.logfile.write(self.hdr + "\n")
+            self.logfile.write(self.hdr + '\n')
 
     def __del__(self):
         self.close()

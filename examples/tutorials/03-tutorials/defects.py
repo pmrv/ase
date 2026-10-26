@@ -86,7 +86,6 @@ conf = conf.repeat((3, 3, 1))
 fig, ax = plt.subplots()
 add_decoration(ax, conf, centralidx, neighborcutoff, arrow_offset=(0.5, 0.5))
 plot_atoms(conf, ax, offset=(0, 0))  # , rotation=('-80x,0y,0z'))
-ax.set_axis_off()
 ax.text(
     0.1,
     -0.1,
@@ -117,7 +116,6 @@ conf = conf.repeat((3, 3, 1))
 fig, ax = plt.subplots()
 add_decoration(ax, conf, centralidx, neighborcutoff, arrow_offset=(0.5, 0.5))
 plot_atoms(conf, ax, offset=(0, 0))
-ax.set_axis_off()
 ax.text(
     0,
     -0.2,
@@ -148,7 +146,6 @@ add_decoration(
     arrow_offset=(-conf.cell[1][0] + 1, 1.5),
 )
 plot_atoms(conf, ax, offset=(0, 0), rotation=('0x,0y,0z'))
-ax.set_axis_off()
 ax.text(
     0.1,
     -0.1,
@@ -279,7 +276,6 @@ conf = bulk('Au')
 
 fig, ax = plt.subplots()
 plot_atoms(conf, ax)
-ax.set_axis_off()
 
 # %%
 # Then, we call
@@ -381,7 +377,6 @@ supercell = make_supercell(conf, P)
 
 fig, ax = plt.subplots()
 plot_atoms(supercell, ax)
-ax.set_axis_off()
 # %%
 #
 # .. [Erhart] P. Erhart, B. Sadigh, A. Schleife, and D. Åberg.

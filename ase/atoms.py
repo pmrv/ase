@@ -1040,16 +1040,21 @@ class _LimitedAtoms:
         Centers the atoms in the unit cell, so there is the same
         amount of vacuum on all sides.
 
-        vacuum: float (default: None)
+        Parameters
+        ----------
+        vacuum: float, default: None
             If specified adjust the amount of vacuum when centering.
             If vacuum=10.0 there will thus be 10 Angstrom of vacuum
             on each side.
-        axis: int or sequence of ints
+        axis: int | Sequence[int], default: (0, 1, 2)
             Axis or axes to act on.  Default: Act on all axes.
-        about: float or array (default: None)
-            If specified, center the atoms about <about>.
-            I.e., about=(0., 0., 0.) (or just "about=0.", interpreted
-            identically), to center about the origin.
+        about: float | Sequence[float] | None, default: None
+            If specified, center the atoms about the given point.
+
+            .. versionadded:: 3.30.0
+                A float value is accepted, which is applied to all the axes
+                selected by `axis`.
+
         """
 
         # Find the orientations of the faces of the unit cell
@@ -1108,6 +1113,9 @@ class _LimitedAtoms:
 
         # Optionally, translate to center about a point in space.
         if about is not None:
+            # Convert scalar to a 3-element array to prevent subscriptable error
+            if np.isscalar(about):
+                about = [about] * 3
             for n, vector in enumerate(self.cell):
                 if n in axes:
                     translation -= vector / 2.0
@@ -1548,6 +1556,64 @@ class _LimitedAtoms:
         axis = np.cross(v10, v12)
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
+
+    def mirror(self, v, center=None, indices=None, mirror_cell=False):
+        """Reflect atoms across a plane.
+
+        Parameters
+        ----------
+
+        v : array_like or {'x', 'y', 'z'}
+            Normal vector of the plane of reflection, i.e. the direction in
+            which the atoms are mirrored. Vectors can be specified numerically
+            e.g.: (1, 0, 0); or as one of the strings 'x', 'y', or 'z'.
+
+        center : array_like or {'COM', 'COP', 'COU'} or None, default: None
+            The plane of reflection is shifted to include the center point. Use
+            'COM' to fix the center of mass (of all atoms), 'COP' to fix the
+            center of positions (all atoms) or 'COU' to fix the center of the
+            cell (or origin if cell is not defined). Has no effect, if
+            mirror_cell is True.
+
+        indices : array_like or None, default: None
+            Select which atoms are moved using an array of indices (or a
+            boolean mask). If None, then all atoms are affected.
+
+        mirror_cell : bool, default: False
+            If True, transform the cell with its contents. Can not be used
+            together with 'center'.
+        """
+        v = string2vector(v)
+        v = v / np.linalg.norm(v)
+        if mirror_cell:
+            if center is not None:
+                raise ValueError(
+                    "The 'center' keyword can't be used when mirroring cell."
+                )
+            center = (0.0, 0.0, 0.0)
+        elif center is None:
+            center = 'COU'
+        center = self._centering_as_array(center)
+
+        if indices is None:
+            indices = np.ones(len(self), dtype=bool)
+
+        tmp_pos = self.positions.copy()
+        tmp_pos -= center
+        tmp_pos[indices, :] = self._mirror_array(tmp_pos[indices, :], v)
+        tmp_pos += center
+        self.set_positions(tmp_pos)
+
+        if mirror_cell:
+            self.set_cell(self._mirror_array(self.get_cell(), v))
+
+    def _mirror_array(self, a, v):
+        """Mirror given array of coordinates across v, relative to origin
+
+        Following Ref_b(w) = w - 2 * (w·b)/(b·b) * b
+        """
+        vdota = (a * v).sum(1, keepdims=True)
+        return a - vdota / np.dot(v, v) * 2 * v.reshape(1, 3)
 
     def rattle(self, stdev=0.001, seed=None, rng=None):
         """Randomly displace atoms.

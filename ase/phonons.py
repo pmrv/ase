@@ -141,6 +141,11 @@ class Displacement:
                     indices = atomlist
                 self.indices = np.array(indices)
                 self.nindices = len(indices)
+            case _:
+                raise TypeError(
+                    'Bad input type for keyword "select_atoms"; '
+                    'should be either list[str] or list[int]!'
+                )
 
     def _eq_disp(self):
         return self._disp(0, 0, 0)
@@ -283,7 +288,7 @@ class Phonons(Displacement):
     >>> ph = Phonons(
     ...     atoms,
     ...     calc,
-    ...     supercell=(7, 7, 7),
+    ...     supercell=(5, 5, 5),
     ...     delta=0.05,
     ...     use_mean_minimum_images=True
     ... )
@@ -291,7 +296,7 @@ class Phonons(Displacement):
     >>> ph.read()
     >>> path = atoms.cell.bandpath('GXULGK', npoints=100)
     >>> bs = ph.get_band_structure(path, verbose=False)
-    >>> dos = ph.get_dos(kpts=(20, 20, 20)).sample_grid(npts=100, width=1e-3)
+    >>> dos = ph.get_dos(kpts=(12, 12, 12)).sample_grid(npts=100, width=1e-3)
 
     """
 

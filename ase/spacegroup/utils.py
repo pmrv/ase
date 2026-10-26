@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 
 from ase import Atoms
@@ -25,11 +27,15 @@ def _get_basis_ase(
     Uses the first index as a basis, then removes all equivalent sites,
     uses the next index which hasn't been placed into a basis, etc.
 
-    :param atoms: Atoms object to get basis from.
-    :param spacegroup: ``int``, ``str``, or
-        :class:`ase.spacegroup.Spacegroup` object.
-    :param tol: ``float``, numeric tolerance for positional comparisons
-        Default: ``1e-5``
+    Parameters
+    ----------
+    atoms : Atoms
+        ASE Atoms object to get basis from.
+    spacegroup : int | str | Spacegroup
+        Space group.
+    tol : float, default: 1e-5
+        Tolerance for positional comparisons.
+
     """
     scaled_positions = atoms.get_scaled_positions()
     spacegroup = Spacegroup(spacegroup)
@@ -74,9 +80,13 @@ def _get_basis_spglib(atoms: Atoms, tol: float = 1e-5) -> np.ndarray:
     """Get a reduced basis using spglib. This requires having the
     spglib package installed.
 
-    :param atoms: Atoms, atoms object to get basis from
-    :param tol: ``float``, numeric tolerance for positional comparisons
-        Default: ``1e-5``
+    Parameters
+    ----------
+    atoms : Atoms
+        ASE Atoms object to get basis from.
+    tol : float, default: 1e-5
+        Tolerance for positional comparisons.
+
     """
     if not _has_spglib():
         # Give a reasonable alternative solution to this function.
@@ -107,7 +117,7 @@ def _can_use_spglib(spacegroup: _SPACEGROUP | None = None) -> bool:
 def get_basis(
     atoms: Atoms,
     spacegroup: _SPACEGROUP | None = None,
-    method: str = 'auto',
+    method: Literal['auto', 'ase', 'spglib'] = 'auto',
     tol: float = 1e-5,
 ) -> np.ndarray:
     """Function for determining a reduced basis of an atoms object.
@@ -118,18 +128,22 @@ def get_basis(
     to use, based on the the ``spacegroup`` parameter,
     and whether spglib is installed.
 
-    :param atoms: ase Atoms object to get basis from
-    :param spacegroup: Optional, ``int``, ``str``
-        or :class:`ase.spacegroup.Spacegroup` object.
+    Parameters
+    ----------
+    atoms : Atoms
+        ASE Atoms object to get basis from.
+    spacegroup : int | str | Spacegroup | None, default: None
+        Space group.
         If unspecified, the spacegroup can be inferred using spglib,
         if spglib is installed, and ``method`` is set to either
         ``'spglib'`` or ``'auto'``.
         Inferring the spacegroup requires spglib.
-    :param method: ``str``, one of: ``'auto'`` | ``'ase'`` | ``'spglib'``.
+    method : Literal['auto', 'ase', 'spglib'], default: 'auto'
         Selection of which implementation to use.
         It is recommended to use ``'auto'``, which is also the default.
-    :param tol: ``float``, numeric tolerance for positional comparisons
-        Default: ``1e-5``
+    tol : float, default: 1e-5
+        Tolerance for positional comparisons.
+
     """
     ALLOWED_METHODS = ('auto', 'ase', 'spglib')
 
@@ -169,8 +183,13 @@ def _get_reduced_indices(atoms: Atoms, tol: float = 1e-5) -> list[int]:
     """Get a list of the reduced atomic indices using spglib.
     Note: Does no checks to see if spglib is installed.
 
-    :param atoms: ase Atoms object to reduce
-    :param tol: ``float``, numeric tolerance for positional comparisons
+    Parameters
+    ----------
+    atoms : Atoms
+        ASE Atoms object to reduce.
+    tol : float, default: 1e-5
+        Tolerance for positional comparisons.
+
     """
     from ase.spacegroup.symmetrize import spglib_get_symmetry_dataset
 

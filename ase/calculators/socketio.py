@@ -367,7 +367,7 @@ class SocketServer(IOContext):
             try:
                 self.clientsocket, self.address = self.serversocket.accept()
                 self.closelater(self.clientsocket)
-            except socket.timeout:
+            except TimeoutError:
                 if self.proc is not None:
                     status = self.proc.poll()
                     if status is not None:
@@ -706,8 +706,10 @@ class SocketIOCalculator(Calculator, IOContext):
         )
 
     def calculate(
-        self, atoms=None, properties=['energy'], system_changes=all_changes
+        self, atoms=None, properties=None, system_changes=all_changes
     ):
+        if properties is None:
+            properties = ['energy']
         bad = [
             change
             for change in system_changes

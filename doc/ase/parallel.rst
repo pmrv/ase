@@ -18,9 +18,14 @@ calculation.
 If one requires an individual core/cores to read a particular file, please
 use :func:`~ase.io.Trajectory`:
 
+>>> from ase.atoms import Atoms
 >>> from ase.io import Trajectory
 >>> from ase.parallel import world
->>> atoms = Trajectory('myfile_{}.traj'.format(world.rank))[-1]
+>>> atoms = Atoms('N2', positions=[[0., 0., 0.], [0., 0., 1.]])
+>>> with Trajectory(f'myfile_{world.rank}.traj', mode='w', atoms=atoms) as traj:
+>>>     traj.write()
+>>> with Trajectory(f'myfile_{world.rank}.traj', mode='r') as traj:
+>>>     atoms = traj[-1]
 
 .. autofunction:: paropen
 .. autofunction:: parprint
