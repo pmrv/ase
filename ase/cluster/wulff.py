@@ -54,9 +54,9 @@ def wulff_construction(
     Examples
     --------
 
-    This example sets up a nanoparticle of copper in the FCC crystal structure,
-    by specifying 6 layers in the (100) directions, 9 in the (110) directions and
-    5 in the (111) directions::
+    This example sets up a nanoparticle of copper in the FCC crystal
+    structure, by specifying 6 layers in the (100) directions, 9 in
+    the (110) directions and 5 in the (111) directions::
 
     >>> import ase
     >>> from ase.cluster.cubic import FaceCenteredCubic
