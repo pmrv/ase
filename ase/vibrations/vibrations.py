@@ -144,9 +144,9 @@ class Vibrations(AtomicDisplacements):
     0    0.0       0.0
     1    0.0       0.0
     2    0.0       0.0
-    3    1.4      11.5
-    4    1.4      11.5
-    5  152.7    1231.3
+    3   42.0     338.8
+    4   42.0     338.8
+    5  123.2     993.9
     ---------------------
     Zero-point energy: 0.078 eV
     >>> vib.write_mode(-1)  # write last mode to trajectory file
