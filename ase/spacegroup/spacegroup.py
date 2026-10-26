@@ -49,15 +49,15 @@ class Spacegroup:
     >>> print('Space group', sg.no, sg.symbol)
     Space group 225 F m -3 m
     >>> sg.scaled_primitive_cell
-    array([[ 0. ,  0.5,  0.5],
-           [ 0.5,  0. ,  0.5],
-           [ 0.5,  0.5,  0. ]])
+    array([[0. , 0.5, 0.5],
+           [0.5, 0. , 0.5],
+           [0.5, 0.5, 0. ]])
     >>> sites, kinds = sg.equivalent_sites([[0,0,0]])
     >>> sites
-    array([[ 0. ,  0. ,  0. ],
-           [ 0. ,  0.5,  0.5],
-           [ 0.5,  0. ,  0.5],
-           [ 0.5,  0.5,  0. ]])
+    array([[0. , 0. , 0. ],
+           [0. , 0.5, 0.5],
+           [0.5, 0. , 0.5],
+           [0.5, 0.5, 0. ]])
     """
 
     @property
@@ -443,14 +443,14 @@ class Spacegroup:
         >>> sg = Spacegroup(225)  # fcc
         >>> sites, kinds = sg.equivalent_sites([[0, 0, 0], [0.5, 0.0, 0.0]])
         >>> sites
-        array([[ 0. ,  0. ,  0. ],
-               [ 0. ,  0.5,  0.5],
-               [ 0.5,  0. ,  0.5],
-               [ 0.5,  0.5,  0. ],
-               [ 0.5,  0. ,  0. ],
-               [ 0. ,  0.5,  0. ],
-               [ 0. ,  0. ,  0.5],
-               [ 0.5,  0.5,  0.5]])
+        array([[0. , 0. , 0. ],
+               [0. , 0.5, 0.5],
+               [0.5, 0. , 0.5],
+               [0.5, 0.5, 0. ],
+               [0.5, 0. , 0. ],
+               [0. , 0.5, 0. ],
+               [0. , 0. , 0.5],
+               [0.5, 0.5, 0.5]])
         >>> kinds
         [0, 0, 0, 0, 1, 1, 1, 1]
         """
@@ -522,8 +522,8 @@ class Spacegroup:
         >>> from ase.spacegroup import Spacegroup
         >>> sg = Spacegroup(225)  # fcc
         >>> sg.symmetry_normalised_sites([[0.0, 0.5, 0.5], [1.0, 1.0, 0.0]])
-        array([[ 0.,  0.,  0.],
-               [ 0.,  0.,  0.]])
+        array([[0., 0., 0.],
+               [0., 0., 0.]])
         """
         scaled = np.array(scaled_positions, ndmin=2)
         normalised = np.empty(scaled.shape, float)
@@ -560,8 +560,8 @@ class Spacegroup:
         ...                  [0.5, 0.5, 0.0],
         ...                  [1.0, 0.0, 0.0],
         ...                  [0.5, 0.0, 0.0]])
-        array([[ 0. ,  0. ,  0. ],
-               [ 0.5,  0. ,  0. ]])
+        array([[0. , 0. , 0. ],
+               [0.5, 0. , 0. ]])
         """
         scaled = np.array(scaled_positions, ndmin=2)
         symnorm = self.symmetry_normalised_sites(scaled, map_to_unitcell)
