@@ -128,7 +128,7 @@ class Vibrations(AtomicDisplacements):
     >>> from ase.vibrations import Vibrations
     >>> n2 = Atoms('N2', [(0, 0, 0), (0, 0, 1.1)],
     ...            calculator=EMT())
-    >>> BFGS(n2).run(fmax=0.01)
+    >>> BFGS(n2).run(fmax=0.01) # doctest:+ELLIPSIS, +NORMALIZE_WHITESPACE
           Step     Time          Energy          fmax
     BFGS:   0       ...        0.440344        3.251800
     BFGS:   1       ...        0.264361        0.347497
