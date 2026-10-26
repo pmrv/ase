@@ -77,12 +77,12 @@ class BFGS(Optimizer):
         ... (0, 0, 0)],
         ... calculator=EMT())
         >>> dyn = BFGS(system)
-        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS
+        >>> dyn.run(fmax=0.05) # doctest:+ELLIPSIS, +NORMALIZE_WHITESPACE
               Step     Time          Energy          fmax
-        BFGS:    0 ...        2.769632        8.609090
-        BFGS:    1 ...        1.930507        1.641499
-        BFGS:    2 ...        1.884227        0.535354
-        BFGS:    3 ...        1.879314        0.049628
+        BFGS:    0      ...        2.769632      8.609090
+        BFGS:    1      ...        1.930507      1.641499
+        BFGS:    2      ...        1.884227      0.535354
+        BFGS:    3      ...        1.879314      0.049628
         ...
 
         The columns are the solver name, step number, clock time, potential
