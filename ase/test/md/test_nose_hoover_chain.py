@@ -230,6 +230,25 @@ def test_anisotropic_barostat(
     assert np.allclose(barostat._p_xi, p_xi_start, atol=1e-6)
 
 
+def test_symmetric_barostat_thermal_kinetic_energy():
+    """The barostat thermostat must balance six independent quadratic modes."""
+    kT = ase.units.kB * 300
+    barostat = MTKBarostat(
+        num_atoms_global=108,
+        temperature_K=300,
+        pdamp=200 * ase.units.fs,
+        pchain=1,
+    )
+    # In an orthonormal basis of symmetric matrices, each of the six
+    # momentum coordinates has squared magnitude W * kT.
+    p_cell = np.full((3, 3), np.sqrt(barostat.W * kT / 2))
+    np.fill_diagonal(p_cell, np.sqrt(barostat.W * kT))
+    initial = p_cell.copy()
+    result = barostat.integrate_nhc_baro(p_cell, ase.units.fs)
+    np.testing.assert_allclose(result, initial, rtol=1e-12, atol=0)
+    assert barostat.get_barostat_energy() == pytest.approx(0, abs=1e-14)
+
+
 @pytest.mark.parametrize(
     'constraints',
     [None, FixAtoms([0, 1, 2, 3]), FixBondLengths([[0, 1], [2, 3]])],

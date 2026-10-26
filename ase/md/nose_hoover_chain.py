@@ -816,11 +816,11 @@ class MTKBarostat:
     See `MTKNPT` for the references.
 
     Note for `mask` keyword argument:
-        If `mask` is None, full 9 DoF cell fluctuations are allowed.
+        If `mask` is None, the symmetric cell momentum has 6 independent DoF.
         If `mask` is a 3-tuple of booleans, only the specified axes are allowed
         to fluctuate, and its DoF is a number of the specified axes. Thus,
         `mask=(True, True, True)` gives 3 DoF cell fluctuations along a, b,
-        and c axes, which is different from the full 9 DoF fluctuations.
+        and c axes, which is different from the full 6 DoF fluctuations.
         Other cell fluctuations such as partially allowed off-diagonal
         components are not supported in the current implementation.
     """
@@ -839,7 +839,7 @@ class MTKBarostat:
         self._pchain = pchain
         self._ploop = ploop
 
-        self._cell_dof = 9 if mask is None else sum(mask)
+        self._cell_dof = 6 if mask is None else sum(mask)
 
         self._kT = ase.units.kB * temperature_K
 
