@@ -239,8 +239,10 @@ def test_symmetric_barostat_thermal_kinetic_energy():
         pdamp=200 * ase.units.fs,
         pchain=1,
     )
-    # In an orthonormal basis of symmetric matrices, each of the six
-    # momentum coordinates has squared magnitude W * kT.
+    # Each diagonal entry contributes kT/2 to the cell kinetic energy.
+    # Each off-diagonal pair (e.g. xy and yx) shares a contribution of kT/2.
+    # The total is 3*kT, so the single-link thermostat, initially at rest,
+    # must leave the cell momenta unchanged.
     p_cell = np.full((3, 3), np.sqrt(barostat.W * kT / 2))
     np.fill_diagonal(p_cell, np.sqrt(barostat.W * kT))
     initial = p_cell.copy()
