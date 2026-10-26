@@ -1,6 +1,5 @@
 """
 Function-like objects that creates cubic clusters.
-
 """
 
 import numpy as np
