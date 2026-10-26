@@ -1,5 +1,6 @@
 """
 Function-like objects that creates cubic clusters.
+
 """
 
 import numpy as np
@@ -53,6 +54,25 @@ BodyCenteredCubic = BodyCenteredCubicFactory()
 
 
 class FaceCenteredCubicFactory(SimpleCubicFactory):
+    """
+    Class to create FCC atom clusters.
+       
+    Examples
+    --------
+
+    This example sets up a nanoparticle of copper in the FCC crystal structure,
+    by specifying 6 layers in the (100) directions, 9 in the (110) directions and
+    5 in the (111) directions::
+
+    >>> import ase
+    >>> from ase.cluster.cubic import FaceCenteredCubic
+
+    >>> surfaces = [(1, 0, 0), (1, 1, 0), (1, 1, 1)]
+    >>> layers = [6, 9, 5]
+    >>> lc = 3.61000
+    >>> atoms = FaceCenteredCubic('Cu', surfaces, layers, latticeconstant=lc)
+    """
+
     spacegroup = 225
 
     xtal_name = 'fcc'
