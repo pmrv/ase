@@ -134,6 +134,7 @@ class Vibrations(AtomicDisplacements):
     BFGS:   1       ...        0.264361        0.347497
     BFGS:   2       ...        0.262860        0.080535
     BFGS:   3       ...        0.262777        0.001453
+    ...
     >>> vib = Vibrations(n2)
     >>> vib.run()
     >>> vib.summary()
