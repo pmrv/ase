@@ -53,7 +53,6 @@ ase.vibrations
 ase.vibrations.albrecht
 ase.vibrations.data
 ase.vibrations.franck_condon
-ase.vibrations.infrared
 ase.vibrations.pickle2json
 ase.vibrations.placzek
 ase.vibrations.raman
