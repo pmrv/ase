@@ -30,27 +30,7 @@ To see the visualized structure using POV-Ray, see :ref:`gallery_nanoparticle`.
 Wulff construction
 ------------------
 
-To set up a Wulff construction, the surface energies should be
-specified, in units of energy per area (*not* energy per atom).  The
-actual unit used does not matter, as only the ratio between surface
-energies is important.  In addition, the approximate size of the
-nanoparticle should be given.  As the Wulff construction is build from
-whole layers, it is not possible to hit the desired particles size
-exactly::
-
-  from ase.cluster import wulff_construction
-
-  surfaces = [(1, 0, 0), (1, 1, 0), (1, 1, 1)]
-  esurf = [1.0, 1.1, 0.9]   # Surface energies.
-  lc = 3.61000
-  size = 1000  # Number of atoms
-  atoms = wulff_construction('Cu', surfaces, esurf,
-                             size, 'fcc',
-                             rounding='above', latticeconstant=lc)
-
-Note that the Wulff construction currently only work with cubic
-lattices.
-
+.. automodule:: ase.cluster.wulff
 
 Creating a nanoparticle
 =======================
