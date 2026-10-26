@@ -478,6 +478,9 @@ class GenerateVaspInput:
             'setups': None,  # Special setups (e.g pv, sv, ...)
             'txt': '-',  # Where to send information
             'kpts': (1, 1, 1),  # k-points
+            'kpts_opt': None,  # optional NSCF k-points
+            'gamma_opt': False,
+            'reciprocal_opt': False,
             # Option to use gamma-sampling instead of Monkhorst-Pack:
             'gamma': False,
             # number of points between points in band structures:
@@ -1063,32 +1066,32 @@ class GenerateVaspInput:
         write_incar(directory=directory, parameters=incar_params)
 
     def write_kpoints(self, atoms=None, directory='./', **kwargs):
-        """Writes the KPOINTS file."""
+        """Write KPOINTS and, when requested, KPOINTS_OPT."""
 
         if atoms is None:
             atoms = self.atoms
 
-        # Don't write anything if KSPACING is being used
-        if self.float_params.get('kspacing') is not None:
-            if self.float_params['kspacing'] > 0:
-                return
-            else:
+        for suffix in ('', '_opt'):
+            spacing = self.float_params.get('kspacing' + suffix)
+            if spacing is not None and not spacing > 0:
                 raise ValueError(
-                    'KSPACING value {} is not allowable. '
+                    f'KSPACING{suffix.upper()} value {spacing} '
+                    'is not allowable. '
                     'Please use None or a positive number.'
-                    ''.format(self.float_params['kspacing'])
                 )
-        if self.input_params.get('kpts') is None:
-            return
-
-        kpointstring = format_kpoints(
-            kpts=self.input_params.get('kpts'),
-            atoms=atoms,
-            reciprocal=self.input_params.get('reciprocal'),
-            gamma=self.input_params.get('gamma'),
-        )
-        with open(join(directory, 'KPOINTS'), 'w') as kpoints:
-            kpoints.write(kpointstring)
+            if spacing is not None:
+                continue
+            kpts = self.input_params['kpts' + suffix]
+            if kpts is None:
+                continue
+            kpointstring = format_kpoints(
+                kpts=kpts,
+                atoms=atoms,
+                reciprocal=self.input_params['reciprocal' + suffix],
+                gamma=self.input_params['gamma' + suffix],
+            )
+            with open(join(directory, 'KPOINTS' + suffix.upper()), 'w') as fd:
+                fd.write(kpointstring)
 
     def write_potcar(self, suffix='', directory='./'):
         """Writes the POTCAR file."""
@@ -1211,10 +1214,11 @@ class GenerateVaspInput:
             except IndexError as exc:
                 raise IndexError(f'Value missing for keyword "{key}".') from exc
 
-    def read_kpoints(self, filename):
+    def read_kpoints(self, filename, opt=False):
         """Read kpoints file, typically named KPOINTS."""
         # If we used VASP builtin kspacing,
-        if self.float_params.get('kspacing') is not None:
+        suffix = '_opt' if opt else ''
+        if self.float_params.get('kspacing' + suffix) is not None:
             # Don't update kpts array
             return
 
@@ -1224,21 +1228,22 @@ class GenerateVaspInput:
         ktype = lines[2].split()[0].lower()[0]
         if ktype in ['g', 'm', 'a']:
             if ktype == 'g':
-                self.set(gamma=True)
+                self.set(**{'gamma' + suffix: True})
                 kpts = np.array([int(lines[3].split()[i]) for i in range(3)])
             elif ktype == 'a':
                 kpts = np.array([int(lines[3].split()[i]) for i in range(1)])
             elif ktype == 'm':
+                self.set(**{'gamma' + suffix: False})
                 kpts = np.array([int(lines[3].split()[i]) for i in range(3)])
         else:
             if ktype in ['c', 'k']:
-                self.set(reciprocal=False)
+                self.set(**{'reciprocal' + suffix: False})
             else:
-                self.set(reciprocal=True)
+                self.set(**{'reciprocal' + suffix: True})
             kpts = np.array(
                 [list(map(float, line.split())) for line in lines[3:]]
             )
-        self.set(kpts=kpts)
+        self.set(**{'kpts' + suffix: kpts})
 
     def read_potcar(self, filename):
         """Read the pseudopotential XC functional from POTCAR file."""

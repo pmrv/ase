@@ -538,6 +538,8 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         # Read parameters
         self.read_incar(filename=self._indir('INCAR'))
         self.read_kpoints(filename=self._indir('KPOINTS'))
+        if self._indir('KPOINTS_OPT').is_file():
+            self.read_kpoints(filename=self._indir('KPOINTS_OPT'), opt=True)
         self.read_potcar(filename=self._indir('POTCAR'))
 
         # Read the results from the calculation
