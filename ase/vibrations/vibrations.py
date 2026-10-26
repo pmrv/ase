@@ -148,7 +148,7 @@ class Vibrations(AtomicDisplacements):
     4   42.0     338.8
     5  123.2     993.9
     ---------------------
-    Zero-point energy: 0.078 eV
+    Zero-point energy: 0.104 eV
     >>> vib.write_mode(-1)  # write last mode to trajectory file
 
     """
@@ -594,7 +594,7 @@ Please remove them and recalculate or run \
         and folding method (Gaussian/Lorentzian).
         The energy unit is cm^-1.
 
-        Paramters
+        Parameters
         ---------
         normalize : bool, default: False
             If :obj:`True`, the integral over the peaks gives the intensity.
