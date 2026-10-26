@@ -3,10 +3,10 @@
 Visualization
 =============
 
-.. function:: view(atoms, data=None, viewer=None, repeat=None)
+.. autofunction:: ase.visualize.view
 
 This provides an interface to various visualization tools, such as
-:mod:`ase.gui`, RasMol_, VMD_, gOpenMol_, Avogadro_, ParaView_ or NGLView_. The default viewer is
+:mod:`ase.gui`, RasMol_, VMD_, gOpenMol_, Avogadro_, or NGLView_. The default viewer is
 the ase.gui, described in the :mod:`ase.gui` module. The simplest invocation
 is:
 
@@ -20,12 +20,12 @@ is:
 
 where ``atoms`` is any :class:`~ase.Atoms` object.  Alternative viewers
 can be used by specifying the optional keyword ``viewer=...`` - use one of
-'ase.gui', 'gopenmol', 'vmd', 'rasmol', 'paraview', 'ngl'.  The VMD and Avogadro viewers can
+'ase', 'gopenmol', 'vmd', 'rasmol', 'ngl', 'x3d', 'avogadro', 'sage', 'xmakemol' or 'mlab'.  The VMD and Avogadro viewers can
 take an optional ``data`` argument to show 3D data, such as charge density:
 
 >>> view(atoms, viewer='VMD', data=...)
 
-The nglview viewer additionally supports any indexible sequence of :class:`~ase.Atoms`
+The nglview viewer additionally supports any indexable sequence of :class:`~ase.Atoms`
 objects, e.g. lists of structures and :class:`~ase.io.Trajectory` objects.
 
 If you do not wish to open an interactive gui, but rather visualize
@@ -37,17 +37,16 @@ your structure by dumping directly to a graphics file; you can use the
 >>> write('image.png', atoms)
 
 It is also possible to plot directly to a Matplotlib subplot object, which allows for
-a large degree of customisability. :ref:`More information <matplotlib_plotting>`.
+a large degree of customizability. :ref:`More information <matplotlib_plotting>`.
 
-.. _RasMol: http://openrasmol.org/
+.. _RasMol: https://www.rasmol.net
 .. _VMD: http://www.ks.uiuc.edu/Research/vmd/
-.. _gOpenMol: http://www.csc.fi/gopenmol/
+.. _gOpenMol: https://github.com/gopenmoldev/gOpenMol
 .. _Avogadro: http://avogadro.cc/
-.. _ParaView: https://www.paraview.org/
 .. _NGLView: https://github.com/arose/nglview
 
 
-.. module:: ase.visualize.nglview
+.. module:: ase.visualize.ngl
 
 Viewer for Jupyter notebooks
 ----------------------------
@@ -72,13 +71,13 @@ only a small fraction of the NGL_ widget capabilities. The simplest form:
 
 creates an interactive ngl viewer widget with a few additional control widgets
 added on the side. The object returned by the above call is a reference to
-the ``.gui`` member of the :class:`ase.visualize.nglview.NGLDisplay` containing
-actual viewer (``.view`` member), a reference to control widgets box
+the ``.gui`` member of the :class:`ase.visualize.ngl.NGLDisplay` containing
+the actual viewer (``.view`` member), a reference to control widgets box
 (``.control_box`` member) and
-:func:`ase.visualize.view.nglview.NGLDisplay.custom_colors` method. The
+:meth:`ase.visualize.ngl.NGLDisplay.custom_colors` method. The
 notebook interface is not blocked by the above call and the returned object
-may be further manipulated by the following code in the separate cell (the
-``\_`` variable contains output from the previous cell):
+may be further manipulated by the following code in a separate cell (the
+``_`` variable contains output from the previous cell):
 
 >>> v=_
 >>> v.custom_colors({'Mn':'green','As':'blue'})
@@ -165,6 +164,8 @@ degree of customizability.
 
 .. image:: matplotlib_plot_atoms2.png
 
+>>> import matplotlib.image as mpimg
+>>> from ase.spacegroup import crystal
 >>> stem_image = mpimg.imread("stem_image.jpg")
 >>> atom_pos = [(0.0, 0.0, 0.0), (0.5, 0.5, 0.5), (0.5, 0.5, 0.0)]
 >>> srtio3 = crystal(['Sr','Ti','O'], atom_pos, spacegroup=221, cellpar=3.905, size=(3, 3, 3))

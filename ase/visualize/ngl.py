@@ -120,8 +120,8 @@ class NGLDisplay:
 def view_ngl(atoms, data=None, repeat=None, w=500, h=500):
     """
     Returns the nglviewer + some control widgets in the VBox ipywidget.
-    The viewer supports any Atoms objectand any sequence of Atoms objects.
-    The returned object has two shortcuts members:
+    The viewer supports any Atoms object and any sequence of Atoms objects.
+    The returned object has two shortcut members:
 
     .view:
         nglviewer ipywidget for direct interaction

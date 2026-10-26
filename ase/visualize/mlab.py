@@ -15,10 +15,10 @@ def plot(atoms, data, contours):
     ----------
 
     atoms: Atoms object
-        Positions, atomiz numbers and unit-cell.
+        Positions, atomic numbers and unit-cell.
     data: 3-d ndarray of float
         Data for iso-surfaces.
-    countours: list of float
+    contours: list of float
         Contour values.
     """
 
