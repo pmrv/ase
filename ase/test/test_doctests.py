@@ -61,7 +61,7 @@ ase.cluster
 ase.cluster.decahedron
 ase.cluster.icosahedron
 ase.cluster.wulff
-ase.cluster.compunds
+ase.cluster.compounds
 ase.cluster.factory
 ase.cluster.octahedron
 ase.cluster.base
