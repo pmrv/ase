@@ -104,60 +104,69 @@ The default setting used by the VASP interface is
 
 Below follows a list with a selection of parameters
 
-==============  =========  ==============  ============================
-keyword         type       default value   description
-==============  =========  ==============  ============================
-``directory``   ``str``    ``.``           Directory of the VASP run.
-                                           Defaults to running in the current
-                                           working directory.
-``command``     ``str``    None            Instructions on how to execute VASP.
-                                           If this is ``None``, either the
-                                           :envvar:`ASE_VASP_COMMAND`,
-                                           :envvar:`VASP_COMMAND`,
-                                           or :envvar:`VASP_SCRIPT` will
-                                           be used (in that order).
-``txt``         Various    ``vasp.out``    Where to redict the stdout text
-                                           from the VASP execution.
-                                           Defaults to ``vasp.out``.
-                                           If it is set to a string,
-                                           the file will always be opened in
-                                           folder specified by the
-                                           ``directory`` keyword.
-``restart``     ``bool``   None            Restart old calculation or
-                                           use ASE for post-processing
-``xc``          ``str``    'PW91'          XC-functional. Defaults to
-                                           None if ``gga`` set explicitly.
-``setups``      ``str``    None            Additional setup option
-``pp``          ``str``    Set by ``xc``   Pseudopotential (POTCAR) set
-                           or ``gga``      used (LDA or PBE).
-``pp_version``  ``str``    None            Version (suffix) to use, such as
-                                           "", "52", "54", "64"
-``kpts``        various    Γ-point         **k**-point sampling
-``gamma``       ``bool``   None            Γ-point centered
-                                           **k**-point sampling
-``reciprocal``  ``bool``   None            Use reciprocal units if
-                                           **k**-points are specified
-                                           explicitly
-``charge``      ``int``    None            Net charge per unit cell given in
-                                           units of the elementary charge, as
-                                           an alternative to specifying
-                                           ``nelect``. **Note**: The
-                                           now-deprecated ``net_charge``
-                                           parameter worked just like this one
-                                           but with the sign inverted.
-``prec``        ``str``                    Accuracy of calculation
-``encut``       ``float``                  Kinetic energy cutoff
-``ediff``       ``float``                  Convergence break condition
-                                           for SC-loop.
-``nbands``      ``int``                    Number of bands
-``algo``        ``str``                    Electronic minimization
-                                           algorithm
-``ismear``      ``int``                    Type of smearing
-``sigma``       ``float``                  Width of smearing
-``nelm``        ``int``                    Maximum number of
-                                           SC-iterations
-``ldau_luj``    ``dict``                   LD(S)A+U parameters
-==============  =========  ==============  ============================
+==================  =========  ==============  ============================
+keyword             type       default value   description
+==================  =========  ==============  ============================
+``directory``       ``str``    ``.``           Directory of the VASP run.
+                                               Defaults to running in the current
+                                               working directory.
+``command``         ``str``    None            Instructions on how to execute VASP.
+                                               If this is ``None``, either the
+                                               :envvar:`ASE_VASP_COMMAND`,
+                                               :envvar:`VASP_COMMAND`,
+                                               or :envvar:`VASP_SCRIPT` will
+                                               be used (in that order).
+``txt``             Various    ``vasp.out``    Where to redict the stdout text
+                                               from the VASP execution.
+                                               Defaults to ``vasp.out``.
+                                               If it is set to a string,
+                                               the file will always be opened in
+                                               folder specified by the
+                                               ``directory`` keyword.
+``restart``         ``bool``   None            Restart old calculation or
+                                               use ASE for post-processing
+``xc``              ``str``    'PW91'          XC-functional. Defaults to
+                                               None if ``gga`` set explicitly.
+``setups``          ``str``    None            Additional setup option
+``pp``              ``str``    Set by ``xc``   Pseudopotential (POTCAR) set
+                               or ``gga``      used (LDA or PBE).
+``pp_version``      ``str``    None            Version (suffix) to use, such as
+                                               "", "52", "54", "64"
+``kpts``            various    Γ-point         **k**-point sampling
+``gamma``           ``bool``   None            Γ-point centered
+                                               **k**-point sampling
+``reciprocal``      ``bool``   None            Use reciprocal units if
+                                               **k**-points are specified
+                                               explicitly
+``kpts_opt``        various    None            Optional **k**-point sampling for
+                                               :file:`KPOINTS_OPT`; same formats as
+                                               ``kpts`` (VASP 6.3+).
+``gamma_opt``       ``bool``   False           Use a Γ-centered mesh in
+                                               :file:`KPOINTS_OPT`, independently of
+                                               ``gamma``.
+``reciprocal_opt``  ``bool``   False           Use reciprocal units for explicit
+                                               points in :file:`KPOINTS_OPT`,
+                                               independently of ``reciprocal``.
+``charge``          ``int``    None            Net charge per unit cell given in
+                                               units of the elementary charge, as
+                                               an alternative to specifying
+                                               ``nelect``. **Note**: The
+                                               now-deprecated ``net_charge``
+                                               parameter worked just like this one
+                                               but with the sign inverted.
+``prec``            ``str``                    Accuracy of calculation
+``encut``           ``float``                  Kinetic energy cutoff
+``ediff``           ``float``                  Convergence break condition
+                                               for SC-loop.
+``nbands``          ``int``                    Number of bands
+``algo``            ``str``                    Electronic minimization
+                                               algorithm
+``ismear``          ``int``                    Type of smearing
+``sigma``           ``float``                  Width of smearing
+``nelm``            ``int``                    Maximum number of
+                                               SC-iterations
+``ldau_luj``        ``dict``                   LD(S)A+U parameters
+==================  =========  ==============  ============================
 
 For parameters in the list without default value given, VASP will set
 the default value. Most of the parameters used in the VASP :file:`INCAR` file
@@ -322,6 +331,19 @@ Brillouin-zone sampling
 Brillouin-zone sampling is controlled by the parameters ``kpts``,
 ``gamma`` and ``reciprocal``, and may also be set with the VASP
 parameters ``kspacing`` and ``kgamma``.
+
+An optional non-self-consistent calculation after the SCF step can be requested
+with ``kpts_opt`` (VASP 6.3 or newer). It accepts the same formats as ``kpts``
+and writes a separate ``KPOINTS_OPT`` file. Its centering and coordinate system
+are controlled independently by ``gamma_opt`` and ``reciprocal_opt``.
+For example::
+
+    calc = Vasp(kpts=(4, 4, 4), gamma=True,
+                kpts_opt={'path': 'GXW', 'npoints': 100}, reciprocal_opt=True)
+
+With VASP 6.6 or newer, ``kspacing_opt`` can be
+used instead of ``kpts_opt``; setting it suppresses writing
+``KPOINTS_OPT``, independently of ``kspacing`` and ``KPOINTS``.
 
 Single-parameter schemes
 ------------------------
