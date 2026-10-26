@@ -49,6 +49,15 @@ ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.vibrations
+ase.vibrations.albrecht
+ase.vibrations.data
+ase.vibrations.franck_condon
+ase.vibrations.pickle2json
+ase.vibrations.placzek
+ase.vibrations.raman
+ase.vibrations.resonant_raman
+ase.vibrations.vibrations
 ase.io
 ase.io.trajectory
 ase.io.opls
