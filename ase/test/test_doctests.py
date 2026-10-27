@@ -12,7 +12,6 @@ all_module_names = [
 ]
 
 skip_module_names = """
-ase.__main__
 ase.calculators.abinit
 ase.calculators.dmol
 ase.calculators.elk
