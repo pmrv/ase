@@ -7,8 +7,9 @@ import pytest
 
 import ase
 
-all_module_names = [module.name for module in pkgutil.walk_packages(
-                    ase.__path__, prefix="ase.")]
+all_module_names = [
+    module.name for module in pkgutil.walk_packages(ase.__path__, prefix='ase.')
+]
 
 skip_module_names = """
 ase.__main__
