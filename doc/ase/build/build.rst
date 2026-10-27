@@ -89,25 +89,6 @@ Common bulk crystals
 
 .. autofunction:: bulk
 
-examples:
-
->>> from ase.build import bulk
->>> a1 = bulk('Cu', 'fcc', a=3.6)
->>> a2 = bulk('Cu', 'fcc', a=3.6, orthorhombic=True)
->>> a3 = bulk('Cu', 'fcc', a=3.6, cubic=True)
->>> a1.cell
-array([[ 0. ,  1.8,  1.8],
-       [ 1.8,  0. ,  1.8],
-       [ 1.8,  1.8,  0. ]])
->>> a2.cell
-array([[ 2.546,  0.   ,  0.   ],
-       [ 0.   ,  2.546,  0.   ],
-       [ 0.   ,  0.   ,  3.6  ]])
->>> a3.cell
-array([[ 3.6,  0. ,  0. ],
-       [ 0. ,  3.6,  0. ],
-       [ 0. ,  0. ,  3.6]])
-
 |a1| |a2| |a3|
 
 .. |a1| image:: a1.png
