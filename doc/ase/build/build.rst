@@ -103,11 +103,6 @@ Nanotubes
 
 .. autofunction:: nanotube
 
-examples:
-
->>> from ase.build import nanotube
->>> cnt1 = nanotube(6, 0, length=4)
->>> cnt2 = nanotube(3, 3, length=6, bond=1.4, symbol='Si')
 
 |cnt1| |cnt2|
 
