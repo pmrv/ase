@@ -38,88 +38,266 @@ Supported :mod:`Calculators <ase.calculators>`
 ==============================================
 
 .. list-table::
-   :header-rows: 1
-   :widths: 40 60
+   :header-rows: 0
+   :widths: 33 33 33
    :class: calculator-table
- 
-   * - `ABACUS <https://gitlab.com/1041176461/ase-abacus>`__
-     - |ABACUS|
-   * - `ABINIT <ase/calculators/abinit.html>`__
+
+   * - |ABACUS|
+
+       `ABACUS <https://gitlab.com/1041176461/ase-abacus>`__
+
+       Plane-wave and numerical atomic orbital DFT.
+
      - |abinit|
-   * - `Asap <https://wiki.fysik.dtu.dk/asap>`__
+
+       `ABINIT <ase/calculators/abinit.html>`__
+
+       Plane-wave DFT and many-body perturbation theory.
+
      - |Asap|
-   * - `Atomistica <https://github.com/Atomistica/atomistica>`__
-     - |Atomistica|
-   * - `BigDFT <https://bigdft.org/>`__
+
+       `Asap <https://wiki.fysik.dtu.dk/asap>`__
+
+       Fast classical potentials (EMT, EAM, ...).
+
+   * - |Atomistica|
+
+       `Atomistica <https://github.com/Atomistica/atomistica>`__
+
+       Bond-order and reactive potentials.
+
      - |BigDFT|
-   * - `CASTEP <ase/calculators/castep.html>`__
+
+       `BigDFT <https://bigdft.org/>`__
+
+       Wavelet-based DFT.
+
      - |CASTEP|
-   * - `CP2K <ase/calculators/cp2k.html>`__
-     - |CP2K|
-   * - `CRYSTAL <ase/calculators/crystal.html>`__
+
+       `CASTEP <ase/calculators/castep.html>`__
+
+       Plane-wave pseudopotential DFT.
+
+   * - |CP2K|
+
+       `CP2K <ase/calculators/cp2k.html>`__
+
+       Mixed Gaussian and plane-wave DFT and molecular dynamics.
+
      - |CRYSTAL|
-   * - `DeePMD-kit <https://github.com/deepmodeling/deepmd-kit>`__
+
+       `CRYSTAL <ase/calculators/crystal.html>`__
+
+       Periodic ab initio code with Gaussian basis sets.
+
      - |DeePMD-kit|
-   * - `deMon <ase/calculators/demon.html>`__
-     - |deMon|
-   * - `DFTB+ <ase/calculators/dftb.html>`__
+
+       `DeePMD-kit <https://github.com/deepmodeling/deepmd-kit>`__
+
+       Machine-learned deep potential models.
+
+   * - |deMon|
+
+       `deMon <ase/calculators/demon.html>`__
+
+       Gaussian-type orbital DFT (deMon2k).
+
      - |dftb|
-   * - `DFT-D4 <https://github.com/dftd4/dftd4/tree/master/python>`__
+
+       `DFTB+ <ase/calculators/dftb.html>`__
+
+       Density functional tight binding.
+
      - |dftd4|
-   * - `DFTK <https://dftk.org/q/ase>`__
-     - |DFTK|
-   * - `Elk <http://elk.sourceforge.net/>`__
+
+       `DFT-D4 <https://github.com/dftd4/dftd4/tree/master/python>`__
+
+       Dispersion corrections for DFT.
+
+   * - |DFTK|
+
+       `DFTK <https://dftk.org/q/ase>`__
+
+       Plane-wave DFT in Julia.
+
      - |elk|
-   * - `exciting <ase/calculators/exciting.html>`__
+
+       `Elk <http://elk.sourceforge.net/>`__
+
+       All-electron full-potential LAPW DFT.
+
      - |exciting|
-   * - `EMT <ase/calculators/emt.html>`__
-     - |EMT|
-   * - `FHI-aims <ase/calculators/FHI-aims.html>`__
+
+       `exciting <ase/calculators/exciting.html>`__
+
+       All-electron full-potential LAPW DFT.
+
+   * - |EMT|
+
+       `EMT <ase/calculators/emt.html>`__
+
+       Effective medium theory potential for metals.
+
      - |fhi-aims|
-   * - `FLEUR <ase/calculators/fleur.html>`__
+
+       `FHI-aims <ase/calculators/FHI-aims.html>`__
+
+       All-electron DFT with numeric atom-centered orbitals.
+
      - |fleur|
-   * - `GAMESS-US <ase/calculators/gamess_us.html>`__
-     - |gamess_us|
-   * - `GPAW <https://gpaw.readthedocs.io/>`__
+
+       `FLEUR <ase/calculators/fleur.html>`__
+
+       All-electron full-potential LAPW DFT.
+
+   * - |gamess_us|
+
+       `GAMESS-US <ase/calculators/gamess_us.html>`__
+
+       Quantum chemistry package.
+
      - |gpaw|
-   * - `GROMACS <ase/calculators/gromacs.html>`__
+
+       `GPAW <https://gpaw.readthedocs.io/>`__
+
+       PAW DFT with real-space grid, plane-wave and LCAO modes.
+
      - |gromacs|
-   * - `Hotbit <https://github.com/pekkosk/hotbit>`__
-     - |hotbit|
-   * - `JDFTx <http://jdftx.org/ASE.html>`__
+
+       `GROMACS <ase/calculators/gromacs.html>`__
+
+       Classical molecular dynamics for biomolecular systems.
+
+   * - |hotbit|
+
+       `Hotbit <https://github.com/pekkosk/hotbit>`__
+
+       Density functional tight binding.
+
      - |jdftx|
-   * - `KIM <ase/calculators/kim.html>`__
+
+       `JDFTx <http://jdftx.org/ASE.html>`__
+
+       Plane-wave DFT with joint density-functional solvation.
+
      - |kim|
-   * - `LAMMPS <ase/calculators/lammps.html>`__
-     - |lammps|
-   * - `MOPAC <ase/calculators/mopac.html>`__
+
+       `KIM <ase/calculators/kim.html>`__
+
+       Interatomic models from the OpenKIM repository.
+
+   * - |lammps|
+
+       `LAMMPS <ase/calculators/lammps.html>`__
+
+       Classical molecular dynamics.
+
      - |mopac|
-   * - `NWChem <ase/calculators/nwchem.html>`__
+
+       `MOPAC <ase/calculators/mopac.html>`__
+
+       Semi-empirical quantum chemistry.
+
      - |nwchem|
-   * - `Octopus <ase/calculators/octopus.html>`__
-     - |octopus|
-   * - `ONETEP <ase/calculators/onetep.html>`__
+
+       `NWChem <ase/calculators/nwchem.html>`__
+
+       Quantum chemistry and DFT package.
+
+   * - |octopus|
+
+       `Octopus <ase/calculators/octopus.html>`__
+
+       Real-space and real-time TDDFT.
+
      - |onetep|
-   * - `OpenMX <ase/calculators/openmx.html>`__
+
+       `ONETEP <ase/calculators/onetep.html>`__
+
+       Linear-scaling DFT.
+
      - |openmx|
-   * - `PLUMED <ase/calculators/plumed.html>`__
-     - |plumed|
-   * - `Psi4 <ase/calculators/psi4.html>`__
+
+       `OpenMX <ase/calculators/openmx.html>`__
+
+       DFT with numerical pseudo-atomic orbitals.
+
+   * - |plumed|
+
+       `PLUMED <ase/calculators/plumed.html>`__
+
+       Enhanced sampling and free-energy methods.
+
      - |psi4|
-   * - `Q-Chem <ase/calculators/qchem.html>`__
+
+       `Psi4 <ase/calculators/psi4.html>`__
+
+       Quantum chemistry package.
+
      - |qchem|
-   * - `Quantum ESPRESSO <ase/calculators/espresso.html>`__
-     - |q_espresso|
-   * - `SIESTA <ase/calculators/siesta.html>`__
+
+       `Q-Chem <ase/calculators/qchem.html>`__
+
+       Quantum chemistry package.
+
+   * - |q_espresso|
+
+       `Quantum ESPRESSO <ase/calculators/espresso.html>`__
+
+       Plane-wave pseudopotential DFT.
+
      - |siesta|
-   * - `TURBOMOLE <ase/calculators/turbomole.html>`__
+
+       `SIESTA <ase/calculators/siesta.html>`__
+
+       DFT with numerical atomic orbitals.
+
      - |turbomole|
-   * - `VASP <ase/calculators/vasp.html>`__
-     - |vasp|
-   * - `xtb <https://github.com/grimme-lab/xtb/tree/master/python>`__
+
+       `TURBOMOLE <ase/calculators/turbomole.html>`__
+
+       Quantum chemistry package.
+
+   * - |vasp|
+
+       `VASP <ase/calculators/vasp.html>`__
+
+       Plane-wave PAW DFT.
+
      - |xtb|
-   * - `ORCA <ase/calculators/orca.html>`__
+
+       `xtb <https://github.com/grimme-lab/xtb/tree/master/python>`__
+
+       Semi-empirical GFN tight-binding methods.
+
      - |orca|
+
+       `ORCA <ase/calculators/orca.html>`__
+
+       Quantum chemistry package.
+
+Contents
+========
+
+.. toctree::
+
+    about
+    install
+    examples_generated/index
+    howtos_generated/index
+    gettingstarted/gettingstarted
+    cmdline
+    ase/gui/gui
+    ase/ase
+    tips
+    releasenotes
+    contact
+    development/development
+    faq
+
+.. Keep all the ".. |name| image:: ..." substitution definitions and the
+   ".. _Sphinx:" / ".. _Asap:" / ".. _CAMd:" targets from your original
+   file below this point.
 
 :mod:`ACE-Molecule <ase.calculators.acemolecule>`
 :mod:`~ase.calculators.amber`
