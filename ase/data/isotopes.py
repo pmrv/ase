@@ -38,12 +38,13 @@ def download_isotope_data():
     indexed by the atomic number and mass number, e.g. titanium-48:
 
     >>> from ase.data.isotopes import download_isotope_data
-    >>> isotopes = download_isotope_data()
-    >>> isotopes[22][48]['mass']
+    >>> isotopes = download_isotope_data()  # doctest: +SKIP
+    >>> isotopes[22][48]['mass']            # doctest: +SKIP
     47.94794198
-    >>> isotopes[22][48]['composition']
+    >>> isotopes[22][48]['composition']     # doctest: +SKIP
     0.7372
     """
+    # Do not enable the doctest because we do not want to download stuff.
 
     url = (
         'http://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl'

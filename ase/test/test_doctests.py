@@ -1,115 +1,62 @@
 import doctest
 import importlib
+import pkgutil
 
 import numpy as np
 import pytest
 
-module_names = """\
-ase.atom
-ase.atoms
-ase.build
-ase.build.bulk
-ase.build.attach
-ase.build.connected
-ase.build.general_surface
-ase.build.molecule
-ase.build.niggli
-ase.build.ribbon
-ase.build.rotate
-ase.build.root
-ase.build.supercells
-ase.build.surface
-ase.build.surfaces_with_termination
-ase.build.tools
-ase.build.tube
-ase.cell
-ase.calculators.vasp.vasp
-ase.collections
-ase.collections.create
-ase.collections.collection
-ase.constraints
-ase.data
-ase.data.cccbdb_ip
-ase.data.cohesive_energies
-ase.data.dbh24
-ase.data.extra_molecules
-ase.data.g2
-ase.data.g2_1
-ase.data.g2_2
-ase.data.isotopes
-ase.data.pubchem
-ase.data.s22
-ase.data.vdw
-ase.data.vdw_alvarez
-ase.dft.kpoints
-ase.eos
-ase.filters
-ase.formula
-ase.geometry
-ase.geometry.analysis
-ase.geometry.bravais_type_engine
-ase.geometry.dimensionality
-ase.geometry.cell
-ase.geometry.geometry
-ase.geometry.distance
-ase.geometry.rdf
-ase.geometry.minkowski_reduction
-ase.io.ulm
-ase.lattice
-ase.neighborlist
-ase.optimize.basin
-ase.optimize.bfgs
-ase.optimize.bfgslinesearch
-ase.optimize.cellawarebfgs
-ase.optimize.climbfixinternals
-ase.optimize.fire
-ase.optimize.fire2
-ase.optimize.gpmin.gpmin
-ase.optimize.lbfgs
-ase.optimize.mdmin
-ase.optimize.minimahopping
-ase.optimize.ode
-ase.optimize.oldqn
-ase.optimize.optimize
-ase.optimize.rfo
-ase.optimize.sciopt
-ase.parallel
-ase.phonons
-ase.spacegroup.spacegroup
-ase.spacegroup.xtal
-ase.symbols
-ase.vibrations
-ase.vibrations.albrecht
-ase.vibrations.data
-ase.vibrations.franck_condon
-ase.vibrations.pickle2json
-ase.vibrations.placzek
-ase.vibrations.raman
-ase.vibrations.resonant_raman
-ase.vibrations.vibrations
-ase.io
-ase.io.trajectory
-ase.io.opls
-ase.phasediagram
-ase.pourbaix
-ase.utils
-ase.spectrum
-ase.cluster.cluster
-ase.cluster
-ase.cluster.decahedron
-ase.cluster.icosahedron
-ase.cluster.wulff
-ase.cluster.compounds
-ase.cluster.factory
-ase.cluster.octahedron
-ase.cluster.base
-ase.cluster.cubic
-ase.cluster.hexagonal
-ase.cluster.util
+import ase
+
+all_module_names = [
+    module.name for module in pkgutil.walk_packages(ase.__path__, prefix='ase.')
+]
+
+skip_module_names = """
+ase.calculators.abinit
+ase.calculators.dmol
+ase.calculators.elk
+ase.calculators.exciting.exciting
+ase.calculators.gamess_us
+ase.calculators.kim
+ase.calculators.kim.kimpy_wrappers
+ase.calculators.kim.neighborlist
+ase.calculators.lammpslib
+ase.calculators.mopac
+ase.calculators.nwchem
+ase.calculators.openmx.reader
+ase.calculators.orca
+ase.cli.run
+ase.dft.band_structure
+ase.dft.bandgap
+ase.dft.bz
+ase.dft.stm
+ase.io.elk
+ase.io.eon
+ase.io.espresso
+ase.io.vasp
+ase.transport.calculators
+ase.utils.cube
+ase.utils.sphinx_create_png
+ase.utils.structure_comparator
+ase.vibrations.infrared
 """.split()
 
 
-@pytest.mark.parametrize('modname', module_names)
+module_names = set(all_module_names) - set(skip_module_names)
+
+# remove some modules like ase.test, ase.gui
+rem_modules = [
+    modname
+    for name in ['ase.test', 'ase.gui', 'ase.ga']
+    for modname in module_names
+    if name in modname
+]
+module_names -= set(rem_modules)
+
+sorted_module_names = sorted(module_names)
+
+
+@pytest.mark.parametrize('modname', sorted_module_names)
 def test_doctest(testdir, modname):
     if int(np.__version__.split('.')[0]) < 2:
         pytest.skip('Doctests need numpy2+')
