@@ -56,6 +56,7 @@ def bulk(
         which is the default.
     cubic: bool
         Construct cubic unit cell if possible.
+
     Examples
     --------
     >>> from ase.build import bulk
