@@ -42,7 +42,6 @@ ase.vibrations.infrared
 """.split()
 
 
-print(f'Skipping doctest for {len(skip_module_names)} (sub)modules.')
 module_names = set(all_module_names) - set(skip_module_names)
 
 # remove some modules like ase.test, ase.gui
@@ -54,7 +53,6 @@ rem_modules = [
 ]
 module_names -= set(rem_modules)
 
-# sort names
 sorted_module_names = sorted(module_names)
 
 
