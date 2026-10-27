@@ -65,6 +65,18 @@ ase.phasediagram
 ase.pourbaix
 ase.utils
 ase.spectrum
+ase.cluster.cluster
+ase.cluster
+ase.cluster.decahedron
+ase.cluster.icosahedron
+ase.cluster.wulff
+ase.cluster.compounds
+ase.cluster.factory
+ase.cluster.octahedron
+ase.cluster.base
+ase.cluster.cubic
+ase.cluster.hexagonal
+ase.cluster.util
 """.split()
 
 
