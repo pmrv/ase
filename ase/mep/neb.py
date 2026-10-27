@@ -694,10 +694,10 @@ class NEB:
             real_forces[i] = images[i].get_forces(apply_constraint=False)
         except Exception:
             # Make sure other images also fail:
-            error = self.world.sum(1.0)
+            error = self.world.sum_scalar(1.0)
             raise
         else:
-            error = self.world.sum(0.0)
+            error = self.world.sum_scalar(0.0)
             if error:
                 raise RuntimeError('Parallel NEB failed!')
 
