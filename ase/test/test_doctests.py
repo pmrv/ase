@@ -75,9 +75,7 @@ print(f'Skipping doctest for {len(skip_module_names)} (sub)modules.')
 module_names = set(all_module_names) - set(skip_module_names)
 
 # remove tests
-test_modules = [
-    modname for modname in module_names if 'ase.test' in modname
-]
+test_modules = [modname for modname in module_names if 'ase.test' in modname]
 module_names -= set(test_modules)
 
 # sort names
