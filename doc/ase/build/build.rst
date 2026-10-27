@@ -117,15 +117,6 @@ Graphene nanoribbons
 
 .. autofunction:: graphene_nanoribbon
 
-examples:
-
->>> from ase.build import graphene_nanoribbon
->>> gnr1 = graphene_nanoribbon(3, 4, type='armchair', saturated=True,
-                               vacuum=3.5)
->>> gnr2 = graphene_nanoribbon(2, 6, type='zigzag', saturated=True,
-...                            C_H=1.1, C_C=1.4, vacuum=3.0,
-...                            magnetic=True, initial_mag=1.12)
-
 |gnr1| |gnr2|
 
 .. |gnr1| image:: gnr1.png
