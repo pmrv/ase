@@ -10,6 +10,8 @@ ase.atoms
 ase.build.tools
 ase.cell
 ase.calculators.vasp.vasp
+ase.collections
+ase.collections.create
 ase.collections.collection
 ase.constraints
 ase.dft.kpoints
