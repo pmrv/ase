@@ -7,9 +7,25 @@ import pytest
 module_names = """\
 ase.atom
 ase.atoms
+ase.build
+ase.build.bulk
+ase.build.attach
+ase.build.connected
+ase.build.general_surface
+ase.build.molecule
+ase.build.niggli
+ase.build.ribbon
+ase.build.rotate
+ase.build.root
+ase.build.supercells
+ase.build.surface
+ase.build.surfaces_with_termination
 ase.build.tools
+ase.build.tube
 ase.cell
 ase.calculators.vasp.vasp
+ase.collections
+ase.collections.create
 ase.collections.collection
 ase.constraints
 ase.data
@@ -62,6 +78,15 @@ ase.phonons
 ase.spacegroup.spacegroup
 ase.spacegroup.xtal
 ase.symbols
+ase.vibrations
+ase.vibrations.albrecht
+ase.vibrations.data
+ase.vibrations.franck_condon
+ase.vibrations.pickle2json
+ase.vibrations.placzek
+ase.vibrations.raman
+ase.vibrations.resonant_raman
+ase.vibrations.vibrations
 ase.io
 ase.io.trajectory
 ase.io.opls
@@ -69,11 +94,24 @@ ase.phasediagram
 ase.pourbaix
 ase.utils
 ase.spectrum
+ase.cluster.cluster
+ase.cluster
+ase.cluster.decahedron
+ase.cluster.icosahedron
+ase.cluster.wulff
+ase.cluster.compounds
+ase.cluster.factory
+ase.cluster.octahedron
+ase.cluster.base
+ase.cluster.cubic
+ase.cluster.hexagonal
+ase.cluster.util
 """.split()
 
 
 @pytest.mark.parametrize('modname', module_names)
 def test_doctest(testdir, modname):
+    if int(np.__version__.split('.')[0]) < 2:
+        pytest.skip('Doctests need numpy2+')
     mod = importlib.import_module(modname)
-    with np.printoptions(legacy='1.13'):
-        doctest.testmod(mod, raise_on_error=True, verbose=True)
+    doctest.testmod(mod, raise_on_error=True, verbose=True)
