@@ -58,7 +58,6 @@ def wulff_construction(
     structure, by specifying 6 layers in the (100) directions, 9 in
     the (110) directions and 5 in the (111) directions::
 
-    >>> import ase
     >>> from ase.cluster.cubic import FaceCenteredCubic
 
     >>> surfaces = [(1, 0, 0), (1, 1, 0), (1, 1, 1)]
