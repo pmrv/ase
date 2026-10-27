@@ -37,12 +37,89 @@ BFGS:   3  19:10:51    -31.492848     0.0023
 Supported :mod:`Calculators <ase.calculators>`
 ==============================================
 
-|ABACUS| |abinit| |Asap| |Atomistica| |BigDFT| |CASTEP| |CP2K| |CRYSTAL| |DeePMD-kit| |deMon| |dftb|
-|dftd4| |DFTK| |elk| |exciting| |EMT|
-|fhi-aims| |fleur| |gamess_us| |gpaw| |gromacs|
-|hotbit| |jdftx| |kim| |lammps| |mopac| |nwchem|
-|octopus| |onetep| |openmx| |plumed|  |psi4| |qchem| |q_espresso| |siesta| |turbomole| |vasp|
-|xtb| |orca|
+.. list-table::
+   :header-rows: 1
+   :widths: 40 60
+   :class: calculator-table
+ 
+   * - `ABACUS <https://gitlab.com/1041176461/ase-abacus>`__
+     - |ABACUS|
+   * - `ABINIT <ase/calculators/abinit.html>`__
+     - |abinit|
+   * - `Asap <https://wiki.fysik.dtu.dk/asap>`__
+     - |Asap|
+   * - `Atomistica <https://github.com/Atomistica/atomistica>`__
+     - |Atomistica|
+   * - `BigDFT <https://bigdft.org/>`__
+     - |BigDFT|
+   * - `CASTEP <ase/calculators/castep.html>`__
+     - |CASTEP|
+   * - `CP2K <ase/calculators/cp2k.html>`__
+     - |CP2K|
+   * - `CRYSTAL <ase/calculators/crystal.html>`__
+     - |CRYSTAL|
+   * - `DeePMD-kit <https://github.com/deepmodeling/deepmd-kit>`__
+     - |DeePMD-kit|
+   * - `deMon <ase/calculators/demon.html>`__
+     - |deMon|
+   * - `DFTB+ <ase/calculators/dftb.html>`__
+     - |dftb|
+   * - `DFT-D4 <https://github.com/dftd4/dftd4/tree/master/python>`__
+     - |dftd4|
+   * - `DFTK <https://dftk.org/q/ase>`__
+     - |DFTK|
+   * - `Elk <http://elk.sourceforge.net/>`__
+     - |elk|
+   * - `exciting <ase/calculators/exciting.html>`__
+     - |exciting|
+   * - `EMT <ase/calculators/emt.html>`__
+     - |EMT|
+   * - `FHI-aims <ase/calculators/FHI-aims.html>`__
+     - |fhi-aims|
+   * - `FLEUR <ase/calculators/fleur.html>`__
+     - |fleur|
+   * - `GAMESS-US <ase/calculators/gamess_us.html>`__
+     - |gamess_us|
+   * - `GPAW <https://gpaw.readthedocs.io/>`__
+     - |gpaw|
+   * - `GROMACS <ase/calculators/gromacs.html>`__
+     - |gromacs|
+   * - `Hotbit <https://github.com/pekkosk/hotbit>`__
+     - |hotbit|
+   * - `JDFTx <http://jdftx.org/ASE.html>`__
+     - |jdftx|
+   * - `KIM <ase/calculators/kim.html>`__
+     - |kim|
+   * - `LAMMPS <ase/calculators/lammps.html>`__
+     - |lammps|
+   * - `MOPAC <ase/calculators/mopac.html>`__
+     - |mopac|
+   * - `NWChem <ase/calculators/nwchem.html>`__
+     - |nwchem|
+   * - `Octopus <ase/calculators/octopus.html>`__
+     - |octopus|
+   * - `ONETEP <ase/calculators/onetep.html>`__
+     - |onetep|
+   * - `OpenMX <ase/calculators/openmx.html>`__
+     - |openmx|
+   * - `PLUMED <ase/calculators/plumed.html>`__
+     - |plumed|
+   * - `Psi4 <ase/calculators/psi4.html>`__
+     - |psi4|
+   * - `Q-Chem <ase/calculators/qchem.html>`__
+     - |qchem|
+   * - `Quantum ESPRESSO <ase/calculators/espresso.html>`__
+     - |q_espresso|
+   * - `SIESTA <ase/calculators/siesta.html>`__
+     - |siesta|
+   * - `TURBOMOLE <ase/calculators/turbomole.html>`__
+     - |turbomole|
+   * - `VASP <ase/calculators/vasp.html>`__
+     - |vasp|
+   * - `xtb <https://github.com/grimme-lab/xtb/tree/master/python>`__
+     - |xtb|
+   * - `ORCA <ase/calculators/orca.html>`__
+     - |orca|
 
 :mod:`ACE-Molecule <ase.calculators.acemolecule>`
 :mod:`~ase.calculators.amber`
