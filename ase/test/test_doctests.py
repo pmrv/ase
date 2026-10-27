@@ -74,6 +74,15 @@ ase.vibrations.infrared
 print(f'Skipping doctest for {len(skip_module_names)} (sub)modules.')
 doctest_module_names = set(all_module_names) - set(skip_module_names)
 
+# remove tests
+test_modules = [
+    modname for modname in doctest_module_names if 'ase.test' in modname
+]
+doctest_module_names -= set(test_modules)
+
+# sort names
+doctest_module_names = sorted(doctest_module_names)
+
 
 @pytest.mark.parametrize('modname', doctest_module_names)
 def test_doctest(testdir, modname):
