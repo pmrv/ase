@@ -3,6 +3,11 @@
 Physical constants and units derived from CODATA for converting
 to and from ase internal units.
 
+Examples
+--------
+>>> from ase.units import kcal, mol
+>>> print(kcal / mol)
+0.04336410390059322
 
 """
 
