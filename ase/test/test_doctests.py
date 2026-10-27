@@ -27,8 +27,6 @@ ase.calculators.nwchem
 ase.calculators.openmx.reader
 ase.calculators.orca
 ase.cli.run
-ase.data.g2_1
-ase.data.isotopes
 ase.dft.band_structure
 ase.dft.bandgap
 ase.dft.bz

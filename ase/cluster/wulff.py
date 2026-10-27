@@ -50,6 +50,22 @@ def wulff_construction(
     debug : bool, default False
         If True, information about the iteration towards the right cluster
         size is printed.
+
+    Examples
+    --------
+
+    This example sets up a nanoparticle of copper in the FCC crystal
+    structure, by specifying 6 layers in the (100) directions, 9 in
+    the (110) directions and 5 in the (111) directions::
+
+    >>> from ase.cluster.cubic import FaceCenteredCubic
+
+    >>> surfaces = [(1, 0, 0), (1, 1, 0), (1, 1, 1)]
+    >>> layers = [6, 9, 5]
+    >>> lc = 3.61000
+    >>> atoms = FaceCenteredCubic('Cu', surfaces, layers, latticeconstant=lc)
+
+    Note that the Wulff construction currently only work with cubic lattices.
     """
 
     if debug:
