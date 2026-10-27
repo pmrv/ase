@@ -1,0 +1,28 @@
+/* ---- Calculator grid table ---- */
+
+/* Cell layout: centered, stacked content */
+table.calculator-table td {
+    text-align: center;
+    vertical-align: top;
+    padding: 1em;
+}
+
+/* Spacing between logo, name and description */
+table.calculator-table td p {
+    margin: 0.3em 0;
+}
+
+/* Description (last paragraph in the cell) looks secondary */
+table.calculator-table td p:last-child {
+    font-size: 0.85em;
+    opacity: 0.75;
+}
+
+/* Uniform logo sizing */
+table.calculator-table td img {
+    height: 60px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    object-fit: contain;
+    vertical-align: middle;
+}
