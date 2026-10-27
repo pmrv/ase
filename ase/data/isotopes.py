@@ -50,7 +50,15 @@ def download_isotope_data():
         '?ele=&ascii=ascii&isotype=all'
     )
 
-    with request.urlopen(url) as fd:
+    req = request.Request(
+         url,
+         headers={
+            'User-Agent': 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
+         
+         }
+    )
+
+    with request.urlopen(req) as fd:
         txt = fd.read()
 
     raw_data = txt.decode().splitlines()
