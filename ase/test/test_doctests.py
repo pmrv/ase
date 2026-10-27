@@ -33,28 +33,6 @@ ase.dft.band_structure
 ase.dft.bandgap
 ase.dft.bz
 ase.dft.stm
-ase.ga
-ase.ga.convergence
-ase.ga.cutandsplicepairing
-ase.ga.data
-ase.ga.element_crossovers
-ase.ga.element_mutations
-ase.ga.multiprocessingrun
-ase.ga.offspring_creator
-ase.ga.ofp_comparator
-ase.ga.particle_comparator
-ase.ga.particle_crossovers
-ase.ga.particle_mutations
-ase.ga.parallellocalrun
-ase.ga.pbs_queue_run
-ase.ga.population
-ase.ga.relax_attaches
-ase.ga.slab_operators
-ase.ga.soft_mutation
-ase.ga.standard_comparators
-ase.ga.standardmutations
-ase.ga.startgenerator
-ase.ga.utilities
 ase.io.elk
 ase.io.eon
 ase.io.espresso
@@ -73,7 +51,7 @@ module_names = set(all_module_names) - set(skip_module_names)
 # remove some modules like ase.test, ase.gui
 rem_modules = [
     modname
-    for name in ['ase.test', 'ase.gui']
+    for name in ['ase.test', 'ase.gui', 'ase.ga']
     for modname in module_names
     if name in modname
 ]
