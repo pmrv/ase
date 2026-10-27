@@ -7,7 +7,21 @@ import pytest
 module_names = """\
 ase.atom
 ase.atoms
+ase.build
+ase.build.bulk
+ase.build.attach
+ase.build.connected
+ase.build.general_surface
+ase.build.molecule
+ase.build.niggli
+ase.build.ribbon
+ase.build.rotate
+ase.build.root
+ase.build.supercells
+ase.build.surface
+ase.build.surfaces_with_termination
 ase.build.tools
+ase.build.tube
 ase.cell
 ase.calculators.vasp.vasp
 ase.collections
