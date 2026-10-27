@@ -7,7 +7,6 @@ import pytest
 module_names = """\
 ase.atom
 ase.atoms
-ase.build.tools
 ase.build
 ase.build.bulk
 ase.build.attach
