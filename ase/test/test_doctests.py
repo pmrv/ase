@@ -59,11 +59,6 @@ ase.io.elk
 ase.io.eon
 ase.io.espresso
 ase.io.vasp
-ase.test.calculator.siesta.test_scripts.CH4.script
-ase.test.calculator.siesta.test_scripts.H2.script
-ase.test.calculator.siesta.test_scripts.Na8.script
-ase.test.calculator.siesta.test_scripts.Si.script
-ase.test.calculator.test_tersoff
 ase.transport.calculators
 ase.utils.cube
 ase.utils.sphinx_create_png
@@ -74,9 +69,14 @@ ase.vibrations.infrared
 print(f'Skipping doctest for {len(skip_module_names)} (sub)modules.')
 module_names = set(all_module_names) - set(skip_module_names)
 
-# remove tests
-test_modules = [modname for modname in module_names if 'ase.test' in modname]
-module_names -= set(test_modules)
+# remove some modules like ase.test, ase.gui
+rem_modules = [
+    modname
+    for name in ['ase.test', 'ase.gui']
+    for modname in module_names
+    if name in modname
+]
+module_names -= set(rem_modules)
 
 # sort names
 sorted_module_names = sorted(module_names)
