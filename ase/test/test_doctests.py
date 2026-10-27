@@ -1,10 +1,10 @@
 import doctest
 import importlib
+import pkgutil
 
 import numpy as np
 import pytest
 
-import pkgutil
 import ase
 
 all_module_names = [module.name for module in pkgutil.walk_packages(
