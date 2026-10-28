@@ -649,12 +649,10 @@ def test_atoms_history(gui):
     before = gui.images[gui.frame].copy()
     gui.images.selected[0] = True
     gui.really_delete_selected_atoms()
-    assert set(compare_atoms(gui.images[gui.frame], before)) == set(
-        [
-            'numbers',
-            'positions',
-        ]
-    )
+    assert set(compare_atoms(gui.images[gui.frame], before)) == {
+        'numbers',
+        'positions',
+    }
     gui.undo_history()
     gui.redo_history()
     gui.undo_history()
@@ -682,12 +680,10 @@ def test_many_atoms_history(gui_many_images):
         before = gui_many_images.images[frame].copy()
         gui_many_images.images.selected[0] = True
         gui_many_images.really_delete_selected_atoms()
-        assert set(compare_atoms(gui_many_images.images[frame], before)) == set(
-            [
-                'numbers',
-                'positions',
-            ]
-        )
+        assert set(compare_atoms(gui_many_images.images[frame], before)) == {
+            'numbers',
+            'positions',
+        }
         gui_many_images.undo_history()
         gui_many_images.redo_history()
         gui_many_images.undo_history()

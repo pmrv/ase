@@ -68,7 +68,6 @@ def mock_vasp_calculate(monkeypatch):
     # Patch the calculate and run methods, so we're certain
     # calculations aren't accidentally launched
     monkeypatch.setattr('ase.calculators.vasp.Vasp._run', _mock_run)
-    return
 
 
 @pytest.fixture()
@@ -78,4 +77,3 @@ def clear_vasp_envvar(monkeypatch):
     for envvar in Vasp.env_commands:
         monkeypatch.delenv(envvar, raising=False)
         assert envvar not in os.environ
-    return
