@@ -276,29 +276,6 @@ Supported :mod:`Calculators <ase.calculators>`
 
        Quantum chemistry package.
 
-Contents
-========
-
-.. toctree::
-
-    about
-    install
-    examples_generated/index
-    howtos_generated/index
-    gettingstarted/gettingstarted
-    cmdline
-    ase/gui/gui
-    ase/ase
-    tips
-    releasenotes
-    contact
-    development/development
-    faq
-
-.. Keep all the ".. |name| image:: ..." substitution definitions and the
-   ".. _Sphinx:" / ".. _Asap:" / ".. _CAMd:" targets from your original
-   file below this point.
-
 :mod:`ACE-Molecule <ase.calculators.acemolecule>`
 :mod:`~ase.calculators.amber`
 :mod:`DMol³ <ase.calculators.dmol>`
@@ -312,7 +289,6 @@ Contents
 
 
 `Reference publication on ASE <https://iopscience.iop.org/article/10.1088/1361-648X/aa680e/meta>`__
-
 
 .. _news:
 
@@ -457,7 +433,6 @@ News
 
 * A beta version of the new ASE-3.0 will be used for the
   electronic structure course at CAMd_.  (10 Jan 2008)
-
 
 Contents
 ========
