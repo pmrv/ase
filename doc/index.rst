@@ -285,7 +285,7 @@ Supported :mod:`Calculators <ase.calculators>`
 :mod:`~ase.calculators.qmmm`
 :mod:`~ase.calculators.tip3p`
 :mod:`deMon-Nano <ase.calculators.demonnano>`
-`Skala <https://microsoft.github.io/skala/ase.html>`_
+:mod:`Skala <https://microsoft.github.io/skala/ase.html>`_
 
 
 `Reference publication on ASE <https://iopscience.iop.org/article/10.1088/1361-648X/aa680e/meta>`__
