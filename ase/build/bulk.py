@@ -63,11 +63,11 @@ def bulk(
     >>> a1 = bulk('Cu', 'fcc', a=3.6)
     >>> a2 = bulk('Cu', 'fcc', a=3.6, orthorhombic=True)
     >>> a3 = bulk('Cu', 'fcc', a=3.6, cubic=True)
-    >>> a1.cell
-    Cell([[0.0, 1.8, 1.8], [1.8, 0.0, 1.8], [1.8, 1.8, 0.0]])
-    >>> a2.cell
-    Cell([2.545584412271571, 2.545584412271571, 3.6])
-    >>> a3.cell
+    >>> print(a1.cell)
+    Cell([[0, 1.8, 1.8], [1.8, 0, 1.8], [1.8, 1.8, 0]])
+    >>> print(a2.cell)
+    Cell([2.54558, 2.54558, 3.6])
+    >>> print(a3.cell)
     Cell([3.6, 3.6, 3.6])
     """
 
