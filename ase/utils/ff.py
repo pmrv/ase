@@ -22,6 +22,20 @@ Mx = Bx
 
 
 class Morse:
+    """Morse potential between two atoms.
+
+    Parameters
+    ----------
+    atomi, atomj : int
+        Indices of the two atoms.
+    D : float
+        Dissociation energy.
+    alpha : float
+        Parameter controlling the width of the potential.
+    r0 : float
+        Equilibrium bond length.
+    """
+
     def __init__(self, atomi, atomj, D, alpha, r0):
         self.atomi = atomi
         self.atomj = atomj
@@ -92,6 +106,23 @@ class Angle:
 
 
 class Dihedral:
+    """Dihedral potential involving four atoms.
+
+    The potential is harmonic if `n` is None and `d0` is specified,
+    periodic if both are specified, and planar if `d0` is None.
+
+    Parameters
+    ----------
+    atomi, atomj, atomk, atoml : int
+        Indices of the four atoms defining the dihedral angle.
+    k : float
+        Force constant or potential amplitude.
+    d0 : float or None
+        Equilibrium dihedral angle or phase offset, in radians.
+    n : int or None
+        Periodicity of the torsional potential.
+    """
+
     def __init__(
         self,
         atomi,
@@ -117,6 +148,18 @@ class Dihedral:
 
 
 class VdW:
+    """Van der Waals potential between two atoms.
+
+    Parameters
+    ----------
+    atomi, atomj : int
+        Indices of the two atoms.
+    Aij : float
+        Coefficient of the repulsive r^-12 term.
+    Bij : float
+        Coefficient of the attractive r^-6 term.
+    """
+
     def __init__(
         self,
         atomi,
@@ -184,6 +227,20 @@ class VdW:
 
 
 class Coulomb:
+    """Coulomb potential between two point charges.
+
+    Parameters
+    ----------
+    atomi, atomj : int
+        Indices of the two atoms.
+    chargeij : float or None
+        Product of the two charges.
+    chargei, chargej : float or None
+        Individual atomic charges, used if `chargeij` is None.
+    scale : float
+        Scaling factor for the Coulomb interaction.
+    """
+
     def __init__(
         self, atomi, atomj, chargeij=None, chargei=None, chargej=None, scale=1.0
     ):
@@ -319,6 +376,11 @@ def get_morse_potential_reduced_hessian(
     atoms: Atoms,
     morse: Morse,
 ) -> tuple[int, int, NDArray[np.floating]]:
+    """Calculate the reduced Hessian of a Morse potential.
+
+    Only the bond-stretching contribution is retained, and the absolute value
+    of the curvature is used to obtain a positive-semidefinite Hessian.
+    """
     i = morse.atomi
     j = morse.atomj
 
@@ -422,6 +484,14 @@ def get_bond_potential_reduced_hessian(
     bond: Bond,
     morses: Sequence[Morse] | None = None,
 ) -> tuple[int, int, NDArray[np.floating]]:
+    """Calculate the reduced Hessian of a harmonic bond potential.
+
+    Only the bond-stretching contribution is retained, neglecting
+    the transverse contributions to the Hessian.
+
+    The Hessian is optionally scaled by distance-dependent factors
+    and Morse-potential-based bond-breaking factors.
+    """
     i = bond.atomi
     j = bond.atomj
 
@@ -714,6 +784,16 @@ def get_angle_potential_reduced_hessian(
     angle: Angle,
     morses: Sequence[Morse] | None = None,
 ) -> tuple[int, int, int, NDArray[np.floating]]:
+    """Calculate the reduced Hessian of an angle potential.
+
+    Only the angle-bending contribution is retained.
+
+    The absolute value of the angular curvature is used to obtain
+    a positive-semidefinite Hessian.
+
+    The Hessian is optionally scaled by distance-dependent factors
+    and Morse-potential-based bond-breaking factors.
+    """
     i = angle.atomi
     j = angle.atomj
     k = angle.atomk
@@ -983,6 +1063,16 @@ def get_dihedral_potential_reduced_hessian(
     dihedral: Dihedral,
     morses: Sequence[Morse] | None = None,
 ) -> tuple[int, int, int, int, NDArray[np.floating]]:
+    """Calculate the reduced Hessian of a dihedral potential.
+
+    Only the torsional contribution is retained.
+
+    The absolute value of the torsional curvature is used to obtain
+    a positive-semidefinite Hessian.
+
+    The Hessian is optionally scaled by distance-dependent factors
+    and Morse-potential-based bond-breaking factors.
+    """
     i = dihedral.atomi
     j = dihedral.atomj
     k = dihedral.atomk
