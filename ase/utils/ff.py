@@ -1,7 +1,10 @@
+from collections.abc import Sequence
+
 import numpy as np
 from numpy import linalg
+from numpy.typing import NDArray
 
-from ase import units
+from ase import Atoms, units
 
 # Three variables extracted from what used to be endless repetitions below.
 Ax = np.array(
@@ -29,6 +32,22 @@ class Morse:
 
 
 class Bond:
+    """Harmonic bond-stretching potential between two atoms.
+
+    Parameters
+    ----------
+    atomi, atomj : int
+        Indices of the two atoms.
+    k : float
+        Bond force constant.
+    b0 : float
+        Equilibrium bond length.
+    alpha : sequence of float or None
+        Parameters for distance-dependent scaling of the Hessian.
+    rref : sequence of float or None
+        Reference bond lengths for distance-dependent scaling.
+    """
+
     def __init__(self, atomi, atomj, k, b0, alpha=None, rref=None):
         self.atomi = atomi
         self.atomj = atomj
@@ -40,6 +59,24 @@ class Bond:
 
 
 class Angle:
+    """Harmonic angle-bending potential involving three atoms.
+
+    Parameters
+    ----------
+    atomi, atomj, atomk : int
+        Indices of the three atoms, with atomj as the central atom.
+    k : float
+        Angle force constant.
+    a0 : float
+        Equilibrium bond angle in radians.
+    cos : bool
+        If True, use the difference in cosines instead of angles.
+    alpha : sequence of float or None
+        Parameters for distance-dependent scaling of the Hessian.
+    rref : sequence of float or None
+        Reference bond lengths for distance-dependent scaling.
+    """
+
     def __init__(
         self, atomi, atomj, atomk, k, a0, cos=False, alpha=None, rref=None
     ):
@@ -180,7 +217,10 @@ class Coulomb:
         self.r = None
 
 
-def get_morse_potential_eta(atoms, morse):
+def get_morse_potential_eta(
+    atoms: Atoms,
+    morse: Morse,
+) -> float:
     i = morse.atomi
     j = morse.atomj
 
@@ -196,7 +236,10 @@ def get_morse_potential_eta(atoms, morse):
     return eta
 
 
-def get_morse_potential_value(atoms, morse):
+def get_morse_potential_value(
+    atoms: Atoms,
+    morse: Morse,
+) -> tuple[int, int, float]:
     i = morse.atomi
     j = morse.atomj
 
@@ -212,7 +255,10 @@ def get_morse_potential_value(atoms, morse):
     return i, j, v
 
 
-def get_morse_potential_gradient(atoms, morse):
+def get_morse_potential_gradient(
+    atoms: Atoms,
+    morse: Morse,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = morse.atomi
     j = morse.atomj
 
@@ -231,7 +277,11 @@ def get_morse_potential_gradient(atoms, morse):
     return i, j, gx
 
 
-def get_morse_potential_hessian(atoms, morse, spectral=False):
+def get_morse_potential_hessian(
+    atoms: Atoms,
+    morse: Morse,
+    spectral: bool = False,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = morse.atomi
     j = morse.atomj
 
@@ -265,7 +315,10 @@ def get_morse_potential_hessian(atoms, morse, spectral=False):
     return i, j, Hx
 
 
-def get_morse_potential_reduced_hessian(atoms, morse):
+def get_morse_potential_reduced_hessian(
+    atoms: Atoms,
+    morse: Morse,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = morse.atomi
     j = morse.atomj
 
@@ -286,7 +339,10 @@ def get_morse_potential_reduced_hessian(atoms, morse):
     return i, j, Hx
 
 
-def get_bond_potential_value(atoms, bond):
+def get_bond_potential_value(
+    atoms: Atoms,
+    bond: Bond,
+) -> tuple[int, int, float]:
     i = bond.atomi
     j = bond.atomj
 
@@ -300,7 +356,10 @@ def get_bond_potential_value(atoms, bond):
     return i, j, v
 
 
-def get_bond_potential_gradient(atoms, bond):
+def get_bond_potential_gradient(
+    atoms: Atoms,
+    bond: Bond,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = bond.atomi
     j = bond.atomj
 
@@ -317,7 +376,12 @@ def get_bond_potential_gradient(atoms, bond):
     return i, j, gx
 
 
-def get_bond_potential_hessian(atoms, bond, morses=None, spectral=False):
+def get_bond_potential_hessian(
+    atoms: Atoms,
+    bond: Bond,
+    morses: Sequence[Morse] | None = None,
+    spectral: bool = False,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = bond.atomi
     j = bond.atomj
 
@@ -353,7 +417,11 @@ def get_bond_potential_hessian(atoms, bond, morses=None, spectral=False):
     return i, j, Hx
 
 
-def get_bond_potential_reduced_hessian(atoms, bond, morses=None):
+def get_bond_potential_reduced_hessian(
+    atoms: Atoms,
+    bond: Bond,
+    morses: Sequence[Morse] | None = None,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = bond.atomi
     j = bond.atomj
 
@@ -382,7 +450,10 @@ def get_bond_potential_reduced_hessian(atoms, bond, morses=None):
     return i, j, Hx
 
 
-def get_bond_potential_reduced_hessian_test(atoms, bond):
+def get_bond_potential_reduced_hessian_test(
+    atoms: Atoms,
+    bond: Bond,
+) -> tuple[int, int, NDArray[np.floating]]:
 
     i, j, v = get_bond_potential_value(atoms, bond)
     i, j, gx = get_bond_potential_gradient(atoms, bond)
@@ -392,7 +463,10 @@ def get_bond_potential_reduced_hessian_test(atoms, bond):
     return i, j, Hx
 
 
-def get_angle_potential_value(atoms, angle):
+def get_angle_potential_value(
+    atoms: Atoms,
+    angle: Angle,
+) -> tuple[int, int, int, float]:
 
     i = angle.atomi
     j = angle.atomj
@@ -423,7 +497,10 @@ def get_angle_potential_value(atoms, angle):
     return i, j, k, v
 
 
-def get_angle_potential_gradient(atoms, angle):
+def get_angle_potential_gradient(
+    atoms: Atoms,
+    angle: Angle,
+) -> tuple[int, int, int, NDArray[np.floating]]:
     i = angle.atomi
     j = angle.atomj
     k = angle.atomk
@@ -466,7 +543,12 @@ def get_angle_potential_gradient(atoms, angle):
     return i, j, k, gx
 
 
-def get_angle_potential_hessian(atoms, angle, morses=None, spectral=False):
+def get_angle_potential_hessian(
+    atoms: Atoms,
+    angle: Angle,
+    morses: Sequence[Morse] | None = None,
+    spectral: bool = False,
+) -> tuple[int, int, int, NDArray[np.floating]]:
     i = angle.atomi
     j = angle.atomj
     k = angle.atomk
@@ -627,7 +709,11 @@ def get_angle_potential_hessian(atoms, angle, morses=None, spectral=False):
     return i, j, k, Hx
 
 
-def get_angle_potential_reduced_hessian(atoms, angle, morses=None):
+def get_angle_potential_reduced_hessian(
+    atoms: Atoms,
+    angle: Angle,
+    morses: Sequence[Morse] | None = None,
+) -> tuple[int, int, int, NDArray[np.floating]]:
     i = angle.atomi
     j = angle.atomj
     k = angle.atomk
@@ -697,7 +783,10 @@ def get_angle_potential_reduced_hessian(atoms, angle, morses=None):
     return i, j, k, Hx
 
 
-def get_angle_potential_reduced_hessian_test(atoms, angle):
+def get_angle_potential_reduced_hessian_test(
+    atoms: Atoms,
+    angle: Angle,
+) -> tuple[int, int, int, NDArray[np.floating]]:
     i, j, k, v = get_angle_potential_value(atoms, angle)
     i, j, k, gx = get_angle_potential_gradient(atoms, angle)
 
@@ -706,7 +795,10 @@ def get_angle_potential_reduced_hessian_test(atoms, angle):
     return i, j, k, Hx
 
 
-def get_dihedral_potential_value(atoms, dihedral):
+def get_dihedral_potential_value(
+    atoms: Atoms,
+    dihedral: Dihedral,
+) -> tuple[int, int, int, int, float]:
     i = dihedral.atomi
     j = dihedral.atomj
     k = dihedral.atomk
@@ -743,7 +835,10 @@ def get_dihedral_potential_value(atoms, dihedral):
     return i, j, k, l, v
 
 
-def get_dihedral_potential_gradient(atoms, dihedral):
+def get_dihedral_potential_gradient(
+    atoms: Atoms,
+    dihedral: Dihedral,
+) -> tuple[int, int, int, int, NDArray[np.floating]]:
     i = dihedral.atomi
     j = dihedral.atomj
     k = dihedral.atomk
@@ -800,8 +895,11 @@ def get_dihedral_potential_gradient(atoms, dihedral):
 
 
 def get_dihedral_potential_hessian(
-    atoms, dihedral, morses=None, spectral=False
-):
+    atoms: Atoms,
+    dihedral: Dihedral,
+    morses: Sequence[Morse] | None = None,
+    spectral: bool = False,
+) -> tuple[int, int, int, int, NDArray[np.floating]]:
     eps = 0.000001
 
     i, j, k, l, g = get_dihedral_potential_gradient(atoms, dihedral)
@@ -880,7 +978,11 @@ def get_dihedral_potential_hessian(
     return i, j, k, l, Hx
 
 
-def get_dihedral_potential_reduced_hessian(atoms, dihedral, morses=None):
+def get_dihedral_potential_reduced_hessian(
+    atoms: Atoms,
+    dihedral: Dihedral,
+    morses: Sequence[Morse] | None = None,
+) -> tuple[int, int, int, int, NDArray[np.floating]]:
     i = dihedral.atomi
     j = dihedral.atomj
     k = dihedral.atomk
@@ -965,7 +1067,10 @@ def get_dihedral_potential_reduced_hessian(atoms, dihedral, morses=None):
     return i, j, k, l, Hx
 
 
-def get_dihedral_potential_reduced_hessian_test(atoms, dihedral):
+def get_dihedral_potential_reduced_hessian_test(
+    atoms: Atoms,
+    dihedral: Dihedral,
+) -> tuple[int, int, int, int, NDArray[np.floating]]:
     i, j, k, l, gx = get_dihedral_potential_gradient(atoms, dihedral)
 
     if dihedral.n is None:
@@ -984,7 +1089,10 @@ def get_dihedral_potential_reduced_hessian_test(atoms, dihedral):
     return i, j, k, l, Hx
 
 
-def get_vdw_potential_value(atoms, vdw):
+def get_vdw_potential_value(
+    atoms: Atoms,
+    vdw: VdW,
+) -> tuple[int, int, float]:
     i = vdw.atomi
     j = vdw.atomj
 
@@ -998,7 +1106,10 @@ def get_vdw_potential_value(atoms, vdw):
     return i, j, v
 
 
-def get_vdw_potential_gradient(atoms, vdw):
+def get_vdw_potential_gradient(
+    atoms: Atoms,
+    vdw: VdW,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = vdw.atomi
     j = vdw.atomj
 
@@ -1015,7 +1126,11 @@ def get_vdw_potential_gradient(atoms, vdw):
     return i, j, gx
 
 
-def get_vdw_potential_hessian(atoms, vdw, spectral=False):
+def get_vdw_potential_hessian(
+    atoms: Atoms,
+    vdw: VdW,
+    spectral: bool = False,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = vdw.atomi
     j = vdw.atomj
 
@@ -1043,7 +1158,10 @@ def get_vdw_potential_hessian(atoms, vdw, spectral=False):
     return i, j, Hx
 
 
-def get_coulomb_potential_value(atoms, coulomb):
+def get_coulomb_potential_value(
+    atoms: Atoms,
+    coulomb: Coulomb,
+) -> tuple[int, int, float]:
     i = coulomb.atomi
     j = coulomb.atomj
 
@@ -1057,7 +1175,10 @@ def get_coulomb_potential_value(atoms, coulomb):
     return i, j, v
 
 
-def get_coulomb_potential_gradient(atoms, coulomb):
+def get_coulomb_potential_gradient(
+    atoms: Atoms,
+    coulomb: Coulomb,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = coulomb.atomi
     j = coulomb.atomj
 
@@ -1074,7 +1195,11 @@ def get_coulomb_potential_gradient(atoms, coulomb):
     return i, j, gx
 
 
-def get_coulomb_potential_hessian(atoms, coulomb, spectral=False):
+def get_coulomb_potential_hessian(
+    atoms: Atoms,
+    coulomb: Coulomb,
+    spectral: bool = False,
+) -> tuple[int, int, NDArray[np.floating]]:
     i = coulomb.atomi
     j = coulomb.atomj
 
@@ -1102,7 +1227,7 @@ def get_coulomb_potential_hessian(atoms, coulomb, spectral=False):
     return i, j, Hx
 
 
-def rel_pos_pbc(atoms, i, j):
+def rel_pos_pbc(atoms: Atoms, i: int, j: int) -> NDArray[np.floating]:
     """
     Return difference between two atomic positions,
     correcting for jumps across PBC
