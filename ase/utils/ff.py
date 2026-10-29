@@ -520,19 +520,6 @@ def get_bond_potential_reduced_hessian(
     return i, j, Hx
 
 
-def get_bond_potential_reduced_hessian_test(
-    atoms: Atoms,
-    bond: Bond,
-) -> tuple[int, int, NDArray[np.floating]]:
-
-    i, j, v = get_bond_potential_value(atoms, bond)
-    i, j, gx = get_bond_potential_gradient(atoms, bond)
-
-    Hx = np.tensordot(gx, gx, axes=0) / v / 2.0
-
-    return i, j, Hx
-
-
 def get_angle_potential_value(
     atoms: Atoms,
     angle: Angle,
@@ -863,18 +850,6 @@ def get_angle_potential_reduced_hessian(
     return i, j, k, Hx
 
 
-def get_angle_potential_reduced_hessian_test(
-    atoms: Atoms,
-    angle: Angle,
-) -> tuple[int, int, int, NDArray[np.floating]]:
-    i, j, k, v = get_angle_potential_value(atoms, angle)
-    i, j, k, gx = get_angle_potential_gradient(atoms, angle)
-
-    Hx = np.tensordot(gx, gx, axes=0) / v / 2.0
-
-    return i, j, k, Hx
-
-
 def get_dihedral_potential_value(
     atoms: Atoms,
     dihedral: Dihedral,
@@ -1153,28 +1128,6 @@ def get_dihedral_potential_reduced_hessian(
                 Hx *= get_morse_potential_eta(atoms, morses[m])
 
     dihedral.d = d
-
-    return i, j, k, l, Hx
-
-
-def get_dihedral_potential_reduced_hessian_test(
-    atoms: Atoms,
-    dihedral: Dihedral,
-) -> tuple[int, int, int, int, NDArray[np.floating]]:
-    i, j, k, l, gx = get_dihedral_potential_gradient(atoms, dihedral)
-
-    if dihedral.n is None:
-        i, j, k, l, v = get_dihedral_potential_value(atoms, dihedral)
-        Hx = np.tensordot(gx, gx, axes=0) / v / 2.0
-    else:
-        arg = dihedral.n * dihedral.d - dihedral.d0
-        Hx = (
-            np.tensordot(gx, gx, axes=0)
-            / dihedral.k
-            / np.sin(arg)
-            / np.sin(arg)
-            * np.cos(arg)
-        )
 
     return i, j, k, l, Hx
 
