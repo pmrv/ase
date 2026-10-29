@@ -89,7 +89,6 @@ class NGLDisplay:
 
     def _update_frame(self, chg=None):
         self.view.frame = self.frm.value
-        return
 
     def _select_atom(self, chg=None):
         sel = self.asel.value

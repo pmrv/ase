@@ -66,6 +66,7 @@ html_logo = 'static/ase256.png'
 html_favicon = 'static/ase256.png'
 html_static_path = ['static']
 html_last_updated_fmt = '%a, %d %b %Y %H:%M:%S'
+html_css_files = ['calc_table.css']
 
 html_theme_options = {
     # https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/header-links.html

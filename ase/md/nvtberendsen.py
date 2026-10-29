@@ -100,7 +100,6 @@ class NVTBerendsen(MolecularDynamics):
         p = self.atoms.get_momenta()
         p = scl_temperature * p
         self.atoms.set_momenta(p)
-        return
 
     def step(self, forces=None):
         """Move one timestep forward using Berenden NVT molecular dynamics."""

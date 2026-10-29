@@ -309,13 +309,26 @@ class Cell:
         """Areas spanned by cell vector pairs (1, 2), (2, 0), and (0, 1)."""
         return np.linalg.norm(self.normals(), axis=1)
 
-    def __repr__(self):
-        if self.orthorhombic:
-            numbers = self.lengths().tolist()
-        else:
-            numbers = self.tolist()
+    def _tostring(self, fmt='g'):
 
-        return f'Cell({numbers})'
+        def joinlist(tokens):
+            text = ', '.join(tokens)
+            return f'[{text}]'
+
+        if self.orthorhombic:
+            text = joinlist(format(x, fmt) for x in self.lengths())
+        else:
+            text = joinlist(
+                joinlist(format(x, fmt) for x in v) for v in self.tolist()
+            )
+
+        return f'Cell({text})'
+
+    def __str__(self) -> str:
+        return self._tostring()
+
+    def __repr__(self) -> str:
+        return self._tostring('')
 
     def niggli_reduce(self, eps=1e-5):
         """Niggli reduce this cell, returning a new cell and mapping.

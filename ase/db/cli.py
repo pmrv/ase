@@ -22,7 +22,6 @@ def count_keys(db, query):
     n = max(len(key) for key in keys) + 1
     for key, number in keys.items():
         print('{:{}} {}'.format(key + ':', n, number))
-    return
 
 
 def show_values(args, db, query):
