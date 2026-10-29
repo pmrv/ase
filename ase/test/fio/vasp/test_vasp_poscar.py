@@ -5,6 +5,7 @@ import pytest
 
 from ase.build import bulk
 from ase.calculators.calculator import compare_atoms
+from ase.constraints import FixScaled
 from ase.io.vasp import parse_poscar_scaling_factor, read_vasp, write_vasp
 
 
@@ -97,3 +98,23 @@ def test_unwrapped_scaled_positions():
     buf.seek(0)
     atoms = read_vasp(buf)
     np.testing.assert_allclose(atoms_ref.positions, atoms.positions)
+
+
+def test_write_combines_overlapping_constraints(atoms):
+    """Multiple constraints on an atom must all reach selective dynamics."""
+    atoms.set_constraint([
+        FixScaled(0, mask=[True, False, False]),
+        FixScaled(0, mask=[False, True, False]),
+    ])
+
+    buf = io.StringIO()
+    write_vasp(buf, atoms, direct=True)
+    buf.seek(0)
+    loaded = read_vasp(buf)
+
+    assert len(loaded.constraints) == 1
+    assert isinstance(loaded.constraints[0], FixScaled)
+    np.testing.assert_array_equal(
+        loaded.constraints[0].mask,
+        [True, True, False],
+    )
