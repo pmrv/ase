@@ -943,15 +943,10 @@ def read(
             _iread(filename, index, format, io, parallel=parallel, **kwargs)
         )
     else:
+        # For index=-1, stop=None avoids the empty slice [-1:0].
+        index = slice(index, (index + 1) or None)
         return next(
-            _iread(
-                filename,
-                slice(index, None),
-                format,
-                io,
-                parallel=parallel,
-                **kwargs,
-            )
+            _iread(filename, index, format, io, parallel=parallel, **kwargs)
         )
 
 
@@ -980,6 +975,7 @@ def iread(
         index = slice(None, None, None)
 
     if not isinstance(index, (slice, str)):
+        # For index=-1, stop=None avoids the empty slice [-1:0].
         index = slice(index, (index + 1) or None)
 
     format = format or filetype(filename, read=isinstance(filename, str))
