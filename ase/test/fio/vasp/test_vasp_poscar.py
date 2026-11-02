@@ -102,17 +102,34 @@ def test_unwrapped_scaled_positions():
 
 @pytest.mark.parametrize('direct', [True, False])
 @pytest.mark.parametrize('reverse', [True, False])
-@pytest.mark.parametrize('constraints, mask', [
-    ([FixScaled(0, [True, False, False]),
-      FixScaled(0, [False, True, False])], [True, True, False]),
-    ([FixAtoms([0]), FixScaled(0, [True, False, False])], [True, True, True]),
-    ([FixedPlane(0, [1, 0, 0]),
-      FixScaled(0, [False, True, False])], [True, True, False]),
-    ([FixedLine(0, [1, 0, 0]),
-      FixScaled(0, [True, False, False])], [True, True, True]),
-    ([FixedLine(0, [0, 0, 1]),
-      FixedPlane(0, [1, 0, 0])], [True, True, False]),
-])
+@pytest.mark.parametrize(
+    'constraints, mask',
+    [
+        (
+            [
+                FixScaled(0, [True, False, False]),
+                FixScaled(0, [False, True, False]),
+            ],
+            [True, True, False],
+        ),
+        (
+            [FixAtoms([0]), FixScaled(0, [True, False, False])],
+            [True, True, True],
+        ),
+        (
+            [FixedPlane(0, [1, 0, 0]), FixScaled(0, [False, True, False])],
+            [True, True, False],
+        ),
+        (
+            [FixedLine(0, [1, 0, 0]), FixScaled(0, [True, False, False])],
+            [True, True, True],
+        ),
+        (
+            [FixedLine(0, [0, 0, 1]), FixedPlane(0, [1, 0, 0])],
+            [True, True, False],
+        ),
+    ],
+)
 def test_write_combines_overlapping_constraints(
     atoms, constraints, mask, reverse, direct
 ):
