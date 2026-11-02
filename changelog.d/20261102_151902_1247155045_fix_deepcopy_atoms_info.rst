@@ -1,0 +1,6 @@
+Bugfixes
+--------
+
+- Copying or slicing an :class:`ase.Atoms` object now deep-copies its ``info``
+  dictionary, so modifying nested metadata on the copy or slice no longer
+  changes the original object (:mr:`4325`).
