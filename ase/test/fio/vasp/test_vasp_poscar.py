@@ -5,7 +5,7 @@ import pytest
 
 from ase.build import bulk
 from ase.calculators.calculator import compare_atoms
-from ase.constraints import FixScaled
+from ase.constraints import FixAtoms, FixedLine, FixedPlane, FixScaled
 from ase.io.vasp import parse_poscar_scaling_factor, read_vasp, write_vasp
 
 
@@ -100,21 +100,34 @@ def test_unwrapped_scaled_positions():
     np.testing.assert_allclose(atoms_ref.positions, atoms.positions)
 
 
-def test_write_combines_overlapping_constraints(atoms):
+@pytest.mark.parametrize('direct', [True, False])
+@pytest.mark.parametrize('reverse', [True, False])
+@pytest.mark.parametrize('constraints, mask', [
+    ([FixScaled(0, [True, False, False]),
+      FixScaled(0, [False, True, False])], [True, True, False]),
+    ([FixAtoms([0]), FixScaled(0, [True, False, False])], [True, True, True]),
+    ([FixedPlane(0, [1, 0, 0]),
+      FixScaled(0, [False, True, False])], [True, True, False]),
+    ([FixedLine(0, [1, 0, 0]),
+      FixScaled(0, [True, False, False])], [True, True, True]),
+    ([FixedLine(0, [0, 0, 1]),
+      FixedPlane(0, [1, 0, 0])], [True, True, False]),
+])
+def test_write_combines_overlapping_constraints(
+    atoms, constraints, mask, reverse, direct
+):
     """Multiple constraints on an atom must all reach selective dynamics."""
-    atoms.set_constraint([
-        FixScaled(0, mask=[True, False, False]),
-        FixScaled(0, mask=[False, True, False]),
-    ])
+    atoms.set_constraint(constraints[::-1] if reverse else constraints)
 
     buf = io.StringIO()
-    write_vasp(buf, atoms, direct=True)
+    write_vasp(buf, atoms, direct=direct)
     buf.seek(0)
     loaded = read_vasp(buf)
 
-    assert len(loaded.constraints) == 1
-    assert isinstance(loaded.constraints[0], FixScaled)
-    np.testing.assert_array_equal(
-        loaded.constraints[0].mask,
-        [True, True, False],
-    )
+    for structure in (atoms, loaded):
+        forces = np.tile([1.0, 2.0, 3.0], (len(structure), 1))
+        expected = forces.copy()
+        expected[0, mask] = 0.0
+        for constraint in structure.constraints:
+            constraint.adjust_forces(structure, forces)
+        np.testing.assert_allclose(forces, expected, atol=1e-12)
