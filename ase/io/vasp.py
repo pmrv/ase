@@ -463,6 +463,9 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
     Reads unit cell, atom positions, energies, forces, and constraints
     from vasprun.xml file
 
+    .. versionchanged:: 3.30.0 (:mr:`4330`)
+        It now parses configurations without energies for a corrupted file.
+
     Examples
     --------
         >>> import ase.io
