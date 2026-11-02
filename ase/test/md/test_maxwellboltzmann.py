@@ -1,7 +1,6 @@
 """Tests for velocity distributions."""
 
 from contextlib import nullcontext
-from typing import ContextManager
 
 import numpy as np
 import pytest
@@ -74,7 +73,7 @@ def test_maxwellboltzmann_dof(atoms: Atoms) -> None:
 def test_force_temperature_with_zero_velocities(
     atoms: Atoms,
     temperature: float,
-    expectation: ContextManager,
+    expectation,
 ) -> None:
     """Test `force_temperature` for `Atoms` with zero temperature."""
     with expectation:
