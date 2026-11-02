@@ -481,8 +481,7 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
                 calculation.append(elem)
 
     except ET.ParseError:
-        if calculation and calculation[-1].find('energy') is None:
-            calculation = calculation[:-1]
+        pass
 
     steps = calculation if calculation else [atoms_init]
 
@@ -723,8 +722,13 @@ def _read_vasp_xml_energy(
     step,
     parameters: dict,
     volume: float,
-) -> tuple[float, float]:
-    free_energy = float(step.find('energy/i[@name="e_fr_energy"]').text)
+) -> tuple[float | None, float | None]:
+    element0 = step.find('energy/i[@name="e_fr_energy"]')
+
+    if element0 is None:
+        return None, None
+
+    free_energy = float(element0.text)
 
     # https://gitlab.com/ase/ase/-/merge_requests/2685
     # e_fr_energy in calculation/energy is actually an enthalpy including
