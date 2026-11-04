@@ -7,6 +7,24 @@ from ase import Atoms
 from ase.utils import deprecated
 
 
+def _get_reference_cell(target_shape: str) -> npt.NDArray[np.floating]:
+    """Return the primitive cell vectors of the target Bravais lattice."""
+    return {
+        'sc': np.eye(3),
+        'bcc': 0.5 * (np.ones((3, 3)) - 2.0 * np.eye(3)),
+        'fcc': 0.5 * (np.ones((3, 3)) - np.eye(3)),
+    }[target_shape]
+
+
+def _get_length_factor(target_shape: str) -> float:
+    """Return the ratio of the 1NN distance to the cubic root of cell volume."""
+    return {
+        'sc': 1.0,
+        'bcc': 3.0 ** (1.0 / 2.0) * 0.5 * 2.0 ** (1.0 / 3.0),
+        'fcc': 2.0 ** (1.0 / 6.0),
+    }[target_shape]
+
+
 class SupercellError(Exception):
     """Use if construction of supercell fails"""
 
@@ -47,7 +65,7 @@ def eval_shape_deviation(
     cell : (..., 3, 3) array_like
         Lattice vectors given as a 3x3 matrix of the input structure.
         Multiple cells can also be given as a higher-dimensional array.
-    target_shape : {'sc', 'fcc'}
+    target_shape : {'sc', 'bcc', 'fcc'}
         Desired supercell shape.
 
     Returns
@@ -60,19 +78,9 @@ def eval_shape_deviation(
     cell = np.asarray(cell)
 
     eff_cubic_length = np.cbrt(np.abs(np.linalg.det(cell)))  # 'a_0'
-
-    if target_shape == 'sc':
-        target_len = eff_cubic_length
-        target_cos = 0.0  # cos(+-pi/2) = 0.0
-        target_metric = np.eye(3)
-    elif target_shape == 'fcc':
-        # FCC is characterised by 60 degree angles & lattice vectors = 2**(1/6)
-        # times the eff cubic length:
-        target_len = eff_cubic_length * 2 ** (1 / 6)
-        target_cos = 0.5  # cos(+-pi/3) = 0.5
-        target_metric = np.eye(3) + target_cos * (np.ones((3, 3)) - np.eye(3))
-    else:
-        raise ValueError(target_shape)
+    target_len = eff_cubic_length * _get_length_factor(target_shape)
+    target_cos = {'sc': 0.0, 'bcc': -1.0 / 3.0, 'fcc': 0.5}[target_shape]
+    target_metric = np.eye(3) + target_cos * (np.ones((3, 3)) - np.eye(3))
 
     # calculate cell @ cell.T for (... , 3, 3)
     # with cell  -> C_mij
@@ -109,9 +117,8 @@ def eval_length_deviation(
     cell : (..., 3, 3) array_like
         Lattice vectors given as a 3x3 matrix of the input structure.
         Multiple cells can also be given as a higher-dimensional array.
-    target_shape : {'sc', 'fcc'}
-        Desired supercell shape. Can be 'sc' for simple cubic or
-        'fcc' for face-centered cubic.
+    target_shape : {'sc', 'bcc', 'fcc'}
+        Desired supercell shape.
 
     Returns
     -------
@@ -172,18 +179,7 @@ def eval_length_deviation(
     cell_lengths = np.sqrt(np.add.reduce(cell**2, axis=-1))
 
     eff_cubic_length = np.cbrt(np.abs(np.linalg.det(cell)))  # 'a_0'
-
-    if target_shape == 'sc':
-        target_len = eff_cubic_length
-
-    elif target_shape == 'fcc':
-        # FCC is characterised by 60 degree angles & lattice vectors = 2**(1/6)
-        # times the eff cubic length:
-        target_len = eff_cubic_length * 2 ** (1 / 6)
-
-    else:
-        raise ValueError(target_shape)
-
+    target_len = eff_cubic_length * _get_length_factor(target_shape)
     inv_target_len = 1.0 / target_len
 
     # rms difference to eff cubic/FCC length:
@@ -200,15 +196,7 @@ def _guess_initial_transformation(
     verbose: bool = False,
 ) -> tuple[npt.NDArray[np.floating], npt.NDArray[np.integer]]:
 
-    # Set up target metric
-    if target_shape == 'sc':
-        target_metric = np.eye(3)
-    elif target_shape == 'fcc':
-        target_metric = 0.5 * np.array(
-            [[0, 1, 1], [1, 0, 1], [1, 1, 0]], dtype=float
-        )
-    else:
-        raise ValueError(target_shape)
+    target_metric = _get_reference_cell(target_shape)
 
     if verbose:
         print('target metric (h_target):')
@@ -321,9 +309,16 @@ def find_optimal_cell_shape(
         Lattice vectors of the input structure given as a 3x3 matrix.
     target_size : int
         Size of desired supercell in number of unit cells.
-    target_shape : str
-        Desired supercell shape. Can be 'sc' for simple cubic or
-        'fcc' for face-centered cubic.
+    target_shape : {'sc', 'bcc', 'fcc'}
+        Desired supercell shape.
+
+        - 'sc': simple cubic
+        - 'bcc': body-centered cubic
+        - 'fcc': face-centered cubic
+
+        .. versionadded:: 3.30.0 (:mr:`4333`)
+            'bcc' is added.
+
     lower_limit : int
         Lower limit of search range.
     upper_limit : int
