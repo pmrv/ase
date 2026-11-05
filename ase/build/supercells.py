@@ -170,7 +170,7 @@ def eval_length_deviation(
     ----------
     .. [1] P. Erhart, B. Sadigh, A. Schleife, and D. Åberg.
         First-principles study of codoping in lanthanum bromide,
-        Phys. Rev. B, Vol **91**, 165206 (2012),
+        Phys. Rev. B, Vol **91**, 165206 (2015),
         :doi:`10.1103/PhysRevB.91.165206`; Appendix C
 
     """
