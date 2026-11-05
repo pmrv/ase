@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
+from ase.calculators.calculator import PropertyNotImplementedError
 from ase.constraints import FixAtoms, FixScaled
 from ase.io import read
 from ase.units import GPa
@@ -283,11 +284,13 @@ def test_corrupted_calculation(vasprun, calculation):
         + corrupted_record
     )
     images = read(StringIO(xml_string), index=':', format='vasp-xml')
-    assert len(images) == 1
+    assert len(images) == 2
     check_calculation(xml_string, expected_values=expected_values_0, index=-2)
-    # check that the parser skips the corrupted last one
-    # Should there be a warning in this case?
-    check_calculation(xml_string, expected_values=expected_values_0, index=-1)
+
+    # make sure we can read the last image but without energy
+    atoms = read(StringIO(xml_string), index=-1, format='vasp-xml')
+    with pytest.raises(PropertyNotImplementedError):
+        atoms.get_potential_energy()
 
 
 def test_vasp_parameters(vasprun, calculation):
