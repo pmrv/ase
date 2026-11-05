@@ -18,11 +18,8 @@ def _get_reference_cell(target_shape: str) -> npt.NDArray[np.floating]:
 
 def _get_length_factor(target_shape: str) -> float:
     """Return the ratio of the 1NN distance to the cubic root of cell volume."""
-    return {
-        'sc': 1.0,
-        'bcc': 3.0 ** (1.0 / 2.0) * 0.5 * 2.0 ** (1.0 / 3.0),
-        'fcc': 2.0 ** (1.0 / 6.0),
-    }[target_shape]
+    h = _get_reference_cell(target_shape)
+    return np.linalg.norm(h[0]) / np.cbrt(abs(np.linalg.det(h)))
 
 
 class SupercellError(Exception):

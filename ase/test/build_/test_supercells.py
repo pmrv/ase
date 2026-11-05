@@ -8,6 +8,7 @@ import pytest
 
 from ase.build import bulk
 from ase.build.supercells import (
+    _get_length_factor,
     all_score_funcs,
     find_optimal_cell_shape,
     make_supercell,
@@ -108,6 +109,19 @@ def test_make_supercell_vs_repeat(prim, rep):
     at2 = make_supercell(prim, P, wrap=False)
     assert np.allclose(at1.positions, at2.positions)
     assert all(at1.symbols == at2.symbols)
+
+
+@pytest.mark.parametrize(
+    ('target_shape', 'expected'),
+    [
+        ('sc', 1.0),
+        ('bcc', 3.0 ** (1.0 / 2.0) * 0.5 * 2.0 ** (1.0 / 3.0)),  # ~1.091
+        ('fcc', 2.0 ** (1.0 / 6.0)),  # ~1.122
+    ],
+)
+def test_get_length_factor(target_shape: str, expected: float) -> None:
+    """Test `_get_length_factor`."""
+    assert _get_length_factor(target_shape) == pytest.approx(expected)
 
 
 def _make_ref_cell(target_shape: str) -> npt.NDArray[np.floating]:
