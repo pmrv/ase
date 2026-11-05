@@ -16,6 +16,13 @@ def _get_reference_cell(target_shape: str) -> npt.NDArray[np.floating]:
     }[target_shape]
 
 
+def _get_target_metric(target_shape: str) -> npt.NDArray[np.floating]:
+    """Return the metric tensor of the target Bravais lattice."""
+    h = _get_reference_cell(target_shape)
+    g = h @ h.T
+    return g / g[0, 0]  # unit diagonal, cos(angle) off-diagonal
+
+
 def _get_length_factor(target_shape: str) -> float:
     """Return the ratio of the 1NN distance to the cubic root of cell volume."""
     h = _get_reference_cell(target_shape)
@@ -76,8 +83,7 @@ def eval_shape_deviation(
 
     eff_cubic_length = np.cbrt(np.abs(np.linalg.det(cell)))  # 'a_0'
     target_len = eff_cubic_length * _get_length_factor(target_shape)
-    target_cos = {'sc': 0.0, 'bcc': -1.0 / 3.0, 'fcc': 0.5}[target_shape]
-    target_metric = np.eye(3) + target_cos * (np.ones((3, 3)) - np.eye(3))
+    target_metric = _get_target_metric(target_shape)
 
     # calculate cell @ cell.T for (... , 3, 3)
     # with cell  -> C_mij

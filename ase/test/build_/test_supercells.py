@@ -9,12 +9,14 @@ import pytest
 from ase.build import bulk
 from ase.build.supercells import (
     _get_length_factor,
+    _get_target_metric,
     all_score_funcs,
     find_optimal_cell_shape,
     make_supercell,
 )
 from ase.geometry.cell import cell_to_cellpar
 
+m13 = -1.0 / 3.0
 sq2 = sqrt(2.0)
 sq3 = sqrt(3.0)
 bcc_angle = degrees(acos(-1.0 / 3.0))  # ~109.4712
@@ -109,6 +111,22 @@ def test_make_supercell_vs_repeat(prim, rep):
     at2 = make_supercell(prim, P, wrap=False)
     assert np.allclose(at1.positions, at2.positions)
     assert all(at1.symbols == at2.symbols)
+
+
+@pytest.mark.parametrize(
+    ('target_shape', 'expected'),
+    [
+        ('sc', np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])),
+        ('bcc', np.array([[1.0, m13, m13], [m13, 1.0, m13], [m13, m13, 1.0]])),
+        ('fcc', np.array([[1.0, 0.5, 0.5], [0.5, 1.0, 0.5], [0.5, 0.5, 1.0]])),
+    ],
+)
+def test_get_target_metric(
+    target_shape: str,
+    expected: npt.NDArray[np.floating],
+) -> None:
+    """Test `_get_length_factor`."""
+    np.testing.assert_allclose(_get_target_metric(target_shape), expected)
 
 
 @pytest.mark.parametrize(
