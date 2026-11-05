@@ -994,9 +994,9 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
     sflags = np.zeros((len(atoms), 3), dtype=bool)
     for constr in atoms.constraints:
         if isinstance(constr, FixScaled):
-            sflags[constr.index] = constr.mask
+            sflags[constr.index] |= constr.mask
         elif isinstance(constr, FixAtoms):
-            sflags[constr.index] = 3 * [True]
+            sflags[constr.index] |= 3 * [True]
         elif isinstance(constr, FixedPlane):
             # Calculate if the plane normal is parallel to a cell vector
             mask = np.all(
@@ -1007,7 +1007,7 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
                     'VASP requires that the direction of FixedPlane '
                     'constraints is parallel with one of the cell axis'
                 )
-            sflags[constr.index] = mask
+            sflags[constr.index] |= mask
         elif isinstance(constr, FixedLine):
             # Calculate if line is parallel to a cell vector
             mask = np.all(
@@ -1018,7 +1018,7 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
                     'VASP requires that the direction of FixedLine '
                     'constraints is parallel with one of the cell axis'
                 )
-            sflags[constr.index] = ~mask
+            sflags[constr.index] |= ~mask
 
     return sflags
 
