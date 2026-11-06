@@ -26,6 +26,7 @@ ase.calculators.nwchem
 ase.calculators.openmx.reader
 ase.calculators.orca
 ase.cli.run
+ase.dft.band_structure
 ase.io.elk
 ase.io.eon
 ase.io.espresso
