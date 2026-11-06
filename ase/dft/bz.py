@@ -398,7 +398,7 @@ def bz_index(repeat):
     -------
     Iterator[Tuple[int, int, int]]
 
-    >>> list(_bz_index((1, 2, -2)))
+    >>> list(bz_index((1, 2, -2)))
     [(0, 0, 0), (0, 0, -1), (0, 1, 0), (0, 1, -1)]
 
     """
