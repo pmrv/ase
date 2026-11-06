@@ -216,15 +216,17 @@ class vdWTkatchenko09prl(Calculator, IOContext):
                 return True
         return False
 
-    def calculate(
-        self, atoms=None, properties=['energy', 'forces'], system_changes=[]
-    ):
+    def calculate(self, atoms=None, properties=None, system_changes=None):
+        if system_changes is None:
+            system_changes = []
+        if properties is None:
+            properties = ['energy', 'forces']
         Calculator.calculate(self, atoms, properties, system_changes)
         self.update(atoms, properties)
 
-    def update(
-        self, atoms=None, properties=['energy', 'free_energy', 'forces']
-    ):
+    def update(self, atoms=None, properties=None):
+        if properties is None:
+            properties = ['energy', 'free_energy', 'forces']
         if not self.calculation_required(atoms, properties):
             return
 

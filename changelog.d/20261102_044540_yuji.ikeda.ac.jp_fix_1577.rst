@@ -1,0 +1,6 @@
+Bugfixes
+--------
+
+- Fixed :func:`ase.io.read` so that it raises an error for a negative
+  out-of-range integer-like `index` (:mr:`4328`)
+

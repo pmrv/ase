@@ -412,7 +412,7 @@ class Gromacs(FileIOCalculator):
     def calculate(
         self,
         atoms=None,
-        properties=['energy', 'forces'],
+        properties=None,
         system_changes=all_changes,
     ):
         """runs a gromacs-mdrun and
@@ -432,6 +432,8 @@ class Gromacs(FileIOCalculator):
 
         """
 
+        if properties is None:
+            properties = ['energy', 'forces']
         self.run()
         if self.clean:
             do_clean('#*')

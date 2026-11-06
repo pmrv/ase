@@ -53,13 +53,23 @@ class Parameters_deMon(Parameters):
         xc='VWN',
         guess='TB',
         print_out='MOE',
-        basis={},
-        ecps={},
-        mcps={},
-        auxis={},
-        augment={},
+        basis=None,
+        ecps=None,
+        mcps=None,
+        auxis=None,
+        augment=None,
         input_arguments=None,
     ):
+        if augment is None:
+            augment = {}
+        if auxis is None:
+            auxis = {}
+        if mcps is None:
+            mcps = {}
+        if ecps is None:
+            ecps = {}
+        if basis is None:
+            basis = {}
         kwargs = locals()
         kwargs.pop('self')
         Parameters.__init__(self, **kwargs)
@@ -193,7 +203,7 @@ class Demon(FileIOCalculator):
             )
 
     def calculate(
-        self, atoms=None, properties=['energy'], system_changes=all_changes
+        self, atoms=None, properties=None, system_changes=all_changes
     ):
         """Capture the RuntimeError from FileIOCalculator.calculate
         and add a little debug information from the deMon output.
@@ -201,6 +211,8 @@ class Demon(FileIOCalculator):
         See base FileIocalculator for documentation.
         """
 
+        if properties is None:
+            properties = ['energy']
         if atoms is not None:
             self.atoms = atoms.copy()
 
@@ -469,7 +481,7 @@ class Demon(FileIOCalculator):
             fd.write('\n')
 
     # routine to write basis set inormation, including ecps and auxis
-    def _write_basis(self, fd, atoms, basis={}, string='BASIS'):
+    def _write_basis(self, fd, atoms, basis=None, string='BASIS'):
         """Write basis set, ECPs, AUXIS, or AUGMENT basis
 
         Parameters
@@ -481,6 +493,8 @@ class Demon(FileIOCalculator):
         """
 
         # basis for all atoms
+        if basis is None:
+            basis = {}
         line = f'{string}'.ljust(10)
 
         if 'all' in basis:

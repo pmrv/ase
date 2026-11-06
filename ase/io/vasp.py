@@ -463,6 +463,9 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
     Reads unit cell, atom positions, energies, forces, and constraints
     from vasprun.xml file
 
+    .. versionchanged:: 3.30.0 (:mr:`4330`)
+        It now parses configurations without energies for a corrupted file.
+
     Examples
     --------
         >>> import ase.io
@@ -481,8 +484,7 @@ def read_vasp_xml(filename='vasprun.xml', index=-1):
                 calculation.append(elem)
 
     except ET.ParseError:
-        if calculation and calculation[-1].find('energy') is None:
-            calculation = calculation[:-1]
+        pass
 
     steps = calculation if calculation else [atoms_init]
 
@@ -723,8 +725,13 @@ def _read_vasp_xml_energy(
     step,
     parameters: dict,
     volume: float,
-) -> tuple[float, float]:
-    free_energy = float(step.find('energy/i[@name="e_fr_energy"]').text)
+) -> tuple[float | None, float | None]:
+    element0 = step.find('energy/i[@name="e_fr_energy"]')
+
+    if element0 is None:
+        return None, None
+
+    free_energy = float(element0.text)
 
     # https://gitlab.com/ase/ase/-/merge_requests/2685
     # e_fr_energy in calculation/energy is actually an enthalpy including
@@ -994,9 +1001,9 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
     sflags = np.zeros((len(atoms), 3), dtype=bool)
     for constr in atoms.constraints:
         if isinstance(constr, FixScaled):
-            sflags[constr.index] = constr.mask
+            sflags[constr.index] |= constr.mask
         elif isinstance(constr, FixAtoms):
-            sflags[constr.index] = 3 * [True]
+            sflags[constr.index] |= 3 * [True]
         elif isinstance(constr, FixedPlane):
             # Calculate if the plane normal is parallel to a cell vector
             mask = np.all(
@@ -1007,7 +1014,7 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
                     'VASP requires that the direction of FixedPlane '
                     'constraints is parallel with one of the cell axis'
                 )
-            sflags[constr.index] = mask
+            sflags[constr.index] |= mask
         elif isinstance(constr, FixedLine):
             # Calculate if line is parallel to a cell vector
             mask = np.all(
@@ -1018,7 +1025,7 @@ def _handle_ase_constraints(atoms: Atoms) -> np.ndarray:
                     'VASP requires that the direction of FixedLine '
                     'constraints is parallel with one of the cell axis'
                 )
-            sflags[constr.index] = ~mask
+            sflags[constr.index] |= ~mask
 
     return sflags
 

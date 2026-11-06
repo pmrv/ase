@@ -271,7 +271,7 @@ def _format_basis_set(basis, basisfile, basis_set):
 def write_gaussian_in(
     fd,
     atoms,
-    properties=['energy'],
+    properties=None,
     method=None,
     basis=None,
     fitting_basis=None,
@@ -375,6 +375,8 @@ def write_gaussian_in(
         route section.
     """
 
+    if properties is None:
+        properties = ['energy']
     params = deepcopy(params)
 
     if properties is None:

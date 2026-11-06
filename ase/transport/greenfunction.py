@@ -16,7 +16,9 @@ class GreenFunction:
     """Equilibrium retarded Green function."""
 
     @asetransport_deprecated
-    def __init__(self, H, S=None, selfenergies=[], eta=1e-4):
+    def __init__(self, H, S=None, selfenergies=None, eta=1e-4):
+        if selfenergies is None:
+            selfenergies = []
         self.H = H
         self.S = S
         self.selfenergies = selfenergies

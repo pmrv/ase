@@ -439,21 +439,6 @@ class UnitCellFilter(Filter):
         >>> # this should be equivalent to the StrainFilter
         >>> atoms.set_constraint(FixAtoms(mask=[True for atom in atoms]))
         >>> ucf = UnitCellFilter(atoms)
-
-        You should not attach :class:`~ase.filters.UnitCellFilter` to a
-        trajectory. Instead, create a trajectory for the atoms, and
-        attach it to an optimizer like this:
-
-        >>> from ase.io import Trajectory
-        >>> from ase.optimize import BFGS
-        >>> atoms = bulk('BN', 'wurtzite', a=2.55, c=4.23)
-        >>> # atoms.calc = ...
-        >>> ucf = UnitCellFilter(atoms)
-        >>> opt = BFGS(ucf)
-        >>> traj = Trajectory('BN.traj', 'w', atoms)
-        >>> opt.attach(traj)
-        >>> # opt.run(fmax=0.05)
-
         """
 
         from ase._4.optimize.cellutil import CellUtility

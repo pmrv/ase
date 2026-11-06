@@ -538,6 +538,8 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
         # Read parameters
         self.read_incar(filename=self._indir('INCAR'))
         self.read_kpoints(filename=self._indir('KPOINTS'))
+        if self._indir('KPOINTS_OPT').is_file():
+            self.read_kpoints(filename=self._indir('KPOINTS_OPT'), opt=True)
         self.read_potcar(filename=self._indir('POTCAR'))
 
         # Read the results from the calculation
@@ -573,8 +575,8 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
     def update_atoms(self, atoms):
         """Update the atoms object with new positions and cell"""
         if (
-            self.int_params['ibrion'] is not None
-            and self.int_params['nsw'] is not None
+            self.int_params.get('ibrion') is not None
+            and self.int_params.get('nsw') is not None
         ):
             if self.int_params['ibrion'] > -1 and self.int_params['nsw'] > 0:
                 # Update atomic positions and unit cell with the ones read
@@ -648,7 +650,7 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
     @property
     def encut(self):
         """Direct access to the encut parameter"""
-        return self.float_params['encut']
+        return self.float_params.get('encut', self.int_params.get('encut'))
 
     @encut.setter
     def encut(self, encut):
@@ -1074,9 +1076,9 @@ class Vasp(GenerateVaspInput, Calculator):  # type: ignore[misc]
                     continue
         # Then if ibrion in [1,2,3] check whether ionic relaxation
         # condition been fulfilled
-        if self.int_params['ibrion'] in [1, 2, 3] and self.int_params[
+        if self.int_params.get('ibrion') in [1, 2, 3] and self.int_params.get(
             'nsw'
-        ] not in [0]:
+        ) not in [0]:
             if not self.read_relaxed():
                 converged = False
             else:

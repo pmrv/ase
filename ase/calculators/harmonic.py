@@ -382,8 +382,10 @@ class SpringCalculator(Calculator):
         self.k = k
 
     def calculate(
-        self, atoms=None, properties=['energy'], system_changes=all_changes
+        self, atoms=None, properties=None, system_changes=all_changes
     ):
+        if properties is None:
+            properties = ['energy']
         Calculator.calculate(self, atoms, properties, system_changes)
         energy, forces = self.compute_energy_and_forces(atoms)
         self.results['energy'], self.results['forces'] = energy, forces

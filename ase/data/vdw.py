@@ -84,7 +84,7 @@ vdw_radii = np.array(
         1.98,  # I [1]
         2.16,  # Xe [1]
         3.43,  # Cs [5]
-        2.49,  # Ba [5]
+        2.68,  # Ba [5]
         np.nan,  # La
         np.nan,  # Ce
         np.nan,  # Pr

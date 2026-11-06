@@ -898,6 +898,8 @@ def read(
 ) -> Atoms | list[Atoms]:
     """Read Atoms object(s) from file.
 
+    Parameters
+    ----------
     filename: str or file
         Name of the file to read from or a file descriptor.
     index: int, slice or str
@@ -909,6 +911,12 @@ def read(
             * ``index='-3:'`` or ``index=slice(-3, None)``: three last
             * ``index='::2'`` or ``index=slice(0, None, 2)``: even
             * ``index='1::2'`` or ``index=slice(1, None, 2)``: odd
+
+        .. versionchanged:: 3.30.0 (:mr:`4328`)
+
+            It raises an error for negative out-of-range integer-like index,
+            e.g., ``index=-3`` for a file with two images.
+
     format: str
         Used to specify the file-format.  If not given, the
         file-format will be guessed by the *filetype* function.
@@ -918,10 +926,13 @@ def read(
     do_not_split_by_at_sign: bool
         If False (default) ``filename`` is splitted by at sign ``@``
 
+    Notes
+    -----
     Many formats allow on open file-like object to be passed instead
     of ``filename``. In this case the format cannot be auto-detected,
-    so the ``format`` argument should be explicitly given."""
+    so the ``format`` argument should be explicitly given.
 
+    """
     if isinstance(filename, PurePath):
         filename = str(filename)
     if filename == '-':
@@ -943,15 +954,10 @@ def read(
             _iread(filename, index, format, io, parallel=parallel, **kwargs)
         )
     else:
+        # For index=-1, stop=None avoids the empty slice [-1:0].
+        index = slice(index, (index + 1) or None)
         return next(
-            _iread(
-                filename,
-                slice(index, None),
-                format,
-                io,
-                parallel=parallel,
-                **kwargs,
-            )
+            _iread(filename, index, format, io, parallel=parallel, **kwargs)
         )
 
 
@@ -980,6 +986,7 @@ def iread(
         index = slice(None, None, None)
 
     if not isinstance(index, (slice, str)):
+        # For index=-1, stop=None avoids the empty slice [-1:0].
         index = slice(index, (index + 1) or None)
 
     format = format or filetype(filename, read=isinstance(filename, str))

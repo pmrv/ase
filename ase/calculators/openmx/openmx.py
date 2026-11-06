@@ -405,7 +405,7 @@ class OpenMX(FileIOCalculator):
                 raise e
 
     def write_input(
-        self, atoms=None, parameters=None, properties=[], system_changes=[]
+        self, atoms=None, parameters=None, properties=None, system_changes=None
     ):
         """Write input (dat)-file.
         See calculator.py for further details.
@@ -420,6 +420,10 @@ class OpenMX(FileIOCalculator):
             Properties changed since last run.
         """
         # Call base calculator.
+        if system_changes is None:
+            system_changes = []
+        if properties is None:
+            properties = []
         if atoms is None:
             atoms = self.atoms
         FileIOCalculator.write_input(self, atoms, properties, system_changes)

@@ -189,11 +189,13 @@ class Psi4(Calculator):
     def calculate(
         self,
         atoms=None,
-        properties=['energy'],
+        properties=None,
         system_changes=all_changes,
         symmetry='c1',
     ):
 
+        if properties is None:
+            properties = ['energy']
         Calculator.calculate(self, atoms=atoms)
         if self.atoms is None:
             raise CalculatorSetupError(

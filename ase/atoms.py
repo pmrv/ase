@@ -625,7 +625,7 @@ class _LimitedAtoms:
         >>> from ase.build import molecule
         >>> atoms = molecule('CH4')
         >>> atoms.get_masses()
-        array([ 12.011,   1.008,   1.008,   1.008,   1.008])
+        array([12.011,  1.008,  1.008,  1.008,  1.008])
         >>> total_mass = atoms.get_masses().sum()
         >>> print(f'{total_mass:f}')
         16.043000
@@ -1556,6 +1556,64 @@ class _LimitedAtoms:
         axis = np.cross(v10, v12)
         center = self.positions[a2]
         self._masked_rotate(center, axis, diff, mask)
+
+    def mirror(self, v, center=None, indices=None, mirror_cell=False):
+        """Reflect atoms across a plane.
+
+        Parameters
+        ----------
+
+        v : array_like or {'x', 'y', 'z'}
+            Normal vector of the plane of reflection, i.e. the direction in
+            which the atoms are mirrored. Vectors can be specified numerically
+            e.g.: (1, 0, 0); or as one of the strings 'x', 'y', or 'z'.
+
+        center : array_like or {'COM', 'COP', 'COU'} or None, default: None
+            The plane of reflection is shifted to include the center point. Use
+            'COM' to fix the center of mass (of all atoms), 'COP' to fix the
+            center of positions (all atoms) or 'COU' to fix the center of the
+            cell (or origin if cell is not defined). Has no effect, if
+            mirror_cell is True.
+
+        indices : array_like or None, default: None
+            Select which atoms are moved using an array of indices (or a
+            boolean mask). If None, then all atoms are affected.
+
+        mirror_cell : bool, default: False
+            If True, transform the cell with its contents. Can not be used
+            together with 'center'.
+        """
+        v = string2vector(v)
+        v = v / np.linalg.norm(v)
+        if mirror_cell:
+            if center is not None:
+                raise ValueError(
+                    "The 'center' keyword can't be used when mirroring cell."
+                )
+            center = (0.0, 0.0, 0.0)
+        elif center is None:
+            center = 'COU'
+        center = self._centering_as_array(center)
+
+        if indices is None:
+            indices = np.ones(len(self), dtype=bool)
+
+        tmp_pos = self.positions.copy()
+        tmp_pos -= center
+        tmp_pos[indices, :] = self._mirror_array(tmp_pos[indices, :], v)
+        tmp_pos += center
+        self.set_positions(tmp_pos)
+
+        if mirror_cell:
+            self.set_cell(self._mirror_array(self.get_cell(), v))
+
+    def _mirror_array(self, a, v):
+        """Mirror given array of coordinates across v, relative to origin
+
+        Following Ref_b(w) = w - 2 * (w·b)/(b·b) * b
+        """
+        vdota = (a * v).sum(1, keepdims=True)
+        return a - vdota / np.dot(v, v) * 2 * v.reshape(1, 3)
 
     def rattle(self, stdev=0.001, seed=None, rng=None):
         """Randomly displace atoms.

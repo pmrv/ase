@@ -1,0 +1,5 @@
+I/O
+---
+
+- Changed :func:`~ase.io.vasp.read_vasp_xml` to parse configurations without
+  energies for a corrupted file (:mr:`4330`)
