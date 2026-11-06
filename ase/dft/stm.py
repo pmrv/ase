@@ -161,9 +161,9 @@ class STM:
         y-coordinates and currents.  These three arrays can be passed to
         matplotlibs contourf() function like this:
 
-        >>> import matplotlib.pyplot as plt
-        >>> plt.contourf(x, y, I)
-        >>> plt.show()
+        >>> import matplotlib.pyplot as plt # doctest: +SKIP
+        >>> plt.contourf(x, y, I) # doctest: +SKIP
+        >>> plt.show() # doctest: +SKIP
 
         """
 
