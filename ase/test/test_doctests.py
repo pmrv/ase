@@ -35,6 +35,8 @@ ase.io.espresso
 ase.io.vasp
 ase.transport.calculators
 ase.utils.cube
+ase.utils.sphinx_create_png
+ase.utils.structure_comparator
 ase.vibrations.infrared
 """.split()
 
