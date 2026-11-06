@@ -33,6 +33,7 @@ ase.io.elk
 ase.io.eon
 ase.io.espresso
 ase.io.vasp
+ase.transport.calculators
 ase.utils.cube
 ase.vibrations.infrared
 """.split()
