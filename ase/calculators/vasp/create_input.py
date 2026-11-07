@@ -1167,11 +1167,14 @@ class GenerateVaspInput:
                     self.set_if_none(self.int_params, key, int(data[2]))
                     if int(data[2]) == 2:
                         self.spinpol = True
-                elif key == 'magmom':
+                elif key == 'ldaul':
+                    lst = _parse_list_value(data[2:], int)
+                    self.set_if_none(self.list_int_params, key, lst)
+                elif key in {'magmom', 'ldauu', 'ldauj'}:
                     lst = _parse_list_value(data[2:], float)
-                    self.set_if_none(self.list_float_params, 'magmom', lst)
-                    lst = np.array(lst)
-                    if self.atoms is not None:
+                    self.set_if_none(self.list_float_params, key, lst)
+                    if key == 'magmom' and self.atoms is not None:
+                        lst = np.array(lst)
                         self.atoms.set_initial_magnetic_moments(
                             lst[self.resort]
                         )
