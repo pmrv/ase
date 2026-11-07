@@ -297,3 +297,14 @@ def test_read_encut_property(value, tmp_path):
     calc = Vasp()
     calc.read_incar(path)
     assert calc.encut == 520
+
+
+def test_read_ldau(tmp_path):
+    path = tmp_path / 'INCAR'
+    path.write_text('LDAUL = -1\nLDAUU = 4\nLDAUJ = 0\n')
+    calc = Vasp()
+    calc.read_incar(path)
+    inputs = calc.asdict()['inputs']
+    assert inputs['ldaul'] == [-1]
+    assert inputs['ldauu'] == [4.0]
+    assert inputs['ldauj'] == [0.0]
