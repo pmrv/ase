@@ -952,7 +952,7 @@ def print_symmetrized_atoms(atoms, log):
 
 
 class Relax:
-    """General utility class to log and perform symmetry adapted relax"""
+    """General utility class to log and perform symmetry adapted relax."""
 
     def __init__(
         self,
@@ -980,7 +980,6 @@ class Relax:
 
         self.symprec = symprec
 
-        self.original_atoms = atoms.copy()
         print_headers(atoms, self.log)
 
         self.atoms = atoms
