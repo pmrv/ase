@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 
+from ase._4.optimize._symopt.relax import SymmetryAdaptedAtoms
 from ase.build import bulk
 from ase.calculators.emt import EMT
 
@@ -16,7 +17,6 @@ def test_symmatoms_fixcell():
     We test that 1) stress tensor is not computed and 2) cell does not change.
     """
 
-    from ase._4.optimize._symopt.relax import SymmetryAdaptedAtoms
     from ase._4.optimize.bfgs import BFGSMethod
     from ase._4.optimize.run import Optimizer
     from ase._4.optimize.symopt import SymOpt
@@ -45,3 +45,13 @@ def test_symmatoms_fixcell():
     # Energy should be at least somewhat lower:
     e1 = atoms.get_potential_energy()
     assert e1 < e0 - 0.05
+
+
+def test_not_symmetric_enough():
+    """If atoms are symmetric but not the cell, we want to complain."""
+    from ase.build import bulk
+
+    atoms = bulk('Si')
+    atoms.cell[0, 0] += 1e-6
+    with pytest.raises(ValueError, match='Symmetrized cell differs'):
+        SymmetryAdaptedAtoms.from_atoms(atoms, fixcell=True)

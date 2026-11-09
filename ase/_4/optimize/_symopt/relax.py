@@ -540,6 +540,7 @@ class SymmetryAdaptedAtoms(Optimizable):
         atom_coordinates=None,
         value_z=None,
         fixcell: bool = False,
+        symmetry_maxerror: float = 1e-7,
     ):
         self.actual_atoms = actual_atoms
         self.symmetries = symmetries
@@ -607,6 +608,20 @@ class SymmetryAdaptedAtoms(Optimizable):
         self.value_z = value_z
         # !!! This actually symmetrizes actual atoms
         self.set_x(self.value_z)
+        if fixcell:
+            # For fixed-cell optimizations, only accept cells
+            # that are already symmetric.  We can relax this restriction
+            # of there are any use cases for doing so.
+            cell_error = np.linalg.norm(
+                self.actual_atoms.cell - self.cell_coordinates.C_cv
+            ).max()
+            if cell_error > symmetry_maxerror:
+                raise ValueError(
+                    f'Symmetrized cell differs by {cell_error:g} '
+                    'from original cell but is allowed to differ only '
+                    'by up to symmetry_maxerror={symmetry_maxerror:g}.  '
+                )
+
         self.actual_atoms.wrap()
 
     def datafy(self):
