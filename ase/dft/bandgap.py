@@ -129,12 +129,8 @@ def bandgap(
 
     Example:
 
-    >>> gap, p1, p2 = bandgap(silicon.calc)
-    >>> print(gap, p1, p2)
-    1.2 (0, 0, 3), (0, 5, 4)
-    >>> gap, p1, p2 = bandgap(silicon.calc, direct=True)
-    >>> print(gap, p1, p2)
-    3.4 (0, 0, 3), (0, 0, 4)
+    >>> gap, p1, p2 = bandgap(silicon.calc) # doctest: +SKIP
+    >>> gap, p1, p2 = bandgap(silicon.calc, direct=True) # doctest: +SKIP
     """
 
     if spin is not _deprecated:

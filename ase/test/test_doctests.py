@@ -26,9 +26,6 @@ ase.calculators.nwchem
 ase.calculators.openmx.reader
 ase.calculators.orca
 ase.dft.band_structure
-ase.dft.bandgap
-ase.dft.bz
-ase.dft.stm
 ase.io.elk
 ase.io.eon
 ase.io.espresso

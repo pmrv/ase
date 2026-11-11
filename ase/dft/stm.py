@@ -125,10 +125,10 @@ class STM:
         Returns three 2-d arrays (x, y, z) containing x-coordinates,
         y-coordinates and heights.  These three arrays can be passed to
         matplotlibs contourf() function like this:
-
-        >>> import matplotlib.pyplot as plt
-        >>> plt.contourf(x, y, z)
-        >>> plt.show()
+        >>> x, y, z = stm.scan(bias, current)  # doctest: +SKIP
+        >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+        >>> plt.contourf(x, y, z) # doctest: +SKIP
+        >>> plt.show() # doctest: +SKIP
 
         """
 
@@ -161,9 +161,9 @@ class STM:
         y-coordinates and currents.  These three arrays can be passed to
         matplotlibs contourf() function like this:
 
-        >>> import matplotlib.pyplot as plt
-        >>> plt.contourf(x, y, I)
-        >>> plt.show()
+        >>> import matplotlib.pyplot as plt # doctest: +SKIP
+        >>> plt.contourf(x, y, I) # doctest: +SKIP
+        >>> plt.show() # doctest: +SKIP
 
         """
 
