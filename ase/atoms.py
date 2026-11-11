@@ -699,7 +699,7 @@ class _LimitedAtoms:
         atoms = self.__class__(
             cell=self.cell,
             pbc=self.pbc,
-            info=self.info,
+            info=copy.deepcopy(self.info),
             celldisp=self._celldisp.copy(),
         )
 
@@ -929,7 +929,7 @@ class _LimitedAtoms:
         atoms = self.__class__(
             cell=self.cell,
             pbc=self.pbc,
-            info=self.info,
+            info=copy.deepcopy(self.info),
             # should be communicated to the slice as well
             celldisp=self._celldisp,
         )
