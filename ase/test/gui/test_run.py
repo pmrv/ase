@@ -628,7 +628,6 @@ def test_atoms_editor_select_in_gui(gui, atoms):
     assert len(editor.treeview.selection()) == 0
 
     gui.set_selected_atoms([2, 5, 6])
-    gui.window.win.update()  # The editor updates on the redraw.
     selection = editor.treeview.selection()
     assert selection == ('R2', 'R5', 'R6')
 
@@ -709,29 +708,6 @@ def test_custom_radii(gui, radii):
     assert radii[1] / radius_scale == pytest.approx(3.0)
 
 
-def test_draw_is_coalesced(gui, monkeypatch):
-    """A burst of draw() calls produces a single redraw once Tk is idle."""
-    gui.window.win.update()
-    redraws = []
-    redraw_now = gui.redraw_now
-
-    def record_redraw():
-        redraws.append(True)
-        redraw_now()
-
-    monkeypatch.setattr(gui, 'redraw_now', record_redraw)
-    for i in range(5):
-        gui.draw()
-    assert redraws == []
-    gui.window.win.update()
-    assert len(redraws) == 1
-
-    # Once flushed, the next draw() redraws again.
-    gui.draw()
-    gui.window.win.update()
-    assert len(redraws) == 2
-
-
 class MockEvent:
     def __init__(self, x, y, button, modifier=None, time=0):
         self.x = x
@@ -768,7 +744,7 @@ def large_gui(gui, monkeypatch):
 def drawn_objects(gui):
     """Atom and bond indices drawn by a fresh redraw."""
     gui.drawn.clear()
-    gui.redraw_now()
+    gui.draw()
     indices = gui.drawn[-1]
     n = len(gui.atoms)
     bond_start = n + len(gui.X_cell)
@@ -827,7 +803,7 @@ def test_occlusion_culling(large_gui):
 def test_occlusion_culling_small_structure(gui):
     """Structures below the size threshold are drawn in full."""
     gui.new_atoms(bulk('Cu', cubic=True) * (2, 2, 2))
-    gui.redraw_now()
+    gui.draw()
     assert len(gui._draw_indices(*draw_args(gui))) == len(gui.X)
 
 
