@@ -26,7 +26,7 @@ import os
 import re
 import shutil
 import warnings
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from os.path import join
 from typing import Any, TextIO
 
@@ -1167,23 +1167,14 @@ class GenerateVaspInput:
                     self.set_if_none(self.int_params, key, int(data[2]))
                     if int(data[2]) == 2:
                         self.spinpol = True
-                elif key == 'magmom':
-                    lst = []
-                    i = 2
-                    while i < len(data):
-                        if data[i] in ['#', '!']:
-                            break
-                        if data[i] == '*':
-                            b = lst.pop()
-                            i += 1
-                            for _ in range(int(b)):
-                                lst.append(float(data[i]))
-                        else:
-                            lst.append(float(data[i]))
-                        i += 1
-                    self.set_if_none(self.list_float_params, 'magmom', lst)
-                    lst = np.array(lst)
-                    if self.atoms is not None:
+                elif key == 'ldaul':
+                    lst = _parse_list_value(data[2:], int)
+                    self.set_if_none(self.list_int_params, key, lst)
+                elif key in {'magmom', 'ldauu', 'ldauj'}:
+                    lst = _parse_list_value(data[2:], float)
+                    self.set_if_none(self.list_float_params, key, lst)
+                    if key == 'magmom' and self.atoms is not None:
+                        lst = np.array(lst)
                         self.atoms.set_initial_magnetic_moments(
                             lst[self.resort]
                         )
@@ -1359,6 +1350,23 @@ def _flatten(values: Iterable) -> Iterable:
         else:
             result.append(value)
     return result
+
+
+def _parse_list_value(data: list[str], converter: Callable) -> list:
+    value: list = []
+    i = 0
+    while i < len(data):
+        if data[i] in ['#', '!']:
+            break
+        if data[i] == '*':
+            b = value.pop()
+            i += 1
+            for _ in range(int(b)):
+                value.append(converter(data[i]))
+        else:
+            value.append(converter(data[i]))
+        i += 1
+    return value
 
 
 def open_potcar(filename):
