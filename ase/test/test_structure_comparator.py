@@ -338,3 +338,40 @@ def test_supercell_w_periodic_atom_removed(comparator):
 
     assert comparator.compare(a0, a5)
     assert comparator.compare(a5, a0) == comparator.compare(a0, a5)
+
+
+def _strained_fluorite_in_other_setting():
+    """Al2Cu fluorite with a 0.7 % tetragonal squeeze, written in another
+    primitive basis and with another origin. The two Niggli cells then differ
+    in shape, which is what made the comparison fail for the Materials Project
+    and OQMD entries of Al2Cu (mp-aaacechq, OQMD 695020)."""
+    prim = bulk('CaF2', 'fluorite', a=5.76)
+    prim.set_chemical_symbols(['Cu', 'Al', 'Al'])
+    s2 = prim.copy()
+    # 0.7 % squeeze along the conventional x axis
+    s2.set_cell(s2.cell[:] * [0.993, 1.0, 1.0], scale_atoms=True)
+    # another basis of the same lattice (a' = -a, b' = -b - c, c' = c) ...
+    basis = np.array([[-1, 0, 0], [0, -1, -1], [0, 0, 1]])
+    s2 = Atoms(
+        s2.numbers, positions=s2.positions, cell=basis @ s2.cell[:], pbc=True
+    )
+    # ... and another origin
+    s2.set_scaled_positions(
+        (s2.get_scaled_positions() + [0.25, 0.5, 0.75]) % 1.0
+    )
+    return prim, s2
+
+
+def test_lattice_search_finds_other_basis():
+    s1, s2 = _strained_fluorite_in_other_setting()
+    comp = SymmetryEquivalenceCheck(scale_volume=True)
+    assert not comp.compare(s1.copy(), s2.copy())
+    comp = SymmetryEquivalenceCheck(scale_volume=True, lattice_search=True)
+    assert comp.compare(s1.copy(), s2.copy())
+
+
+def test_lattice_search_keeps_different_structures_apart():
+    s1, s2 = _strained_fluorite_in_other_setting()
+    s2.set_chemical_symbols(['Al', 'Cu', 'Al'])  # Cu off the fcc site
+    comp = SymmetryEquivalenceCheck(scale_volume=True, lattice_search=True)
+    assert not comp.compare(s1, s2)
