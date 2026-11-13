@@ -16,6 +16,34 @@ def normalize(cell):
         cell[i] /= np.linalg.norm(cell[i])
 
 
+_UNIMODULAR = {}
+
+
+def unimodular_matrices(r=2):
+    """All 3x3 integer matrices with entries in [-r, r] and determinant +-1.
+
+    These are the changes of basis that map a lattice onto itself. For r=2
+    there are 135408 of them; they are built once and cached.
+    """
+    if r not in _UNIMODULAR:
+        vals = np.arange(-r, r + 1)
+        rows = np.array(list(product(vals, repeat=3)))
+        pairs = np.array(list(product(range(len(rows)), repeat=2)))
+        b, c = rows[pairs[:, 0]], rows[pairs[:, 1]]
+        out = []
+        for a in rows:
+            det = (
+                a[0] * (b[:, 1] * c[:, 2] - b[:, 2] * c[:, 1])
+                - a[1] * (b[:, 0] * c[:, 2] - b[:, 2] * c[:, 0])
+                + a[2] * (b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0])
+            )
+            keep = np.abs(det) == 1
+            first = np.broadcast_to(a, (int(keep.sum()), 3))
+            out.append(np.stack([first, b[keep], c[keep]], axis=1))
+        _UNIMODULAR[r] = np.concatenate(out)
+    return _UNIMODULAR[r]
+
+
 class SpgLibNotFoundError(Exception):
     """Raised if SPG lib is not found when needed."""
 
@@ -51,6 +79,18 @@ class SymmetryEquivalenceCheck:
     to_primitive: bool
         if True the structures are reduced to their primitive cells
         note that this feature requires spglib to installed
+
+    lattice_search: bool
+        if True and the Niggli cells of the two structures do not have the
+        same angles, search all changes of basis of the first lattice
+        (integer matrices with entries in [-2, 2] and determinant +-1) for
+        one whose lengths and angles match the second cell within ``ltol``
+        and ``angle_tol``, and continue the comparison in that basis.
+        Niggli reduction is not continuous: for a lattice near a boundary
+        between reduced forms (e.g. a slightly strained fcc lattice) two
+        structures that differ by a small strain can reduce to cells of
+        different shape, and the angle check then rejects them before any
+        positions are compared.
 
     Examples
     --------
@@ -105,6 +145,7 @@ class SymmetryEquivalenceCheck:
         vol_tol=0.1,
         scale_volume=False,
         to_primitive=False,
+        lattice_search=False,
     ):
         self.angle_tol = angle_tol * np.pi / 180.0  # convert to radians
         self.scale_volume = scale_volume
@@ -113,6 +154,7 @@ class SymmetryEquivalenceCheck:
         self.vol_tol = vol_tol
         self.position_tolerance = 0.0
         self.to_primitive = to_primitive
+        self.lattice_search = lattice_search
 
         # Variables to be used in the compare function
         self.s1 = None
@@ -189,6 +231,54 @@ class SymmetryEquivalenceCheck:
         atoms.set_positions(total_rot_mat.dot(atoms.get_positions().T).T)
         atoms.wrap(pbc=[1, 1, 1])
         return atoms
+
+    def _match_lattice_basis(self):
+        """Re-express s1 in the basis of its lattice that best matches s2.
+
+        Compares cell shapes at equal volume, so it does not depend on
+        ``scale_volume``. Lengths must agree within ``ltol / len(s1)``
+        (the tolerance used for the lattice vectors elsewhere) and angles
+        within ``angle_tol``. Returns True if such a basis was found, in
+        which case ``self.s1`` has been changed to it (same lattice, same
+        atoms) and rotated to the standard orientation.
+        """
+        cell1 = self.s1.get_cell().array
+        cell2 = self.s2.get_cell().array
+        unit1 = cell1 / abs(np.linalg.det(cell1)) ** (1.0 / 3.0)
+        unit2 = cell2 / abs(np.linalg.det(cell2)) ** (1.0 / 3.0)
+        mats = unimodular_matrices(2)
+        trial = mats @ unit1
+        len_t = np.linalg.norm(trial, axis=2)
+        len_2 = np.linalg.norm(unit2, axis=1)
+        len_err = np.abs(len_t / len_2 - 1.0).max(axis=1)
+
+        def angles(vecs, lengths):
+            pairs = ((0, 1), (0, 2), (1, 2))
+            cos = np.stack(
+                [
+                    np.einsum('...i,...i', vecs[..., i, :], vecs[..., j, :])
+                    / (lengths[..., i] * lengths[..., j])
+                    for i, j in pairs
+                ],
+                axis=-1,
+            )
+            return np.arccos(np.clip(cos, -1.0, 1.0))
+
+        ang_t, ang_2 = angles(trial, len_t), angles(unit2, len_2)
+        ang_err = np.abs(ang_t - ang_2).max(axis=1)
+        ok = (len_err <= self.ltol / len(self.s1)) & (ang_err <= self.angle_tol)
+        if not np.any(ok):
+            return False
+        idx = np.nonzero(ok)[0]
+        best = idx[np.argmin(len_err[idx] + ang_err[idx])]
+        basis = mats[best]
+        if np.linalg.det(basis) < 0:
+            # -basis spans the same lattice with the same lengths and angles,
+            # and keeps the cell right-handed (positive volume)
+            basis = -basis
+        self.s1.set_cell(basis @ cell1, scale_atoms=False)
+        self._standarize_cell(self.s1)
+        return self._has_same_angles()
 
     def _get_element_count(self, struct):
         """Count the number of elements in each of the structures."""
@@ -289,7 +379,11 @@ class SymmetryEquivalenceCheck:
                 self._niggli_reduce(self.s1)
             self._niggli_reduce(self.s2)
             if not self._has_same_angles():
-                continue
+                if not (self.lattice_search and self._match_lattice_basis()):
+                    continue
+                # s1 is now written in another basis: candidates built for
+                # the previous basis do not apply
+                matrices = translations = transposed_matrices = None
 
             # Compare volumes
             if self.scale_volume:
