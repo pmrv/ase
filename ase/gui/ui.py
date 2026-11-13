@@ -1,5 +1,3 @@
-# fmt: off
-
 # type: ignore
 import platform
 import re
@@ -17,10 +15,29 @@ from ase.gui.i18n import _
 from ase.utils.parsemath import eval_expression
 
 __all__ = [
-    'error', 'ask_question', 'MainWindow', 'LoadFileDialog', 'SaveFileDialog',
-    'ASEGUIWindow', 'Button', 'CheckButton', 'ComboBox', 'Entry', 'Label',
-    'Window', 'Tooltip', 'MenuItem', 'RadioButton', 'RadioButtons', 'Rows',
-    'Scale', 'showinfo', 'showwarning', 'SpinBox', 'Text']
+    'error',
+    'ask_question',
+    'MainWindow',
+    'LoadFileDialog',
+    'SaveFileDialog',
+    'ASEGUIWindow',
+    'Button',
+    'CheckButton',
+    'ComboBox',
+    'Entry',
+    'Label',
+    'Window',
+    'Tooltip',
+    'MenuItem',
+    'RadioButton',
+    'RadioButtons',
+    'Rows',
+    'Scale',
+    'showinfo',
+    'showwarning',
+    'SpinBox',
+    'Text',
+]
 
 # Shapes with this tag, specifically the selection box while dragging, are
 # cleared more eagerly than retained atoms, bonds, and labels.
@@ -35,10 +52,12 @@ def error(title, message=None):
 
 
 def about(name, version, webpage):
-    text = [name,
-            '',
-            _('Version') + ': ' + version,
-            _('Web-page') + ': ' + webpage]
+    text = [
+        name,
+        '',
+        _('Version') + ': ' + version,
+        _('Web-page') + ': ' + webpage,
+    ]
     win = Window(_('About'))
     win.add(Text('\n'.join(text)))
 
@@ -110,7 +129,7 @@ class Tooltip(BaseWindow):
         delta_x = self.label.widget.winfo_reqwidth() + 5
         delta_y = self.label.widget.winfo_reqheight() + 5
         self.win.geometry(
-            "+{0}+{1}".format(pointer_x - delta_x, pointer_y - delta_y)
+            '+{0}+{1}'.format(pointer_x - delta_x, pointer_y - delta_y)
         )
 
     def hide(self, key=None):
@@ -192,16 +211,14 @@ class Text(Widget):
         for text, tags in self.text:
             widget.insert('insert', text, tags)
         widget.configure(state='disabled', background=parent['bg'])
-        widget.bind("<1>", lambda event: widget.focus_set())
+        widget.bind('<1>', lambda event: widget.focus_set())
         return widget
 
 
 class Button(Widget):
     def __init__(self, text, callback, *args, **kwargs):
         self.callback = partial(callback, *args, **kwargs)
-        self.creator = partial(tk.Button,
-                               text=text,
-                               command=self.callback)
+        self.creator = partial(tk.Button, text=text, command=self.callback)
 
 
 class CheckButton(Widget):
@@ -211,8 +228,9 @@ class CheckButton(Widget):
         self.callback = callback
 
     def create(self, parent):
-        self.check = tk.Checkbutton(parent, text=self.text,
-                                    var=self.var, command=self.callback)
+        self.check = tk.Checkbutton(
+            parent, text=self.text, var=self.var, command=self.callback
+        )
         return self.check
 
     @property
@@ -221,16 +239,19 @@ class CheckButton(Widget):
 
 
 class SpinBox(Widget):
-    def __init__(self, value, start, end, step, callback=None,
-                 rounding=None, width=6):
+    def __init__(
+        self, value, start, end, step, callback=None, rounding=None, width=6
+    ):
         self.callback = callback
         self.rounding = rounding
-        self.creator = partial(tk.Spinbox,
-                               from_=start,
-                               to=end,
-                               increment=step,
-                               command=callback,
-                               width=width)
+        self.creator = partial(
+            tk.Spinbox,
+            from_=start,
+            to=end,
+            increment=step,
+            command=callback,
+            width=width,
+        )
         self.initial = str(value)
 
     def create(self, parent):
@@ -285,8 +306,7 @@ def _set_entry_value(widget, value):
 
 class Entry(Widget):
     def __init__(self, value='', width=20, callback=None):
-        self.creator = partial(tk.Entry,
-                               width=width)
+        self.creator = partial(tk.Entry, width=width)
         if callback is not None:
             self.callback = lambda event: callback()
         else:
@@ -314,11 +334,9 @@ class Scale(Widget):
         def command(val):
             callback(int(val))
 
-        self.creator = partial(tk.Scale,
-                               from_=start,
-                               to=end,
-                               orient='horizontal',
-                               command=command)
+        self.creator = partial(
+            tk.Scale, from_=start, to=end, orient='horizontal', command=command
+        )
         self.initial = value
 
     def create(self, parent):
@@ -340,14 +358,17 @@ class RadioButtons(Widget):
         self.var = tk.IntVar()
 
         if callback:
+
             def callback2():
                 callback(self.value)
         else:
             callback2 = None
 
         self.values = values or list(range(len(labels)))
-        self.buttons = [RadioButton(label, i, self.var, callback2)
-                        for i, label in enumerate(labels)]
+        self.buttons = [
+            RadioButton(label, i, self.var, callback2)
+            for i, label in enumerate(labels)
+        ]
         self.vertical = vertical
 
     def create(self, parent):
@@ -371,27 +392,27 @@ class RadioButtons(Widget):
 
 class RadioButton(Widget):
     def __init__(self, label, i, var, callback):
-        self.creator = partial(tk.Radiobutton,
-                               text=label,
-                               var=var,
-                               value=i,
-                               command=callback)
+        self.creator = partial(
+            tk.Radiobutton, text=label, var=var, value=i, command=callback
+        )
 
 
 if ttk is not None:
+
     class ComboBox(Widget):
         def __init__(self, labels, values=None, callback=None):
             self.values = values or list(range(len(labels)))
             self.callback = callback
-            self.creator = partial(ttk.Combobox,
-                                   values=labels)
+            self.creator = partial(ttk.Combobox, values=labels)
 
         def create(self, parent):
             widget = Widget.create(self, parent)
             widget.current(0)
             if self.callback:
+
                 def callback(event):
                     self.callback(self.value)
+
                 widget.bind('<<ComboboxSelected>>', callback)
 
             return widget
@@ -447,8 +468,16 @@ class Rows(Widget):
 
 
 class MenuItem:
-    def __init__(self, label, callback=None, key=None,
-                 value=None, choices=None, submenu=None, disabled=False):
+    def __init__(
+        self,
+        label,
+        callback=None,
+        key=None,
+        value=None,
+        choices=None,
+        submenu=None,
+        disabled=False,
+    ):
         self.underline = label.find('_')
         self.label = label.replace('_', '')
 
@@ -475,7 +504,7 @@ class MenuItem:
                 modifiers = ['Command' if m == 'Alt' else m for m in modifiers]
 
             if modifiers and key_char:
-                self.keyname = f"<{'-'.join(modifiers)}-{key_char}>"
+                self.keyname = f'<{"-".join(modifiers)}-{key_char}>'
             else:
                 # Handle special non-modifier keys
                 self.keyname = {
@@ -483,12 +512,13 @@ class MenuItem:
                     'End': '<End>',
                     'PageUp': '<Prior>',
                     'PageDown': '<Next>',
-                    'Backspace': '<BackSpace>'
+                    'Backspace': '<BackSpace>',
                 }.get(key, key.lower())
         else:
             self.keyname = None
 
         if key:
+
             def callback2(event=None):
                 callback(key)
 
@@ -514,11 +544,13 @@ class MenuItem:
             var = tk.BooleanVar(value=self.value)
             stuff[self.callback.__name__.replace('_', '-')] = var
 
-            menu.add_checkbutton(label=self.label,
-                                 underline=self.underline,
-                                 command=self.callback,
-                                 accelerator=self.key,
-                                 var=var)
+            menu.add_checkbutton(
+                label=self.label,
+                underline=self.underline,
+                command=self.callback,
+                accelerator=self.key,
+                var=var,
+            )
 
             def callback(key):  # noqa: F811
                 var.set(not var.get())
@@ -531,26 +563,29 @@ class MenuItem:
             var.set(0)
             stuff[self.callback.__name__.replace('_', '-')] = var
             for i, choice in enumerate(self.choices):
-                submenu.add_radiobutton(label=choice.replace('_', ''),
-                                        underline=choice.find('_'),
-                                        command=self.callback,
-                                        value=i,
-                                        var=var)
+                submenu.add_radiobutton(
+                    label=choice.replace('_', ''),
+                    underline=choice.find('_'),
+                    command=self.callback,
+                    value=i,
+                    var=var,
+                )
         elif self.submenu:
             submenu = tk.Menu(menu)
-            menu.add_cascade(label=self.label,
-                             menu=submenu)
+            menu.add_cascade(label=self.label, menu=submenu)
             for thing in self.submenu:
                 thing.addto(submenu, window)
         else:
             state = 'normal'
             if self.disabled:
                 state = 'disabled'
-            menu.add_command(label=self.label,
-                             underline=self.underline,
-                             command=self.callback,
-                             accelerator=self.key,
-                             state=state)
+            menu.add_command(
+                label=self.label,
+                underline=self.underline,
+                command=self.callback,
+                accelerator=self.key,
+                state=state,
+            )
         if self.key:
             window.bind(self.keyname, callback)
 
@@ -576,9 +611,11 @@ class MainWindow(BaseWindow):
 
         for label, things in menu_description:
             submenu = tk.Menu(menu)
-            menu.add_cascade(label=label.replace('_', ''),
-                             underline=label.find('_'),
-                             menu=submenu)
+            menu.add_cascade(
+                label=label.replace('_', ''),
+                underline=label.find('_'),
+                menu=submenu,
+            )
             for thing in things:
                 thing.addto(submenu, self.win, self.menu)
 
@@ -613,12 +650,14 @@ def bind(callback, modifier=None):
         event.key = event.keysym.lower()
         event.modifier = modifier
         callback(event)
+
     return handle
 
 
 class ASEFileChooser(LoadFileDialog):
     def __init__(self, win, formatcallback=lambda event: None):
         from ase.io.formats import all_formats, get_ioformat
+
         super().__init__(win, _('Open ...'))
         labels = [_('Automatic')]
         values = ['']
@@ -626,8 +665,7 @@ class ASEFileChooser(LoadFileDialog):
         def key(item):
             return item[1][0]
 
-        for format, (description, code) in sorted(all_formats.items(),
-                                                  key=key):
+        for format, (description, code) in sorted(all_formats.items(), key=key):
             io = get_ioformat(format)
             if io.can_read and description != '?':
                 labels.append(_(description))
@@ -644,14 +682,23 @@ class ASEFileChooser(LoadFileDialog):
 
 
 def show_io_error(filename, err):
-    showerror(_('Read error'),
-              _(f'Could not read {filename}: {err}'))
+    showerror(_('Read error'), _(f'Could not read {filename}: {err}'))
 
 
 class ASEGUIWindow(MainWindow):
-    def __init__(self, close, menu, config,
-                 scroll, scroll_event,
-                 press, move, release, resize, gui):
+    def __init__(
+        self,
+        close,
+        menu,
+        config,
+        scroll,
+        scroll_event,
+        press,
+        move,
+        release,
+        resize,
+        gui,
+    ):
         from ase.gui.movie import MovieToolbar
 
         super().__init__('ASE-GUI', close, menu)
@@ -665,13 +712,16 @@ class ASEGUIWindow(MainWindow):
 
         self.moviebar = MovieToolbar(self.win, gui)
         self.moviebar.tkframe.pack(
-            anchor=tk.N, side=tk.TOP, expand=False, fill=tk.X)
+            anchor=tk.N, side=tk.TOP, expand=False, fill=tk.X
+        )
 
-        self.canvas = tk.Canvas(self.win,
-                                width=self.size[0],
-                                height=self.size[1],
-                                bg=self.bg,
-                                highlightthickness=0)
+        self.canvas = tk.Canvas(
+            self.win,
+            width=self.size[0],
+            height=self.size[1],
+            bg=self.bg,
+            highlightthickness=0,
+        )
         self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self._canvas_pools = {
             'arc': [],
@@ -679,8 +729,7 @@ class ASEGUIWindow(MainWindow):
             'oval': [],
             'text': [],
         }
-        self._canvas_pool_indices = {kind: 0
-                                     for kind in self._canvas_pools}
+        self._canvas_pool_indices = {kind: 0 for kind in self._canvas_pools}
 
         self.status = tk.Label(self.win, text='', anchor=tk.W)
         self.status.pack(side=tk.BOTTOM, fill=tk.X)
@@ -771,8 +820,13 @@ class ASEGUIWindow(MainWindow):
         else:
             outline = self.fg
             width = 1
-        self._canvas_item('oval', tuple(int(x) for x in bbox),
-                          fill=color, outline=outline, width=width)
+        self._canvas_item(
+            'oval',
+            tuple(int(x) for x in bbox),
+            fill=color,
+            outline=outline,
+            width=width,
+        )
 
     def arc(self, color, selected, start, extent, *bbox):
         if selected:
@@ -781,22 +835,34 @@ class ASEGUIWindow(MainWindow):
         else:
             outline = self.fg
             width = 1
-        self._canvas_item('arc', tuple(int(x) for x in bbox),
-                          start=start, extent=extent, fill=color,
-                          outline=outline, width=width)
+        self._canvas_item(
+            'arc',
+            tuple(int(x) for x in bbox),
+            start=start,
+            extent=extent,
+            fill=color,
+            outline=outline,
+            width=width,
+        )
 
     def line(self, bbox, width=1):
-        self._canvas_item('line', tuple(int(x) for x in bbox), width=width,
-                          fill=self.fg)
+        self._canvas_item(
+            'line', tuple(int(x) for x in bbox), width=width, fill=self.fg
+        )
 
     def text(self, x, y, txt, anchor=tk.CENTER, color=None):
         if color is None:
             color = self.fg
         anchor = {'SE': tk.SE}.get(anchor, anchor)
-        self._canvas_item('text', (x, y), text=txt, anchor=anchor,
-                          fill=color)
+        self._canvas_item('text', (x, y), text=txt, anchor=anchor, fill=color)
 
-    def show_widget(self, widget, x, y, anchor=tk.CENTER,):
+    def show_widget(
+        self,
+        widget,
+        x,
+        y,
+        anchor=tk.CENTER,
+    ):
         """Places a given widget on self.canvas"""
         if isinstance(anchor, str):
             anchor = anchor.lower()
