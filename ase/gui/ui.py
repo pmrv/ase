@@ -682,7 +682,12 @@ class ASEFileChooser(LoadFileDialog):
 
 
 def show_io_error(filename, err):
-    showerror(_('Read error'), _(f'Could not read {filename}: {err}'))
+    showerror(
+        _('Read error'),
+        _('Could not read {filename}: {err}').format(
+            filename=filename, err=err
+        ),
+    )
 
 
 class ASEGUIWindow(MainWindow):

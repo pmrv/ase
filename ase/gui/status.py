@@ -85,10 +85,10 @@ class Status:
             magmoms = get_magmoms(gui.atoms)
             if magmoms.any():
                 # TRANSLATORS: mom refers to magnetic moment
-                text += _(' mom={:1.2f}'.format(magmoms[indices][0]))
+                text += _(' mom={:1.2f}').format(magmoms[indices][0])
             charges = gui.atoms.get_initial_charges()
             if charges.any():
-                text += _(' q={:1.2f}'.format(charges[indices][0]))
+                text += _(' q={:1.2f}').format(charges[indices][0])
             haveit = {
                 'numbers',
                 'positions',
