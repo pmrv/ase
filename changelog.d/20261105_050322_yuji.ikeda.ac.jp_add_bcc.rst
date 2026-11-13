@@ -1,0 +1,5 @@
+Other changes
+-------------
+
+- Added `'bcc'` for `target_shape` of :func:`~ase.build.find_optimal_cell_shape`
+  (:mr:`4333`)

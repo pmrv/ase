@@ -48,6 +48,7 @@ Quick links:
 .. toctree::
    :maxdepth: 2
 
+   supercells
    surface
    tools
    connected
