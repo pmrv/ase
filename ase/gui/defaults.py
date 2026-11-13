@@ -25,6 +25,11 @@ gui_default_settings = {
     'show_unit_cell': True,
     'show_axes': True,
     'show_bonds': False,
+    # Performance options for large systems.  Both are no-ops for small
+    # structures; see View._draw_indices().
+    # Draw fewer objects while dragging/zooming:
+    'interactive_level_of_detail': True,
+    'occlusion_culling': True,  # skip atoms fully obscured by nearer atoms
     'shift_cell': False,
     'swap_mouse': False,
     'movie_rate': 'auto',  # float or 'auto'

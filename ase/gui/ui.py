@@ -694,11 +694,9 @@ class ASEGUIWindow(MainWindow):
         self.canvas.bind('<Configure>', resize)
         if not config.getboolean('swap_mouse'):
             for button in (2, 3):
-                self.canvas.bind(f'<Shift-B{button}-Motion>',
-                                 bind(scroll))
+                self.canvas.bind(f'<Shift-B{button}-Motion>', bind(scroll))
         else:
-            self.canvas.bind('<Shift-B1-Motion>',
-                             bind(scroll))
+            self.canvas.bind('<Shift-B1-Motion>', bind(scroll))
 
         self.win.bind('<MouseWheel>', bind(scroll_event))
         self.win.bind('<Key>', bind(scroll))

@@ -219,6 +219,9 @@ class GUI(View):
     def _do_zoom(self, x):
         """Utility method for zooming"""
         self.scale *= x
+        # Zooming has no release event, so the settle timer armed here is
+        # what restores full detail once the user stops.
+        self.begin_interaction()
         self.draw()
 
     def zoom(self, key):
